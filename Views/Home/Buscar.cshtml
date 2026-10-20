@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Buscar";
+}
+
+<div class="container-xl py-4 py-lg-5">
+    <div class="row g-4">
+
+        <!-- ===== Filtros ===== -->
+        <aside class="col-lg-3">
+            <!-- En mobile se colapsa -->
+            <button class="btn btn-sw-outline w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros">
+                <i class="bi bi-funnel"></i> Filtros
+            </button>
+
+            <form id="filtros" class="sw-filtros collapse d-lg-block">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
+                    <button type="reset" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</button>
+                </div>
+
+                <!-- Categoría: después se llena con la tabla Categorias -->
+                <h6>Categoría</h6>
+                <div id="filtro-categorias" class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="1" id="cat-1" checked>
+                        <label class="form-check-label" for="cat-1">Muebles</label>
+                        <span class="contador">48</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="2" id="cat-2">
+                        <label class="form-check-label" for="cat-2">Electrodomésticos</label>
+                        <span class="contador">32</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="3" id="cat-3">
+                        <label class="form-check-label" for="cat-3">Cocina y vajilla</label>
+                        <span class="contador">21</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="4" id="cat-4">
+                        <label class="form-check-label" for="cat-4">Decoración</label>
+                        <span class="contador">17</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="5" id="cat-5">
+                        <label class="form-check-label" for="cat-5">Iluminación</label>
+                        <span class="contador">10</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="categoria" value="6" id="cat-6">
+                        <label class="form-check-label" for="cat-6">Ropa de cama</label>
+                        <span class="contador">9</span>
+                    </div>
+                </div>
+
+                <h6>Distancia</h6>
+                <div class="mb-4">
+                    <input type="range" class="form-range" name="distancia" id="filtro-distancia" min="0" max="20" value="5">
+                    <div class="d-flex justify-content-between small text-suave">
+                        <span>0 km</span>
+                        <span class="fw-semibold text-dark">Hasta <span id="distancia-valor">5</span> km</span>
+                        <span>20 km</span>
+                    </div>
+                </div>
+
+                <h6>Estado</h6>
+                <div>
+                    <input type="checkbox" class="btn-check" name="estado" value="Como nuevo" id="est-1"><label class="sw-chip" for="est-1">Como nuevo</label>
+                    <input type="checkbox" class="btn-check" name="estado" value="Muy buen estado" id="est-2"><label class="sw-chip" for="est-2">Muy buen estado</label>
+                    <input type="checkbox" class="btn-check" name="estado" value="Buen estado" id="est-3"><label class="sw-chip" for="est-3">Buen estado</label>
+                    <input type="checkbox" class="btn-check" name="estado" value="Usado" id="est-4"><label class="sw-chip" for="est-4">Usado</label>
+                </div>
+            </form>
+        </aside>
+
+        <!-- ===== Resultados ===== -->
+        <section class="col-lg-9">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <h1 class="font-titulo h2 mb-0">Los más buscados</h1>
+                <div class="d-flex align-items-center gap-2">
+                    <select class="form-select form-select-sm" id="ordenar" aria-label="Ordenar por" style="width:auto">
+                        <option value="cercanos" selected>Más cercanos</option>
+                        <option value="recientes">Más recientes</option>
+                        <option value="az">A - Z</option>
+                    </select>
+                    <div class="btn-group btn-group-sm sw-vista-toggle" role="group" aria-label="Vista">
+                        <input type="radio" class="btn-check" name="vista" id="vista-grilla" value="grilla" checked>
+                        <label class="btn" for="vista-grilla" title="Grilla"><i class="bi bi-grid"></i></label>
+                        <input type="radio" class="btn-check" name="vista" id="vista-lista" value="lista">
+                        <label class="btn" for="vista-lista" title="Lista"><i class="bi bi-list-ul"></i></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Se llena desde JS: swappit.renderObjetos('#lista-objetos', lista) -->
+            <div id="lista-objetos" class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                <partial name="_CardObjeto" />
+            </div>
+
+            <!-- Se muestra cuando no hay resultados -->
+            <div id="sin-resultados" class="text-center py-5 d-none">
+                <i class="bi bi-inbox fs-1 text-suave"></i>
+                <p class="text-suave mt-2">No encontramos objetos con esos filtros.</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Sólo comportamiento visual; el filtrado real va con el backend
+        document.getElementById('filtro-distancia').addEventListener('input', e => {
+            document.getElementById('distancia-valor').textContent = e.target.value;
+        });
+        document.querySelectorAll('input[name="vista"]').forEach(r => r.addEventListener('change', e => {
+            document.getElementById('lista-objetos').classList.toggle('vista-lista', e.target.value === 'lista');
+        }));
+    </script>
+}

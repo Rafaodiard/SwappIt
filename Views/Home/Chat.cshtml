@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Mensajes";
+}
+
+<div class="container-xl py-4">
+    <div class="sw-chat sw-card row g-0">
+
+        <!-- ===== Lista de conversaciones (una por Intercambio) ===== -->
+        <aside class="col-md-4 col-lg-3 sw-chat-lista d-flex flex-column">
+            <div class="p-3">
+                <div class="sw-buscador border">
+                    <input type="search" placeholder="Buscar" aria-label="Buscar conversación">
+                    <i class="bi bi-search me-2"></i>
+                </div>
+            </div>
+
+            <!-- Se llena desde JS: swappit.renderLista('#lista-chats', lista, 'chat-contacto', rellenar) -->
+            <nav id="lista-chats">
+                <a href="#" class="sw-chat-contacto activo" data-template="chat-contacto" data-id-intercambio="1">
+                    <span class="sw-avatar" data-campo="iniciales">JP</span>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="fw-semibold" data-campo="nombre">Juan Pérez</div>
+                        <div class="small text-suave text-truncate" data-campo="ultimoMensaje">¿Te queda bien el sábado?</div>
+                    </div>
+                    <span class="no-leidos" data-campo="noLeidos">3</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- ===== Conversación ===== -->
+        <section class="col-md-8 col-lg-9 d-flex flex-column h-100">
+            <header class="sw-chat-header d-flex align-items-center gap-3">
+                <span class="sw-avatar" data-campo="iniciales">JP</span>
+                <div class="flex-grow-1">
+                    <div class="fw-semibold" data-campo="nombre">Juan Pérez</div>
+                    <div class="small text-suave">Intercambio: <span data-campo="intercambio">Silla ⇄ Lámpara</span></div>
+                </div>
+                <button class="btn btn-link text-dark" aria-label="Llamar"><i class="bi bi-telephone-fill"></i></button>
+                <button class="btn btn-link text-dark" aria-label="Videollamada"><i class="bi bi-camera-video-fill"></i></button>
+                <button class="btn btn-link text-dark" aria-label="Más opciones"><i class="bi bi-three-dots-vertical"></i></button>
+            </header>
+
+            <!-- Se llena desde JS con la tabla Mensajes.
+                 Clase "enviado" si IdUsuariosManda == usuario logueado, si no "recibido". -->
+            <div id="mensajes" class="sw-chat-mensajes flex-grow-1">
+                <div class="sw-msg recibido" data-template="mensaje">
+                    <div class="sw-msg-burbuja" data-campo="texto">¡Hola! ¿Sigue disponible la lámpara?</div>
+                    <div class="sw-msg-hora"><span data-campo="hora">15:33</span> <i class="bi bi-check2-all visto" data-campo="visto"></i></div>
+                </div>
+                <div class="sw-msg enviado">
+                    <div class="sw-msg-burbuja">Sí, ¡sigue disponible! ¿Te interesa cambiarla por la silla?</div>
+                    <div class="sw-msg-hora">15:34 <i class="bi bi-check2-all visto"></i></div>
+                </div>
+            </div>
+
+            <form id="form-mensaje" class="sw-chat-input d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-link text-dark" aria-label="Adjuntar"><i class="bi bi-paperclip fs-5"></i></button>
+                <input type="text" class="form-control" name="texto" placeholder="Escribe un mensaje" maxlength="50" autocomplete="off">
+                <button type="submit" class="sw-btn-icono" aria-label="Enviar"><i class="bi bi-send-fill"></i></button>
+            </form>
+        </section>
+    </div>
+</div>

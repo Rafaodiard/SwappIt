@@ -46,3 +46,7 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.small.mb-0{
+  color: #6E2C3A;
+}
