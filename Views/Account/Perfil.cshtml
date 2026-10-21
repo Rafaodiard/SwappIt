@@ -5,6 +5,7 @@
     string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
     string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
+    string? foto = ViewBag.foto;
     string? errorPerfil = TempData["ErrorPerfil"] as string;
     string? mensajePerfil = TempData["MensajePerfil"] as string;
 }
@@ -20,14 +21,15 @@
 
     <div class="row g-4">
 
-        <!-- ===== Nombre + descripción ===== -->
+        <!-- ===== Nombre + foto ===== -->
+        @* TODO (BD): la tabla Usuarios no tiene columna para la descripción del perfil. *@
         <div class="col-lg-6 d-flex flex-column gap-4">
-            <div class="sw-card p-4">
-                <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
+            <div class="sw-card p-4 flex-grow-1 d-flex align-items-center">
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start w-100">
                     <div class="sw-perfil-avatar">
-                        @if (usuario.Foto != null)
+                        @if (foto != null)
                         {
-                            <img src="@usuario.Foto" alt="Foto de @usuario.Nombre">
+                            <img src="@foto" alt="Foto de @usuario.Nombre">
                         }
                         else
                         {
@@ -42,26 +44,6 @@
                         <button type="button" class="btn btn-sw-primario btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1"></i> Editar perfil</button>
                     </div>
                 </div>
-            </div>
-
-            <div class="sw-card p-4 flex-grow-1">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 fw-bold mb-0">Descripción</h2>
-                    <button type="button" class="btn btn-link text-suave p-0" aria-label="Editar descripción"
-                            data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-enfocar="Descripcion"><i class="bi bi-pencil"></i></button>
-                </div>
-                @if (usuario.Descripcion != null)
-                {
-                    <p class="text-suave mb-0" data-campo="descripcion" style="white-space: pre-line">@usuario.Descripcion</p>
-                }
-                else
-                {
-                    <p class="text-suave mb-0" data-campo="descripcion">
-                        Todavía no agregaste una descripción.
-                        <button type="button" class="btn btn-link p-0 align-baseline fw-semibold text-primario text-decoration-none"
-                                data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-enfocar="Descripcion">Agregar descripción</button>
-                    </p>
-                }
             </div>
         </div>
 
@@ -155,9 +137,9 @@
                 <!-- Foto -->
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
                     <div class="sw-perfil-avatar sw-perfil-avatar--chico" id="vista-previa-foto" data-iniciales="@iniciales">
-                        @if (usuario.Foto != null)
+                        @if (foto != null)
                         {
-                            <img src="@usuario.Foto" alt="Foto actual">
+                            <img src="@foto" alt="Foto actual">
                         }
                         else
                         {
@@ -167,7 +149,7 @@
                     <div class="d-flex flex-column align-items-center align-items-sm-start gap-2">
                         <div class="d-flex flex-wrap gap-2">
                             <button type="button" class="sw-btn sw-btn-contorno" data-elegir-foto><i class="bi bi-camera me-1"></i> Cambiar foto</button>
-                            <button type="button" class="sw-btn sw-btn-contorno @(usuario.Foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
+                            <button type="button" class="sw-btn sw-btn-contorno @(foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
                         </div>
                         <input type="file" class="d-none" id="Foto" name="Foto" accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                                data-max-mb="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxFotoMB">
@@ -214,14 +196,6 @@
                             }
                         </select>
                     </div>
-                </div>
-
-                <div class="sw-campo">
-                    <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4"
-                              maxlength="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion"
-                              placeholder="Contá un poco sobre vos y qué te gustaría intercambiar…">@usuario.Descripcion</textarea>
-                    <span class="sw-contador" id="contador-descripcion-perfil" aria-live="polite"></span>
                 </div>
 
                 <div class="sw-campo">

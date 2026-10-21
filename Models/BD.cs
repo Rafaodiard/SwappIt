@@ -10,7 +10,7 @@ public static class BD
 
     // La columna se llama [Fecha nacimiento] (con espacio), por eso el alias.
     private const string SelectUsuarios = @"SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion, Foto FROM Usuarios";
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias FROM Usuarios";
 
     public static Usuarios? Login(LoginViewModel l)
     {
@@ -73,9 +73,37 @@ public static class BD
         {
             string query = @"UPDATE Usuarios SET Nombre = @Nombre, Apellido = @Apellido, Usuario = @Usuario, Mail = @Mail,
                 Telefono = @Telefono, Contraseña = @Contraseña, Barrio = @Barrio, [Fecha nacimiento] = @FechaNacimiento,
-                Edad = @Edad, IdProvincias = @IdProvincias, Descripcion = @Descripcion, Foto = @Foto
-                WHERE IdUsuarios = @IdUsuarios";
+                Edad = @Edad, IdProvincias = @IdProvincias WHERE IdUsuarios = @IdUsuarios";
             connection.Execute(query, u);
+        }
+    }
+
+    // La foto de perfil es la fila de Imagenes con IdUsuarios del usuario y sin IdArticulos.
+    public static string? GetFotoUsuario(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT TOP 1 Ruta FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL ORDER BY IdImagenes DESC";
+            return connection.QueryFirstOrDefault<string>(query, new { pId = idUsuario });
+        }
+    }
+
+    public static void GuardarFotoUsuario(int idUsuario, string ruta)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"DELETE FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL;
+                INSERT INTO Imagenes (Ruta, IdUsuarios) VALUES (@pRuta, @pId)";
+            connection.Execute(query, new { pId = idUsuario, pRuta = ruta });
+        }
+    }
+
+    public static void BorrarFotoUsuario(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "DELETE FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL";
+            connection.Execute(query, new { pId = idUsuario });
         }
     }
 }

@@ -34,6 +34,7 @@ public class AccountController : Controller
             ViewBag.usuario = usuario;
             ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
             ViewBag.provincias = BD.GetProvincias();
+            ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
             return View();
     }
     public IActionResult Registro()
@@ -204,13 +205,13 @@ public class AccountController : Controller
                 return RedirectToAction("Perfil");
             }
 
-            BorrarFoto(usuario.Foto);
-            usuario.Foto = GuardarFoto(e.Foto, usuario.IdUsuarios, extension);
+            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
+            BD.GuardarFotoUsuario(usuario.IdUsuarios, GuardarFoto(e.Foto, usuario.IdUsuarios, extension));
         }
         else if (e.QuitarFoto)
         {
-            BorrarFoto(usuario.Foto);
-            usuario.Foto = null;
+            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
+            BD.BorrarFotoUsuario(usuario.IdUsuarios);
         }
 
         usuario.Nombre = e.Nombre.Trim();
@@ -219,7 +220,6 @@ public class AccountController : Controller
         usuario.Telefono = ConvertirTelefono(e.Telefono ?? string.Empty);
         usuario.Barrio = e.Barrio?.Trim() ?? string.Empty;
         usuario.IdProvincias = e.IdProvincias;
-        usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();
 
         BD.UpdateUsuario(usuario);
         GuardarDatosHeader(usuario);
@@ -241,9 +241,10 @@ public class AccountController : Controller
     {
         HttpContext.Session.SetString("Iniciales", ObtenerIniciales(u));
 
-        if (u.Foto != null)
+        string? foto = BD.GetFotoUsuario(u.IdUsuarios);
+        if (foto != null)
         {
-            HttpContext.Session.SetString("Foto", u.Foto);
+            HttpContext.Session.SetString("Foto", foto);
         }
         else
         {
@@ -256,13 +257,14 @@ public class AccountController : Controller
         return $"{u.Nombre?.FirstOrDefault()}{u.Apellido?.FirstOrDefault()}".ToUpper();
     }
 
-    // Las fotos de perfil se guardan en wwwroot/img/perfiles y en la BD queda la ruta.
+    // Las fotos de perfil se guardan en wwwroot/img/perfiles y la ruta va a Imagenes.Ruta,
+    // que es varchar(50): por eso el nombre es corto (id + ticks en hexa, ~36 caracteres en total).
     private string GuardarFoto(IFormFile foto, int idUsuario, string extension)
     {
         string carpeta = Path.Combine(_env.WebRootPath, "img", "perfiles");
         Directory.CreateDirectory(carpeta);
 
-        string nombreArchivo = $"{idUsuario}_{Guid.NewGuid():N}{extension}";
+        string nombreArchivo = $"{idUsuario}_{DateTime.Now.Ticks:x}{extension}";
 
         using (FileStream stream = new FileStream(Path.Combine(carpeta, nombreArchivo), FileMode.Create))
         {

@@ -2,7 +2,6 @@
 // SWAPPIT - Perfil: pop up "Editar perfil"
 // - Lo abren los botones con data-bs-toggle="modal" (Bootstrap)
 // - Vista previa de la foto elegida y botón "Quitar foto"
-// - Contador de caracteres de la descripción
 // - Si el servidor devolvió un error, se vuelve a abrir solo
 // La validación final y el guardado los hace AccountController.EditarPerfil.
 // =========================================================
@@ -17,8 +16,6 @@
     const btnQuitar = document.getElementById('quitar-foto');
     const vistaPrevia = document.getElementById('vista-previa-foto');
     const errorFoto = document.getElementById('error-foto');
-    const descripcion = document.getElementById('Descripcion');
-    const contador = document.getElementById('contador-descripcion-perfil');
 
     const MAX_MB = Number(inputFoto.dataset.maxMb) || 5;
     const TIPOS = ['image/jpeg', 'image/png'];
@@ -79,11 +76,6 @@
         btnQuitar.classList.add('d-none');
     });
 
-    // --- Contador de la descripción ---
-    const actualizarContador = () => { contador.textContent = `${descripcion.value.length}/${descripcion.maxLength}`; };
-    descripcion.addEventListener('input', actualizarContador);
-    actualizarContador();
-
     // --- Abrir / cerrar ---
     // El botón de la cámara abre directamente el selector de archivos
     document.querySelectorAll('[data-elegir-foto]').forEach(btn =>
@@ -104,7 +96,6 @@
         quitarFoto.value = 'false';
         btnQuitar.classList.toggle('d-none', !botonQuitarVisible);
         errorFoto.textContent = '';
-        actualizarContador();
     });
 
     // Error del servidor: se vuelve a abrir el pop up para mostrarlo
