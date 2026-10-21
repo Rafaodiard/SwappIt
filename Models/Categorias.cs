@@ -1,8 +1,6 @@
-namespace Swappit.Models
+namespace Swappit.Models;
+public class Categorias
 {
-    public class Categorias
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-    }
+    public int IdCategorias { get; set; }
+    public string? Nombre { get; set; }
 }

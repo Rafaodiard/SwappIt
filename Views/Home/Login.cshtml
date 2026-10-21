@@ -1,29 +1,50 @@
+@model Swappit.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Iniciar sesión";
     ViewData["Visitante"] = true;
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-5">
-            <form class="sw-form-card" method="post" asp-action="Login" novalidate>
-                <h1 class="font-titulo text-center text-primario mb-4">Iniciar sesión</h1>
+@*
+    Pantalla derivada del diseño de "Registrarse" (no hay un frame de login
+    en alta fidelidad): misma tarjeta, tipografías y componentes del UI Kit.
+*@
+<section class="sw-auth">
+    <div class="sw-auth-card sw-auth-card--angosta">
+        <header class="sw-auth-encabezado">
+            <h1 class="sw-auth-titulo">Iniciá sesión</h1>
+            <p class="sw-auth-subtitulo">Ingresá para seguir intercambiando</p>
+        </header>
 
-                <div class="mb-3">
-                    <label for="Mail" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="Mail" name="Mail" required>
-                </div>
-                <div class="mb-2">
-                    <label for="Contrasena" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="Contrasena" name="Contrasena" required>
-                </div>
-                <div class="text-end mb-4">
-                    <a href="#" class="small text-suave">¿Olvidaste tu contraseña?</a>
-                </div>
+        <form class="sw-form" method="post" asp-controller="Home" asp-action="Login" novalidate>
+            <!-- Errores generales (ej: "Email o contraseña incorrectos") -->
+            <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
 
-                <button type="submit" class="btn btn-sw-primario w-100">Ingresar</button>
-                <p class="small text-center mt-4 mb-0">¿No tenés cuenta? <a asp-action="Registro" class="fw-semibold text-secundario">Registrate</a></p>
-            </form>
-        </div>
+            <div class="sw-campo">
+                <label class="sw-label" asp-for="Mail"></label>
+                <input class="sw-input" asp-for="Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                <span class="sw-error" asp-validation-for="Mail"></span>
+            </div>
+
+            <div class="sw-campo">
+                <label class="sw-label" asp-for="Contrasena"></label>
+                <input class="sw-input" asp-for="Contrasena" type="password" placeholder="Tu contraseña" autocomplete="current-password" maxlength="50">
+                <span class="sw-error" asp-validation-for="Contrasena"></span>
+                <a href="#" class="sw-link sw-link-chico sw-campo-extra">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div class="sw-form-acciones">
+                <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Iniciar sesión</button>
+            </div>
+        </form>
+
+        <p class="sw-auth-pie">
+            <span>¿Todavía no tenés cuenta?</span>
+            <a asp-controller="Home" asp-action="Registro" class="sw-link">Registrate</a>
+        </p>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

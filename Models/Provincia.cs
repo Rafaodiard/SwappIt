@@ -1,8 +1,6 @@
-namespace Swappit.Models
+namespace Swappit.Models;
+public class Provincias
 {
-    public class Provincias
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; }
-    }
+    public int IdProvincia { get; set; }
+    public string? Nombre { get; set; }
 }

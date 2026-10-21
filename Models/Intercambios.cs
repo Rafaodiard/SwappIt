@@ -1,19 +1,11 @@
-using System;
-
-namespace Swappit.Models
+namespace Swappit.Models;
+public class Intercambios
 {
-    public class Intercambios
-    {
-        public int Id { get; set; }
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
-        public string Estado { get; set; } = "Pendiente"; // Pendiente, Aceptado, Rechazado
-        public string? Mensaje { get; set; }
-
-        // Artículos involucrados
-        public int ArticuloOfrecidoId { get; set; }
-        public Articulos? ArticuloOfrecido { get; set; }
-
-        public int ArticuloSolicitadoId { get; set; }
-        public Articulos? ArticuloSolicitado { get; set; }
-    }
+    public int IdIntercambios { get; set; }
+    public DateTime Fecha { get; set; }
+    public bool fueRealizado { get; set; }
+    public int IdUsuarios1 { get; set; }
+    public int IdUsuarios2 { get; set; }
+    public int IdArticulos1 { get; set; }
+    public int IdArticulos2 { get; set; }
 }

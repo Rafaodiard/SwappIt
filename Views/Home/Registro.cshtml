@@ -1,67 +1,73 @@
+@model Swappit.Models.ViewModels.RegistroViewModel
 @{
     ViewData["Title"] = "Registrarse";
     ViewData["Visitante"] = true;
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-7 col-xl-6">
-            <!-- Campos = columnas de la tabla Usuarios -->
-            <form class="sw-form-card" method="post" asp-action="Registro" novalidate>
-                <h1 class="font-titulo text-center text-primario mb-4">Registrarse</h1>
+<section class="sw-auth">
+    <div class="sw-auth-card">
+        <header class="sw-auth-encabezado">
+            <h1 class="sw-auth-titulo">Registrate</h1>
+            <p class="sw-auth-subtitulo">Creá tu cuenta y empezá a intercambiar</p>
+        </header>
 
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <label for="Nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="Nombre" name="Nombre" maxlength="50" required>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="Apellido" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="Apellido" name="Apellido" maxlength="50" required>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="Usuario" class="form-label">Usuario</label>
-                        <div class="input-group">
-                            <span class="input-group-text">@@</span>
-                            <input type="text" class="form-control" id="Usuario" name="Usuario" maxlength="50" required>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="Mail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="Mail" name="Mail" maxlength="50" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="Contrasena" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="Contrasena" name="Contrasena" maxlength="50" required>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
-                        <input type="date" class="form-control" id="FechaNacimiento" name="FechaNacimiento" required>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="Telefono" class="form-label">Número de teléfono</label>
-                        <input type="tel" class="form-control" id="Telefono" name="Telefono" required>
-                    </div>
-                    <div class="col-sm-6">
-                        <!-- Opciones desde la tabla Provincias -->
-                        <label for="IdProvincias" class="form-label">Provincia</label>
-                        <select class="form-select" id="IdProvincias" name="IdProvincias" required>
-                            <option value="" selected disabled>Elegí una</option>
-                            <option value="1">Buenos Aires</option>
-                            <option value="2">CABA</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="Barrio" class="form-label">Barrio</label>
-                        <input type="text" class="form-control" id="Barrio" name="Barrio" maxlength="50" required>
-                    </div>
-                </div>
+        <form class="sw-form" method="post" asp-controller="Home" asp-action="Registro" novalidate>
+            <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
 
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-sw-primario px-5">Enviar</button>
-                    <p class="small mt-4 mb-0">¿Ya tenés cuenta? <a asp-action="Login" class="fw-semibold text-secundario">Iniciar sesión</a></p>
+            <div class="sw-fila">
+                <div class="sw-campo">
+                    <label class="sw-label" asp-for="Nombre"></label>
+                    <input class="sw-input" asp-for="Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
+                    <span class="sw-error" asp-validation-for="Nombre"></span>
                 </div>
-            </form>
-        </div>
+                <div class="sw-campo">
+                    <label class="sw-label" asp-for="Apellido"></label>
+                    <input class="sw-input" asp-for="Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
+                    <span class="sw-error" asp-validation-for="Apellido"></span>
+                </div>
+            </div>
+
+            <div class="sw-campo">
+                <label class="sw-label" asp-for="Mail"></label>
+                <input class="sw-input" asp-for="Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                <span class="sw-error" asp-validation-for="Mail"></span>
+            </div>
+
+            <div class="sw-campo">
+                <label class="sw-label" asp-for="Contrasena"></label>
+                <input class="sw-input" asp-for="Contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
+                <span class="sw-error" asp-validation-for="Contrasena"></span>
+            </div>
+
+            <div class="sw-fila">
+                <div class="sw-campo">
+                    <label class="sw-label" asp-for="FechaNacimiento"></label>
+                    <div class="sw-input-icono">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        <input class="sw-input" asp-for="FechaNacimiento" type="date" autocomplete="bday">
+                    </div>
+                    <span class="sw-error" asp-validation-for="FechaNacimiento"></span>
+                </div>
+                <div class="sw-campo">
+                    <label class="sw-label" asp-for="Telefono"></label>
+                    <input class="sw-input" asp-for="Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
+                    <span class="sw-error" asp-validation-for="Telefono"></span>
+                </div>
+            </div>
+
+            <div class="sw-form-acciones">
+                <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Crear cuenta</button>
+            </div>
+        </form>
+
+        <p class="sw-auth-pie">
+            <span>¿Ya tenés cuenta?</span>
+            <a asp-controller="Home" asp-action="Login" class="sw-link">Iniciar sesión</a>
+        </p>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

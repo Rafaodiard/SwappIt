@@ -1,23 +1,10 @@
-using System;
-
-namespace Swappit.Models
+namespace Swappit.Models;
+public class Articulos
 {
-    public class Articulos
-    {
-        public int Id { get; set; }
-        public string Titulo { get; set; } = string.Empty;
-        public string Descripcion { get; set; } = string.Empty;
-        public string ImagenUrl { get; set; } = string.Empty;
-        public DateTime FechaPublicacion { get; set; } = DateTime.Now;
-
-        // Relaciones
-        public int? CategoriaId { get; set; }
-        public Categorias? Categoria { get; set; }
-
-        public int? ProvinciaId { get; set; }
-        public Provincias? Provincia { get; set; }
-
-        public int? UsuarioId { get; set; }
-        public Usuarios? Usuario { get; set; }
-    }
+    public int IdArticulos { get; set; }
+    public string? Nombre { get; set; }
+    public string? Descripcion { get; set; }
+    public string? Estado { get; set; }
+    public int IdUsuarios { get; set; }
+    public int IdCategorias { get; set; }
 }
