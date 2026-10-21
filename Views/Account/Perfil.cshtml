@@ -1,0 +1,244 @@
+@{
+    ViewData["Title"] = "Mi perfil";
+    Swappit.Models.Usuarios usuario = ViewBag.usuario;
+    Swappit.Models.Provincias? provincia = ViewBag.provincia;
+    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
+    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
+    string? errorPerfil = TempData["ErrorPerfil"] as string;
+    string? mensajePerfil = TempData["MensajePerfil"] as string;
+}
+
+<div class="container-xl py-4 py-lg-5">
+    @if (mensajePerfil != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
+            <i class="bi bi-check-circle-fill me-1"></i> @mensajePerfil
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- ===== Nombre + descripción ===== -->
+        <div class="col-lg-6 d-flex flex-column gap-4">
+            <div class="sw-card p-4">
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
+                    <div class="sw-perfil-avatar">
+                        @if (usuario.Foto != null)
+                        {
+                            <img src="@usuario.Foto" alt="Foto de @usuario.Nombre">
+                        }
+                        else
+                        {
+                            <span data-campo="iniciales">@iniciales</span>
+                        }
+                        <button type="button" class="sw-perfil-avatar-editar border-0" aria-label="Cambiar foto"
+                                data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-elegir-foto><i class="bi bi-camera-fill"></i></button>
+                    </div>
+                    <div>
+                        <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
+                        <p class="text-suave mb-3">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        <button type="button" class="btn btn-sw-primario btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1"></i> Editar perfil</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sw-card p-4 flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 fw-bold mb-0">Descripción</h2>
+                    <button type="button" class="btn btn-link text-suave p-0" aria-label="Editar descripción"
+                            data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-enfocar="Descripcion"><i class="bi bi-pencil"></i></button>
+                </div>
+                @if (usuario.Descripcion != null)
+                {
+                    <p class="text-suave mb-0" data-campo="descripcion" style="white-space: pre-line">@usuario.Descripcion</p>
+                }
+                else
+                {
+                    <p class="text-suave mb-0" data-campo="descripcion">
+                        Todavía no agregaste una descripción.
+                        <button type="button" class="btn btn-link p-0 align-baseline fw-semibold text-primario text-decoration-none"
+                                data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-enfocar="Descripcion">Agregar descripción</button>
+                    </p>
+                }
+            </div>
+        </div>
+
+        <!-- ===== Información personal (tabla Usuarios) ===== -->
+        <div class="col-lg-6">
+            <div class="sw-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                    <h2 class="h5 fw-bold mb-0">Información personal</h2>
+                    <button type="button" class="btn btn-link text-suave p-0" aria-label="Editar información"
+                            data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil"></i></button>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-4 mb-0">
+                    <li class="d-flex align-items-center gap-3">
+                        <span class="sw-info-icono"><i class="bi bi-person-fill"></i></span>
+                        <span class="fw-semibold" style="width:150px">Usuario</span>
+                        <span class="text-suave text-break" data-campo="usuario">@@@usuario.Usuario</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-3">
+                        <span class="sw-info-icono"><i class="bi bi-envelope-fill"></i></span>
+                        <span class="fw-semibold" style="width:150px">Email</span>
+                        <span class="text-suave text-break" data-campo="mail">@usuario.Mail</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-3">
+                        <span class="sw-info-icono"><i class="bi bi-telephone-fill"></i></span>
+                        <span class="fw-semibold" style="width:150px">Teléfono</span>
+                        <span class="text-suave" data-campo="telefono">@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "—")</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-3">
+                        <span class="sw-info-icono"><i class="bi bi-geo-alt-fill"></i></span>
+                        <span class="fw-semibold" style="width:150px">Barrio</span>
+                        <span class="text-suave" data-campo="barrio">@(ubicacion != "" ? ubicacion : "—")</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-3">
+                        <span class="sw-info-icono"><i class="bi bi-calendar-fill"></i></span>
+                        <span class="fw-semibold" style="width:150px">Edad</span>
+                        <span class="text-suave" data-campo="edad">@usuario.Edad años</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== Historial de intercambios (tabla Intercambios) ===== -->
+        <div class="col-12">
+            <div class="sw-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="font-titulo h3 mb-0">Historial de intercambios</h2>
+                    <a href="#" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <!-- Se llena desde JS: swappit.renderLista('#historial', lista, 'historial-item', rellenar) -->
+                <div id="historial" class="d-flex flex-column gap-3">
+                    <div class="sw-historial-item d-flex flex-column flex-md-row align-items-md-center gap-3" data-template="historial-item">
+                        <div class="sw-historial-img sw-img"><img src="" alt="" data-campo="imagen"></div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h3 class="h5 fw-bold mb-0" data-campo="articuloRecibido">Silla</h3>
+                                <span class="sw-badge sw-badge-recibido" data-campo="tipo">Recibido</span>
+                            </div>
+                            <div class="text-suave small mb-1">
+                                <i class="bi bi-arrow-left-right"></i> <span data-campo="articuloEntregado">Lámpara</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3 text-suave small">
+                                <span><i class="bi bi-person"></i> Intercambio con <span data-campo="otroUsuario">@@juanp</span></span>
+                                <span><i class="bi bi-calendar3"></i> Fecha: <span data-campo="fecha">12/09/2026</span></span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Pop up: Editar perfil (lo maneja wwwroot/js/perfil.js) ===== -->
+<div class="modal fade sw-modal" id="modal-editar-perfil" tabindex="-1" aria-labelledby="titulo-editar-perfil" aria-hidden="true"
+     data-error="@errorPerfil">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <form class="modal-content" method="post" asp-controller="Account" asp-action="EditarPerfil" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h2 class="modal-title font-titulo h3 mb-0" id="titulo-editar-perfil">Editar perfil</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body d-flex flex-column gap-4">
+                @if (errorPerfil != null)
+                {
+                    <p class="sw-error-resumen mb-0" role="alert">@errorPerfil</p>
+                }
+
+                <!-- Foto -->
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
+                    <div class="sw-perfil-avatar sw-perfil-avatar--chico" id="vista-previa-foto" data-iniciales="@iniciales">
+                        @if (usuario.Foto != null)
+                        {
+                            <img src="@usuario.Foto" alt="Foto actual">
+                        }
+                        else
+                        {
+                            <span>@iniciales</span>
+                        }
+                    </div>
+                    <div class="d-flex flex-column align-items-center align-items-sm-start gap-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="sw-btn sw-btn-contorno" data-elegir-foto><i class="bi bi-camera me-1"></i> Cambiar foto</button>
+                            <button type="button" class="sw-btn sw-btn-contorno @(usuario.Foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
+                        </div>
+                        <input type="file" class="d-none" id="Foto" name="Foto" accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                               data-max-mb="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxFotoMB">
+                        <input type="hidden" id="QuitarFoto" name="QuitarFoto" value="false">
+                        <span class="sw-ayuda">JPG o PNG, hasta @Swappit.Models.ViewModels.EditarPerfilViewModel.MaxFotoMB MB.</span>
+                        <span class="sw-error" id="error-foto" role="alert"></span>
+                    </div>
+                </div>
+
+                <div class="sw-fila">
+                    <div class="sw-campo">
+                        <label class="sw-label" for="Nombre">Nombre</label>
+                        <input class="sw-input" id="Nombre" name="Nombre" value="@usuario.Nombre" maxlength="50" autocomplete="given-name" required>
+                    </div>
+                    <div class="sw-campo">
+                        <label class="sw-label" for="Apellido">Apellido</label>
+                        <input class="sw-input" id="Apellido" name="Apellido" value="@usuario.Apellido" maxlength="50" autocomplete="family-name" required>
+                    </div>
+                </div>
+
+                <div class="sw-fila">
+                    <div class="sw-campo">
+                        <label class="sw-label" for="Usuario">Usuario</label>
+                        <input class="sw-input" id="Usuario" name="Usuario" value="@usuario.Usuario" maxlength="50" autocomplete="username" required>
+                    </div>
+                    <div class="sw-campo">
+                        <label class="sw-label" for="Telefono">Teléfono</label>
+                        <input class="sw-input" id="Telefono" name="Telefono" type="tel" value="@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "")"
+                               placeholder="11 0000 0000" autocomplete="tel">
+                    </div>
+                </div>
+
+                <div class="sw-fila">
+                    <div class="sw-campo">
+                        <label class="sw-label" for="Barrio">Barrio</label>
+                        <input class="sw-input" id="Barrio" name="Barrio" value="@usuario.Barrio" maxlength="50" placeholder="Ej: Palermo">
+                    </div>
+                    <div class="sw-campo">
+                        <label class="sw-label" for="IdProvincias">Provincia</label>
+                        <select class="sw-input sw-select" id="IdProvincias" name="IdProvincias" required>
+                            @foreach (var p in provincias)
+                            {
+                                <option value="@p.IdProvincia" selected="@(p.IdProvincia == usuario.IdProvincias)">@p.Nombre</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sw-campo">
+                    <label class="sw-label" for="Descripcion">Descripción</label>
+                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4"
+                              maxlength="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion"
+                              placeholder="Contá un poco sobre vos y qué te gustaría intercambiar…">@usuario.Descripcion</textarea>
+                    <span class="sw-contador" id="contador-descripcion-perfil" aria-live="polite"></span>
+                </div>
+
+                <div class="sw-campo">
+                    <label class="sw-label" for="mail-perfil">Email</label>
+                    <input class="sw-input" id="mail-perfil" value="@usuario.Mail" disabled>
+                    <span class="sw-ayuda">El email no se puede cambiar.</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="sw-btn sw-btn-solido">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/perfil.js" asp-append-version="true"></script>
+}

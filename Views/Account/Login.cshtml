@@ -1,7 +1,6 @@
 @model Swappit.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Iniciar sesión";
-    ViewData["Visitante"] = true;
 }
 
 @*
@@ -15,9 +14,13 @@
             <p class="sw-auth-subtitulo">Ingresá para seguir intercambiando</p>
         </header>
 
-        <form class="sw-form" method="post" asp-controller="Home" asp-action="Login" novalidate>
+        <form class="sw-form" method="post" asp-controller="Account" asp-action="Login" novalidate>
             <!-- Errores generales (ej: "Email o contraseña incorrectos") -->
             <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
+            @if (ViewBag.Error != null)
+            {
+                <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
+            }
 
             <div class="sw-campo">
                 <label class="sw-label" asp-for="Mail"></label>
@@ -39,7 +42,7 @@
 
         <p class="sw-auth-pie">
             <span>¿Todavía no tenés cuenta?</span>
-            <a asp-controller="Home" asp-action="Registro" class="sw-link">Registrate</a>
+            <a asp-controller="Account" asp-action="Registro" class="sw-link">Registrate</a>
         </p>
     </div>
 </section>
