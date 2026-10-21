@@ -1,6 +1,5 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
-    ViewData["Visitante"] = true;
 }
 
 <!-- ===== Hero ===== -->
@@ -136,7 +135,7 @@
         <div class="sw-cta-box text-center">
             <h1 class="fs-5 mb-3">¿Querés empezar a intercambiar?</h1>
             <p>Creá tu cuenta gratis y publicá tu primer objeto en minutos</p>
-            <a asp-action="Registro" class="btn btn-sw-secundario">Registrate ahora <i class="bi bi-arrow-right ms-1"></i></a>
+            <a asp-controller="Account" asp-action="Registro" class="btn btn-sw-secundario">Registrate ahora <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
     </div>
 </section>

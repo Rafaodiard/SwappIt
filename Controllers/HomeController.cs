@@ -25,11 +25,6 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Perfil()
-    {
-        return View();
-    }
-
     public IActionResult Buscar(string? q)
     {
         return View();
@@ -38,40 +33,6 @@ public class HomeController : Controller
     public IActionResult Chat()
     {
         return View();
-    }
-
-    // ===== Registro =====
-    [HttpGet]
-    public IActionResult Registro()
-    {
-        return View(new RegistroViewModel());
-    }
-
-    [HttpPost]
-    public IActionResult Registro(RegistroViewModel modelo)
-    {
-        if (!ModelState.IsValid) return View(modelo);
-
-        // TODO: crear el usuario (validar que el mail no exista, hashear la contraseña,
-        // calcular Edad a partir de FechaNacimiento) y redirigir a Login.
-        return View(modelo);
-    }
-
-    // ===== Login =====
-    [HttpGet]
-    public IActionResult Login()
-    {
-        return View(new LoginViewModel());
-    }
-
-    [HttpPost]
-    public IActionResult Login(LoginViewModel modelo)
-    {
-        if (!ModelState.IsValid) return View(modelo);
-
-        // TODO: validar credenciales e iniciar sesión.
-        // Si fallan: ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
-        return View(modelo);
     }
 
     // ===== Publicar objeto =====

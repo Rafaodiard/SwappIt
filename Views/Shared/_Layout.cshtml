@@ -1,8 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 @{
-    // Las vistas públicas (landing, login, registro) ponen ViewData["Visitante"] = true
-    var esVisitante = ViewData["Visitante"] as bool? ?? false;
+    // Si no hay usuario en la sesión (ver AccountController) se muestra el header de visitante
+    var esVisitante = Context.Session.GetInt32("UsuarioId") == null;
+    var iniciales = Context.Session.GetString("Iniciales");
+    var foto = Context.Session.GetString("Foto");
 }
 <head>
     <meta charset="utf-8" />
@@ -37,8 +39,8 @@
             @if (esVisitante)
             {
                 <nav class="d-flex align-items-center gap-3 ms-auto">
-                    <a asp-controller="Home" asp-action="Login" class="text-dark text-decoration-none small fw-semibold">Iniciar sesión</a>
-                    <a asp-controller="Home" asp-action="Registro" class="btn btn-sw-secundario btn-sm">Registrarse</a>
+                    <a asp-controller="Account" asp-action="Index" class="text-dark text-decoration-none small fw-semibold">Iniciar sesión</a>
+                    <a asp-controller="Account" asp-action="Registro" class="btn btn-sw-secundario btn-sm">Registrarse</a>
                 </nav>
             }
             else
@@ -47,8 +49,9 @@
                     <a href="#" class="sw-header-accion" title="Favoritos"><i class="bi bi-heart"></i></a>
                     <a asp-controller="Home" asp-action="Chat" class="sw-header-accion" title="Mensajes"><i class="bi bi-chat-dots"></i><span class="sw-punto"></span></a>
                     <a href="#" class="sw-header-accion" title="Notificaciones"><i class="bi bi-bell"></i></a>
-                    <a asp-controller="Home" asp-action="Perfil" class="sw-avatar" title="Mi perfil">MG</a>
+                    <a asp-controller="Account" asp-action="Perfil" class="sw-avatar" title="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
                     <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> Publicar</a>
+                    <a asp-controller="Account" asp-action="Logout" class="sw-header-accion" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></a>
                 </nav>
             }
         </div>

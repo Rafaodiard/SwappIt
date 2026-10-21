@@ -1,7 +1,6 @@
 @model Swappit.Models.ViewModels.RegistroViewModel
 @{
     ViewData["Title"] = "Registrarse";
-    ViewData["Visitante"] = true;
 }
 
 <section class="sw-auth">
@@ -11,8 +10,12 @@
             <p class="sw-auth-subtitulo">Creá tu cuenta y empezá a intercambiar</p>
         </header>
 
-        <form class="sw-form" method="post" asp-controller="Home" asp-action="Registro" novalidate>
+        <form class="sw-form" method="post" asp-controller="Account" asp-action="Registro" novalidate>
             <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
+            @if (ViewBag.Error != null)
+            {
+                <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
+            }
 
             <div class="sw-fila">
                 <div class="sw-campo">
@@ -39,6 +42,11 @@
                 <span class="sw-error" asp-validation-for="Contrasena"></span>
             </div>
 
+            <div class="sw-campo">
+                <label class="sw-label" for="password2">Repetir contraseña</label>
+                <input class="sw-input" id="password2" name="password2" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password" maxlength="50">
+            </div>
+
             <div class="sw-fila">
                 <div class="sw-campo">
                     <label class="sw-label" asp-for="FechaNacimiento"></label>
@@ -62,7 +70,7 @@
 
         <p class="sw-auth-pie">
             <span>¿Ya tenés cuenta?</span>
-            <a asp-controller="Home" asp-action="Login" class="sw-link">Iniciar sesión</a>
+            <a asp-controller="Account" asp-action="Index" class="sw-link">Iniciar sesión</a>
         </p>
     </div>
 </section>

@@ -399,6 +399,21 @@ main { flex: 1 0 auto; }
     display: inline-flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 }
+
+/* Foto de perfil dentro de los avatares (perfil y header) */
+.sw-perfil-avatar > img,
+.sw-avatar > img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.sw-avatar { overflow: hidden; }
+.sw-perfil-avatar--chico { width: 96px; height: 96px; font-size: 2rem; }
+
+/* Pop up "Editar perfil" */
+.sw-modal .modal-content { border: 0; border-radius: var(--sw-radio); box-shadow: var(--sw-ui-sombra-card); }
+.sw-modal .modal-header,
+.sw-modal .modal-footer { border-color: var(--sw-borde); padding: 1.25rem 1.5rem; }
+.sw-modal .modal-body { padding: 1.5rem; }
+.sw-modal .modal-footer { gap: .75rem; }
+.sw-modal .modal-footer > * { margin: 0; }
+.sw-modal .sw-fila { gap: 16px; }
 .sw-historial-item { background: var(--sw-fondo); border-radius: 14px; padding: 1rem; }
 .sw-historial-img { width: 88px; height: 88px; border-radius: 12px; font-size: 2rem; flex-shrink: 0; }
 
