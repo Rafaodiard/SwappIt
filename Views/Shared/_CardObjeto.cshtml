@@ -1,38 +1,46 @@
+@model Swappit.Models.ViewModels.ArticuloCardViewModel
 @*
     Card / Objeto  (componente "10. Card" del UI Kit)
     ------------------------------------------------------------
-    Es UNA sola tarjeta de ejemplo. Desde JS se usa como molde:
-    swappit.renderObjetos('#contenedor', listaDeArticulos)
-    clona este <div data-template="card-objeto"> y rellena cada
-    elemento marcado con data-campo="...".
+    Se renderiza desde el servidor con un ArticuloCardViewModel:
+    <partial name="_CardObjeto" model="articulo" />
 
-    Campos (columnas de la tabla Articulos / Usuarios):
-      data-campo="imagen"      -> <img>, se le pone el src (columna todavía no existe en la BD)
-      data-campo="estado"      -> Articulos.Estado
-      data-campo="nombre"      -> Articulos.Nombre
-      data-campo="barrio"      -> Usuarios.Barrio del dueño
-      data-campo="distancia"   -> calculada
-      data-campo="busca"       -> qué pide a cambio (todavía no existe en la BD)
+    Mantiene data-template / data-campo para que swappit.renderObjetos (site.js)
+    pueda seguir usándola como molde si más adelante se carga por JS.
+
+    Campos:
+      imagen   -> primera fila de Imagenes del artículo (si no hay, se ve el placeholder de .sw-img)
+      estado   -> Articulos.Estado
+      nombre   -> Articulos.Nombre
+      barrio   -> Usuarios.Barrio del dueño
+    Pendiente (no existe en la BD todavía): distancia y "Busca a cambio".
 *@
 <div class="col col-objeto" data-template="card-objeto">
-    <article class="card-objeto" data-id="1">
+    <article class="card-objeto" data-id="@Model.IdArticulos">
         <div class="card-objeto-img sw-img">
-            <img src="" alt="" data-campo="imagen">
-            <span class="card-objeto-estado" data-campo="estado">Muy buen estado</span>
-            <button type="button" class="card-objeto-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
+            @if (!string.IsNullOrEmpty(Model.Imagen))
+            {
+                <img src="@Model.Imagen" alt="@Model.Nombre" data-campo="imagen">
+            }
+            else
+            {
+                <img alt="" data-campo="imagen">
+            }
+            <span class="card-objeto-estado" data-campo="estado">@Model.Estado</span>
+            <button type="button" class="card-objeto-fav" aria-label="Agregar @Model.Nombre a favoritos"><i class="bi bi-heart"></i></button>
         </div>
         <div class="card-objeto-body">
             <h3 class="card-objeto-titulo">
-                <a href="#" class="stretched-link text-reset text-decoration-none" data-campo="nombre">Sillón 2 cuerpos</a>
+                @* TODO: apuntar al detalle del artículo cuando exista esa pantalla *@
+                <a href="#" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@Model.Nombre</a>
             </h3>
-            <div class="card-objeto-ubicacion">
-                <i class="bi bi-geo-alt"></i>
-                <span data-campo="barrio">Palermo</span> · <span data-campo="distancia">1,2 km</span>
-            </div>
-            <div class="card-objeto-cambio">
-                <small>Busca a cambio</small>
-                <span data-campo="busca">Mesa ratona o lámpara</span>
-            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.Barrio))
+            {
+                <div class="card-objeto-ubicacion">
+                    <i class="bi bi-geo-alt"></i>
+                    <span data-campo="barrio">@Model.Barrio</span>
+                </div>
+            }
         </div>
     </article>
 </div>

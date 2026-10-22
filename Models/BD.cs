@@ -106,4 +106,81 @@ public static class BD
             connection.Execute(query, new { pId = idUsuario });
         }
     }
+
+    // Artículos para el catálogo, del más nuevo al más viejo.
+    // busqueda: filtra por nombre (null o vacío = todos). cantidad: límite opcional (ej: destacados del inicio).
+    // categorias / estados: filtros del panel de Buscar (null o vacío = sin filtrar por ese campo).
+    public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
+        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<string>? estados = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')" };
+            // Dapper expande las listas en IN (...); con una lista vacía no se agrega la condición.
+            if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
+            if (estados is { Count: > 0 }) condiciones.Add("a.Estado IN @pEstados");
+
+            string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
+            string query = $@"SELECT {top}a.IdArticulos, a.Nombre, a.Estado, u.Barrio,
+                    (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
+                FROM Articulos a
+                INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+                WHERE {string.Join(" AND ", condiciones)}
+                ORDER BY a.IdArticulos DESC";
+
+            return connection.Query<ArticuloCardViewModel>(query, new
+            {
+                pBusqueda = PatronBusqueda(busqueda),
+                pCantidad = cantidad,
+                pCategorias = categorias,
+                pEstados = estados
+            }).ToList();
+        }
+    }
+
+    public static List<Categorias> GetCategorias()
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT IdCategorias, Nombre FROM Categorias ORDER BY Nombre";
+            return connection.Query<Categorias>(query).ToList();
+        }
+    }
+
+    // Categorías para el filtro de Buscar, con cuántos artículos de cada una coinciden con la búsqueda por nombre.
+    // Incluye las categorías sin artículos (cantidad 0).
+    public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT CAST(c.IdCategorias AS varchar(10)) AS Valor, c.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
+                FROM Categorias c
+                LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
+                    AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                GROUP BY c.IdCategorias, c.Nombre
+                ORDER BY c.Nombre";
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda) }).ToList();
+        }
+    }
+
+    // Estados para el filtro de Buscar. No hay tabla de estados: son los valores distintos de Articulos.Estado.
+    public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT Estado AS Valor, Estado AS Texto, COUNT(*) AS Cantidad
+                FROM Articulos
+                WHERE @pBusqueda IS NULL OR Nombre LIKE '%' + @pBusqueda + '%'
+                GROUP BY Estado
+                ORDER BY Estado";
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda) }).ToList();
+        }
+    }
+
+    private static string? PatronBusqueda(string? busqueda) =>
+        string.IsNullOrWhiteSpace(busqueda) ? null : EscaparLike(busqueda.Trim());
+
+    // Evita que %, _ o [ escritos por el usuario funcionen como comodines del LIKE.
+    private static string EscaparLike(string texto) =>
+        texto.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
 }

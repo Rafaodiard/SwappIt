@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<Swappit.Models.ViewModels.ArticuloCardViewModel>
+@{
     ViewData["Title"] = "Inicio";
 }
 
@@ -127,10 +128,16 @@
     <div class="container-xl">
         <h2 class="font-titulo text-center mb-4">Lo que ya no usás puede ser lo que alguien necesita</h2>
 
-        <!-- Se llena desde JS: swappit.renderObjetos('#objetos-destacados', lista) -->
-        <div id="objetos-destacados" class="row row-cols-2 row-cols-md-4 g-3 mb-4">
-            <partial name="_CardObjeto" />
-        </div>
+        <!-- Los 4 artículos más recientes (HomeController.Index) -->
+        @if (Model.Count > 0)
+        {
+            <div id="objetos-destacados" class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+                @foreach (var articulo in Model)
+                {
+                    <partial name="_CardObjeto" model="articulo" />
+                }
+            </div>
+        }
 
         <div class="sw-cta-box text-center">
             <h1 class="fs-5 mb-3">¿Querés empezar a intercambiar?</h1>
