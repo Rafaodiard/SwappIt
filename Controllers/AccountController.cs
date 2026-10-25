@@ -38,6 +38,38 @@ public class AccountController : Controller
             ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
             return View();
     }
+    // Perfil de otro usuario (se llega desde la página del artículo). Lo puede ver cualquiera.
+    // Muestra solo datos públicos: no se pasan mail, teléfono ni edad a la vista.
+    public IActionResult PerfilPublico(int id)
+    {
+        // Si es el propio usuario, va a su perfil (el que se puede editar).
+        if (HttpContext.Session.GetInt32("UsuarioId") == id)
+        {
+            return RedirectToAction("Perfil");
+        }
+
+        Usuarios? usuario = BD.GetUsuarioById(id);
+        if (usuario == null)
+        {
+            Response.StatusCode = StatusCodes.Status404NotFound;
+            ViewBag.usuario = null;
+            return View();
+        }
+
+        ViewBag.usuario = new Usuarios
+        {
+            IdUsuarios = usuario.IdUsuarios,
+            Nombre = usuario.Nombre,
+            Apellido = usuario.Apellido,
+            Usuario = usuario.Usuario,
+            Barrio = usuario.Barrio
+        };
+        ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
+        ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
+        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
+        return View();
+    }
+
     public IActionResult Registro()
     {
         return View();

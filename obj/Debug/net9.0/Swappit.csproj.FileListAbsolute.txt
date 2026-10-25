@@ -522,7 +522,6 @@ C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\bundle\Swappit.styles.css
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\projectbundle\Swappit.bundle.scp.css
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-srtcokyao8.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\cueivfcjbs-61n19gt1b8.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\4ch4uxh4d7-4q3ty3w99i.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\m5q5qmvx59-biblc9qxl4.gz
@@ -595,3 +594,9 @@ C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\staticwebassets.build.endpoint
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\Swappit.csproj.Up2Date
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\Swappit.genruntimeconfig.cache
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\ref\Swappit.dll
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\.graphify_labels.json
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\cost.json
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\graph.json
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\manifest.json
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-whcrm1xj2h.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\bgok2kicae-6hqfbjiyre.gz

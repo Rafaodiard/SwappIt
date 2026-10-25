@@ -1,0 +1,90 @@
+@*
+    Perfil público de otro usuario (AccountController.PerfilPublico).
+    Solo muestra datos públicos: nombre, usuario, barrio/provincia, foto y sus artículos.
+    Mail, teléfono y edad quedan solo en el perfil propio (Perfil.cshtml).
+*@
+@{
+    Swappit.Models.Usuarios? usuario = ViewBag.usuario;
+    ViewData["Title"] = usuario != null ? $"{usuario.Nombre} {usuario.Apellido}" : "Usuario no encontrado";
+}
+
+@if (usuario == null)
+{
+    <div class="container-xl py-5">
+        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
+            <i class="bi bi-person-x fs-1 text-suave"></i>
+            <h1 class="font-titulo h2 mt-3">Este usuario no existe</h1>
+            <p class="text-suave mb-4">Puede que el enlace esté mal.</p>
+            <a asp-controller="Home" asp-action="Buscar" class="btn btn-sw-primario">Ver artículos</a>
+        </div>
+    </div>
+    return;
+}
+
+@{
+    Swappit.Models.Provincias? provincia = ViewBag.provincia;
+    string? foto = ViewBag.foto;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
+    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
+    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+}
+
+<div class="container-xl py-4 py-lg-5">
+    <div class="row g-4">
+
+        <!-- ===== Nombre + foto ===== -->
+        @* TODO (BD): reputación e intercambios realizados todavía no tienen datos para mostrarse acá. *@
+        <div class="col-12">
+            <div class="sw-card p-4 p-lg-5">
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
+                    <div class="sw-perfil-avatar">
+                        @if (foto != null)
+                        {
+                            <img src="@foto" alt="Foto de @usuario.Nombre">
+                        }
+                        else
+                        {
+                            <span aria-hidden="true">@iniciales</span>
+                        }
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="font-titulo h2 mb-0">@usuario.Nombre @usuario.Apellido</h1>
+                        <p class="text-suave mb-2">@@@usuario.Usuario</p>
+                        <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-3 text-suave small">
+                            @if (ubicacion != "")
+                            {
+                                <span><i class="bi bi-geo-alt me-1"></i>@ubicacion</span>
+                            }
+                            <span><i class="bi bi-box-seam me-1"></i>@articulos.Count @(articulos.Count == 1 ? "artículo publicado" : "artículos publicados")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Artículos publicados (Articulos.IdUsuarios = este usuario) ===== -->
+        <div class="col-12">
+            <section class="sw-card p-4" aria-labelledby="titulo-articulos-usuario">
+                <h2 class="font-titulo h3 mb-4" id="titulo-articulos-usuario">Artículos de @usuario.Nombre</h2>
+
+                @if (articulos.Count > 0)
+                {
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                        @foreach (var articulo in articulos)
+                        {
+                            ViewBag.articulo = articulo;
+                            <partial name="_CardObjeto" />
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-box-seam fs-1 text-suave"></i>
+                        <p class="text-suave mt-2 mb-0">@usuario.Nombre todavía no publicó ningún artículo.</p>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</div>

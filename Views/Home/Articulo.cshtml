@@ -1,0 +1,257 @@
+@*
+    Detalle de un artículo (HomeController.Articulo).
+    Datos: Articulos + Imagenes (fotos del artículo) + Categorias + Usuarios (dueño) + Provincias.
+    - Artículo de otra persona: botón "Proponer intercambio" (pop up para elegir qué artículo ofrecés).
+    - Artículo propio (el dueño es el usuario logueado): aviso "Es tu artículo" y acciones del dueño.
+    - Visitante (sin sesión): "Proponer intercambio" lleva a iniciar sesión.
+*@
+@{
+    Swappit.Models.Articulos? articulo = ViewBag.detalle;
+    bool errorCarga = ViewBag.errorCarga;
+    ViewData["Title"] = articulo?.Nombre ?? (errorCarga ? "Artículo" : "Artículo no encontrado");
+}
+
+@if (articulo == null)
+{
+    <div class="container-xl py-5">
+        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
+            <i class="bi @(errorCarga ? "bi-exclamation-triangle" : "bi-search") fs-1 text-suave"></i>
+            <h1 class="font-titulo h2 mt-3">@(errorCarga ? "No pudimos cargar el artículo" : "Este artículo no existe")</h1>
+            <p class="text-suave mb-4">
+                @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
+                             : "Puede que lo hayan dado de baja o que el enlace esté mal.")
+            </p>
+            <a asp-controller="Home" asp-action="Buscar" class="btn btn-sw-primario">Ver otros artículos</a>
+        </div>
+    </div>
+    return;
+}
+
+@{
+    List<string> imagenes = ViewBag.imagenes;
+    Swappit.Models.Categorias? categoria = ViewBag.categoria;
+    Swappit.Models.Usuarios dueno = ViewBag.dueno;
+    string? fotoDueno = ViewBag.fotoDueno;
+    Swappit.Models.Provincias? provinciaDueno = ViewBag.provinciaDueno;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> otrosArticulos = ViewBag.otrosArticulos;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> misArticulos = ViewBag.misArticulos;
+    bool esPropio = ViewBag.esPropio;
+    bool logueado = ViewBag.logueado;
+
+    string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
+    string ubicacion = string.Join(", ", new[] { dueno.Barrio, provinciaDueno?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string? fotoPrincipal = imagenes.FirstOrDefault();
+}
+
+<div class="container-xl py-4 py-lg-5">
+
+    <!-- ===== Migas de pan ===== -->
+    <nav aria-label="Ubicación" class="mb-4">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Buscar" class="text-decoration-none text-primario">Artículos</a></li>
+            @if (categoria != null)
+            {
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Buscar" asp-route-categoria="@categoria.IdCategorias" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
+            }
+            <li class="breadcrumb-item active text-truncate" aria-current="page">@articulo.Nombre</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4 g-lg-5">
+
+        <!-- ===== Fotos (tabla Imagenes, IdArticulos = este artículo) ===== -->
+        <div class="col-lg-7">
+            <div class="sw-img sw-articulo-foto">
+                <img id="articulo-foto-principal" src="@fotoPrincipal" alt="@(fotoPrincipal != null ? $"Foto de {articulo.Nombre}" : "")">
+            </div>
+            @if (imagenes.Count > 1)
+            {
+                <!-- Miniaturas: al hacer clic cambian la foto principal (wwwroot/js/articulo.js) -->
+                <div class="sw-articulo-miniaturas" role="group" aria-label="Fotos del artículo">
+                    @for (int i = 0; i < imagenes.Count; i++)
+                    {
+                        <button type="button" class="sw-img sw-articulo-miniatura" data-foto="@imagenes[i]"
+                                aria-label="Ver foto @(i + 1) de @imagenes.Count" aria-current="@(i == 0 ? "true" : "false")">
+                            <img src="@imagenes[i]" alt="">
+                        </button>
+                    }
+                </div>
+            }
+            else if (imagenes.Count == 0)
+            {
+                <p class="text-suave small mt-2 mb-0"><i class="bi bi-image me-1"></i> Este artículo todavía no tiene fotos.</p>
+            }
+        </div>
+
+        <!-- ===== Información del artículo ===== -->
+        <div class="col-lg-5">
+            <div class="sw-card p-4 p-lg-5 d-flex flex-column gap-4">
+
+                @if (esPropio)
+                {
+                    <p class="sw-articulo-propio mb-0" role="status"><i class="bi bi-person-check-fill me-1"></i> Este artículo es tuyo. Así lo ven los demás usuarios.</p>
+                }
+
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <span class="sw-articulo-estado">@articulo.Estado</span>
+                        @if (categoria != null)
+                        {
+                            <span class="text-suave small"><i class="bi bi-tag me-1"></i>@categoria.Nombre</span>
+                        }
+                    </div>
+                    <h1 class="font-titulo display-6 text-primario mb-2">@articulo.Nombre</h1>
+                    @if (ubicacion != "")
+                    {
+                        <p class="text-suave mb-0"><i class="bi bi-geo-alt me-1"></i>@ubicacion</p>
+                    }
+                </div>
+
+                <div>
+                    <h2 class="h6 fw-bold mb-2">Descripción</h2>
+                    <p class="sw-articulo-descripcion mb-0">@articulo.Descripcion</p>
+                </div>
+
+                <hr class="sw-divisor">
+
+                <!-- Quién lo publicó (Usuarios). Lleva al perfil público, o al propio si es tuyo. -->
+                <div>
+                    <h2 class="h6 fw-bold mb-2">Publicado por</h2>
+                    <a class="sw-dueno" href="@(esPropio ? Url.Action("Perfil", "Account") : Url.Action("PerfilPublico", "Account", new { id = dueno.IdUsuarios }))">
+                        <span class="sw-perfil-avatar sw-perfil-avatar--mini">
+                            @if (fotoDueno != null)
+                            {
+                                <img src="@fotoDueno" alt="">
+                            }
+                            else
+                            {
+                                <span aria-hidden="true">@inicialesDueno</span>
+                            }
+                        </span>
+                        <span class="flex-grow-1 min-w-0">
+                            <span class="d-block fw-bold text-truncate">@dueno.Nombre @dueno.Apellido @(esPropio ? "(vos)" : "")</span>
+                            <span class="d-block text-suave small text-truncate">@@@dueno.Usuario</span>
+                        </span>
+                        <span class="text-primario small fw-semibold text-nowrap">@(esPropio ? "Mi perfil" : "Ver perfil") <i class="bi bi-chevron-right"></i></span>
+                    </a>
+                </div>
+
+                <!-- ===== Acciones ===== -->
+                <div class="d-flex flex-column gap-2">
+                    @if (esPropio)
+                    {
+                        @* TODO: todavía no existe la pantalla para editar un artículo. *@
+                        <button type="button" class="btn btn-sw-primario btn-lg" disabled aria-describedby="editar-pendiente">
+                            <i class="bi bi-pencil-square me-1"></i> Editar artículo
+                        </button>
+                        <span id="editar-pendiente" class="text-suave small text-center">La edición de artículos todavía no está disponible.</span>
+                        <a asp-controller="Account" asp-action="Perfil" class="btn btn-sw-outline">Ver mis artículos publicados</a>
+                    }
+                    else if (logueado)
+                    {
+                        <button type="button" class="btn btn-sw-primario btn-lg" data-bs-toggle="modal" data-bs-target="#modal-proponer">
+                            <i class="bi bi-arrow-left-right me-1"></i> Proponer intercambio
+                        </button>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Index" class="btn btn-sw-primario btn-lg">
+                            <i class="bi bi-arrow-left-right me-1"></i> Proponer intercambio
+                        </a>
+                        <span class="text-suave small text-center">Iniciá sesión para proponer un intercambio.</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Más artículos del mismo usuario ===== -->
+        @if (otrosArticulos.Count > 0)
+        {
+            <div class="col-12">
+                <section aria-labelledby="titulo-otros-articulos">
+                    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                        <h2 class="font-titulo h3 mb-0" id="titulo-otros-articulos">
+                            @(esPropio ? "Tus otros artículos" : $"Más artículos de {dueno.Nombre}")
+                        </h2>
+                        @if (!esPropio)
+                        {
+                            <a asp-controller="Account" asp-action="PerfilPublico" asp-route-id="@dueno.IdUsuarios" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+                        }
+                    </div>
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                        @foreach (var otro in otrosArticulos)
+                        {
+                            ViewBag.articulo = otro;
+                            <partial name="_CardObjeto" />
+                        }
+                    </div>
+                </section>
+            </div>
+        }
+    </div>
+</div>
+
+@if (logueado && !esPropio)
+{
+    <!-- ===== Pop up: Proponer intercambio =====
+         El usuario elige cuál de sus artículos ofrece a cambio (Intercambios.IdArticulos2).
+         TODO: falta guardar la propuesta en Intercambios. -->
+    <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form class="modal-content" method="post" onsubmit="return false">
+                <div class="modal-header">
+                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body d-flex flex-column gap-3">
+                    <p class="mb-0">Querés <strong>@articulo.Nombre</strong> de @@@dueno.Usuario. ¿Qué ofrecés a cambio?</p>
+
+                    @if (misArticulos.Count > 0)
+                    {
+                        <fieldset class="d-flex flex-column gap-2">
+                            <legend class="visually-hidden">Elegí uno de tus artículos</legend>
+                            @foreach (var mio in misArticulos)
+                            {
+                                <label class="sw-opcion-articulo">
+                                    <input type="radio" class="sw-estado-radio" name="IdArticuloOfrecido" value="@mio.IdArticulos" required>
+                                    <span class="sw-opcion-articulo-cuerpo">
+                                        <span class="sw-img sw-opcion-articulo-img">
+                                            @if (!string.IsNullOrEmpty(mio.Imagen))
+                                            {
+                                                <img src="@mio.Imagen" alt="">
+                                            }
+                                        </span>
+                                        <span class="min-w-0">
+                                            <span class="d-block fw-semibold text-truncate">@mio.Nombre</span>
+                                            <span class="d-block text-suave small">@mio.Estado</span>
+                                        </span>
+                                    </span>
+                                </label>
+                            }
+                        </fieldset>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <i class="bi bi-box-seam fs-1 text-suave"></i>
+                            <p class="text-suave mt-2 mb-3">Para proponer un intercambio necesitás tener al menos un artículo publicado.</p>
+                            <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
+                        </div>
+                    }
+
+                    <p class="sw-nota mb-0"><i class="bi bi-info-circle me-1"></i> El envío de propuestas todavía no está conectado: por ahora podés elegir el artículo, pero no se guarda.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="sw-btn sw-btn-solido" disabled>Enviar propuesta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/articulo.js" asp-append-version="true"></script>
+}

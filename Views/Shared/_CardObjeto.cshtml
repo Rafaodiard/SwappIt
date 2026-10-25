@@ -34,8 +34,7 @@
         </div>
         <div class="card-objeto-body">
             <h3 class="card-objeto-titulo">
-                @* TODO: apuntar al detalle del artículo cuando exista esa pantalla *@
-                <a href="#" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
+                <a asp-controller="Home" asp-action="Articulo" asp-route-id="@articulo.IdArticulos" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
             </h3>
             @if (!string.IsNullOrWhiteSpace(articulo.Barrio))
             {

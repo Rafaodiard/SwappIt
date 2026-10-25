@@ -84,6 +84,52 @@ public class HomeController : Controller
     // Límite de opciones por filtro que se aceptan en la URL (hoy hay 6 categorías y pocos estados).
     private const int MaxOpcionesFiltro = 20;
 
+    // Detalle de un artículo. Lo puede ver cualquiera (logueado o no).
+    // Si el que mira es el dueño (Articulos.IdUsuarios = UsuarioId de la sesión) se muestran sus acciones
+    // en lugar de "Proponer intercambio".
+    public IActionResult Articulo(int id)
+    {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        ViewBag.errorCarga = false;
+
+        try
+        {
+            Articulos? articulo = BD.GetArticuloById(id);
+            if (articulo == null)
+            {
+                Response.StatusCode = StatusCodes.Status404NotFound;
+                ViewBag.detalle = null;
+                return View();
+            }
+
+            // Articulos.IdUsuarios es NOT NULL con clave foránea a Usuarios: el dueño siempre existe.
+            Usuarios dueno = BD.GetUsuarioById(articulo.IdUsuarios)!;
+            bool esPropio = usuarioId == articulo.IdUsuarios;
+
+            ViewBag.detalle = articulo;
+            ViewBag.imagenes = BD.GetImagenesArticulo(articulo.IdArticulos);
+            ViewBag.categoria = BD.GetCategoriaById(articulo.IdCategorias);
+            ViewBag.dueno = dueno;
+            ViewBag.fotoDueno = BD.GetFotoUsuario(dueno.IdUsuarios);
+            ViewBag.provinciaDueno = BD.GetProvinciaById(dueno.IdProvincias);
+            ViewBag.otrosArticulos = BD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
+                .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
+            ViewBag.esPropio = esPropio;
+            ViewBag.logueado = usuarioId != null;
+            // Pop up "Proponer intercambio": artículos del usuario logueado que puede ofrecer a cambio.
+            ViewBag.misArticulos = usuarioId != null && !esPropio
+                ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
+                : new List<ArticuloCardViewModel>();
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudo cargar el artículo {IdArticulo}", id);
+            ViewBag.errorCarga = true;
+            ViewBag.detalle = null;
+        }
+        return View();
+    }
+
     public IActionResult Chat()
     {
         return View();

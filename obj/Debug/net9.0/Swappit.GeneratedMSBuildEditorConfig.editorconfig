@@ -32,8 +32,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQZXJmaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rafae/Proyectos/swappit/Views/Account/PerfilPublico.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQZXJmaWxQdWJsaWNvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rafae/Proyectos/swappit/Views/Account/Registro.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Ryby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rafae/Proyectos/swappit/Views/Home/Articulo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBcnRpY3Vsby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rafae/Proyectos/swappit/Views/Home/Buscar.cshtml]

@@ -140,6 +140,34 @@ public static class BD
         }
     }
 
+    public static Articulos? GetArticuloById(int id)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT IdArticulos, Nombre, Descripcion, Estado, IdUsuarios, IdCategorias FROM Articulos WHERE IdArticulos = @pId";
+            return connection.QueryFirstOrDefault<Articulos>(query, new { pId = id });
+        }
+    }
+
+    // Fotos de un artículo (Imagenes.IdArticulos), en el orden en que se cargaron. La primera es la de la card.
+    public static List<string> GetImagenesArticulo(int idArticulo)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT Ruta FROM Imagenes WHERE IdArticulos = @pId ORDER BY IdImagenes";
+            return connection.Query<string>(query, new { pId = idArticulo }).ToList();
+        }
+    }
+
+    public static Categorias? GetCategoriaById(int id)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT IdCategorias, Nombre FROM Categorias WHERE IdCategorias = @pId";
+            return connection.QueryFirstOrDefault<Categorias>(query, new { pId = id });
+        }
+    }
+
     public static List<Categorias> GetCategorias()
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
