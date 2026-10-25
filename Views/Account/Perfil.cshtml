@@ -58,29 +58,29 @@
                 </div>
                 <ul class="list-unstyled d-flex flex-column gap-4 mb-0">
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono"><i class="bi bi-person-fill"></i></span>
-                        <span class="fw-semibold" style="width:150px">Usuario</span>
-                        <span class="text-suave text-break" data-campo="usuario">@@@usuario.Usuario</span>
+                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                        <span class="fw-semibold sw-info-etiqueta">Usuario</span>
+                        <span class="text-suave sw-info-valor" data-campo="usuario">@@@usuario.Usuario</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono"><i class="bi bi-envelope-fill"></i></span>
-                        <span class="fw-semibold" style="width:150px">Email</span>
-                        <span class="text-suave text-break" data-campo="mail">@usuario.Mail</span>
+                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-envelope-fill"></i></span>
+                        <span class="fw-semibold sw-info-etiqueta">Email</span>
+                        <span class="text-suave sw-info-valor" data-campo="mail">@usuario.Mail</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono"><i class="bi bi-telephone-fill"></i></span>
-                        <span class="fw-semibold" style="width:150px">Teléfono</span>
-                        <span class="text-suave" data-campo="telefono">@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "—")</span>
+                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-telephone-fill"></i></span>
+                        <span class="fw-semibold sw-info-etiqueta">Teléfono</span>
+                        <span class="text-suave sw-info-valor" data-campo="telefono">@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "—")</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono"><i class="bi bi-geo-alt-fill"></i></span>
-                        <span class="fw-semibold" style="width:150px">Barrio</span>
-                        <span class="text-suave" data-campo="barrio">@(ubicacion != "" ? ubicacion : "—")</span>
+                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+                        <span class="fw-semibold sw-info-etiqueta">Barrio</span>
+                        <span class="text-suave sw-info-valor" data-campo="barrio">@(ubicacion != "" ? ubicacion : "—")</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono"><i class="bi bi-calendar-fill"></i></span>
-                        <span class="fw-semibold" style="width:150px">Edad</span>
-                        <span class="text-suave" data-campo="edad">@usuario.Edad años</span>
+                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-calendar-fill"></i></span>
+                        <span class="fw-semibold sw-info-etiqueta">Edad</span>
+                        <span class="text-suave sw-info-valor" data-campo="edad">@usuario.Edad años</span>
                     </li>
                 </ul>
             </div>
@@ -97,13 +97,13 @@
                             <span class="text-suave fs-6 fw-normal ms-1">(@articulos.Count)</span>
                         }
                     </h2>
-                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar</a>
+                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-primario btn-sm text-nowrap flex-shrink-0"><i class="bi bi-plus-lg me-1"></i> Publicar</a>
                 </div>
 
                 @if (articulos.Count > 0)
                 {
                     <!-- Misma card que el catálogo (Views/Shared/_CardObjeto.cshtml) -->
-                    <div id="mis-articulos" class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                    <div id="mis-articulos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
                         @foreach (var articulo in articulos)
                         {
                             ViewBag.articulo = articulo;

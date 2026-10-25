@@ -598,5 +598,5 @@ C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\.graphify_labels.
 C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\cost.json
 C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\graph.json
 C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\manifest.json
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-whcrm1xj2h.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\bgok2kicae-6hqfbjiyre.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-2wilmvgft5.gz

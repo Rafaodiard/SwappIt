@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    <a href="#contenido" class="sw-saltar">Saltar al contenido</a>
 
     <!-- ===== Header ===== -->
     <header class="sw-header">
@@ -27,8 +28,8 @@
             </a>
 
             <!-- Buscador (va a Home/Buscar con ?q=) -->
-            <form asp-controller="Home" asp-action="Buscar" method="get" class="sw-buscador flex-grow-1 d-none d-md-flex">
-                <i class="bi bi-search text-suave"></i>
+            <form asp-controller="Home" asp-action="Buscar" method="get" class="sw-buscador flex-grow-1 d-none d-md-flex" role="search">
+                <i class="bi bi-search text-suave" aria-hidden="true"></i>
                 <input type="search" name="q" placeholder="Buscá sillones, heladeras, lámparas..." aria-label="Buscar objetos">
                 <button type="button" class="sw-buscador-ubicacion d-none d-lg-inline">
                     <i class="bi bi-geo-alt"></i> <span id="ubicacion-actual">Palermo, CABA</span> <i class="bi bi-chevron-down small"></i>
@@ -45,19 +46,30 @@
             }
             else
             {
-                <nav class="d-flex align-items-center gap-3 ms-auto">
-                    <a href="#" class="sw-header-accion" title="Favoritos"><i class="bi bi-heart"></i></a>
-                    <a asp-controller="Home" asp-action="Chat" class="sw-header-accion" title="Mensajes"><i class="bi bi-chat-dots"></i><span class="sw-punto"></span></a>
-                    <a href="#" class="sw-header-accion" title="Notificaciones"><i class="bi bi-bell"></i></a>
-                    <a asp-controller="Account" asp-action="Perfil" class="sw-avatar" title="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
-                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg"></i> Publicar</a>
-                    <a asp-controller="Account" asp-action="Logout" class="sw-header-accion" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></a>
+                <nav class="d-flex align-items-center gap-1 gap-sm-2 ms-auto" aria-label="Mi cuenta">
+                    <a href="#" class="sw-header-accion" title="Favoritos" aria-label="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
+                    <a asp-controller="Home" asp-action="Chat" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
+                    <a href="#" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones"><i class="bi bi-bell" aria-hidden="true"></i></a>
+                    <a asp-controller="Account" asp-action="Perfil" class="sw-avatar mx-1" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
+                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar</a>
+                    <!-- En celulares el botón Publicar queda como ícono para que entre en el header -->
+                    <a asp-controller="Home" asp-action="Publicar" class="sw-header-accion sw-header-accion--publicar d-sm-none" title="Publicar" aria-label="Publicar"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                    <a asp-controller="Account" asp-action="Logout" class="sw-header-accion" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                 </nav>
             }
         </div>
+
+        <!-- Buscador en celulares (en pantallas medianas en adelante está en la fila de arriba) -->
+        <div class="container-xl d-md-none">
+            <form asp-controller="Home" asp-action="Buscar" method="get" class="sw-buscador sw-buscador--mobile" role="search">
+                <i class="bi bi-search text-suave" aria-hidden="true"></i>
+                <input type="search" name="q" placeholder="Buscá sillones, lámparas..." aria-label="Buscar objetos">
+                <button type="submit" class="sw-btn-icono" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>
+            </form>
+        </div>
     </header>
 
-    <main>
+    <main id="contenido" tabindex="-1">
         @RenderBody()
     </main>
 
