@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Swappit.Models.ViewModels
 {
-    // Datos del formulario de Views/Home/Registro.cshtml
-    // Los nombres de las propiedades coinciden con los asp-for de la vista.
+    // Datos del formulario de Views/Account/Registro.cshtml (llegan por POST).
+    // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
     // Longitudes máximas = columnas de la tabla Usuarios (varchar(50)).
     public class RegistroViewModel
     {

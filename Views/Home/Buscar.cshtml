@@ -1,7 +1,14 @@
-@model Swappit.Models.ViewModels.BuscarViewModel
+@using Swappit.Models.ViewModels
 @{
     ViewData["Title"] = "Buscar";
-    var busqueda = Model.Busqueda;
+    string? busqueda = ViewBag.busqueda;
+    List<ArticuloCardViewModel> articulos = ViewBag.articulos;
+    List<OpcionFiltroViewModel> categorias = ViewBag.categorias;
+    List<OpcionFiltroViewModel> estados = ViewBag.estados;
+    List<int> categoriasSeleccionadas = ViewBag.categoriasSeleccionadas;
+    List<string> estadosSeleccionados = ViewBag.estadosSeleccionados;
+    bool errorCarga = ViewBag.errorCarga;
+    bool hayFiltros = ViewBag.hayFiltros;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -15,14 +22,14 @@
             </button>
 
             <!-- Se envía por GET a Buscar: los filtros quedan en la URL y se combinan con la búsqueda (q) -->
-            <form id="filtros" class="sw-filtros collapse d-lg-block @(Model.HayFiltros ? "show" : "")" method="get" asp-action="Buscar">
+            <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" asp-action="Buscar">
                 @if (!string.IsNullOrEmpty(busqueda))
                 {
                     <input type="hidden" name="q" value="@busqueda">
                 }
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
-                    @if (Model.HayFiltros)
+                    @if (hayFiltros)
                     {
                         <a asp-action="Buscar" asp-route-q="@busqueda" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
                     }
@@ -31,12 +38,12 @@
                 <!-- Categoría: tabla Categorias. El número es cuántos artículos hay (respetando la búsqueda) -->
                 <h6>Categoría</h6>
                 <div id="filtro-categorias" class="mb-4">
-                    @foreach (var cat in Model.Categorias)
+                    @foreach (var cat in categorias)
                     {
                         var idCat = "cat-" + cat.Valor;
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="@idCat"
-                                   checked="@(Model.CategoriasSeleccionadas.Any(c => c.ToString() == cat.Valor))">
+                                   checked="@(categoriasSeleccionadas.Any(c => c.ToString() == cat.Valor))">
                             <label class="form-check-label" for="@idCat">@cat.Texto</label>
                             <span class="contador">@cat.Cantidad</span>
                         </div>
@@ -57,12 +64,12 @@
                 <!-- Estado: valores distintos de Articulos.Estado -->
                 <h6>Estado</h6>
                 <div>
-                    @for (var i = 0; i < Model.Estados.Count; i++)
+                    @for (var i = 0; i < estados.Count; i++)
                     {
-                        var est = Model.Estados[i];
+                        var est = estados[i];
                         var idEst = "est-" + i;
                         <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="@idEst"
-                               checked="@(Model.EstadosSeleccionados.Contains(est.Valor))">
+                               checked="@(estadosSeleccionados.Contains(est.Valor))">
                         <label class="sw-chip" for="@idEst">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
                     }
                 </div>
@@ -96,13 +103,14 @@
 
             <!-- Artículos de la tabla Articulos (HomeController.Buscar → BD.GetArticulosCatalogo) -->
             <div id="lista-objetos" class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
-                @foreach (var articulo in Model.Articulos)
+                @foreach (var articulo in articulos)
                 {
-                    <partial name="_CardObjeto" model="articulo" />
+                    ViewBag.articulo = articulo;
+                    <partial name="_CardObjeto" />
                 }
             </div>
 
-            @if (Model.ErrorCarga)
+            @if (errorCarga)
             {
                 <div class="text-center py-5" role="alert">
                     <i class="bi bi-exclamation-circle fs-1 text-suave"></i>
@@ -112,10 +120,10 @@
             else
             {
                 <!-- Se muestra cuando no hay resultados -->
-                <div id="sin-resultados" class="text-center py-5 @(Model.Articulos.Count > 0 ? "d-none" : "")">
+                <div id="sin-resultados" class="text-center py-5 @(articulos.Count > 0 ? "d-none" : "")">
                     <i class="bi bi-inbox fs-1 text-suave"></i>
                     <p class="text-suave mt-2">
-                        @if (string.IsNullOrEmpty(busqueda) && !Model.HayFiltros) { <text>Todavía no hay objetos publicados.</text> }
+                        @if (string.IsNullOrEmpty(busqueda) && !hayFiltros) { <text>Todavía no hay objetos publicados.</text> }
                         else { <text>No encontramos objetos con esos filtros.</text> }
                     </p>
                 </div>

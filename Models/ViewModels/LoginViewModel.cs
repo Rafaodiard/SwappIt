@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Swappit.Models.ViewModels
 {
-    // Datos del formulario de Views/Home/Login.cshtml
-    // Los nombres de las propiedades coinciden con los asp-for de la vista.
+    // Datos del formulario de Views/Account/Login.cshtml (llegan por POST).
+    // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
     public class LoginViewModel
     {
         [Required(ErrorMessage = "Ingresá tu email")]

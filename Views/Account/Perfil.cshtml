@@ -6,6 +6,7 @@
     string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
     string? foto = ViewBag.foto;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
     string? errorPerfil = TempData["ErrorPerfil"] as string;
     string? mensajePerfil = TempData["MensajePerfil"] as string;
 }
@@ -83,6 +84,41 @@
                     </li>
                 </ul>
             </div>
+        </div>
+
+        <!-- ===== Artículos publicados (Articulos.IdUsuarios = usuario del perfil) ===== -->
+        <div class="col-12">
+            <section class="sw-card p-4" aria-labelledby="titulo-mis-articulos">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+                    <h2 class="font-titulo h3 mb-0" id="titulo-mis-articulos">
+                        Mis artículos publicados
+                        @if (articulos.Count > 0)
+                        {
+                            <span class="text-suave fs-6 fw-normal ms-1">(@articulos.Count)</span>
+                        }
+                    </h2>
+                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar</a>
+                </div>
+
+                @if (articulos.Count > 0)
+                {
+                    <!-- Misma card que el catálogo (Views/Shared/_CardObjeto.cshtml) -->
+                    <div id="mis-articulos" class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                        @foreach (var articulo in articulos)
+                        {
+                            ViewBag.articulo = articulo;
+                            <partial name="_CardObjeto" />
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-box-seam fs-1 text-suave"></i>
+                        <p class="text-suave mt-2 mb-0">Todavía no publicaste ningún artículo.</p>
+                    </div>
+                }
+            </section>
         </div>
 
         <!-- ===== Historial de intercambios (tabla Intercambios) ===== -->

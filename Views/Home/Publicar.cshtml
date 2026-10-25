@@ -1,7 +1,15 @@
 @using Swappit.Models.ViewModels
-@model PublicarArticuloViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Publicar objeto";
+    // Lo cargado en el formulario (vacío la primera vez; con los datos del usuario si el POST volvió con errores).
+    PublicarArticuloViewModel publicar = ViewBag.publicar;
+    List<SelectListItem> categorias = ViewBag.categorias;
+}
+
+@functions {
+    // Clase que pone el input en rojo si el campo volvió del controller con error (como hacía asp-for).
+    string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
 }
 
 <section class="sw-publicar">
@@ -28,7 +36,7 @@
                     <p class="sw-zona-carga-ayuda">o hacé clic para buscarlas en tu dispositivo</p>
                     <button type="button" class="sw-btn sw-btn-contorno" id="boton-subir-fotos" tabindex="-1">Subir fotos</button>
                 </div>
-                <input asp-for="Fotos" id="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden>
+                <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden>
 
                 <!-- Miniaturas: 4 espacios vacíos; publicar.js las completa con las fotos elegidas -->
                 <div class="sw-miniaturas" id="miniaturas">
@@ -39,31 +47,35 @@
                 </div>
 
                 <p class="sw-nota">Hasta @PublicarArticuloViewModel.MaxFotos fotos · JPG o PNG · máx. 10 MB</p>
-                <span class="sw-error" asp-validation-for="Fotos"></span>
+                @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
             </div>
 
             <!-- ===== Columna derecha: datos ===== -->
             <div class="sw-publicar-datos">
-                <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
+                @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
 
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="Titulo"></label>
-                    <input class="sw-input" asp-for="Titulo" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
-                    <span class="sw-error" asp-validation-for="Titulo"></span>
+                    <label class="sw-label" for="Titulo">Título</label>
+                    <input class="sw-input @ClaseError("Titulo")" id="Titulo" name="Titulo" value="@publicar.Titulo" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
+                    @Html.ValidationMessage("Titulo", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-fila">
                     <div class="sw-campo">
-                        <label class="sw-label" asp-for="IdCategorias"></label>
-                        <select class="sw-input sw-select" asp-for="IdCategorias" asp-items="Model.Categorias" required>
-                            <option value="" disabled selected>Elegí una categoría</option>
+                        <label class="sw-label" for="IdCategorias">Categoría</label>
+                        <select class="sw-input sw-select @ClaseError("IdCategorias")" id="IdCategorias" name="IdCategorias" required>
+                            <option value="" disabled selected="@(publicar.IdCategorias == null)">Elegí una categoría</option>
+                            @foreach (var c in categorias)
+                            {
+                                <option value="@c.Value" selected="@(c.Value == publicar.IdCategorias?.ToString())">@c.Text</option>
+                            }
                         </select>
-                        <span class="sw-error" asp-validation-for="IdCategorias"></span>
+                        @Html.ValidationMessage("IdCategorias", new { @class = "sw-error" })
                     </div>
                     <div class="sw-campo">
-                        <label class="sw-label" asp-for="Ubicacion"></label>
-                        <input class="sw-input" asp-for="Ubicacion" placeholder="Palermo, CABA" maxlength="100">
-                        <span class="sw-error" asp-validation-for="Ubicacion"></span>
+                        <label class="sw-label" for="Ubicacion">Ubicación</label>
+                        <input class="sw-input @ClaseError("Ubicacion")" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" placeholder="Palermo, CABA" maxlength="100">
+                        @Html.ValidationMessage("Ubicacion", new { @class = "sw-error" })
                     </div>
                 </div>
 
@@ -73,25 +85,25 @@
                         @foreach (var estado in PublicarArticuloViewModel.Estados)
                         {
                             var idEstado = "Estado_" + estado.Replace(" ", "_");
-                            <input type="radio" class="sw-estado-radio" id="@idEstado" name="Estado" value="@estado" checked="@(Model.Estado == estado)">
+                            <input type="radio" class="sw-estado-radio" id="@idEstado" name="Estado" value="@estado" checked="@(publicar.Estado == estado)">
                             <label class="sw-estado" for="@idEstado">@estado</label>
                         }
                     </div>
-                    <span class="sw-error" asp-validation-for="Estado"></span>
+                    @Html.ValidationMessage("Estado", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="Descripcion"></label>
-                    <textarea class="sw-input sw-textarea" asp-for="Descripcion" rows="5" maxlength="@PublicarArticuloViewModel.MaxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…"></textarea>
+                    <label class="sw-label" for="Descripcion">Descripción</label>
+                    <textarea class="sw-input sw-textarea @ClaseError("Descripcion")" id="Descripcion" name="Descripcion" rows="5" maxlength="@PublicarArticuloViewModel.MaxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
                     <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@PublicarArticuloViewModel.MaxDescripcion</span>
-                    <span class="sw-error" asp-validation-for="Descripcion"></span>
+                    @Html.ValidationMessage("Descripcion", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="ACambio"></label>
+                    <label class="sw-label" for="ACambio">¿Qué te gustaría recibir a cambio?</label>
                     <span class="sw-ayuda">Podés poner varias opciones o dejarlo abierto a propuestas.</span>
-                    <input class="sw-input" asp-for="ACambio" placeholder="Ej: una lámpara, libros, plantas…" maxlength="100">
-                    <span class="sw-error" asp-validation-for="ACambio"></span>
+                    <input class="sw-input @ClaseError("ACambio")" id="ACambio" name="ACambio" value="@publicar.ACambio" placeholder="Ej: una lámpara, libros, plantas…" maxlength="100">
+                    @Html.ValidationMessage("ACambio", new { @class = "sw-error" })
                 </div>
 
                 <hr class="sw-divisor">

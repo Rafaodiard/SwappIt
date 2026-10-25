@@ -15,7 +15,7 @@ public class AccountController : Controller
 
     public IActionResult Index()
     {
-        return View("Login", new LoginViewModel());
+        return View("Login");
     }
     public IActionResult Perfil()
     {
@@ -35,11 +35,12 @@ public class AccountController : Controller
             ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
             ViewBag.provincias = BD.GetProvincias();
             ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
+            ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
             return View();
     }
     public IActionResult Registro()
     {
-        return View(new RegistroViewModel());
+        return View();
     }
 
     public IActionResult CambiarContrasena()
@@ -57,7 +58,9 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Login(LoginViewModel l)
     {
-        if (!ModelState.IsValid) return View("Login", l);
+        // La vista usa ViewBag.login para volver a mostrar el email cargado.
+        ViewBag.login = l;
+        if (!ModelState.IsValid) return View("Login");
 
         Usuarios? u = BD.Login(l);
 
@@ -70,24 +73,26 @@ public class AccountController : Controller
         }
 
         ViewBag.Error = "Email o contraseña incorrectos";
-        return View("Login", l);
+        return View("Login");
     }
 
     [HttpPost]
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
-        if (!ModelState.IsValid) return View(r);
+        // La vista usa ViewBag.registro para volver a mostrar lo que se cargó.
+        ViewBag.registro = r;
+        if (!ModelState.IsValid) return View();
 
         if (BD.UsuarioExiste(r.Mail))
         {
             ViewBag.Error = "Ya existe una cuenta con ese email.";
-            return View(r);
+            return View();
         }
 
         if (r.Contrasena != password2)
         {
             ViewBag.Error = "Las contraseñas no coinciden.";
-            return View(r);
+            return View();
         }
 
         Usuarios u = new Usuarios

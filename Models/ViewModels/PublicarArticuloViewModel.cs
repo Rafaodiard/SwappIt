@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Swappit.Models.ViewModels
 {
-    // Datos del formulario de Views/Home/Publicar.cshtml
-    // Los nombres de las propiedades coinciden con los asp-for de la vista.
+    // Datos del formulario de Views/Home/Publicar.cshtml (llegan por POST).
+    // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
+    // Las opciones de categorías van aparte, en ViewBag.categorias.
     public class PublicarArticuloViewModel
     {
         public const int MaxFotos = 6;
@@ -44,10 +43,6 @@ namespace Swappit.Models.ViewModels
 
         // Hasta MaxFotos imágenes JPG/PNG de máx. 10 MB. La primera es la portada.
         public List<IFormFile>? Fotos { get; set; }
-
-        // Opciones del <select> de categorías (tabla Categorias).
-        [ValidateNever]
-        public IEnumerable<SelectListItem> Categorias { get; set; } = new List<SelectListItem>();
 
         // TODO (BD): la tabla Articulos hoy solo tiene Nombre, Descripcion (varchar(50)),
         // Estado, IdUsuarios e IdCategorias. Faltan columnas/tablas para fotos,

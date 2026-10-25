@@ -1,6 +1,12 @@
-@model Swappit.Models.ViewModels.RegistroViewModel
 @{
     ViewData["Title"] = "Registrarse";
+    // Lo que se cargó en el formulario, si el controller lo devolvió (POST con error). La contraseña no se vuelve a mostrar.
+    Swappit.Models.ViewModels.RegistroViewModel? registro = ViewBag.registro;
+}
+
+@functions {
+    // Clase que pone el input en rojo si el campo volvió del controller con error (como hacía asp-for).
+    string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
 }
 
 <section class="sw-auth">
@@ -11,7 +17,7 @@
         </header>
 
         <form class="sw-form" method="post" asp-controller="Account" asp-action="Registro" novalidate>
-            <div asp-validation-summary="ModelOnly" class="sw-error-resumen" role="alert"></div>
+            @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
             @if (ViewBag.Error != null)
             {
                 <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
@@ -19,27 +25,27 @@
 
             <div class="sw-fila">
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="Nombre"></label>
-                    <input class="sw-input" asp-for="Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
-                    <span class="sw-error" asp-validation-for="Nombre"></span>
+                    <label class="sw-label" for="Nombre">Nombre</label>
+                    <input class="sw-input @ClaseError("Nombre")" id="Nombre" name="Nombre" value="@registro?.Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
+                    @Html.ValidationMessage("Nombre", new { @class = "sw-error" })
                 </div>
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="Apellido"></label>
-                    <input class="sw-input" asp-for="Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
-                    <span class="sw-error" asp-validation-for="Apellido"></span>
+                    <label class="sw-label" for="Apellido">Apellido</label>
+                    <input class="sw-input @ClaseError("Apellido")" id="Apellido" name="Apellido" value="@registro?.Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
+                    @Html.ValidationMessage("Apellido", new { @class = "sw-error" })
                 </div>
             </div>
 
             <div class="sw-campo">
-                <label class="sw-label" asp-for="Mail"></label>
-                <input class="sw-input" asp-for="Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
-                <span class="sw-error" asp-validation-for="Mail"></span>
+                <label class="sw-label" for="Mail">Email</label>
+                <input class="sw-input @ClaseError("Mail")" id="Mail" name="Mail" value="@registro?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                @Html.ValidationMessage("Mail", new { @class = "sw-error" })
             </div>
 
             <div class="sw-campo">
-                <label class="sw-label" asp-for="Contrasena"></label>
-                <input class="sw-input" asp-for="Contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
-                <span class="sw-error" asp-validation-for="Contrasena"></span>
+                <label class="sw-label" for="Contrasena">Contraseña</label>
+                <input class="sw-input @ClaseError("Contrasena")" id="Contrasena" name="Contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
+                @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
             </div>
 
             <div class="sw-campo">
@@ -49,17 +55,17 @@
 
             <div class="sw-fila">
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="FechaNacimiento"></label>
+                    <label class="sw-label" for="FechaNacimiento">Fecha de nacimiento</label>
                     <div class="sw-input-icono">
                         <i class="bi bi-calendar3" aria-hidden="true"></i>
-                        <input class="sw-input" asp-for="FechaNacimiento" type="date" autocomplete="bday">
+                        <input class="sw-input @ClaseError("FechaNacimiento")" id="FechaNacimiento" name="FechaNacimiento" value="@registro?.FechaNacimiento?.ToString("yyyy-MM-dd")" type="date" autocomplete="bday">
                     </div>
-                    <span class="sw-error" asp-validation-for="FechaNacimiento"></span>
+                    @Html.ValidationMessage("FechaNacimiento", new { @class = "sw-error" })
                 </div>
                 <div class="sw-campo">
-                    <label class="sw-label" asp-for="Telefono"></label>
-                    <input class="sw-input" asp-for="Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
-                    <span class="sw-error" asp-validation-for="Telefono"></span>
+                    <label class="sw-label" for="Telefono">Número de teléfono</label>
+                    <input class="sw-input @ClaseError("Telefono")" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
+                    @Html.ValidationMessage("Telefono", new { @class = "sw-error" })
                 </div>
             </div>
 

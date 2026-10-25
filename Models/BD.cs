@@ -6,9 +6,8 @@ namespace Swappit.Models;
 
 public static class BD
 {
-    private static string _connectionString = @"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
-
-    // La columna se llama [Fecha nacimiento] (con espacio), por eso el alias.
+    private static string _connectionString = //@"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
+    @"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
     private const string SelectUsuarios = @"SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
         [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias FROM Usuarios";
 
@@ -110,8 +109,9 @@ public static class BD
     // Artículos para el catálogo, del más nuevo al más viejo.
     // busqueda: filtra por nombre (null o vacío = todos). cantidad: límite opcional (ej: destacados del inicio).
     // categorias / estados: filtros del panel de Buscar (null o vacío = sin filtrar por ese campo).
+    // idUsuario: solo los artículos publicados por ese usuario (Articulos.IdUsuarios), para el perfil.
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
-        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<string>? estados = null)
+        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<string>? estados = null, int? idUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -119,6 +119,7 @@ public static class BD
             // Dapper expande las listas en IN (...); con una lista vacía no se agrega la condición.
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
             if (estados is { Count: > 0 }) condiciones.Add("a.Estado IN @pEstados");
+            if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
             string query = $@"SELECT {top}a.IdArticulos, a.Nombre, a.Estado, u.Barrio,
@@ -133,7 +134,8 @@ public static class BD
                 pBusqueda = PatronBusqueda(busqueda),
                 pCantidad = cantidad,
                 pCategorias = categorias,
-                pEstados = estados
+                pEstados = estados,
+                pIdUsuario = idUsuario
             }).ToList();
         }
     }

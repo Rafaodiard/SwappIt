@@ -1,9 +1,9 @@
-@model Swappit.Models.ViewModels.ArticuloCardViewModel
 @*
     Card / Objeto  (componente "10. Card" del UI Kit)
     ------------------------------------------------------------
-    Se renderiza desde el servidor con un ArticuloCardViewModel:
-    <partial name="_CardObjeto" model="articulo" />
+    Se renderiza desde el servidor con un ArticuloCardViewModel en ViewBag.articulo:
+    ViewBag.articulo = articulo;
+    <partial name="_CardObjeto" />
 
     Mantiene data-template / data-campo para que swappit.renderObjetos (site.js)
     pueda seguir usándola como molde si más adelante se carga por JS.
@@ -15,30 +15,33 @@
       barrio   -> Usuarios.Barrio del dueño
     Pendiente (no existe en la BD todavía): distancia y "Busca a cambio".
 *@
+@{
+    Swappit.Models.ViewModels.ArticuloCardViewModel articulo = ViewBag.articulo;
+}
 <div class="col col-objeto" data-template="card-objeto">
-    <article class="card-objeto" data-id="@Model.IdArticulos">
+    <article class="card-objeto" data-id="@articulo.IdArticulos">
         <div class="card-objeto-img sw-img">
-            @if (!string.IsNullOrEmpty(Model.Imagen))
+            @if (!string.IsNullOrEmpty(articulo.Imagen))
             {
-                <img src="@Model.Imagen" alt="@Model.Nombre" data-campo="imagen">
+                <img src="@articulo.Imagen" alt="@articulo.Nombre" data-campo="imagen">
             }
             else
             {
                 <img alt="" data-campo="imagen">
             }
-            <span class="card-objeto-estado" data-campo="estado">@Model.Estado</span>
-            <button type="button" class="card-objeto-fav" aria-label="Agregar @Model.Nombre a favoritos"><i class="bi bi-heart"></i></button>
+            <span class="card-objeto-estado" data-campo="estado">@articulo.Estado</span>
+            <button type="button" class="card-objeto-fav" aria-label="Agregar @articulo.Nombre a favoritos"><i class="bi bi-heart"></i></button>
         </div>
         <div class="card-objeto-body">
             <h3 class="card-objeto-titulo">
                 @* TODO: apuntar al detalle del artículo cuando exista esa pantalla *@
-                <a href="#" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@Model.Nombre</a>
+                <a href="#" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
             </h3>
-            @if (!string.IsNullOrWhiteSpace(Model.Barrio))
+            @if (!string.IsNullOrWhiteSpace(articulo.Barrio))
             {
                 <div class="card-objeto-ubicacion">
                     <i class="bi bi-geo-alt"></i>
-                    <span data-campo="barrio">@Model.Barrio</span>
+                    <span data-campo="barrio">@articulo.Barrio</span>
                 </div>
             }
         </div>
