@@ -11,12 +11,23 @@ public static class BD
     private const string SelectUsuarios = @"SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
         [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias FROM Usuarios";
 
-    public static Usuarios? Login(LoginViewModel l)
+    // La contraseña no se compara en SQL: se guarda hasheada y se verifica en Contrasenas.Verificar.
+    public static Usuarios? GetUsuarioByMail(string mail)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = SelectUsuarios + " WHERE Mail = @pMail AND Contraseña = @pContrasena";
-            return connection.QueryFirstOrDefault<Usuarios>(query, new { pMail = l.Mail, pContrasena = l.Contrasena });
+            string query = SelectUsuarios + " WHERE Mail = @pMail";
+            return connection.QueryFirstOrDefault<Usuarios>(query, new { pMail = mail });
+        }
+    }
+
+    // Recibe la contraseña ya hasheada (Contrasenas.Hashear).
+    public static void ActualizarContrasena(int idUsuario, string contrasenaHash)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "UPDATE Usuarios SET Contraseña = @pContrasena WHERE IdUsuarios = @pId";
+            connection.Execute(query, new { pId = idUsuario, pContrasena = contrasenaHash });
         }
     }
 

@@ -94,10 +94,16 @@ public class AccountController : Controller
         ViewBag.login = l;
         if (!ModelState.IsValid) return View("Login");
 
-        Usuarios? u = BD.Login(l);
+        Usuarios? u = BD.GetUsuarioByMail(l.Mail);
 
-        if (u != null)
+        if (u != null && Contrasenas.Verificar(u.Contraseña, l.Contrasena, out bool hayQueActualizar))
         {
+            // Contraseña vieja en texto plano: se aprovecha que la tenemos para guardarla hasheada.
+            if (hayQueActualizar)
+            {
+                BD.ActualizarContrasena(u.IdUsuarios, Contrasenas.Hashear(l.Contrasena));
+            }
+
             HttpContext.Session.SetInt32("UsuarioId", u.IdUsuarios);
             GuardarDatosHeader(u);
 
@@ -132,7 +138,7 @@ public class AccountController : Controller
             Nombre = r.Nombre,
             Apellido = r.Apellido,
             Mail = r.Mail,
-            Contraseña = r.Contrasena,
+            Contraseña = Contrasenas.Hashear(r.Contrasena),
             FechaNacimiento = r.FechaNacimiento!.Value,
             Edad = CalcularEdad(r.FechaNacimiento.Value),
             Telefono = ConvertirTelefono(r.Telefono),
@@ -144,13 +150,7 @@ public class AccountController : Controller
 
         BD.Register(u);
 
-        LoginViewModel login = new LoginViewModel
-        {
-            Mail = u.Mail,
-            Contrasena = u.Contraseña
-        };
-
-        Usuarios? usuario = BD.Login(login);
+        Usuarios? usuario = BD.GetUsuarioByMail(u.Mail);
 
         if (usuario != null)
         {
@@ -163,9 +163,9 @@ public class AccountController : Controller
 
     [HttpPost]
     public IActionResult CambiarContrasena(
-        string contrasenaActual,
-        string contrasenaNueva,
-        string confirmarContrasena)
+        string? contrasenaActual,
+        string? contrasenaNueva,
+        string? confirmarContrasena)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
 
@@ -181,9 +181,16 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        if (usuario.Contraseña != contrasenaActual)
+        if (!Contrasenas.Verificar(usuario.Contraseña, contrasenaActual ?? string.Empty, out _))
         {
             ViewBag.Error = "La contraseña actual es incorrecta.";
+            return View();
+        }
+
+        // Mismo largo que pide el registro (RegistroViewModel.Contrasena).
+        if (string.IsNullOrEmpty(contrasenaNueva) || contrasenaNueva.Length < 8 || contrasenaNueva.Length > 50)
+        {
+            ViewBag.Error = "La nueva contraseña tiene que tener entre 8 y 50 caracteres.";
             return View();
         }
 
@@ -193,9 +200,7 @@ public class AccountController : Controller
             return View();
         }
 
-        usuario.Contraseña = contrasenaNueva;
-
-        BD.UpdateUsuario(usuario);
+        BD.ActualizarContrasena(usuario.IdUsuarios, Contrasenas.Hashear(contrasenaNueva));
 
         ViewBag.Message = "Contraseña cambiada exitosamente.";
 
