@@ -217,7 +217,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Usuario] [varchar](50) NOT NULL,
 	[Mail] [varchar](50) NOT NULL,
 	[Telefono] [int] NOT NULL,
-	[Contraseña] [varchar](50) NOT NULL,
+	[Contraseña] [varchar](100) NOT NULL,
 	[Barrio] [varchar](50) NOT NULL,
 	[Fecha nacimiento] [date] NOT NULL,
 	[Edad] [int] NOT NULL,
@@ -230,26 +230,26 @@ CREATE TABLE [dbo].[Usuarios](
 GO
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
 
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Auriculares Bluetooth', N'Funcionan perfectamente', N'Muy bueno', 3, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Novela de fantasía', N'Leída una sola vez', N'Bueno', 3, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Teclado mecánico', N'Switches en buen estado', N'Muy bueno', 4, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Buzo gris', N'Talle M, poco uso', N'Bueno', 4, 3)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Mochila universitaria', N'Sin roturas, amplia', N'Muy bueno', 5, 3)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Lámpara de escritorio', N'Luz cálida, funciona bien', N'Bueno', 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Remera negra', N'Talle L, buen estado', N'Bueno', 6, 3)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Parlante portátil', N'Batería en buen estado', N'Muy bueno', 6, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Lámpara LED', N'Funciona correctamente', N'Muy bueno', 7, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Raqueta de tenis', N'Grip cuidado, sin roturas', N'Bueno', 7, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Organizador de escritorio', N'Madera, poco uso', N'Bueno', 8, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Webcam HD', N'Imagen nítida, funciona bien', N'Muy bueno', 8, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Mouse gamer', N'Sensor funcionando bien', N'Muy bueno', 9, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Pelota de básquet', N'Uso normal, buen pique', N'Bueno', 9, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Mancuernas 5 kg', N'Par completo, buen estado', N'Muy bueno', 10, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Guitarra criolla', N'Afinada y funcional', N'Bueno', 10, 6)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Set de tazas', N'Seis tazas en buen estado', N'Muy bueno', 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Libro de programación', N'Con algunos subrayados', N'Bueno', 11, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Cuaderno de dibujo', N'Hojas sin usar', N'Muy bueno', 12, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Campera de jean', N'Talle M, buen estado', N'Bueno', 12, 3)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', N'Muy bueno', 3, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', N'Bueno', 3, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', N'Bueno', 4, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', N'Muy bueno', 4, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', N'Bueno', 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', N'Muy bueno', 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', N'Muy bueno', 6, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', N'Bueno', 6, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', N'Bueno', 7, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', N'Muy bueno', 7, 2)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', N'Bueno', 8, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', N'Bueno', 8, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', N'Muy bueno', 9, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', N'Bueno', 9, 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', N'Bueno', 10, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', N'Muy bueno', 10, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', N'Muy bueno', 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', N'Bueno', 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', N'Muy bueno', 12, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', N'Bueno', 12, 1)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -492,7 +492,7 @@ CREATE PROCEDURE [dbo].[RegistrarUsuario]
 	@usuario varchar(50),
 	@mail varchar(50),
 	@telefono int,
-	@contraseña varchar(50),
+	@contraseña varchar(100),
 	@barrio varchar(50),
 	@fechaNacimiento date,
 	@idProvincia int
@@ -502,11 +502,8 @@ BEGIN
 	BEGIN
 		IF NOT EXISTS (SELECT Telefono FROM Usuarios WHERE Telefono = @telefono)
 		BEGIN
-			IF NOT EXISTS (SELECT Contraseña FROM Usuarios WHERE Contraseña = @contraseña)
-			BEGIN
-				INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], IdProvincias)
-				VALUES(@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @idProvincia)
-			END
+			INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], IdProvincias)
+			VALUES(@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @idProvincia)
 		END
 	END
 END

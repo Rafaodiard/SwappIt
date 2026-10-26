@@ -1,4 +1,5 @@
-﻿/****** Contraseñas hasheadas. Ejecutar UNA vez sobre una base ya creada (con SQLSwappit.sql, SQLSwappit_CualquierCompu.sql o BaseDatos/).
+﻿/****** Contraseñas hasheadas. Solo hace falta en bases creadas antes de que los scripts de creación
+   (SQLSwappit.sql, SQLSwappit_CualquierCompu.sql y BaseDatos/) ya trajeran Contraseña varchar(100).
    Se puede volver a ejecutar sin problema. ******/
 USE [Base_De_Datos_Swappit]
 GO

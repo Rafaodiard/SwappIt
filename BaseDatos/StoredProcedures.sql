@@ -103,7 +103,7 @@ CREATE PROCEDURE [dbo].[RegistrarUsuario]
 	@usuario varchar(50),
 	@mail varchar(50),
 	@telefono int,
-	@contraseña varchar(50),
+	@contraseña varchar(100),
 	@barrio varchar(50),
 	@fechaNacimiento date,
 	@idProvincia int
@@ -113,11 +113,8 @@ BEGIN
 	BEGIN
 		IF NOT EXISTS (SELECT Telefono FROM Usuarios WHERE Telefono = @telefono)
 		BEGIN
-			IF NOT EXISTS (SELECT Contraseña FROM Usuarios WHERE Contraseña = @contraseña)
-			BEGIN
-				INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], IdProvincias)
-				VALUES(@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @idProvincia)
-			END
+			INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], IdProvincias)
+			VALUES(@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @idProvincia)
 		END
 	END
 END

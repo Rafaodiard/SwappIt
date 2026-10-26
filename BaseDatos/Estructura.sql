@@ -196,7 +196,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Usuario] [varchar](50) NOT NULL,
 	[Mail] [varchar](50) NOT NULL,
 	[Telefono] [int] NOT NULL,
-	[Contraseña] [varchar](50) NOT NULL,
+	[Contraseña] [varchar](100) NOT NULL,
 	[Barrio] [varchar](50) NOT NULL,
 	[Fecha nacimiento] [date] NOT NULL,
 	[Edad] [int] NOT NULL,
