@@ -12,4 +12,5 @@ public class Usuarios
     public DateTime FechaNacimiento { get; set; }
     public int Edad { get; set; }
     public int IdProvincias { get; set; }
+    public string? Descripcion { get; set; }
 }

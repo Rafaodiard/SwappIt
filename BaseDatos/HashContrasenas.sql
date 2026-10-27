@@ -7,10 +7,7 @@ GO
 IF COL_LENGTH('dbo.Usuarios', 'Contraseña') < 100
 	ALTER TABLE [dbo].[Usuarios] ALTER COLUMN [Contraseña] [varchar](100) NOT NULL
 GO
-/****** 2. RegistrarUsuario: se saca el control de "contraseña ya usada por otro usuario".
-   Con hash nunca coincide (cada hash tiene su propia sal) y, además, le avisaba a quien se registraba
-   que otra persona usa esa contraseña. Lo demás queda igual que antes.
-   La app no usa este procedure (registra con un INSERT en BD.Register). ******/
+
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

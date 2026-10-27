@@ -81,3 +81,25 @@ document.addEventListener('click', e => {
     icono.classList.toggle('bi-heart');
     icono.classList.toggle('bi-heart-fill');
 });
+
+// Avatares: si la foto de perfil no se puede cargar (ej: el archivo no está en esta compu),
+// se reemplaza por las iniciales del contenedor (data-iniciales).
+(() => {
+    function mostrarIniciales(img) {
+        const avatar = img.closest('[data-iniciales]');
+        if (!avatar) return;
+        const span = document.createElement('span');
+        span.textContent = avatar.dataset.iniciales;
+        img.replaceWith(span);
+    }
+
+    // Fase de captura: el evento error de las imágenes no burbujea. También cubre las que agrega perfil.js.
+    document.addEventListener('error', (e) => {
+        if (e.target instanceof HTMLImageElement) mostrarIniciales(e.target);
+    }, true);
+
+    // Las que ya fallaron antes de que cargara este script.
+    document.querySelectorAll('[data-iniciales] img').forEach((img) => {
+        if (img.complete && img.naturalWidth === 0) mostrarIniciales(img);
+    });
+})();

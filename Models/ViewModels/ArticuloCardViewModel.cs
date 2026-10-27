@@ -1,7 +1,8 @@
 namespace Swappit.Models.ViewModels;
 
 // Datos que necesita la card de un artículo (Views/Shared/_CardObjeto.cshtml).
-// Sale de Articulos + Usuarios (barrio del dueño) + Imagenes (primera foto del artículo).
+// Sale de Articulos + Usuarios + Imagenes (primera foto del artículo).
+// Barrio = Articulos.Ubicacion, o el barrio del dueño si el artículo no tiene ubicación.
 public class ArticuloCardViewModel
 {
     public int IdArticulos { get; set; }

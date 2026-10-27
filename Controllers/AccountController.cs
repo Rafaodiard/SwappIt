@@ -38,11 +38,9 @@ public class AccountController : Controller
             ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
             return View();
     }
-    // Perfil de otro usuario (se llega desde la página del artículo). Lo puede ver cualquiera.
-    // Muestra solo datos públicos: no se pasan mail, teléfono ni edad a la vista.
+   
     public IActionResult PerfilPublico(int id)
     {
-        // Si es el propio usuario, va a su perfil (el que se puede editar).
         if (HttpContext.Session.GetInt32("UsuarioId") == id)
         {
             return RedirectToAction("Perfil");
@@ -62,7 +60,8 @@ public class AccountController : Controller
             Nombre = usuario.Nombre,
             Apellido = usuario.Apellido,
             Usuario = usuario.Usuario,
-            Barrio = usuario.Barrio
+            Barrio = usuario.Barrio,
+            Descripcion = usuario.Descripcion
         };
         ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
         ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
@@ -90,7 +89,6 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Login(LoginViewModel l)
     {
-        // La vista usa ViewBag.login para volver a mostrar el email cargado.
         ViewBag.login = l;
         if (!ModelState.IsValid) return View("Login");
 
@@ -98,7 +96,6 @@ public class AccountController : Controller
 
         if (u != null && Contrasenas.Verificar(u.Contraseña, l.Contrasena, out bool hayQueActualizar))
         {
-            // Contraseña vieja en texto plano: se aprovecha que la tenemos para guardarla hasheada.
             if (hayQueActualizar)
             {
                 BD.ActualizarContrasena(u.IdUsuarios, Contrasenas.Hashear(l.Contrasena));
@@ -117,7 +114,6 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
-        // La vista usa ViewBag.registro para volver a mostrar lo que se cargó.
         ViewBag.registro = r;
         if (!ModelState.IsValid) return View();
 
@@ -142,7 +138,6 @@ public class AccountController : Controller
             FechaNacimiento = r.FechaNacimiento!.Value,
             Edad = CalcularEdad(r.FechaNacimiento.Value),
             Telefono = ConvertirTelefono(r.Telefono),
-            // TODO: el formulario no pide Usuario, Barrio ni Provincia.
             Usuario = r.Mail.Split('@')[0],
             Barrio = string.Empty,
             IdProvincias = 1
@@ -187,7 +182,7 @@ public class AccountController : Controller
             return View();
         }
 
-        // Mismo largo que pide el registro (RegistroViewModel.Contrasena).
+        
         if (string.IsNullOrEmpty(contrasenaNueva) || contrasenaNueva.Length < 8 || contrasenaNueva.Length > 50)
         {
             ViewBag.Error = "La nueva contraseña tiene que tener entre 8 y 50 caracteres.";
@@ -224,7 +219,6 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        // Los errores se muestran en el pop up: Perfil lo vuelve a abrir si hay TempData["ErrorPerfil"]
         if (!ModelState.IsValid)
         {
             TempData["ErrorPerfil"] = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
@@ -262,6 +256,7 @@ public class AccountController : Controller
         usuario.Telefono = ConvertirTelefono(e.Telefono ?? string.Empty);
         usuario.Barrio = e.Barrio?.Trim() ?? string.Empty;
         usuario.IdProvincias = e.IdProvincias;
+        usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();
 
         BD.UpdateUsuario(usuario);
         GuardarDatosHeader(usuario);

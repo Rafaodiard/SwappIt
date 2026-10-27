@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\50416809\\Desktop\\SwappIt\\Swappit.csproj": {}
+    "C:\\Users\\49758734\\Desktop\\SwappIt\\Swappit.csproj": {}
   },
   "projects": {
-    "C:\\Users\\50416809\\Desktop\\SwappIt\\Swappit.csproj": {
+    "C:\\Users\\49758734\\Desktop\\SwappIt\\Swappit.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\50416809\\Desktop\\SwappIt\\Swappit.csproj",
+        "projectUniqueName": "C:\\Users\\49758734\\Desktop\\SwappIt\\Swappit.csproj",
         "projectName": "Swappit",
-        "projectPath": "C:\\Users\\50416809\\Desktop\\SwappIt\\Swappit.csproj",
-        "packagesPath": "C:\\Users\\50416809\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\50416809\\Desktop\\SwappIt\\obj\\",
+        "projectPath": "C:\\Users\\49758734\\Desktop\\SwappIt\\Swappit.csproj",
+        "packagesPath": "C:\\Users\\49758734\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\49758734\\Desktop\\SwappIt\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\50416809\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\49758734\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

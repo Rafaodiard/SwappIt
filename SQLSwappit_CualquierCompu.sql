@@ -112,10 +112,12 @@ GO
 CREATE TABLE [dbo].[Articulos](
 	[IdArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
-	[Descripcion] [varchar](50) NOT NULL,
+	[Descripcion] [varchar](500) NOT NULL,
 	[Estado] [varchar](50) NOT NULL,
 	[IdUsuarios] [int] NOT NULL,
 	[IdCategorias] [int] NOT NULL,
+	[Ubicacion] [varchar](100) NULL,
+	[ACambio] [varchar](100) NULL,
  CONSTRAINT [PK_Articulos] PRIMARY KEY CLUSTERED 
 (
 	[IdArticulos] ASC
@@ -133,6 +135,20 @@ CREATE TABLE [dbo].[Categorias](
  CONSTRAINT [PK_Categorias] PRIMARY KEY CLUSTERED 
 (
 	[IdCategorias] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Estados]    Script Date: 27/10/2026 08:51:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Estados](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_Estados] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -222,6 +238,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Fecha nacimiento] [date] NOT NULL,
 	[Edad] [int] NOT NULL,
 	[IdProvincias] [int] NOT NULL,
+	[Descripcion] [varchar](500) NULL,
  CONSTRAINT [PK_Usuarios] PRIMARY KEY CLUSTERED 
 (
 	[IdUsuarios] ASC
@@ -230,26 +247,26 @@ CREATE TABLE [dbo].[Usuarios](
 GO
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
 
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', N'Muy bueno', 3, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', N'Bueno', 3, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', N'Bueno', 4, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', N'Muy bueno', 4, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', N'Bueno', 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', N'Muy bueno', 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', N'Muy bueno', 6, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', N'Bueno', 6, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', N'Bueno', 7, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', N'Muy bueno', 7, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', N'Bueno', 8, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', N'Bueno', 8, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', N'Muy bueno', 9, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', N'Bueno', 9, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', N'Bueno', 10, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', N'Muy bueno', 10, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', N'Muy bueno', 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', N'Bueno', 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', N'Muy bueno', 12, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', N'Bueno', 12, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', N'Muy buen estado', 3, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', N'Buen estado', 3, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', N'Buen estado', 4, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', N'Muy buen estado', 4, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', N'Buen estado', 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', N'Muy buen estado', 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', N'Muy buen estado', 6, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', N'Buen estado', 6, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', N'Buen estado', 7, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', N'Muy buen estado', 7, 2)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', N'Buen estado', 8, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', N'Buen estado', 8, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', N'Muy buen estado', 9, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', N'Buen estado', 9, 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', N'Buen estado', 10, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', N'Muy buen estado', 10, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', N'Muy buen estado', 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', N'Buen estado', 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', N'Muy buen estado', 12, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', N'Buen estado', 12, 1)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -262,9 +279,17 @@ INSERT [dbo].[Categorias] ([IdCategorias], [Nombre]) VALUES (5, N'Deportes')
 INSERT [dbo].[Categorias] ([IdCategorias], [Nombre]) VALUES (6, N'Música')
 SET IDENTITY_INSERT [dbo].[Categorias] OFF
 GO
+SET IDENTITY_INSERT [dbo].[Estados] ON 
+
+INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (1, N'Como nuevo')
+INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (2, N'Muy buen estado')
+INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (3, N'Buen estado')
+INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (4, N'Usado')
+SET IDENTITY_INSERT [dbo].[Estados] OFF
+GO
 SET IDENTITY_INSERT [dbo].[Imagenes] ON 
 
-INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (1, N'/img/perfiles/2_8df301965cc785d.png', NULL, 2)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (2, N'/img/perfiles/2_8df340421a76dd6.png', NULL, 2)
 SET IDENTITY_INSERT [dbo].[Imagenes] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Provincias] ON 
@@ -321,18 +346,18 @@ SET IDENTITY_INSERT [dbo].[Provincias] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 
 
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (2, N'Rafael dasf', N'Odiard Wesler', N'rafaelodiard', N'rafaelodiard@gmail.com', 0, N'12345678', N'', CAST(N'2024-11-01' AS Date), 1, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (3, N'Sofía', N'Martínez', N'sofia.martinez', N'sofia.martinez@example.com', 110000001, N'SwappitDemo01!', N'Almagro', CAST(N'2005-04-12' AS Date), 21, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (4, N'Mateo', N'Gómez', N'mateo.gomez', N'mateo.gomez@example.com', 110000002, N'SwappitDemo02!', N'Villa Crespo', CAST(N'2004-09-23' AS Date), 22, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (5, N'Valentina', N'López', N'valentina.lopez', N'valentina.lopez@example.com', 110000003, N'SwappitDemo03!', N'Caballito', CAST(N'2006-01-30' AS Date), 20, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (6, N'Lucas', N'Pérez', N'lucas.perez', N'lucas.perez@example.com', 110000006, N'SwappitDemo06!', N'Villa Urquiza', CAST(N'2005-02-19' AS Date), 21, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (7, N'Martina', N'Díaz', N'martina.diaz', N'martina.diaz@example.com', 110000007, N'SwappitDemo07!', N'Belgrano', CAST(N'2006-06-02' AS Date), 20, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (8, N'Thiago', N'Acosta', N'thiago.acosta', N'thiago.acosta@example.com', 110000010, N'SwappitDemo10!', N'Palermo', CAST(N'2005-08-05' AS Date), 21, 1)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (9, N'Tomás', N'Fernández', N'tomas.fernandez', N'tomas.fernandez@example.com', 110000004, N'SwappitDemo04!', N'Nueva Córdoba', CAST(N'2005-07-08' AS Date), 21, 6)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (10, N'Benjamín', N'Torres', N'benjamin.torres', N'benjamin.torres@example.com', 110000008, N'SwappitDemo08!', N'General Paz', CAST(N'2005-12-27' AS Date), 20, 6)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (11, N'Camila', N'Rodríguez', N'camila.rodriguez', N'camila.rodriguez@example.com', 110000005, N'SwappitDemo05!', N'Centro', CAST(N'2004-11-16' AS Date), 21, 21)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (12, N'Julieta', N'Romero', N'julieta.romero', N'julieta.romero@example.com', 110000009, N'SwappitDemo09!', N'Rosario Centro', CAST(N'2004-03-14' AS Date), 22, 21)
-INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias]) VALUES (13, N'MARTINA', N'DRUCAROFF', N'50416809', N'50416809@est.ort.edu.ar', 0, N'12345678', N'', CAST(N'2000-09-09' AS Date), 26, 1)
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (2, N'Rafael dasf', N'Odiard Wesler', N'rafaelodiard', N'rafaelodiard@gmail.com', 0, N'AQAAAAIAAYagAAAAECiEIkRdwaCH2m8I7EVXb7wY7NNakfcf73xLU1wvvOWUCSSQNxhmMZj4mvt1ffIK/w==', N'', CAST(N'2024-11-01' AS Date), 1, 25, NULL)
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (3, N'Sofía', N'Martínez', N'sofia.martinez', N'sofia.martinez@example.com', 110000001, N'SwappitDemo01!', N'Almagro', CAST(N'2005-04-12' AS Date), 21, 1, N'Me mudé hace poco a Almagro y estoy armando la cocina. Busco cosas para el depto; coordinamos por el chat de Swappit.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (4, N'Mateo', N'Gómez', N'mateo.gomez', N'mateo.gomez@example.com', 110000002, N'SwappitDemo02!', N'Villa Crespo', CAST(N'2004-09-23' AS Date), 22, 1, N'Armando mi primer monoambiente en Villa Crespo. Me interesan muebles chicos y cosas de cocina. Puedo encontrarme cerca del subte B.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (5, N'Valentina', N'López', N'valentina.lopez', N'valentina.lopez@example.com', 110000003, N'SwappitDemo03!', N'Caballito', CAST(N'2006-01-30' AS Date), 20, 1, N'Me sobran cosas de la casa de mis viejos y prefiero cambiarlas antes que tirarlas. Busco plantas, libros o cosas para el balcón.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (6, N'Lucas', N'Pérez', N'lucas.perez', N'lucas.perez@example.com', 110000006, N'SwappitDemo06!', N'Villa Urquiza', CAST(N'2005-02-19' AS Date), 21, 1, N'Trabajo desde casa, así que me interesa todo lo que sirva para armar un buen escritorio. Respondo rápido por el chat.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (7, N'Martina', N'Díaz', N'martina.diaz', N'martina.diaz@example.com', 110000007, N'SwappitDemo07!', N'Belgrano', CAST(N'2006-06-02' AS Date), 20, 1, N'Me encanta cocinar y estoy aprendiendo. Cambio cosas de cocina y libros; si querés, coordinamos un fin de semana por Belgrano.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (8, N'Thiago', N'Acosta', N'thiago.acosta', N'thiago.acosta@example.com', 110000010, N'SwappitDemo10!', N'Palermo', CAST(N'2005-08-05' AS Date), 21, 1, N'Estoy ordenando el depto y quiero darles otra vida a las cosas que no uso. Busco algo para el living. Coordinamos por el chat.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (9, N'Tomás', N'Fernández', N'tomas.fernandez', N'tomas.fernandez@example.com', 110000004, N'SwappitDemo04!', N'Nueva Córdoba', CAST(N'2005-07-08' AS Date), 21, 6, N'Estudio en Córdoba y me muevo en bici. Me interesan cosas útiles para un depto de estudiante. Coordinamos por Nueva Córdoba.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (10, N'Benjamín', N'Torres', N'benjamin.torres', N'benjamin.torres@example.com', 110000008, N'SwappitDemo08!', N'General Paz', CAST(N'2005-12-27' AS Date), 20, 6, N'Me estoy independizando y necesito de todo un poco. Prefiero cambiar antes que comprar nuevo. Escribime y lo vemos.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (11, N'Camila', N'Rodríguez', N'camila.rodriguez', N'camila.rodriguez@example.com', 110000005, N'SwappitDemo05!', N'Centro', CAST(N'2004-11-16' AS Date), 21, 21, N'Me mudo seguido y viajo liviana. Cambio cosas para la casa por algo que entre en una mochila o sirva para cocinar.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (12, N'Julieta', N'Romero', N'julieta.romero', N'julieta.romero@example.com', 110000009, N'SwappitDemo09!', N'Rosario Centro', CAST(N'2004-03-14' AS Date), 22, 21, N'Recién llegada a Rosario Centro, armando el depto de a poco. Busco lámparas, plantas o cosas de deco. Respondo por el chat.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (13, N'MARTINA', N'DRUCAROFF', N'50416809', N'50416809@est.ort.edu.ar', 0, N'12345678', N'', CAST(N'2000-09-09' AS Date), 26, 1, NULL)
 SET IDENTITY_INSERT [dbo].[Usuarios] OFF
 GO
 ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_Categorias] FOREIGN KEY([IdCategorias])

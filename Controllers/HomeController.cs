@@ -10,10 +10,12 @@ namespace Swappit.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IWebHostEnvironment _env;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IWebHostEnvironment env)
     {
         _logger = logger;
+        _env = env;
     }
 
     public IActionResult Index()
@@ -136,32 +138,161 @@ public class HomeController : Controller
     }
 
     // ===== Publicar objeto =====
+    // Hay que estar logueado: el artículo se guarda con IdUsuarios = UsuarioId de la sesión.
     [HttpGet]
     public IActionResult Publicar()
     {
-        // TODO: requerir usuario logueado.
-        ViewBag.publicar = new PublicarArticuloViewModel();
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+        {
+            return RedirectToAction("Index", "Account");
+        }
+
+        // La ubicación arranca con el barrio del perfil; el usuario la puede cambiar.
+        PublicarArticuloViewModel publicar = new PublicarArticuloViewModel();
+        try
+        {
+            publicar.Ubicacion = BD.GetUsuarioById(usuarioId.Value)?.Barrio ?? string.Empty;
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudo leer el barrio del usuario {IdUsuario}", usuarioId);
+        }
+
+        ViewBag.publicar = publicar;
         ViewBag.categorias = ObtenerCategorias();
+        ViewBag.estados = ObtenerEstados();
         return View();
     }
 
+    // 6 fotos de 10 MB superan el límite por defecto de Kestrel por pedido (~28 MB): se amplía solo acá.
+    private const long LimitePedidoPublicar = (PublicarArticuloViewModel.MaxFotos * PublicarArticuloViewModel.MaxFotoMB + 1) * 1024L * 1024L;
+
     [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(LimitePedidoPublicar)]
+    [RequestFormLimits(MultipartBodyLengthLimit = LimitePedidoPublicar)]
     public IActionResult Publicar(PublicarArticuloViewModel modelo)
     {
-        // TODO: requerir usuario logueado.
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+        {
+            return RedirectToAction("Index", "Account");
+        }
+
         List<SelectListItem> categorias = ObtenerCategorias();
         if (modelo.IdCategorias.HasValue && !categorias.Any(c => c.Value == modelo.IdCategorias.Value.ToString()))
         {
             ModelState.AddModelError(nameof(modelo.IdCategorias), "Elegí una categoría de la lista");
         }
+        List<string> estados = ObtenerEstados();
+        if (!string.IsNullOrEmpty(modelo.Estado) && !estados.Contains(modelo.Estado))
+        {
+            ModelState.AddModelError(nameof(modelo.Estado), "Elegí uno de los estados de la lista");
+        }
+
+        List<IFormFile> fotos = (modelo.Fotos ?? []).Where(f => f.Length > 0).ToList();
+        ValidarFotos(fotos);
 
         // Si hay errores, la vista vuelve a mostrar lo que el usuario cargó.
         ViewBag.publicar = modelo;
         ViewBag.categorias = categorias;
-        if (!ModelState.IsValid) return View();
+        ViewBag.estados = estados;
+        if (!ModelState.IsValid)
+        {
+            AvisarFotosDeNuevo(fotos);
+            return View();
+        }
 
-        // TODO: guardar el artículo (y sus fotos) con IdUsuarios del usuario logueado.
-        return View();
+        List<string> rutasFotos = new List<string>();
+        try
+        {
+            GuardarFotosArticulo(fotos, usuarioId.Value, rutasFotos);
+
+            Articulos articulo = new Articulos
+            {
+                Nombre = modelo.Titulo.Trim(),
+                Descripcion = modelo.Descripcion.Trim(),
+                Estado = modelo.Estado,
+                IdUsuarios = usuarioId.Value,
+                IdCategorias = modelo.IdCategorias!.Value,
+                Ubicacion = modelo.Ubicacion.Trim(),
+                ACambio = string.IsNullOrWhiteSpace(modelo.ACambio) ? null : modelo.ACambio.Trim()
+            };
+            int idArticulo = BD.PublicarArticulo(articulo, rutasFotos);
+
+            TempData["MensajeArticulo"] = "¡Listo! Tu artículo ya está publicado.";
+            return RedirectToAction("Articulo", new { id = idArticulo });
+        }
+        catch (Exception ex) when (ex is SqlException or IOException or UnauthorizedAccessException)
+        {
+            // No quedan fotos sueltas en wwwroot de un artículo que no se guardó.
+            _logger.LogError(ex, "No se pudo publicar el artículo del usuario {IdUsuario}", usuarioId);
+            BorrarFotosArticulo(rutasFotos);
+            ModelState.AddModelError(string.Empty, "No pudimos publicar tu artículo. Probá de nuevo en un rato.");
+            AvisarFotosDeNuevo(fotos);
+            return View();
+        }
+    }
+
+    // Mismas reglas que las fotos de perfil (AccountController.EditarPerfil): extensión JPG/PNG y tamaño máximo.
+    private void ValidarFotos(List<IFormFile> fotos)
+    {
+        if (fotos.Count > PublicarArticuloViewModel.MaxFotos)
+        {
+            ModelState.AddModelError("Fotos", $"Podés subir hasta {PublicarArticuloViewModel.MaxFotos} fotos.");
+        }
+        else if (fotos.Any(f => !PublicarArticuloViewModel.ExtensionesFoto.Contains(Path.GetExtension(f.FileName).ToLower())))
+        {
+            ModelState.AddModelError("Fotos", "Las fotos tienen que ser JPG o PNG.");
+        }
+        else if (fotos.Any(f => f.Length > PublicarArticuloViewModel.MaxFotoMB * 1024 * 1024))
+        {
+            ModelState.AddModelError("Fotos", $"Cada foto puede pesar hasta {PublicarArticuloViewModel.MaxFotoMB} MB.");
+        }
+    }
+
+    // El navegador no vuelve a cargar un <input type="file"> cuando la página vuelve con errores.
+    private void AvisarFotosDeNuevo(List<IFormFile> fotos)
+    {
+        if (fotos.Count > 0 && ModelState["Fotos"]?.Errors.Count is null or 0)
+        {
+            ModelState.AddModelError("Fotos", "Volvé a elegir las fotos antes de publicar.");
+        }
+    }
+
+    // Las fotos van a wwwroot/img/articulos y la ruta a Imagenes.Ruta, que es varchar(50):
+    // nombre corto con id del usuario + ticks en hexa + número de foto (~48 caracteres como máximo).
+    // Agrega cada ruta a rutasFotos antes de escribirla, para poder borrarlas si algo falla después.
+    private void GuardarFotosArticulo(List<IFormFile> fotos, int idUsuario, List<string> rutasFotos)
+    {
+        string carpeta = Path.Combine(_env.WebRootPath, "img", "articulos");
+        Directory.CreateDirectory(carpeta);
+
+        long ticks = DateTime.Now.Ticks;
+        for (int i = 0; i < fotos.Count; i++)
+        {
+            string extension = Path.GetExtension(fotos[i].FileName).ToLower();
+            string nombreArchivo = $"{idUsuario}_{ticks:x}_{i + 1}{extension}";
+            rutasFotos.Add($"/img/articulos/{nombreArchivo}");
+
+            using (FileStream stream = new FileStream(Path.Combine(carpeta, nombreArchivo), FileMode.Create))
+            {
+                fotos[i].CopyTo(stream);
+            }
+        }
+    }
+
+    private void BorrarFotosArticulo(List<string> rutasFotos)
+    {
+        foreach (string ruta in rutasFotos)
+        {
+            string archivo = Path.Combine(_env.WebRootPath, "img", "articulos", Path.GetFileName(ruta));
+            if (System.IO.File.Exists(archivo))
+            {
+                System.IO.File.Delete(archivo);
+            }
+        }
     }
 
     // Opciones del <select> de categorías, desde la tabla Categorias.
@@ -176,6 +307,21 @@ public class HomeController : Controller
         {
             _logger.LogError(ex, "No se pudieron cargar las categorías");
             return new List<SelectListItem>();
+        }
+    }
+
+    // Opciones de "Estado del objeto", desde la tabla Estados.
+    // Si la BD falla, no hay opciones y el POST no valida (no se puede publicar sin estado).
+    private List<string> ObtenerEstados()
+    {
+        try
+        {
+            return BD.GetEstados().Select(e => e.Nombre!).ToList();
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron cargar los estados");
+            return new List<string>();
         }
     }
 

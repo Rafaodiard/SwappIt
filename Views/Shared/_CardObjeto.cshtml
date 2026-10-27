@@ -12,8 +12,8 @@
       imagen   -> primera fila de Imagenes del artículo (si no hay, se ve el placeholder de .sw-img)
       estado   -> Articulos.Estado
       nombre   -> Articulos.Nombre
-      barrio   -> Usuarios.Barrio del dueño
-    Pendiente (no existe en la BD todavía): distancia y "Busca a cambio".
+      barrio   -> Articulos.Ubicacion (si está vacía, Usuarios.Barrio del dueño)
+    Pendiente: distancia (no existe en la BD) y "Busca a cambio" (Articulos.ACambio, por ahora solo en el detalle).
 *@
 @{
     Swappit.Models.ViewModels.ArticuloCardViewModel articulo = ViewBag.articulo;

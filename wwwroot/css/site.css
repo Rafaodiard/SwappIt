@@ -460,7 +460,15 @@ a.sw-avatar:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, .7); }
 .form-check-input:checked { background-color: var(--sw-primario); border-color: var(--sw-primario); }
 .form-range::-webkit-slider-thumb { background: var(--sw-primario); }
 .form-range::-moz-range-thumb { background: var(--sw-primario); }
+/* Barrita del filtro distancia */
+input[type="range"] { accent-color: var(--sw-secundario); }
 
+/* Bootstrap .form-range pinta el círculo y la pista aparte
+   (cada navegador en su propia regla, si no se ignoran) */
+.form-range::-webkit-slider-thumb { background-color: var(--sw-secundario); }
+.form-range::-moz-range-thumb { background-color: var(--sw-secundario); }
+.form-range::-webkit-slider-runnable-track { background-color: var(--sw-gris); }
+.form-range::-moz-range-track { background-color: var(--sw-gris); }
 .sw-chip {
     display: inline-block;
     border: 1px solid var(--sw-borde);
@@ -927,7 +935,8 @@ a.sw-avatar:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, .7); }
     background: var(--sw-crema); color: var(--sw-primario);
     font-size: .8rem; font-weight: 600;
 }
-.sw-articulo-descripcion { white-space: pre-line; overflow-wrap: anywhere; }
+.sw-articulo-descripcion,
+.sw-perfil-descripcion { white-space: pre-line; overflow-wrap: anywhere; }
 .sw-articulo-propio { background: var(--sw-crema); color: var(--sw-primario); border-radius: 12px; padding: .75rem 1rem; font-size: .9rem; }
 
 /* Tarjeta "Publicado por": lleva al perfil del dueño */

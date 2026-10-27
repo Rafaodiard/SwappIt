@@ -5,6 +5,8 @@
     // Lo cargado en el formulario (vacío la primera vez; con los datos del usuario si el POST volvió con errores).
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
+    // Nombres de la tabla Estados (HomeController.ObtenerEstados).
+    List<string> estados = ViewBag.estados;
 }
 
 @functions {
@@ -36,7 +38,8 @@
                     <p class="sw-zona-carga-ayuda">o hacé clic para buscarlas en tu dispositivo</p>
                     <button type="button" class="sw-btn sw-btn-contorno" id="boton-subir-fotos" tabindex="-1">Subir fotos</button>
                 </div>
-                <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden>
+                <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden
+                       data-max-fotos="@PublicarArticuloViewModel.MaxFotos" data-max-mb="@PublicarArticuloViewModel.MaxFotoMB">
 
                 <!-- Miniaturas: 4 espacios vacíos; publicar.js las completa con las fotos elegidas -->
                 <div class="sw-miniaturas" id="miniaturas">
@@ -46,8 +49,10 @@
                     <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
                 </div>
 
-                <p class="sw-nota">Hasta @PublicarArticuloViewModel.MaxFotos fotos · JPG o PNG · máx. 10 MB</p>
+                <p class="sw-nota">Hasta @PublicarArticuloViewModel.MaxFotos fotos · JPG o PNG · máx. @PublicarArticuloViewModel.MaxFotoMB MB cada una</p>
                 @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
+                <!-- Aviso de publicar.js si se eligen fotos que no se aceptan -->
+                <p class="sw-error" id="aviso-fotos" role="alert"></p>
             </div>
 
             <!-- ===== Columna derecha: datos ===== -->
@@ -82,7 +87,7 @@
                 <div class="sw-campo sw-campo-estado">
                     <span class="sw-label" id="etiqueta-estado">Estado del objeto</span>
                     <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado">
-                        @foreach (var estado in PublicarArticuloViewModel.Estados)
+                        @foreach (var estado in estados)
                         {
                             var idEstado = "Estado_" + estado.Replace(" ", "_");
                             <input type="radio" class="sw-estado-radio" id="@idEstado" name="Estado" value="@estado" checked="@(publicar.Estado == estado)">

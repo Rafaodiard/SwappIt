@@ -3,7 +3,8 @@
 // - Zona de carga: clic o arrastrar para elegir fotos
 // - Miniaturas con vista previa y botón para quitar
 // - Contador de caracteres de la descripción
-// No valida ni envía nada: eso queda del lado del servidor
+// Descarta fotos que no son JPG/PNG o pesan de más para no mandarlas,
+// pero la validación que vale es la del servidor
 // (ver PublicarArticuloViewModel y HomeController.Publicar).
 // =========================================================
 
@@ -13,8 +14,12 @@
     const miniaturas = document.getElementById('miniaturas');
     if (!zona || !inputFotos || !miniaturas) return;
 
-    const MAX_FOTOS = 6;     // mismo valor que PublicarArticuloViewModel.MaxFotos
+    // Límites que pone la vista desde PublicarArticuloViewModel (MaxFotos / MaxFotoMB)
+    const MAX_FOTOS = Number(inputFotos.dataset.maxFotos) || 6;
+    const MAX_MB = Number(inputFotos.dataset.maxMb) || 10;
+    const TIPOS = ['image/jpeg', 'image/png'];
     const ESPACIOS_MIN = 4;  // espacios vacíos que muestra el diseño
+    const aviso = document.getElementById('aviso-fotos');
     let archivos = [];
 
     // --- Zona de carga ---
@@ -39,14 +44,27 @@
 
     // --- Fotos ---
     function agregar(lista) {
-        const nuevas = Array.from(lista).filter(f => f.type.startsWith('image/'));
-        archivos = archivos.concat(nuevas).slice(0, MAX_FOTOS);
+        const elegidas = Array.from(lista);
+        const validas = elegidas.filter(f => TIPOS.includes(f.type) && f.size <= MAX_MB * 1024 * 1024);
+        const lugar = Math.max(MAX_FOTOS - archivos.length, 0);
+
+        const avisos = [];
+        if (validas.length < elegidas.length) avisos.push(`Solo se aceptan fotos JPG o PNG de hasta ${MAX_MB} MB.`);
+        if (validas.length > lugar) avisos.push(`Podés subir hasta ${MAX_FOTOS} fotos.`);
+        mostrarAviso(avisos.join(' '));
+
+        archivos = archivos.concat(validas.slice(0, lugar));
         actualizar();
     }
 
     function quitar(indice) {
         archivos.splice(indice, 1);
+        mostrarAviso('');
         actualizar();
+    }
+
+    function mostrarAviso(texto) {
+        if (aviso) aviso.textContent = texto;
     }
 
     // Mantiene el <input type="file"> sincronizado para que el formulario envíe las fotos elegidas

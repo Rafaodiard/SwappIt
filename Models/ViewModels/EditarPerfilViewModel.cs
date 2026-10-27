@@ -7,6 +7,7 @@ namespace Swappit.Models.ViewModels
     public class EditarPerfilViewModel
     {
         public const int MaxFotoMB = 5;
+        public const int MaxDescripcion = 500;
         public static readonly string[] ExtensionesFoto = { ".jpg", ".jpeg", ".png" };
 
         [Required(ErrorMessage = "Ingresá tu nombre")]
@@ -26,6 +27,10 @@ namespace Swappit.Models.ViewModels
 
         [StringLength(50, ErrorMessage = "El barrio puede tener hasta {1} caracteres")]
         public string? Barrio { get; set; }
+
+        // Columna Usuarios.Descripcion (varchar(500), opcional). Se muestra en Perfil y PerfilPublico.
+        [StringLength(MaxDescripcion, ErrorMessage = "La descripción puede tener hasta {1} caracteres")]
+        public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "Elegí una provincia")]
         public int IdProvincias { get; set; }

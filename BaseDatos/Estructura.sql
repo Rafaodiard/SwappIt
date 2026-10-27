@@ -91,10 +91,12 @@ GO
 CREATE TABLE [dbo].[Articulos](
 	[IdArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
-	[Descripcion] [varchar](50) NOT NULL,
+	[Descripcion] [varchar](500) NOT NULL,
 	[Estado] [varchar](50) NOT NULL,
 	[IdUsuarios] [int] NOT NULL,
 	[IdCategorias] [int] NOT NULL,
+	[Ubicacion] [varchar](100) NULL,
+	[ACambio] [varchar](100) NULL,
  CONSTRAINT [PK_Articulos] PRIMARY KEY CLUSTERED 
 (
 	[IdArticulos] ASC
@@ -112,6 +114,20 @@ CREATE TABLE [dbo].[Categorias](
  CONSTRAINT [PK_Categorias] PRIMARY KEY CLUSTERED 
 (
 	[IdCategorias] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Estados]    Script Date: 27/10/2026 08:51:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Estados](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_Estados] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -201,6 +217,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Fecha nacimiento] [date] NOT NULL,
 	[Edad] [int] NOT NULL,
 	[IdProvincias] [int] NOT NULL,
+	[Descripcion] [varchar](500) NULL,
  CONSTRAINT [PK_Usuarios] PRIMARY KEY CLUSTERED 
 (
 	[IdUsuarios] ASC

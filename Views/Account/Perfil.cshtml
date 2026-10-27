@@ -23,11 +23,10 @@
     <div class="row g-4">
 
         <!-- ===== Nombre + foto ===== -->
-        @* TODO (BD): la tabla Usuarios no tiene columna para la descripción del perfil. *@
         <div class="col-lg-6 d-flex flex-column gap-4">
             <div class="sw-card p-4 flex-grow-1 d-flex align-items-center">
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start w-100">
-                    <div class="sw-perfil-avatar">
+                    <div class="sw-perfil-avatar" data-iniciales="@iniciales">
                         @if (foto != null)
                         {
                             <img src="@foto" alt="Foto de @usuario.Nombre">
@@ -41,7 +40,18 @@
                     </div>
                     <div>
                         <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
-                        <p class="text-suave mb-3">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        <p class="text-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        @if (!string.IsNullOrWhiteSpace(usuario.Descripcion))
+                        {
+                            <p class="sw-perfil-descripcion mb-3" data-campo="descripcion">@usuario.Descripcion</p>
+                        }
+                        else
+                        {
+                            <p class="mb-3">
+                                <button type="button" class="btn btn-link text-suave p-0" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"
+                                        data-enfocar="Descripcion"><i class="bi bi-plus-circle me-1"></i> Agregá una descripción</button>
+                            </p>
+                        }
                         <button type="button" class="btn btn-sw-primario btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1"></i> Editar perfil</button>
                     </div>
                 </div>
@@ -232,6 +242,14 @@
                             }
                         </select>
                     </div>
+                </div>
+
+                <div class="sw-campo">
+                    <label class="sw-label" for="Descripcion">Descripción</label>
+                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4" maxlength="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion"
+                              placeholder="Contá quién sos, qué te gusta intercambiar o cómo preferís coordinar…">@usuario.Descripcion</textarea>
+                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion</span>
+                    <span class="sw-ayuda">La ven todos en tu perfil público.</span>
                 </div>
 
                 <div class="sw-campo">

@@ -1,6 +1,6 @@
 @*
     Perfil público de otro usuario (AccountController.PerfilPublico).
-    Solo muestra datos públicos: nombre, usuario, barrio/provincia, foto y sus artículos.
+    Solo muestra datos públicos: nombre, usuario, descripción, barrio/provincia, foto y sus artículos.
     Mail, teléfono y edad quedan solo en el perfil propio (Perfil.cshtml).
 *@
 @{
@@ -37,7 +37,7 @@
         <div class="col-12">
             <div class="sw-card p-4 p-lg-5">
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
-                    <div class="sw-perfil-avatar">
+                    <div class="sw-perfil-avatar" data-iniciales="@iniciales">
                         @if (foto != null)
                         {
                             <img src="@foto" alt="Foto de @usuario.Nombre">
@@ -50,6 +50,10 @@
                     <div class="min-w-0">
                         <h1 class="font-titulo h2 mb-0">@usuario.Nombre @usuario.Apellido</h1>
                         <p class="text-suave mb-2">@@@usuario.Usuario</p>
+                        @if (!string.IsNullOrWhiteSpace(usuario.Descripcion))
+                        {
+                            <p class="sw-perfil-descripcion mb-3">@usuario.Descripcion</p>
+                        }
                         <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-3 text-suave small">
                             @if (ubicacion != "")
                             {

@@ -11,9 +11,8 @@ public static class BD
 
     
     private const string SelectUsuarios = @"SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias FROM Usuarios";
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion FROM Usuarios";
 
-    // La contraseña no se compara en SQL: se guarda hasheada y se verifica en Contrasenas.Verificar.
     public static Usuarios? GetUsuarioByMail(string mail)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -84,12 +83,11 @@ public static class BD
         {
             string query = @"UPDATE Usuarios SET Nombre = @Nombre, Apellido = @Apellido, Usuario = @Usuario, Mail = @Mail,
                 Telefono = @Telefono, Contraseña = @Contraseña, Barrio = @Barrio, [Fecha nacimiento] = @FechaNacimiento,
-                Edad = @Edad, IdProvincias = @IdProvincias WHERE IdUsuarios = @IdUsuarios";
+                Edad = @Edad, IdProvincias = @IdProvincias, Descripcion = @Descripcion WHERE IdUsuarios = @IdUsuarios";
             connection.Execute(query, u);
         }
     }
 
-    // La foto de perfil es la fila de Imagenes con IdUsuarios del usuario y sin IdArticulos.
     public static string? GetFotoUsuario(int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -118,23 +116,20 @@ public static class BD
         }
     }
 
-    // Artículos para el catálogo, del más nuevo al más viejo.
-    // busqueda: filtra por nombre (null o vacío = todos). cantidad: límite opcional (ej: destacados del inicio).
-    // categorias / estados: filtros del panel de Buscar (null o vacío = sin filtrar por ese campo).
-    // idUsuario: solo los artículos publicados por ese usuario (Articulos.IdUsuarios), para el perfil.
+ 
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
         IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<string>? estados = null, int? idUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
             var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')" };
-            // Dapper expande las listas en IN (...); con una lista vacía no se agrega la condición.
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
             if (estados is { Count: > 0 }) condiciones.Add("a.Estado IN @pEstados");
             if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
-            string query = $@"SELECT {top}a.IdArticulos, a.Nombre, a.Estado, u.Barrio,
+            // Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
+            string query = $@"SELECT {top}a.IdArticulos, a.Nombre, a.Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
                     (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
                 FROM Articulos a
                 INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
@@ -156,12 +151,39 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdArticulos, Nombre, Descripcion, Estado, IdUsuarios, IdCategorias FROM Articulos WHERE IdArticulos = @pId";
+            string query = @"SELECT IdArticulos, Nombre, Descripcion, Estado, IdUsuarios, IdCategorias, Ubicacion, ACambio
+                FROM Articulos WHERE IdArticulos = @pId";
             return connection.QueryFirstOrDefault<Articulos>(query, new { pId = id });
         }
     }
 
-    // Fotos de un artículo (Imagenes.IdArticulos), en el orden en que se cargaron. La primera es la de la card.
+    // Guarda un artículo nuevo y sus fotos (rutas ya guardadas en wwwroot, la primera es la portada).
+    // Va todo en una transacción: si falla algo, no queda un artículo a medias. Devuelve el IdArticulos nuevo.
+    public static int PublicarArticulo(Articulos a, List<string> rutasFotos)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                string query = @"INSERT INTO Articulos (Nombre, Descripcion, Estado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
+                    OUTPUT INSERTED.IdArticulos
+                    VALUES (@Nombre, @Descripcion, @Estado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio)";
+                int idArticulo = connection.QuerySingle<int>(query, a, transaccion);
+
+                // Las fotos de artículos llevan IdArticulos (las de perfil llevan IdUsuarios e IdArticulos NULL).
+                string queryFoto = "INSERT INTO Imagenes (Ruta, IdArticulos) VALUES (@pRuta, @pIdArticulo)";
+                foreach (string ruta in rutasFotos)
+                {
+                    connection.Execute(queryFoto, new { pRuta = ruta, pIdArticulo = idArticulo }, transaccion);
+                }
+
+                transaccion.Commit();
+                return idArticulo;
+            }
+        }
+    }
+
     public static List<string> GetImagenesArticulo(int idArticulo)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -189,8 +211,17 @@ public static class BD
         }
     }
 
-    // Categorías para el filtro de Buscar, con cuántos artículos de cada una coinciden con la búsqueda por nombre.
-    // Incluye las categorías sin artículos (cantidad 0).
+
+    // Opciones de "Estado del objeto" en Publicar, en el orden en que se cargaron (de mejor a peor).
+    public static List<Estados> GetEstados()
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT Id, Nombre FROM Estados ORDER BY Id";
+            return connection.Query<Estados>(query).ToList();
+        }
+    }
+
     public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))

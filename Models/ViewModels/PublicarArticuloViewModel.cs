@@ -4,14 +4,13 @@ namespace Swappit.Models.ViewModels
 {
     // Datos del formulario de Views/Home/Publicar.cshtml (llegan por POST).
     // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
-    // Las opciones de categorías van aparte, en ViewBag.categorias.
+    // Las opciones de categorías y estados van aparte, en ViewBag.categorias y ViewBag.estados.
     public class PublicarArticuloViewModel
     {
         public const int MaxFotos = 6;
+        public const int MaxFotoMB = 10;
         public const int MaxDescripcion = 500;
-
-        // Valores del selector de estado (chips). Se guardan como texto en Articulos.Estado.
-        public static readonly string[] Estados = { "Como nuevo", "Muy buen estado", "Buen estado", "Usado" };
+        public static readonly string[] ExtensionesFoto = { ".jpg", ".jpeg", ".png" };
 
         [Required(ErrorMessage = "Ponele un título a tu objeto")]
         [StringLength(50, ErrorMessage = "Máximo {1} caracteres")]
@@ -29,7 +28,8 @@ namespace Swappit.Models.ViewModels
 
         [Required(ErrorMessage = "Elegí el estado del objeto")]
         [Display(Name = "Estado del objeto")]
-        public string Estado { get; set; } = "Muy buen estado";
+        // Uno de los Nombre de la tabla Estados. Se guarda como texto en Articulos.Estado.
+        public string Estado { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Contá cómo es tu objeto")]
         [StringLength(MaxDescripcion, ErrorMessage = "Máximo {1} caracteres")]
@@ -41,11 +41,11 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "¿Qué te gustaría recibir a cambio?")]
         public string? ACambio { get; set; }
 
-        // Hasta MaxFotos imágenes JPG/PNG de máx. 10 MB. La primera es la portada.
+        // Hasta MaxFotos imágenes JPG/PNG de máx. MaxFotoMB. La primera es la portada.
+        // Se guardan en wwwroot/img/articulos y en la tabla Imagenes (con IdArticulos).
         public List<IFormFile>? Fotos { get; set; }
 
-        // TODO (BD): la tabla Articulos hoy solo tiene Nombre, Descripcion (varchar(50)),
-        // Estado, IdUsuarios e IdCategorias. Faltan columnas/tablas para fotos,
-        // ubicación y "a cambio", y Descripcion tiene que ampliarse a 500 caracteres.
+        // Titulo -> Articulos.Nombre. Ubicacion, ACambio y Descripcion (varchar(500))
+        // necesitan BaseDatos/PublicarArticulo.sql en bases creadas antes de ese script.
     }
 }
