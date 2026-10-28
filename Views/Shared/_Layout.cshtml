@@ -28,7 +28,7 @@
             </a>
 
             <!-- Buscador (va a Home/Buscar con ?q=) -->
-            <form asp-controller="Home" asp-action="Buscar" method="get" class="sw-buscador flex-grow-1 d-none d-md-flex" role="search">
+            <form asp-controller="Articulos" asp-action="Buscar" method="get" class="sw-buscador flex-grow-1 d-none d-md-flex" role="search">
                 <i class="bi bi-search text-suave" aria-hidden="true"></i>
                 <input type="search" name="q" placeholder="Buscá sillones, heladeras, lámparas..." aria-label="Buscar objetos">
                 <button type="button" class="sw-buscador-ubicacion d-none d-lg-inline">
@@ -48,16 +48,16 @@
             {
                 <nav class="d-flex align-items-center gap-1 gap-sm-2 ms-auto" aria-label="Mi cuenta">
                     <a href="#" class="sw-header-accion" title="Favoritos" aria-label="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
-                    <a asp-controller="Home" asp-action="Chat" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
+                    <a asp-controller="Chat" asp-action="Index" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
                     <!-- Notificaciones: el pop up va justo después del botón para que el Tab entre en él -->
                     <div class="sw-notif" data-notif>
                         <button type="button" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones" aria-expanded="false" aria-controls="popup-notificaciones" data-notif-boton><i class="bi bi-bell" aria-hidden="true"></i></button>
                         <partial name="_PopupNotificaciones" />
                     </div>
-                    <a asp-controller="Account" asp-action="Perfil" class="sw-avatar mx-1" data-iniciales="@iniciales" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
-                    <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar</a>
+                    <a asp-controller="Perfil" asp-action="Index" class="sw-avatar mx-1" data-iniciales="@iniciales" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
+                    <a asp-controller="Publicar" asp-action="Index" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar</a>
                     <!-- En celulares el botón Publicar queda como ícono para que entre en el header -->
-                    <a asp-controller="Home" asp-action="Publicar" class="sw-header-accion sw-header-accion--publicar d-sm-none" title="Publicar" aria-label="Publicar"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
+                    <a asp-controller="Publicar" asp-action="Index" class="sw-header-accion sw-header-accion--publicar d-sm-none" title="Publicar" aria-label="Publicar"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
                     <a asp-controller="Account" asp-action="Logout" class="sw-header-accion" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                 </nav>
             }
@@ -65,7 +65,7 @@
 
         <!-- Buscador en celulares (en pantallas medianas en adelante está en la fila de arriba) -->
         <div class="container-xl d-md-none">
-            <form asp-controller="Home" asp-action="Buscar" method="get" class="sw-buscador sw-buscador--mobile" role="search">
+            <form asp-controller="Articulos" asp-action="Buscar" method="get" class="sw-buscador sw-buscador--mobile" role="search">
                 <i class="bi bi-search text-suave" aria-hidden="true"></i>
                 <input type="search" name="q" placeholder="Buscá sillones, lámparas..." aria-label="Buscar objetos">
                 <button type="submit" class="sw-btn-icono" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>

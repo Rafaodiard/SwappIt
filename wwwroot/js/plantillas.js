@@ -54,7 +54,7 @@ const swappit = (() => {
     function renderObjetos(selector, articulos) {
         renderLista(selector, articulos, 'card-objeto', (nodo, a) => {
             nodo.querySelector('.card-objeto').dataset.id = a.id;
-            nodo.querySelector('[data-campo="nombre"]').href = `/Home/Articulo/${a.id}`;
+            nodo.querySelector('[data-campo="nombre"]').href = `/Articulos/Detalle/${a.id}`;
             nodo.querySelector('img[data-campo="imagen"]').alt = a.nombre;
         });
         const vacio = document.getElementById('sin-resultados');

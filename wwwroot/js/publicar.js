@@ -5,7 +5,7 @@
 // - Contador de caracteres de la descripción
 // Descarta fotos que no son JPG/PNG o pesan de más para no mandarlas,
 // pero la validación que vale es la del servidor
-// (ver PublicarArticuloViewModel y HomeController.Publicar).
+// (ver PublicarArticuloViewModel y PublicarController).
 // =========================================================
 
 (() => {

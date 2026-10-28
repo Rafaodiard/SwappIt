@@ -28,7 +28,7 @@ namespace Swappit.Models.ViewModels
         [StringLength(50, ErrorMessage = "El barrio puede tener hasta {1} caracteres")]
         public string? Barrio { get; set; }
 
-        // Columna Usuarios.Descripcion (varchar(500), opcional). Se muestra en Perfil y PerfilPublico.
+        // Columna Usuarios.Descripcion (varchar(500), opcional). Se muestra en Perfil/Index y Perfil/Publico.
         [StringLength(MaxDescripcion, ErrorMessage = "La descripción puede tener hasta {1} caracteres")]
         public string? Descripcion { get; set; }
 

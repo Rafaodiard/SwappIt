@@ -4,69 +4,13 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
+// Cuenta del usuario: iniciar sesión (/Account), registrarse, cambiar la contraseña y cerrar sesión.
+// Ver y editar el perfil está en PerfilController.
 public class AccountController : Controller
 {
-    private readonly IWebHostEnvironment _env;
-
-    public AccountController(IWebHostEnvironment env)
-    {
-        _env = env;
-    }
-
     public IActionResult Index()
     {
         return View("Login");
-    }
-    public IActionResult Perfil()
-    {
-        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (usuarioId == null)
-            {
-                return RedirectToAction("Index");
-            }
-
-            Usuarios? usuario = BD.GetUsuarioById(usuarioId.Value);
-            if (usuario == null)
-            {
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.usuario = usuario;
-            ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
-            ViewBag.provincias = BD.GetProvincias();
-            ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
-            ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
-            return View();
-    }
-   
-    public IActionResult PerfilPublico(int id)
-    {
-        if (HttpContext.Session.GetInt32("UsuarioId") == id)
-        {
-            return RedirectToAction("Perfil");
-        }
-
-        Usuarios? usuario = BD.GetUsuarioById(id);
-        if (usuario == null)
-        {
-            Response.StatusCode = StatusCodes.Status404NotFound;
-            ViewBag.usuario = null;
-            return View();
-        }
-
-        ViewBag.usuario = new Usuarios
-        {
-            IdUsuarios = usuario.IdUsuarios,
-            Nombre = usuario.Nombre,
-            Apellido = usuario.Apellido,
-            Usuario = usuario.Usuario,
-            Barrio = usuario.Barrio,
-            Descripcion = usuario.Descripcion
-        };
-        ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
-        ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
-        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
-        return View();
     }
 
     public IActionResult Registro()
@@ -102,7 +46,7 @@ public class AccountController : Controller
             }
 
             HttpContext.Session.SetInt32("UsuarioId", u.IdUsuarios);
-            GuardarDatosHeader(u);
+            SesionUsuario.GuardarDatosHeader(HttpContext.Session, u);
 
             return RedirectToAction("Index", "Home");
         }
@@ -137,7 +81,7 @@ public class AccountController : Controller
             Contraseña = Contrasenas.Hashear(r.Contrasena),
             FechaNacimiento = r.FechaNacimiento!.Value,
             Edad = CalcularEdad(r.FechaNacimiento.Value),
-            Telefono = ConvertirTelefono(r.Telefono),
+            Telefono = Telefonos.Convertir(r.Telefono),
             Usuario = r.Mail.Split('@')[0],
             Barrio = string.Empty,
             IdProvincias = 1
@@ -150,7 +94,7 @@ public class AccountController : Controller
         if (usuario != null)
         {
             HttpContext.Session.SetInt32("UsuarioId", usuario.IdUsuarios);
-            GuardarDatosHeader(usuario);
+            SesionUsuario.GuardarDatosHeader(HttpContext.Session, usuario);
         }
 
         return RedirectToAction("Index", "Home");
@@ -182,7 +126,6 @@ public class AccountController : Controller
             return View();
         }
 
-        
         if (string.IsNullOrEmpty(contrasenaNueva) || contrasenaNueva.Length < 8 || contrasenaNueva.Length > 50)
         {
             ViewBag.Error = "La nueva contraseña tiene que tener entre 8 y 50 caracteres.";
@@ -202,70 +145,6 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost]
-    public IActionResult EditarPerfil(EditarPerfilViewModel e)
-    {
-        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-
-        if (usuarioId == null)
-        {
-            return RedirectToAction("Index", "Account");
-        }
-
-        Usuarios? usuario = BD.GetUsuarioById(usuarioId.Value);
-
-        if (usuario == null)
-        {
-            return RedirectToAction("Index", "Account");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            TempData["ErrorPerfil"] = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
-            return RedirectToAction("Perfil");
-        }
-
-        if (e.Foto != null)
-        {
-            string extension = Path.GetExtension(e.Foto.FileName).ToLower();
-
-            if (!EditarPerfilViewModel.ExtensionesFoto.Contains(extension))
-            {
-                TempData["ErrorPerfil"] = "La foto tiene que ser JPG o PNG.";
-                return RedirectToAction("Perfil");
-            }
-
-            if (e.Foto.Length > EditarPerfilViewModel.MaxFotoMB * 1024 * 1024)
-            {
-                TempData["ErrorPerfil"] = $"La foto puede pesar hasta {EditarPerfilViewModel.MaxFotoMB} MB.";
-                return RedirectToAction("Perfil");
-            }
-
-            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
-            BD.GuardarFotoUsuario(usuario.IdUsuarios, GuardarFoto(e.Foto, usuario.IdUsuarios, extension));
-        }
-        else if (e.QuitarFoto)
-        {
-            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
-            BD.BorrarFotoUsuario(usuario.IdUsuarios);
-        }
-
-        usuario.Nombre = e.Nombre.Trim();
-        usuario.Apellido = e.Apellido.Trim();
-        usuario.Usuario = e.Usuario.Trim().TrimStart('@');
-        usuario.Telefono = ConvertirTelefono(e.Telefono ?? string.Empty);
-        usuario.Barrio = e.Barrio?.Trim() ?? string.Empty;
-        usuario.IdProvincias = e.IdProvincias;
-        usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();
-
-        BD.UpdateUsuario(usuario);
-        GuardarDatosHeader(usuario);
-
-        TempData["MensajePerfil"] = "Perfil actualizado.";
-
-        return RedirectToAction("Perfil");
-    }
-
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
@@ -273,67 +152,10 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Account");
     }
 
-    // Iniciales y foto se guardan en la session para mostrarlas en el avatar del header.
-    private void GuardarDatosHeader(Usuarios u)
-    {
-        HttpContext.Session.SetString("Iniciales", ObtenerIniciales(u));
-
-        string? foto = BD.GetFotoUsuario(u.IdUsuarios);
-        if (foto != null)
-        {
-            HttpContext.Session.SetString("Foto", foto);
-        }
-        else
-        {
-            HttpContext.Session.Remove("Foto");
-        }
-    }
-
-    private static string ObtenerIniciales(Usuarios u)
-    {
-        return $"{u.Nombre?.FirstOrDefault()}{u.Apellido?.FirstOrDefault()}".ToUpper();
-    }
-
-    // Las fotos de perfil se guardan en wwwroot/img/perfiles y la ruta va a Imagenes.Ruta,
-    // que es varchar(50): por eso el nombre es corto (id + ticks en hexa, ~36 caracteres en total).
-    private string GuardarFoto(IFormFile foto, int idUsuario, string extension)
-    {
-        string carpeta = Path.Combine(_env.WebRootPath, "img", "perfiles");
-        Directory.CreateDirectory(carpeta);
-
-        string nombreArchivo = $"{idUsuario}_{DateTime.Now.Ticks:x}{extension}";
-
-        using (FileStream stream = new FileStream(Path.Combine(carpeta, nombreArchivo), FileMode.Create))
-        {
-            foto.CopyTo(stream);
-        }
-
-        return $"/img/perfiles/{nombreArchivo}";
-    }
-
-    private void BorrarFoto(string? ruta)
-    {
-        if (ruta == null || !ruta.StartsWith("/img/perfiles/")) return;
-
-        string archivo = Path.Combine(_env.WebRootPath, "img", "perfiles", Path.GetFileName(ruta));
-        if (System.IO.File.Exists(archivo))
-        {
-            System.IO.File.Delete(archivo);
-        }
-    }
-
     private static int CalcularEdad(DateTime fechaNacimiento)
     {
         int edad = DateTime.Today.Year - fechaNacimiento.Year;
         if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
         return edad;
-    }
-
-    // TODO: la columna Telefono es int y no entra un número completo (+54 9 11 ...).
-    // Conviene pasarla a varchar; mientras tanto, si no entra se guarda 0.
-    private static int ConvertirTelefono(string telefono)
-    {
-        string digitos = new string(telefono.Where(char.IsDigit).ToArray());
-        return int.TryParse(digitos, out int numero) ? numero : 0;
     }
 }

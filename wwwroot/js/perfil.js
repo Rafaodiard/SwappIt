@@ -4,7 +4,7 @@
 // - Vista previa de la foto elegida y botón "Quitar foto"
 // - Contador de caracteres de la descripción
 // - Si el servidor devolvió un error, se vuelve a abrir solo
-// La validación final y el guardado los hace AccountController.EditarPerfil.
+// La validación final y el guardado los hace PerfilController.Editar.
 // =========================================================
 
 (() => {

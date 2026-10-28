@@ -1,5 +1,5 @@
 @*
-    Detalle de un artículo (HomeController.Articulo).
+    Detalle de un artículo (ArticulosController.Detalle).
     Datos: Articulos + Imagenes (fotos del artículo) + Categorias + Usuarios (dueño) + Provincias.
     - Artículo de otra persona: botón "Proponer intercambio" (pop up para elegir qué artículo ofrecés).
     - Artículo propio (el dueño es el usuario logueado): aviso "Es tu artículo" y acciones del dueño.
@@ -21,7 +21,7 @@
                 @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
                              : "Puede que lo hayan dado de baja o que el enlace esté mal.")
             </p>
-            <a asp-controller="Home" asp-action="Buscar" class="btn btn-sw-primario">Ver otros artículos</a>
+            <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-primario">Ver otros artículos</a>
         </div>
     </div>
     return;
@@ -45,7 +45,7 @@
         ? articulo.Ubicacion
         : string.Join(", ", new[] { dueno.Barrio, provinciaDueno?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
     string? fotoPrincipal = imagenes.FirstOrDefault();
-    // Viene de HomeController.Publicar después de guardar el artículo.
+    // Viene de PublicarController después de guardar el artículo.
     string? mensajeArticulo = TempData["MensajeArticulo"] as string;
 }
 
@@ -61,10 +61,10 @@
     <!-- ===== Migas de pan ===== -->
     <nav aria-label="Ubicación" class="mb-4">
         <ol class="breadcrumb small mb-0">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Buscar" class="text-decoration-none text-primario">Artículos</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Articulos" asp-action="Buscar" class="text-decoration-none text-primario">Artículos</a></li>
             @if (categoria != null)
             {
-                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Buscar" asp-route-categoria="@categoria.IdCategorias" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Articulos" asp-action="Buscar" asp-route-categoria="@categoria.IdCategorias" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
             }
             <li class="breadcrumb-item active text-truncate" aria-current="page">@articulo.Nombre</li>
         </ol>
@@ -135,7 +135,7 @@
                 <!-- Quién lo publicó (Usuarios). Lleva al perfil público, o al propio si es tuyo. -->
                 <div>
                     <h2 class="h6 fw-bold mb-2">Publicado por</h2>
-                    <a class="sw-dueno" href="@(esPropio ? Url.Action("Perfil", "Account") : Url.Action("PerfilPublico", "Account", new { id = dueno.IdUsuarios }))">
+                    <a class="sw-dueno" href="@(esPropio ? Url.Action("Index", "Perfil") : Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios }))">
                         <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesDueno">
                             @if (fotoDueno != null)
                             {
@@ -163,7 +163,7 @@
                             <i class="bi bi-pencil-square me-1"></i> Editar artículo
                         </button>
                         <span id="editar-pendiente" class="text-suave small text-center">La edición de artículos todavía no está disponible.</span>
-                        <a asp-controller="Account" asp-action="Perfil" class="btn btn-sw-outline">Ver mis artículos publicados</a>
+                        <a asp-controller="Perfil" asp-action="Index" class="btn btn-sw-outline">Ver mis artículos publicados</a>
                     }
                     else if (logueado)
                     {
@@ -193,7 +193,7 @@
                         </h2>
                         @if (!esPropio)
                         {
-                            <a asp-controller="Account" asp-action="PerfilPublico" asp-route-id="@dueno.IdUsuarios" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+                            <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@dueno.IdUsuarios" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
                         }
                     </div>
                     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
@@ -254,7 +254,7 @@
                         <div class="text-center py-3">
                             <i class="bi bi-box-seam fs-1 text-suave"></i>
                             <p class="text-suave mt-2 mb-3">Para proponer un intercambio necesitás tener al menos un artículo publicado.</p>
-                            <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
+                            <a asp-controller="Publicar" asp-action="Index" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
                         </div>
                     }
 

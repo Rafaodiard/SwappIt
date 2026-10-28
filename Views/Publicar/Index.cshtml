@@ -5,7 +5,7 @@
     // Lo cargado en el formulario (vacío la primera vez; con los datos del usuario si el POST volvió con errores).
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
-    // Filas de la tabla EstadosArticulos (HomeController.ObtenerEstados).
+    // Filas de la tabla EstadosArticulos (PublicarController.ObtenerEstados).
     List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
 }
 
@@ -22,7 +22,7 @@
             <p class="sw-auth-subtitulo">Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio</p>
         </header>
 
-        <form class="sw-publicar-card" method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Publicar" novalidate>
+        <form class="sw-publicar-card" method="post" enctype="multipart/form-data" asp-controller="Publicar" asp-action="Index" novalidate>
 
             <!-- ===== Columna izquierda: fotos ===== -->
             <div class="sw-publicar-fotos">

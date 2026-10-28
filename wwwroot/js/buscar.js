@@ -1,7 +1,7 @@
 // =========================================================
 // SWAPPIT - Buscar: panel de filtros y vista de resultados
 // - Al marcar o desmarcar una categoría o un estado se recarga Buscar con los filtros nuevos
-//   (el filtrado lo hace HomeController.Buscar).
+//   (el filtrado lo hace ArticulosController.Buscar).
 // - Distancia: solo visual, todavía no filtra.
 // - Botones grilla / lista: cambian cómo se ven las cards.
 // =========================================================
