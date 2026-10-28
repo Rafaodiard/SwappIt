@@ -118,21 +118,22 @@ public static class BD
 
  
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
-        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<string>? estados = null, int? idUsuario = null)
+        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
             var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')" };
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
-            if (estados is { Count: > 0 }) condiciones.Add("a.Estado IN @pEstados");
+            if (estados is { Count: > 0 }) condiciones.Add("a.IdEstado IN @pEstados");
             if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
             // Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
-            string query = $@"SELECT {top}a.IdArticulos, a.Nombre, a.Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
+            string query = $@"SELECT {top}a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
                     (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
                 FROM Articulos a
                 INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+                INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
                 WHERE {string.Join(" AND ", condiciones)}
                 ORDER BY a.IdArticulos DESC";
 
@@ -151,7 +152,7 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT IdArticulos, Nombre, Descripcion, Estado, IdUsuarios, IdCategorias, Ubicacion, ACambio
+            string query = @"SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio
                 FROM Articulos WHERE IdArticulos = @pId";
             return connection.QueryFirstOrDefault<Articulos>(query, new { pId = id });
         }
@@ -166,9 +167,9 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                string query = @"INSERT INTO Articulos (Nombre, Descripcion, Estado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
+                string query = @"INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
                     OUTPUT INSERTED.IdArticulos
-                    VALUES (@Nombre, @Descripcion, @Estado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio)";
+                    VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio)";
                 int idArticulo = connection.QuerySingle<int>(query, a, transaccion);
 
                 // Las fotos de artículos llevan IdArticulos (las de perfil llevan IdUsuarios e IdArticulos NULL).
@@ -213,12 +214,21 @@ public static class BD
 
 
     // Opciones de "Estado del objeto" en Publicar, en el orden en que se cargaron (de mejor a peor).
-    public static List<Estados> GetEstados()
+    public static List<EstadosArticulos> GetEstadosArticulos()
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT Id, Nombre FROM Estados ORDER BY Id";
-            return connection.Query<Estados>(query).ToList();
+            string query = "SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos ORDER BY IdEstadosArticulos";
+            return connection.Query<EstadosArticulos>(query).ToList();
+        }
+    }
+
+    public static EstadosArticulos? GetEstadoArticuloById(int id)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos WHERE IdEstadosArticulos = @pId";
+            return connection.QueryFirstOrDefault<EstadosArticulos>(query, new { pId = id });
         }
     }
 
@@ -236,16 +246,17 @@ public static class BD
         }
     }
 
-    // Estados para el filtro de Buscar. No hay tabla de estados: son los valores distintos de Articulos.Estado.
+    // Estados para el filtro de Buscar: todos los de EstadosArticulos (como las categorías), de mejor a peor.
     public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT Estado AS Valor, Estado AS Texto, COUNT(*) AS Cantidad
-                FROM Articulos
-                WHERE @pBusqueda IS NULL OR Nombre LIKE '%' + @pBusqueda + '%'
-                GROUP BY Estado
-                ORDER BY Estado";
+            string query = @"SELECT CAST(e.IdEstadosArticulos AS varchar(10)) AS Valor, e.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
+                FROM EstadosArticulos e
+                LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
+                    AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                GROUP BY e.IdEstadosArticulos, e.Nombre
+                ORDER BY e.IdEstadosArticulos";
             return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda) }).ToList();
         }
     }

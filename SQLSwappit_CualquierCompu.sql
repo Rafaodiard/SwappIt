@@ -113,7 +113,7 @@ CREATE TABLE [dbo].[Articulos](
 	[IdArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
 	[Descripcion] [varchar](500) NOT NULL,
-	[Estado] [varchar](50) NOT NULL,
+	[IdEstado] [int] NOT NULL,
 	[IdUsuarios] [int] NOT NULL,
 	[IdCategorias] [int] NOT NULL,
 	[Ubicacion] [varchar](100) NULL,
@@ -138,17 +138,31 @@ CREATE TABLE [dbo].[Categorias](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Estados]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 27/10/2026 08:51:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Estados](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
+CREATE TABLE [dbo].[EstadosArticulos](
+	[IdEstadosArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
- CONSTRAINT [PK_Estados] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_EstadosArticulos] PRIMARY KEY CLUSTERED 
 (
-	[Id] ASC
+	[IdEstadosArticulos] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 27/10/2026 08:51:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EstadosIntercambios](
+	[IdEstadosIntercambios] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_EstadosIntercambios] PRIMARY KEY CLUSTERED 
+(
+	[IdEstadosIntercambios] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -159,7 +173,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Imagenes](
 	[IdImagenes] [int] IDENTITY(1,1) NOT NULL,
-	[Ruta] [varchar](50) NOT NULL,
+	[Ruta] [varchar](100) NOT NULL,
 	[IdArticulos] [int] NULL,
 	[IdUsuarios] [int] NULL,
  CONSTRAINT [PK_Imagenes] PRIMARY KEY CLUSTERED 
@@ -176,7 +190,7 @@ GO
 CREATE TABLE [dbo].[Intercambios](
 	[IdIntercambios] [int] IDENTITY(1,1) NOT NULL,
 	[Fecha] [date] NOT NULL,
-	[Estado] [varchar](50) NOT NULL,
+	[IdEstado] [int] NOT NULL,
 	[IdUsuarios1] [int] NOT NULL,
 	[IdUsuarios2] [int] NOT NULL,
 	[IdArticulos1] [int] NOT NULL,
@@ -247,26 +261,26 @@ CREATE TABLE [dbo].[Usuarios](
 GO
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
 
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', N'Muy buen estado', 3, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', N'Buen estado', 3, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', N'Buen estado', 4, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', N'Muy buen estado', 4, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', N'Buen estado', 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', N'Muy buen estado', 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', N'Muy buen estado', 6, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', N'Buen estado', 6, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', N'Buen estado', 7, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', N'Muy buen estado', 7, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', N'Buen estado', 8, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', N'Buen estado', 8, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', N'Muy buen estado', 9, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', N'Buen estado', 9, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', N'Buen estado', 10, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', N'Muy buen estado', 10, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', N'Muy buen estado', 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', N'Buen estado', 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', N'Muy buen estado', 12, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [Estado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', N'Buen estado', 12, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', 2, 3, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', 3, 3, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', 3, 4, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', 2, 4, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', 3, 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', 2, 5, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', 2, 6, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', 3, 6, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', 3, 7, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', 2, 7, 2)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', 3, 8, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', 3, 8, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', 2, 9, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', 3, 9, 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', 3, 10, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', 2, 10, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', 2, 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', 3, 11, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', 2, 12, 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', 3, 12, 1)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -279,17 +293,45 @@ INSERT [dbo].[Categorias] ([IdCategorias], [Nombre]) VALUES (5, N'Deportes')
 INSERT [dbo].[Categorias] ([IdCategorias], [Nombre]) VALUES (6, N'Música')
 SET IDENTITY_INSERT [dbo].[Categorias] OFF
 GO
-SET IDENTITY_INSERT [dbo].[Estados] ON 
+SET IDENTITY_INSERT [dbo].[EstadosArticulos] ON 
 
-INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (1, N'Como nuevo')
-INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (2, N'Muy buen estado')
-INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (3, N'Buen estado')
-INSERT [dbo].[Estados] ([Id], [Nombre]) VALUES (4, N'Usado')
-SET IDENTITY_INSERT [dbo].[Estados] OFF
+INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (1, N'Como nuevo')
+INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (2, N'Muy buen estado')
+INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (3, N'Buen estado')
+INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (4, N'Usado')
+SET IDENTITY_INSERT [dbo].[EstadosArticulos] OFF
+GO
+SET IDENTITY_INSERT [dbo].[EstadosIntercambios] ON 
+
+INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (1, N'Pendiente')
+INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (2, N'Aceptado')
+INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (3, N'Rechazado')
+INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (4, N'Realizado')
+SET IDENTITY_INSERT [dbo].[EstadosIntercambios] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Imagenes] ON 
 
 INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (2, N'/img/perfiles/2_8df340421a76dd6.png', NULL, 2)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (3, N'/img/ArticulosPrueba/Fotos swappit objetos/microondas.jpg', 1, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (4, N'/img/ArticulosPrueba/Fotos swappit objetos/juegoDeSabanas.jpg', 2, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (5, N'/img/ArticulosPrueba/Fotos swappit objetos/mesaDeLuz.jpg', 3, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (6, N'/img/ArticulosPrueba/Fotos swappit objetos/pavaElectrica.jpg', 4, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (7, N'/img/ArticulosPrueba/Fotos swappit objetos/sillaDeComedor.jpg', 5, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (8, N'/img/ArticulosPrueba/Fotos swappit objetos/sarten.jpg', 6, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (9, N'/img/ArticulosPrueba/Fotos swappit objetos/escritorioPlegable.jpg', 7, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (10, N'/img/ArticulosPrueba/Fotos swappit objetos/routerWifi.jpg', 8, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (11, N'/img/ArticulosPrueba/Fotos swappit objetos/juegoDeOllas.jpg', 9, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (12, N'/img/ArticulosPrueba/Fotos swappit objetos/libroRecetas.jpg', 10, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (13, N'/img/ArticulosPrueba/Fotos swappit objetos/estanteria.jpg', 11, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (14, N'/img/ArticulosPrueba/Fotos swappit objetos/aspiradora.jpg', 12, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (15, N'/img/ArticulosPrueba/Fotos swappit objetos/cortinasBlackout.jpg', 13, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (16, N'/img/ArticulosPrueba/Fotos swappit objetos/bicicletaUrbana.jpg', 14, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (17, N'/img/ArticulosPrueba/Fotos swappit objetos/colchon1Plaza.jpg', 15, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (18, N'/img/ArticulosPrueba/Fotos swappit objetos/tostadora.jpg', 16, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (19, N'/img/ArticulosPrueba/Fotos swappit objetos/vajillas4Personas.webp', 17, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (20, N'/img/ArticulosPrueba/Fotos swappit objetos/percheroDePie.jpg', 18, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (21, N'/img/ArticulosPrueba/Fotos swappit objetos/espejoDePie.jpg', 19, NULL)
+INSERT [dbo].[Imagenes] ([IdImagenes], [Ruta], [IdArticulos], [IdUsuarios]) VALUES (22, N'/img/ArticulosPrueba/Fotos swappit objetos/ventiladorDePie.jpg', 20, NULL)
 SET IDENTITY_INSERT [dbo].[Imagenes] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Provincias] ON 
@@ -365,6 +407,11 @@ REFERENCES [dbo].[Categorias] ([IdCategorias])
 GO
 ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_Categorias]
 GO
+ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_EstadosArticulos] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosArticulos] ([IdEstadosArticulos])
+GO
+ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_EstadosArticulos]
+GO
 ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_Usuarios] FOREIGN KEY([IdUsuarios])
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
@@ -389,6 +436,11 @@ ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Ar
 REFERENCES [dbo].[Articulos] ([IdArticulos])
 GO
 ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_Articulos1]
+GO
+ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_EstadosIntercambios] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosIntercambios] ([IdEstadosIntercambios])
+GO
+ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_EstadosIntercambios]
 GO
 ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Usuarios] FOREIGN KEY([IdUsuarios1])
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
@@ -430,10 +482,10 @@ AS
 BEGIN
 	    IF EXISTS (SELECT Usuario FROM Usuarios WHERE Usuario = @usuario)
         BEGIN
-            IF EXISTS (SELECT Nombre FROM Categorias WHERE Nombre = @categoria)
+            IF EXISTS (SELECT Nombre FROM Categorias WHERE Nombre = @categoria) AND EXISTS (SELECT Nombre FROM EstadosArticulos WHERE Nombre = @estado)
             BEGIN
-                INSERT INTO Articulos (Nombre, Descripcion, Estado, IdUsuarios, IdCategorias)
-                VALUES(@nombre, @descripcion, @estado, (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @usuario), (SELECT IdCategorias
+                INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias)
+                VALUES(@nombre, @descripcion, (SELECT IdEstadosArticulos FROM EstadosArticulos WHERE Nombre = @estado), (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @usuario), (SELECT IdCategorias
                 FROM Categorias WHERE Nombre = @categoria))
             END
         END
@@ -461,11 +513,11 @@ BEGIN
             BEGIN
                 IF EXISTS (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2)
                 BEGIN
-                    IF @fecha < GETDATE()
+                    IF @fecha < GETDATE() AND EXISTS (SELECT Nombre FROM EstadosIntercambios WHERE Nombre = @estado)
                     BEGIN
-                        INSERT INTO Intercambios (Fecha, Estado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
                         VALUES
-                            (@fecha, @estado,
+                            (@fecha, (SELECT IdEstadosIntercambios FROM EstadosIntercambios WHERE Nombre = @estado),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario1),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2),
                              (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1),

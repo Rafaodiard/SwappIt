@@ -30,6 +30,7 @@
 @{
     List<string> imagenes = ViewBag.imagenes;
     Swappit.Models.Categorias? categoria = ViewBag.categoria;
+    Swappit.Models.EstadosArticulos? estado = ViewBag.estado;
     Swappit.Models.Usuarios dueno = ViewBag.dueno;
     string? fotoDueno = ViewBag.fotoDueno;
     Swappit.Models.Provincias? provinciaDueno = ViewBag.provinciaDueno;
@@ -106,7 +107,7 @@
 
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                        <span class="sw-articulo-estado">@articulo.Estado</span>
+                        <span class="sw-articulo-estado">@estado?.Nombre</span>
                         @if (categoria != null)
                         {
                             <span class="text-suave small"><i class="bi bi-tag me-1"></i>@categoria.Nombre</span>

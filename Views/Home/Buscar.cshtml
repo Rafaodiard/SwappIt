@@ -6,7 +6,7 @@
     List<OpcionFiltroViewModel> categorias = ViewBag.categorias;
     List<OpcionFiltroViewModel> estados = ViewBag.estados;
     List<int> categoriasSeleccionadas = ViewBag.categoriasSeleccionadas;
-    List<string> estadosSeleccionados = ViewBag.estadosSeleccionados;
+    List<int> estadosSeleccionados = ViewBag.estadosSeleccionados;
     bool errorCarga = ViewBag.errorCarga;
     bool hayFiltros = ViewBag.hayFiltros;
 }
@@ -61,15 +61,14 @@
                     </div>
                 </div>
 
-                <!-- Estado: valores distintos de Articulos.Estado -->
+                <!-- Estado: filas de la tabla EstadosArticulos -->
                 <h6>Estado</h6>
                 <div>
-                    @for (var i = 0; i < estados.Count; i++)
+                    @foreach (var est in estados)
                     {
-                        var est = estados[i];
-                        var idEst = "est-" + i;
+                        var idEst = "est-" + est.Valor;
                         <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="@idEst"
-                               checked="@(estadosSeleccionados.Contains(est.Valor))">
+                               checked="@(estadosSeleccionados.Any(e => e.ToString() == est.Valor))">
                         <label class="sw-chip" for="@idEst">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
                     }
                 </div>
@@ -133,17 +132,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Al marcar o desmarcar una categoría o un estado se recarga Buscar con los filtros nuevos
-        document.querySelectorAll('#filtros input[name="categoria"], #filtros input[name="estado"]').forEach(c =>
-            c.addEventListener('change', () => c.form.submit()));
-
-        // Sólo visual: la distancia todavía no filtra
-        document.getElementById('filtro-distancia').addEventListener('input', e => {
-            document.getElementById('distancia-valor').textContent = e.target.value;
-        });
-        document.querySelectorAll('input[name="vista"]').forEach(r => r.addEventListener('change', e => {
-            document.getElementById('lista-objetos').classList.toggle('vista-lista', e.target.value === 'lista');
-        }));
-    </script>
+    <script src="~/js/buscar.js" asp-append-version="true"></script>
 }

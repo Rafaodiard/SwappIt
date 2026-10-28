@@ -1,4 +1,4 @@
-﻿/****** 3 de 3: Stored procedures. Ejecutar después de 1_estructura.sql. ******/
+﻿/****** 3 de 3: Stored procedures. Ejecutar después de Estructura.sql. ******/
 USE [Base_De_Datos_Swappit]
 GO
 /****** Object:  StoredProcedure [dbo].[RegistrarArticulo]    Script Date: 23/10/2026 09:04:02 ******/
@@ -16,10 +16,10 @@ AS
 BEGIN
 	    IF EXISTS (SELECT Usuario FROM Usuarios WHERE Usuario = @usuario)
         BEGIN
-            IF EXISTS (SELECT Nombre FROM Categorias WHERE Nombre = @categoria)
+            IF EXISTS (SELECT Nombre FROM Categorias WHERE Nombre = @categoria) AND EXISTS (SELECT Nombre FROM EstadosArticulos WHERE Nombre = @estado)
             BEGIN
-                INSERT INTO Articulos (Nombre, Descripcion, Estado, IdUsuarios, IdCategorias)
-                VALUES(@nombre, @descripcion, @estado, (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @usuario), (SELECT IdCategorias
+                INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias)
+                VALUES(@nombre, @descripcion, (SELECT IdEstadosArticulos FROM EstadosArticulos WHERE Nombre = @estado), (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @usuario), (SELECT IdCategorias
                 FROM Categorias WHERE Nombre = @categoria))
             END
         END
@@ -47,11 +47,11 @@ BEGIN
             BEGIN
                 IF EXISTS (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2)
                 BEGIN
-                    IF @fecha < GETDATE()
+                    IF @fecha < GETDATE() AND EXISTS (SELECT Nombre FROM EstadosIntercambios WHERE Nombre = @estado)
                     BEGIN
-                        INSERT INTO Intercambios (Fecha, Estado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
                         VALUES
-                            (@fecha, @estado,
+                            (@fecha, (SELECT IdEstadosIntercambios FROM EstadosIntercambios WHERE Nombre = @estado),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario1),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2),
                              (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1),

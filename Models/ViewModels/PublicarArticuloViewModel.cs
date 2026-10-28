@@ -28,8 +28,8 @@ namespace Swappit.Models.ViewModels
 
         [Required(ErrorMessage = "Elegí el estado del objeto")]
         [Display(Name = "Estado del objeto")]
-        // Uno de los Nombre de la tabla Estados. Se guarda como texto en Articulos.Estado.
-        public string Estado { get; set; } = string.Empty;
+        // Un IdEstadosArticulos de la tabla EstadosArticulos. Se guarda en Articulos.IdEstado.
+        public int? IdEstado { get; set; }
 
         [Required(ErrorMessage = "Contá cómo es tu objeto")]
         [StringLength(MaxDescripcion, ErrorMessage = "Máximo {1} caracteres")]
@@ -45,7 +45,6 @@ namespace Swappit.Models.ViewModels
         // Se guardan en wwwroot/img/articulos y en la tabla Imagenes (con IdArticulos).
         public List<IFormFile>? Fotos { get; set; }
 
-        // Titulo -> Articulos.Nombre. Ubicacion, ACambio y Descripcion (varchar(500))
-        // necesitan BaseDatos/PublicarArticulo.sql en bases creadas antes de ese script.
+        // Titulo -> Articulos.Nombre.
     }
 }

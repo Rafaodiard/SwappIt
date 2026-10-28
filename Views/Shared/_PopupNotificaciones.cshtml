@@ -1,0 +1,32 @@
+@*
+    Pop up de notificaciones (UI Kit de Figma: "Popup / Notificaciones").
+    Por ahora es solo visual: no hay tabla de notificaciones en la base, así que se muestra
+    el estado vacío. El botón que lo abre está en _Layout.cshtml; la apertura/cierre está en notificaciones.js.
+
+    Cuando exista el backend, reemplazar .sw-notif-vacio por la lista (los estilos ya están en site.css):
+    <div class="sw-notif-lista">
+        <h3 class="sw-notif-grupo">Nuevas</h3>   (y después "Anteriores")
+        <ul class="list-unstyled mb-0">
+            <li class="sw-notif-item sw-notif-item--sin-leer">   (sin el modificador si ya se leyó)
+                <span class="sw-notif-icono" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
+                    (sw-notif-icono--bordo para calificar/rechazo)
+                <div class="sw-notif-texto">
+                    <p class="mb-0"><strong>@usuario</strong> te propuso un intercambio: ...</p>
+                    <p class="sw-notif-meta"><span>Hace 10 min</span> <a class="sw-notif-accion" href="...">Ver propuesta <i class="bi bi-chevron-right" aria-hidden="true"></i></a></p>
+                </div>
+                <span class="sw-notif-punto"><span class="visually-hidden">Sin leer</span></span>
+            </li>
+        </ul>
+    </div>
+*@
+<section id="popup-notificaciones" class="sw-notif-popup" aria-labelledby="notif-titulo">
+    <header class="sw-notif-encabezado">
+        <h2 id="notif-titulo" class="sw-notif-titulo">Notificaciones</h2>
+    </header>
+
+    <div class="sw-notif-vacio">
+        <span class="sw-notif-icono" aria-hidden="true"><i class="bi bi-bell"></i></span>
+        <p class="sw-notif-vacio-titulo">No tenés notificaciones</p>
+        <p class="sw-notif-vacio-texto">Acá vas a ver las propuestas de intercambio, los mensajes nuevos y cuándo calificar un intercambio.</p>
+    </div>
+</section>

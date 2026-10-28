@@ -39,13 +39,11 @@ public class HomeController : Controller
     }
 
     // q: texto del buscador del header. categoria / estado: checkboxes del panel de filtros (se pueden marcar varios).
-    public IActionResult Buscar(string? q, int[]? categoria, string[]? estado)
+    public IActionResult Buscar(string? q, int[]? categoria, int[]? estado)
     {
         string? busqueda = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
         List<int> categoriasSeleccionadas = (categoria ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
-        // Articulos.Estado es varchar(50): un valor más largo no puede coincidir con nada.
-        List<string> estadosSeleccionados = (estado ?? []).Where(e => !string.IsNullOrWhiteSpace(e) && e.Length <= 50)
-            .Select(e => e.Trim()).Distinct().Take(MaxOpcionesFiltro).ToList();
+        List<int> estadosSeleccionados = (estado ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
 
         List<ArticuloCardViewModel> articulos = new List<ArticuloCardViewModel>();
         List<OpcionFiltroViewModel> categorias = new List<OpcionFiltroViewModel>();
@@ -63,13 +61,6 @@ public class HomeController : Controller
         {
             _logger.LogError(ex, "No se pudieron cargar los artículos del catálogo");
             errorCarga = true;
-        }
-
-        // Un estado marcado que no tiene artículos con la búsqueda actual no vuelve de la BD:
-        // se agrega con 0 para que siga visible y se pueda desmarcar.
-        foreach (var e in estadosSeleccionados.Where(e => !estados.Any(o => o.Valor == e)))
-        {
-            estados.Add(new OpcionFiltroViewModel { Valor = e, Texto = e, Cantidad = 0 });
         }
 
         ViewBag.articulos = articulos;
@@ -111,6 +102,7 @@ public class HomeController : Controller
             ViewBag.detalle = articulo;
             ViewBag.imagenes = BD.GetImagenesArticulo(articulo.IdArticulos);
             ViewBag.categoria = BD.GetCategoriaById(articulo.IdCategorias);
+            ViewBag.estado = BD.GetEstadoArticuloById(articulo.IdEstado);
             ViewBag.dueno = dueno;
             ViewBag.fotoDueno = BD.GetFotoUsuario(dueno.IdUsuarios);
             ViewBag.provinciaDueno = BD.GetProvinciaById(dueno.IdProvincias);
@@ -185,10 +177,10 @@ public class HomeController : Controller
         {
             ModelState.AddModelError(nameof(modelo.IdCategorias), "Elegí una categoría de la lista");
         }
-        List<string> estados = ObtenerEstados();
-        if (!string.IsNullOrEmpty(modelo.Estado) && !estados.Contains(modelo.Estado))
+        List<EstadosArticulos> estados = ObtenerEstados();
+        if (modelo.IdEstado.HasValue && !estados.Any(e => e.IdEstadosArticulos == modelo.IdEstado.Value))
         {
-            ModelState.AddModelError(nameof(modelo.Estado), "Elegí uno de los estados de la lista");
+            ModelState.AddModelError(nameof(modelo.IdEstado), "Elegí uno de los estados de la lista");
         }
 
         List<IFormFile> fotos = (modelo.Fotos ?? []).Where(f => f.Length > 0).ToList();
@@ -213,7 +205,7 @@ public class HomeController : Controller
             {
                 Nombre = modelo.Titulo.Trim(),
                 Descripcion = modelo.Descripcion.Trim(),
-                Estado = modelo.Estado,
+                IdEstado = modelo.IdEstado!.Value,
                 IdUsuarios = usuarioId.Value,
                 IdCategorias = modelo.IdCategorias!.Value,
                 Ubicacion = modelo.Ubicacion.Trim(),
@@ -310,18 +302,18 @@ public class HomeController : Controller
         }
     }
 
-    // Opciones de "Estado del objeto", desde la tabla Estados.
+    // Opciones de "Estado del objeto", desde la tabla EstadosArticulos.
     // Si la BD falla, no hay opciones y el POST no valida (no se puede publicar sin estado).
-    private List<string> ObtenerEstados()
+    private List<EstadosArticulos> ObtenerEstados()
     {
         try
         {
-            return BD.GetEstados().Select(e => e.Nombre!).ToList();
+            return BD.GetEstadosArticulos();
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron cargar los estados");
-            return new List<string>();
+            return new List<EstadosArticulos>();
         }
     }
 

@@ -92,7 +92,7 @@ CREATE TABLE [dbo].[Articulos](
 	[IdArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
 	[Descripcion] [varchar](500) NOT NULL,
-	[Estado] [varchar](50) NOT NULL,
+	[IdEstado] [int] NOT NULL,
 	[IdUsuarios] [int] NOT NULL,
 	[IdCategorias] [int] NOT NULL,
 	[Ubicacion] [varchar](100) NULL,
@@ -117,17 +117,31 @@ CREATE TABLE [dbo].[Categorias](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Estados]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 27/10/2026 08:51:27 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Estados](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
+CREATE TABLE [dbo].[EstadosArticulos](
+	[IdEstadosArticulos] [int] IDENTITY(1,1) NOT NULL,
 	[Nombre] [varchar](50) NOT NULL,
- CONSTRAINT [PK_Estados] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_EstadosArticulos] PRIMARY KEY CLUSTERED 
 (
-	[Id] ASC
+	[IdEstadosArticulos] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 27/10/2026 08:51:27 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[EstadosIntercambios](
+	[IdEstadosIntercambios] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_EstadosIntercambios] PRIMARY KEY CLUSTERED 
+(
+	[IdEstadosIntercambios] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -138,7 +152,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Imagenes](
 	[IdImagenes] [int] IDENTITY(1,1) NOT NULL,
-	[Ruta] [varchar](50) NOT NULL,
+	[Ruta] [varchar](100) NOT NULL,
 	[IdArticulos] [int] NULL,
 	[IdUsuarios] [int] NULL,
  CONSTRAINT [PK_Imagenes] PRIMARY KEY CLUSTERED 
@@ -155,7 +169,7 @@ GO
 CREATE TABLE [dbo].[Intercambios](
 	[IdIntercambios] [int] IDENTITY(1,1) NOT NULL,
 	[Fecha] [date] NOT NULL,
-	[Estado] [varchar](50) NOT NULL,
+	[IdEstado] [int] NOT NULL,
 	[IdUsuarios1] [int] NOT NULL,
 	[IdUsuarios2] [int] NOT NULL,
 	[IdArticulos1] [int] NOT NULL,
@@ -229,6 +243,11 @@ REFERENCES [dbo].[Categorias] ([IdCategorias])
 GO
 ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_Categorias]
 GO
+ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_EstadosArticulos] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosArticulos] ([IdEstadosArticulos])
+GO
+ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_EstadosArticulos]
+GO
 ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_Usuarios] FOREIGN KEY([IdUsuarios])
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
@@ -253,6 +272,11 @@ ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Ar
 REFERENCES [dbo].[Articulos] ([IdArticulos])
 GO
 ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_Articulos1]
+GO
+ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_EstadosIntercambios] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosIntercambios] ([IdEstadosIntercambios])
+GO
+ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_EstadosIntercambios]
 GO
 ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Usuarios] FOREIGN KEY([IdUsuarios1])
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])

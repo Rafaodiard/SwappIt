@@ -5,8 +5,8 @@
     // Lo cargado en el formulario (vacío la primera vez; con los datos del usuario si el POST volvió con errores).
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
-    // Nombres de la tabla Estados (HomeController.ObtenerEstados).
-    List<string> estados = ViewBag.estados;
+    // Filas de la tabla EstadosArticulos (HomeController.ObtenerEstados).
+    List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
 }
 
 @functions {
@@ -89,12 +89,12 @@
                     <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado">
                         @foreach (var estado in estados)
                         {
-                            var idEstado = "Estado_" + estado.Replace(" ", "_");
-                            <input type="radio" class="sw-estado-radio" id="@idEstado" name="Estado" value="@estado" checked="@(publicar.Estado == estado)">
-                            <label class="sw-estado" for="@idEstado">@estado</label>
+                            var idEstado = "Estado_" + estado.IdEstadosArticulos;
+                            <input type="radio" class="sw-estado-radio" id="@idEstado" name="IdEstado" value="@estado.IdEstadosArticulos" checked="@(publicar.IdEstado == estado.IdEstadosArticulos)">
+                            <label class="sw-estado" for="@idEstado">@estado.Nombre</label>
                         }
                     </div>
-                    @Html.ValidationMessage("Estado", new { @class = "sw-error" })
+                    @Html.ValidationMessage("IdEstado", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-campo">

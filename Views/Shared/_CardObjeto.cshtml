@@ -5,12 +5,12 @@
     ViewBag.articulo = articulo;
     <partial name="_CardObjeto" />
 
-    Mantiene data-template / data-campo para que swappit.renderObjetos (site.js)
+    Mantiene data-template / data-campo para que swappit.renderObjetos (plantillas.js)
     pueda seguir usándola como molde si más adelante se carga por JS.
 
     Campos:
       imagen   -> primera fila de Imagenes del artículo (si no hay, se ve el placeholder de .sw-img)
-      estado   -> Articulos.Estado
+      estado   -> EstadosArticulos.Nombre (por Articulos.IdEstado)
       nombre   -> Articulos.Nombre
       barrio   -> Articulos.Ubicacion (si está vacía, Usuarios.Barrio del dueño)
     Pendiente: distancia (no existe en la BD) y "Busca a cambio" (Articulos.ACambio, por ahora solo en el detalle).

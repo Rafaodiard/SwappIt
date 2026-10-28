@@ -49,7 +49,11 @@
                 <nav class="d-flex align-items-center gap-1 gap-sm-2 ms-auto" aria-label="Mi cuenta">
                     <a href="#" class="sw-header-accion" title="Favoritos" aria-label="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
                     <a asp-controller="Home" asp-action="Chat" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
-                    <a href="#" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones"><i class="bi bi-bell" aria-hidden="true"></i></a>
+                    <!-- Notificaciones: el pop up va justo después del botón para que el Tab entre en él -->
+                    <div class="sw-notif" data-notif>
+                        <button type="button" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones" aria-expanded="false" aria-controls="popup-notificaciones" data-notif-boton><i class="bi bi-bell" aria-hidden="true"></i></button>
+                        <partial name="_PopupNotificaciones" />
+                    </div>
                     <a asp-controller="Account" asp-action="Perfil" class="sw-avatar mx-1" data-iniciales="@iniciales" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
                     <a asp-controller="Home" asp-action="Publicar" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar</a>
                     <!-- En celulares el botón Publicar queda como ícono para que entre en el header -->
@@ -110,7 +114,11 @@
     </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- JS de todas las páginas (cada archivo dice arriba qué maneja). El JS propio de una página va en su sección Scripts. -->
+    <script src="~/js/plantillas.js" asp-append-version="true"></script>
+    <script src="~/js/imagenes.js" asp-append-version="true"></script>
+    <script src="~/js/favoritos.js" asp-append-version="true"></script>
+    <script src="~/js/notificaciones.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
