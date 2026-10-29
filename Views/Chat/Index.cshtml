@@ -1,63 +1,154 @@
+@*
+    Chat (ChatController.Index): una conversación por intercambio, entre sus dos partes.
+    - Izquierda: los intercambios en curso y los que ya tienen mensajes, con el último mensaje y cuántos no viste.
+    - Derecha: el chat abierto (partial _Mensajes, chat.js lo actualiza cada pocos segundos) y el form para escribir.
+      Si el intercambio se rechazó o ya se realizó, el chat queda para leer.
+*@
+@using Swappit.Models
+@using Swappit.Models.ViewModels
 @{
     ViewData["Title"] = "Mensajes";
+    List<IntercambioViewModel> conversaciones = ViewBag.conversaciones;
+    Dictionary<int, ConversacionViewModel> resumenes = ViewBag.resumenes;
+    IntercambioViewModel? abierta = ViewBag.abierta;
+    bool puedeEscribir = ViewBag.puedeEscribir;
+    int? idPedido = ViewBag.idPedido;
+    bool errorCarga = ViewBag.errorCarga;
+    string? fotoOtro = ViewBag.fotoOtro;
+    string? error = TempData["ErrorChat"] as string;
+    string? textoAnterior = TempData["TextoChat"] as string;
+
+    string Iniciales(IntercambioViewModel i) => $"{i.OtroNombre?.FirstOrDefault()}{i.OtroApellido?.FirstOrDefault()}".ToUpper();
+
+    // Hora si es de hoy, "Ayer" o la fecha.
+    string CuandoFue(DateTime fecha)
+    {
+        int dias = (DateTime.Today - fecha.Date).Days;
+        return dias == 0 ? fecha.ToString("HH:mm") : dias == 1 ? "Ayer" : fecha.ToString("dd/MM");
+    }
 }
 
 <div class="container-xl py-4">
+    @if (errorCarga)
+    {
+        <div class="sw-card p-5 text-center">
+            <i class="bi bi-exclamation-triangle fs-1 text-suave" aria-hidden="true"></i>
+            <h1 class="font-titulo h2 mt-3">No pudimos cargar tus mensajes</h1>
+            <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+        </div>
+        return;
+    }
+
+    @if (conversaciones.Count == 0 && abierta == null)
+    {
+        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
+            <i class="bi bi-chat-dots fs-1 text-suave" aria-hidden="true"></i>
+            <h1 class="font-titulo h2 mt-3">@(idPedido != null ? "Esta conversación no existe" : "Todavía no tenés conversaciones")</h1>
+            <p class="text-suave mb-4">Cuando propongas o recibas un intercambio, vas a poder chatear acá con la otra persona para coordinarlo.</p>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Buscar artículos</a>
+        </div>
+        return;
+    }
+
     <div class="sw-chat sw-card row g-0">
 
-        <!-- ===== Lista de conversaciones (una por Intercambio) ===== -->
-        <aside class="col-md-4 col-lg-3 sw-chat-lista d-flex flex-column">
+        <!-- ===== Lista de conversaciones (una por intercambio) ===== -->
+        <aside class="col-md-4 col-lg-3 sw-chat-lista d-flex flex-column" aria-label="Conversaciones">
             <div class="p-3">
                 <div class="sw-buscador border">
-                    <input type="search" placeholder="Buscar" aria-label="Buscar conversación">
-                    <i class="bi bi-search me-2"></i>
+                    <input type="search" placeholder="Buscar" aria-label="Buscar conversación" data-chat-buscar>
+                    <i class="bi bi-search me-2" aria-hidden="true"></i>
                 </div>
             </div>
 
-            <!-- Se llena desde JS: swappit.renderLista('#lista-chats', lista, 'chat-contacto', rellenar) -->
-            <nav id="lista-chats">
-                <a href="#" class="sw-chat-contacto activo" data-template="chat-contacto" data-id-intercambio="1">
-                    <span class="sw-avatar" data-campo="iniciales">JP</span>
-                    <div class="flex-grow-1 min-w-0">
-                        <div class="fw-semibold" data-campo="nombre">Juan Pérez</div>
-                        <div class="small text-suave text-truncate" data-campo="ultimoMensaje">¿Te queda bien el sábado?</div>
-                    </div>
-                    <span class="no-leidos" data-campo="noLeidos">3</span>
-                </a>
+            <nav>
+                @foreach (IntercambioViewModel c in conversaciones)
+                {
+                    resumenes.TryGetValue(c.IdIntercambios, out ConversacionViewModel? resumen);
+                    bool activa = c.IdIntercambios == abierta?.IdIntercambios;
+                    <a href="@Url.Action("Index", "Chat", new { id = c.IdIntercambios })" class="sw-chat-contacto @(activa ? "activo" : "")"
+                       aria-current="@(activa ? "page" : null)" data-chat-contacto="@($"{c.OtroNombre} {c.OtroApellido} {c.OtroUsuario} {c.MiArticuloNombre} {c.SuArticuloNombre}")">
+                        <span class="sw-avatar" aria-hidden="true">@Iniciales(c)</span>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex justify-content-between gap-2">
+                                <span class="fw-semibold text-truncate">@c.OtroNombre @c.OtroApellido</span>
+                                @if (resumen != null)
+                                {
+                                    <span class="small text-suave flex-shrink-0">@CuandoFue(resumen.UltimaFecha)</span>
+                                }
+                            </div>
+                            <div class="small text-suave text-truncate">
+                                @if (resumen != null)
+                                {
+                                    @:@(resumen.UltimoEsMio ? "Vos: " : "")@resumen.UltimoTexto
+                                }
+                                else
+                                {
+                                    @:@c.MiArticuloNombre ⇄ @c.SuArticuloNombre
+                                }
+                            </div>
+                        </div>
+                        @if (resumen != null && resumen.NoLeidos > 0)
+                        {
+                            <span class="no-leidos">@(resumen.NoLeidos > 9 ? "9+" : resumen.NoLeidos.ToString())<span class="visually-hidden"> sin leer</span></span>
+                        }
+                    </a>
+                }
+                <p class="small text-suave px-3 py-2 mb-0" data-chat-sin-resultados hidden>No hay conversaciones con ese nombre.</p>
             </nav>
         </aside>
 
         <!-- ===== Conversación ===== -->
-        <section class="col-md-8 col-lg-9 d-flex flex-column h-100">
-            <header class="sw-chat-header d-flex align-items-center gap-3">
-                <span class="sw-avatar" data-campo="iniciales">JP</span>
-                <div class="flex-grow-1">
-                    <div class="fw-semibold" data-campo="nombre">Juan Pérez</div>
-                    <div class="small text-suave">Intercambio: <span data-campo="intercambio">Silla ⇄ Lámpara</span></div>
+        <section class="col-md-8 col-lg-9 d-flex flex-column h-100" aria-label="Conversación">
+            @if (abierta == null)
+            {
+                <div class="sw-chat-vacio flex-grow-1">
+                    <i class="bi bi-chat-dots fs-2" aria-hidden="true"></i>
+                    <p class="mb-0">Esta conversación no existe. Elegí otra de la lista.</p>
                 </div>
-                <button class="btn btn-link text-dark" aria-label="Llamar"><i class="bi bi-telephone-fill"></i></button>
-                <button class="btn btn-link text-dark" aria-label="Videollamada"><i class="bi bi-camera-video-fill"></i></button>
-                <button class="btn btn-link text-dark" aria-label="Más opciones"><i class="bi bi-three-dots-vertical"></i></button>
-            </header>
+            }
+            else
+            {
+                string iniciales = Iniciales(abierta);
+                <header class="sw-chat-header d-flex align-items-center gap-3">
+                    <span class="sw-avatar" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @iniciales }</span>
+                    <div class="flex-grow-1 min-w-0">
+                        <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
+                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloNombre ⇄ @abierta.SuArticuloNombre</div>
+                    </div>
+                    <span class="sw-estado-intercambio sw-estado-intercambio--@abierta.Estado.ToLowerInvariant() d-none d-sm-inline-block">@abierta.Estado</span>
+                    <a href="@Url.Action("Detalle", "Intercambio", new { id = abierta.IdIntercambios })" class="btn btn-sw-outline btn-sm flex-shrink-0">Ver intercambio</a>
+                </header>
 
-            <!-- Se llena desde JS con la tabla Mensajes.
-                 Clase "enviado" si IdUsuariosManda == usuario logueado, si no "recibido". -->
-            <div id="mensajes" class="sw-chat-mensajes flex-grow-1">
-                <div class="sw-msg recibido" data-template="mensaje">
-                    <div class="sw-msg-burbuja" data-campo="texto">¡Hola! ¿Sigue disponible la lámpara?</div>
-                    <div class="sw-msg-hora"><span data-campo="hora">15:33</span> <i class="bi bi-check2-all visto" data-campo="visto"></i></div>
+                <div id="mensajes" class="sw-chat-mensajes flex-grow-1" data-url-mensajes="@Url.Action("Mensajes", "Chat", new { id = abierta.IdIntercambios })"
+                     role="log" aria-live="polite" aria-label="Mensajes con @abierta.OtroNombre">
+                    <partial name="_Mensajes" />
                 </div>
-                <div class="sw-msg enviado">
-                    <div class="sw-msg-burbuja">Sí, ¡sigue disponible! ¿Te interesa cambiarla por la silla?</div>
-                    <div class="sw-msg-hora">15:34 <i class="bi bi-check2-all visto"></i></div>
-                </div>
-            </div>
 
-            <form id="form-mensaje" class="sw-chat-input d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-link text-dark" aria-label="Adjuntar"><i class="bi bi-paperclip fs-5"></i></button>
-                <input type="text" class="form-control" aria-label="Mensaje" name="texto" placeholder="Escribí un mensaje" maxlength="50" autocomplete="off">
-                <button type="submit" class="sw-btn-icono" aria-label="Enviar"><i class="bi bi-send-fill"></i></button>
-            </form>
+                @if (error != null)
+                {
+                    <div class="alert alert-danger rounded-0 mb-0 py-2 small" role="alert"><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> @error</div>
+                }
+
+                @if (puedeEscribir)
+                {
+                    <form method="post" action="@Url.Action("Enviar", "Chat", new { id = abierta.IdIntercambios })" asp-antiforgery="true" class="sw-chat-input d-flex align-items-center gap-2">
+                        <input type="text" class="form-control" aria-label="Mensaje" name="texto" value="@textoAnterior" placeholder="Escribí un mensaje"
+                               maxlength="@Mensajes.LargoMaximoTexto" autocomplete="off" required data-chat-texto>
+                        <button type="submit" class="sw-btn-icono" aria-label="Enviar"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
+                    </form>
+                }
+                else
+                {
+                    <p class="sw-chat-input small text-suave text-center mb-0">
+                        Este intercambio está @abierta.Estado.ToLowerInvariant(): ya no se pueden mandar mensajes.
+                    </p>
+                }
+            }
         </section>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

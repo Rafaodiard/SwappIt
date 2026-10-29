@@ -9,7 +9,7 @@
     <header class="sw-notif-encabezado">
         <h2 id="notif-titulo" class="sw-notif-titulo">Notificaciones</h2>
         <!-- Se muestra solo si hay notificaciones sin leer (notificaciones.js) -->
-        <form asp-controller="Notificaciones" asp-action="MarcarTodasLeidas" method="post" data-notif-marcar-todas hidden>
+        <form action="@Url.Action("MarcarTodasLeidas", "Notificaciones")" asp-antiforgery="true" method="post" data-notif-marcar-todas hidden>
             <button type="submit" class="sw-notif-accion">Marcar todas como leídas</button>
         </form>
     </header>

@@ -88,6 +88,8 @@ public class ArticulosController : Controller
             ViewBag.otrosArticulos = BD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
                 .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
             ViewBag.esPropio = esPropio;
+            // Con un intercambio Aceptado o Realizado ya no se muestra en el catálogo ni se puede pedir.
+            ViewBag.comprometido = BD.ArticuloComprometido(articulo.IdArticulos);
             ViewBag.logueado = usuarioId != null;
             // Pop up "Proponer intercambio": artículos del usuario logueado que puede ofrecer a cambio.
             ViewBag.misArticulos = usuarioId != null && !esPropio

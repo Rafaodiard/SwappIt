@@ -34,7 +34,7 @@
         </div>
         <div class="card-objeto-body">
             <h3 class="card-objeto-titulo">
-                <a asp-controller="Articulos" asp-action="Detalle" asp-route-id="@articulo.IdArticulos" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
+                <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
             </h3>
             @if (!string.IsNullOrWhiteSpace(articulo.Barrio))
             {

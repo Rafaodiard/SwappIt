@@ -209,10 +209,10 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Mensajes](
 	[IdMensajes] [int] IDENTITY(1,1) NOT NULL,
-	[Texto] [varchar](50) NOT NULL,
+	[Texto] [varchar](500) NOT NULL,
 	[fueVisto] [bit] NOT NULL,
-	[FechaEnviado] [date] NOT NULL,
-	[FechaRecibido] [date] NULL,
+	[FechaEnviado] [datetime] NOT NULL,
+	[FechaRecibido] [datetime] NULL,
 	[IdUsuariosManda] [int] NOT NULL,
 	[IdIntercambio] [int] NOT NULL,
  CONSTRAINT [PK_Mensajes] PRIMARY KEY CLUSTERED 
@@ -978,9 +978,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[RegistrarMensaje]
-	@texto varchar(50),
+	@texto varchar(500),
 	@fueVisto bit,
-	@fechaEnviado date,
+	@fechaEnviado datetime,
 	@usuariomanda varchar(50),
 	@usuariorecibe varchar(50),
 	@idIntercambio int

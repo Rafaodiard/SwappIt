@@ -2,7 +2,7 @@
 @*
     Contenido del pop up de notificaciones (lo devuelve NotificacionesController.Lista y lo pone
     notificaciones.js dentro de _PopupNotificaciones.cshtml cada vez que se abre).
-    Nuevas = sin leer, Anteriores = ya leídas. "Ver ..." la marca como leída y lleva al intercambio.
+    Nuevas = sin leer, Anteriores = ya leídas. "Ver ..." la marca como leída y lleva al intercambio (o al chat).
 *@
 @functions {
     // "Hace 10 min", "Ayer", "Hace 3 días" o la fecha.
@@ -38,8 +38,12 @@
             TipoNotificaciones.MensajeNuevo => "bi-chat-dots",
             _ => "bi-bell"
         };
-        string accion = n.Tipo == TipoNotificaciones.PropuestaAceptada || n.Tipo == TipoNotificaciones.MensajeNuevo
-            ? "Ver intercambio" : "Ver propuesta";
+        string accion = n.Tipo switch
+        {
+            TipoNotificaciones.PropuestaAceptada => "Ver intercambio",
+            TipoNotificaciones.MensajeNuevo => "Ver chat",
+            _ => "Ver propuesta"
+        };
 
         <li class="sw-notif-item @(n.Leida ? "" : "sw-notif-item--sin-leer")">
             <span class="sw-notif-icono @(rechazo ? "sw-notif-icono--bordo" : "")" aria-hidden="true"><i class="bi @icono"></i></span>
@@ -57,7 +61,7 @@
                             @:<strong>@n.OtroNombre</strong> rechazó tu propuesta por su <strong>@n.ArticuloNombre</strong>.
                             break;
                         case TipoNotificaciones.MensajeNuevo:
-                            @:<strong>@n.OtroNombre</strong> te mandó un mensaje.
+                            @:<strong>@n.OtroNombre</strong> te mandó un mensaje por el intercambio de <strong>@n.ArticuloNombre</strong>.
                             break;
                         default:
                             @:@n.Tipo

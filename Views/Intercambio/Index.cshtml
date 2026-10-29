@@ -31,13 +31,13 @@
     @if (total > 0)
     {
         <nav class="mb-3" aria-label="Filtrar por estado">
-            <a asp-action="Index" class="sw-chip @(estadoElegido == null ? "activo" : "")" aria-current="@(estadoElegido == null ? "page" : null)">
+            <a href="@Url.Action("Index", "Intercambio")" class="sw-chip @(estadoElegido == null ? "activo" : "")" aria-current="@(estadoElegido == null ? "page" : null)">
                 Todos <span class="sw-chip-cantidad">@total</span>
             </a>
             @foreach (var estado in estados)
             {
                 bool elegido = estado.Nombre == estadoElegido;
-                <a asp-action="Index" asp-route-estado="@estado.Nombre" class="sw-chip @(elegido ? "activo" : "")" aria-current="@(elegido ? "page" : null)">
+                <a href="@Url.Action("Index", "Intercambio", new { estado = estado.Nombre })" class="sw-chip @(elegido ? "activo" : "")" aria-current="@(elegido ? "page" : null)">
                     @(estado.Nombre)s <span class="sw-chip-cantidad">@cantidadPorEstado.GetValueOrDefault(estado.Nombre ?? "")</span>
                 </a>
             }
@@ -61,7 +61,7 @@
                 <i class="bi bi-arrow-left-right fs-1 text-suave"></i>
                 <h2 class="font-titulo h3 mt-3">Todavía no tenés intercambios</h2>
                 <p class="text-suave mb-4">Buscá un artículo que te guste y proponé un intercambio con uno de los tuyos.</p>
-                <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-primario">Ver artículos</a>
+                <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Ver artículos</a>
             </div>
         }
         else
@@ -69,7 +69,7 @@
             <div class="text-center py-5 px-3">
                 <i class="bi bi-funnel fs-1 text-suave"></i>
                 <p class="text-suave mt-2 mb-3">No tenés intercambios en estado @estadoElegido?.ToLowerInvariant().</p>
-                <a asp-action="Index" class="btn btn-sw-outline btn-sm">Ver todos</a>
+                <a href="@Url.Action("Index", "Intercambio")" class="btn btn-sw-outline btn-sm">Ver todos</a>
             </div>
         }
     </section>

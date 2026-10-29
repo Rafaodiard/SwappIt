@@ -20,7 +20,7 @@
             <p class="sw-auth-subtitulo">Ingresá para seguir intercambiando</p>
         </header>
 
-        <form class="sw-form" method="post" asp-controller="Account" asp-action="Login" novalidate>
+        <form class="sw-form" method="post" action="@Url.Action("Login", "Account")" asp-antiforgery="true" novalidate>
             <!-- Errores generales (ej: "Email o contraseña incorrectos") -->
             @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
             @if (ViewBag.Error != null)
@@ -48,7 +48,7 @@
 
         <p class="sw-auth-pie">
             <span>¿Todavía no tenés cuenta?</span>
-            <a asp-controller="Account" asp-action="Registro" class="sw-link">Registrate</a>
+            <a href="@Url.Action("Registro", "Account")" class="sw-link">Registrate</a>
         </p>
     </div>
 </section>

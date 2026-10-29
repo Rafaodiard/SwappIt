@@ -29,11 +29,11 @@
         <span class="sw-estado-intercambio sw-estado-intercambio--@fila.Estado.ToLowerInvariant()">@fila.Estado</span>
         @if (porResponder)
         {
-            <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@fila.IdIntercambios" class="btn btn-sw-primario btn-sm">Responder</a>
+            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn btn-sw-primario btn-sm">Responder</a>
         }
         else
         {
-            <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@fila.IdIntercambios" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
         }
     </div>
 </article>

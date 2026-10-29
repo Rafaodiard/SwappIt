@@ -11,7 +11,7 @@
                 <h1 class="mb-3">Swappit</h1>
                 <p class="lead mb-2">Intercambiá. Conectá. Reutilizá.</p>
                 <p class="text-suave mb-4">Creemos en darle una segunda oportunidad a todo.</p>
-                <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-primario btn-lg">Explorar productos</a>
+                <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario btn-lg">Explorar productos</a>
             </div>
             <div class="col-lg-6">
                 <div class="sw-hero-img sw-img"><img src="~/img/foto1.png" alt="Personas intercambiando objetos"></div>
@@ -143,7 +143,7 @@
         <div class="sw-cta-box text-center">
             <h2 class="mb-2">¿Querés empezar a intercambiar?</h2>
             <p>Creá tu cuenta gratis y publicá tu primer objeto en minutos</p>
-            <a asp-controller="Account" asp-action="Registro" class="btn btn-sw-secundario">Registrate ahora <i class="bi bi-arrow-right ms-1"></i></a>
+            <a href="@Url.Action("Registro", "Account")" class="btn btn-sw-secundario">Registrate ahora <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
     </div>
 </section>
