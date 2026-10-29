@@ -34,6 +34,8 @@ public class PerfilController : Controller
         ViewBag.provincias = BD.GetProvincias();
         ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
+        // Historial: los 3 intercambios más nuevos (enviados y recibidos).
+        ViewBag.intercambios = BD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
         return View();
     }
 

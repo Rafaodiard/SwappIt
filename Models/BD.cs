@@ -261,6 +261,134 @@ public static class BD
         }
     }
 
+    // ---------- Intercambios ----------
+    // Quien propone queda en IdUsuarios1/IdArticulos1 (el artículo que ofrece) y el dueño del artículo pedido
+    // en IdUsuarios2/IdArticulos2. Los estados se buscan por nombre (ver EstadosIntercambios).
+
+    // Lista de intercambios del usuario (enviados y recibidos), lo más nuevo primero.
+    // "Mi..." es siempre lo del usuario logueado y "Su..."/"Otro..." lo de la otra persona.
+    // Va sin el SELECT para poder agregarle TOP (ver GetIntercambios).
+    private const string ConsultaIntercambios = @"i.IdIntercambios, i.Fecha, e.Nombre AS Estado,
+            CAST(CASE WHEN i.IdUsuarios2 = @pIdUsuario THEN 1 ELSE 0 END AS bit) AS EsRecibido,
+            am.IdArticulos AS MiArticuloId, am.Nombre AS MiArticuloNombre, eam.Nombre AS MiArticuloEstado,
+            (SELECT TOP 1 im.Ruta FROM Imagenes im WHERE im.IdArticulos = am.IdArticulos ORDER BY im.IdImagenes) AS MiArticuloImagen,
+            asu.IdArticulos AS SuArticuloId, asu.Nombre AS SuArticuloNombre, easu.Nombre AS SuArticuloEstado,
+            (SELECT TOP 1 isu.Ruta FROM Imagenes isu WHERE isu.IdArticulos = asu.IdArticulos ORDER BY isu.IdImagenes) AS SuArticuloImagen,
+            u.IdUsuarios AS OtroIdUsuario, u.Nombre AS OtroNombre, u.Apellido AS OtroApellido, u.Usuario AS OtroUsuario,
+            u.Barrio AS OtroBarrio, p.Nombre AS OtroProvincia
+        FROM Intercambios i
+        INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+        CROSS APPLY (SELECT
+            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos1 ELSE i.IdArticulos2 END AS IdMiArticulo,
+            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos2 ELSE i.IdArticulos1 END AS IdSuArticulo,
+            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END AS IdOtro) lado
+        INNER JOIN Articulos am ON am.IdArticulos = lado.IdMiArticulo
+        INNER JOIN EstadosArticulos eam ON eam.IdEstadosArticulos = am.IdEstado
+        INNER JOIN Articulos asu ON asu.IdArticulos = lado.IdSuArticulo
+        INNER JOIN EstadosArticulos easu ON easu.IdEstadosArticulos = asu.IdEstado
+        INNER JOIN Usuarios u ON u.IdUsuarios = lado.IdOtro
+        LEFT JOIN Provincias p ON p.IdProvincia = u.IdProvincias
+        WHERE (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)";
+
+    public static List<IntercambioViewModel> GetIntercambios(int idUsuario, int? cantidad = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
+            string query = $"SELECT {top}{ConsultaIntercambios} ORDER BY i.Fecha DESC, i.IdIntercambios DESC";
+            return connection.Query<IntercambioViewModel>(query, new { pIdUsuario = idUsuario, pCantidad = cantidad }).ToList();
+        }
+    }
+
+    // Un intercambio, solo si el usuario es una de las dos partes (si no, null).
+    public static IntercambioViewModel? GetIntercambio(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $"SELECT {ConsultaIntercambios} AND i.IdIntercambios = @pId";
+            return connection.QueryFirstOrDefault<IntercambioViewModel>(query, new { pId = idIntercambio, pIdUsuario = idUsuario });
+        }
+    }
+
+    // Propuesta en curso (Pendiente o Aceptado) que el usuario ya hizo por ese artículo, para no repetirla.
+    public static int? GetIdPropuestaEnCurso(int idUsuario, int idArticuloPedido)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT TOP 1 i.IdIntercambios FROM Intercambios i
+                INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+                WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdArticulo AND e.Nombre IN @pEnCurso
+                ORDER BY i.IdIntercambios DESC";
+            return connection.QueryFirstOrDefault<int?>(query, new
+            {
+                pIdUsuario = idUsuario,
+                pIdArticulo = idArticuloPedido,
+                pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+            });
+        }
+    }
+
+    // Guarda una propuesta nueva en estado Pendiente con la fecha de hoy y devuelve su IdIntercambios.
+    // Si el usuario ya tiene una propuesta en curso por ese artículo no inserta nada y devuelve null
+    // (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
+    public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                OUTPUT INSERTED.IdIntercambios
+                SELECT CAST(GETDATE() AS date), e.IdEstadosIntercambios, @pIdUsuario, @pIdDueno, @pIdOfrecido, @pIdPedido
+                FROM EstadosIntercambios e
+                WHERE e.Nombre = @pPendiente
+                    AND NOT EXISTS (SELECT 1 FROM Intercambios i
+                        INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                        WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)";
+            return connection.QueryFirstOrDefault<int?>(query, new
+            {
+                pIdUsuario = idUsuario,
+                pIdDueno = idDueno,
+                pIdOfrecido = idArticuloOfrecido,
+                pIdPedido = idArticuloPedido,
+                pPendiente = EstadosIntercambios.Pendiente,
+                pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+            });
+        }
+    }
+
+    // Pasa un intercambio de estadoActual a estadoNuevo. Solo lo cambia si el usuario puede hacerlo:
+    // soloQuienRecibe = true -> solo el dueño del artículo pedido (aceptar o rechazar); si no, cualquiera de los dos.
+    // Devuelve false si no se cambió (no existe, no es del usuario o ya no estaba en estadoActual).
+    public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo, bool soloQuienRecibe)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
+                FROM Intercambios i
+                INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
+                INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
+                WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
+                    AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))";
+            return connection.Execute(query, new
+            {
+                pId = idIntercambio,
+                pIdUsuario = idUsuario,
+                pActual = estadoActual,
+                pNuevo = estadoNuevo,
+                pSoloQuienRecibe = soloQuienRecibe
+            }) > 0;
+        }
+    }
+
+    // Estados para los filtros de Mis intercambios, en el orden de la tabla.
+    public static List<EstadosIntercambios> GetEstadosIntercambios()
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT IdEstadosIntercambios, Nombre FROM EstadosIntercambios ORDER BY IdEstadosIntercambios";
+            return connection.Query<EstadosIntercambios>(query).ToList();
+        }
+    }
+
     private static string? PatronBusqueda(string? busqueda) =>
         string.IsNullOrWhiteSpace(busqueda) ? null : EscaparLike(busqueda.Trim());
 

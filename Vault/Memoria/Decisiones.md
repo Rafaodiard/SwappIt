@@ -19,3 +19,4 @@ tags:
 | 28/10 | Tipografías Century Gothic (texto) + Forum (títulos) | Aunque Figma use Jost en algunos lugares |
 | 28/10 | Scripts sueltos de `BaseDatos/` que ya estaban en los de creación se borraron | Quedan Estructura, Datos, StoredProcedures (+ Estados.sql hasta que Rafael lo corra) |
 | 29/10 | Vault de Obsidian + grafo de graphify como documentación y memoria | Ver [[Cómo usar esta vault]] |
+| 29/10 | Intercambios: quien propone en IdUsuarios1/IdArticulos1, el dueño del artículo pedido en IdUsuarios2/IdArticulos2; sin usar el SP RegistrarIntercambio | Solo el dueño acepta o rechaza; cualquiera de los dos marca Realizado. Una propuesta en curso por artículo. Sin notificaciones por ahora |

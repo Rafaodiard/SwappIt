@@ -7,6 +7,7 @@
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
     string? foto = ViewBag.foto;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
+    List<Swappit.Models.ViewModels.IntercambioViewModel> intercambios = ViewBag.intercambios;
     string? errorPerfil = TempData["ErrorPerfil"] as string;
     string? mensajePerfil = TempData["MensajePerfil"] as string;
 }
@@ -131,35 +132,35 @@
             </section>
         </div>
 
-        <!-- ===== Historial de intercambios (tabla Intercambios) ===== -->
+        <!-- ===== Historial de intercambios: los últimos de la tabla Intercambios (todos en Intercambio/Index) ===== -->
         <div class="col-12">
-            <div class="sw-card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="font-titulo h3 mb-0">Historial de intercambios</h2>
-                    <a href="#" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+            <section class="sw-card p-4" aria-labelledby="titulo-historial">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+                    <h2 class="font-titulo h3 mb-0" id="titulo-historial">Historial de intercambios</h2>
+                    @if (intercambios.Count > 0)
+                    {
+                        <a asp-controller="Intercambio" asp-action="Index" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right"></i></a>
+                    }
                 </div>
 
-                <!-- Se llena desde JS: swappit.renderLista('#historial', lista, 'historial-item', rellenar) -->
-                <div id="historial" class="d-flex flex-column gap-3">
-                    <div class="sw-historial-item d-flex flex-column flex-md-row align-items-md-center gap-3" data-template="historial-item">
-                        <div class="sw-historial-img sw-img"><img src="" alt="" data-campo="imagen"></div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h3 class="h5 fw-bold mb-0" data-campo="articuloRecibido">Silla</h3>
-                                <span class="sw-badge sw-badge-recibido" data-campo="tipo">Recibido</span>
-                            </div>
-                            <div class="text-suave small mb-1">
-                                <i class="bi bi-arrow-left-right"></i> <span data-campo="articuloEntregado">Lámpara</span>
-                            </div>
-                            <div class="d-flex flex-wrap gap-3 text-suave small">
-                                <span><i class="bi bi-person"></i> Intercambio con <span data-campo="otroUsuario">@@juanp</span></span>
-                                <span><i class="bi bi-calendar3"></i> Fecha: <span data-campo="fecha">12/09/2026</span></span>
-                            </div>
-                        </div>
-                        <a href="#" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right"></i></a>
+                @if (intercambios.Count > 0)
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var intercambio in intercambios)
+                        {
+                            ViewBag.fila = intercambio;
+                            <partial name="_FilaIntercambio" />
+                        }
                     </div>
-                </div>
-            </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-arrow-left-right fs-1 text-suave"></i>
+                        <p class="text-suave mt-2 mb-0">Todavía no tenés intercambios. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
+                    </div>
+                }
+            </section>
         </div>
     </div>
 </div>
