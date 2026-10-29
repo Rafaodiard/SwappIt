@@ -116,13 +116,22 @@ public static class BD
         }
     }
 
- 
+    // Un artículo con un intercambio Aceptado o Realizado ya está comprometido: deja de mostrarse en el inicio,
+    // el catálogo, los filtros, los perfiles y "Más artículos de...", y no se puede pedir ni ofrecer en otra propuesta.
+    // No se le cambia nada al artículo: se calcula desde Intercambios (sigue visible en Mis intercambios y en su detalle).
+    // Va con el alias "a" para Articulos y necesita el parámetro @pComprometidos (EstadosComprometidos).
+    private const string ArticuloDisponible = @"NOT EXISTS (SELECT 1 FROM Intercambios ic
+        INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
+        WHERE eic.Nombre IN @pComprometidos AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))";
+
+    private static readonly string[] EstadosComprometidos = { EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado };
+
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
         IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')" };
+            var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')", ArticuloDisponible };
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
             if (estados is { Count: > 0 }) condiciones.Add("a.IdEstado IN @pEstados");
             if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
@@ -143,7 +152,8 @@ public static class BD
                 pCantidad = cantidad,
                 pCategorias = categorias,
                 pEstados = estados,
-                pIdUsuario = idUsuario
+                pIdUsuario = idUsuario,
+                pComprometidos = EstadosComprometidos
             }).ToList();
         }
     }
@@ -240,9 +250,10 @@ public static class BD
                 FROM Categorias c
                 LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
                     AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                    AND " + ArticuloDisponible + @"
                 GROUP BY c.IdCategorias, c.Nombre
                 ORDER BY c.Nombre";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda) }).ToList();
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pComprometidos = EstadosComprometidos }).ToList();
         }
     }
 
@@ -255,9 +266,10 @@ public static class BD
                 FROM EstadosArticulos e
                 LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
                     AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                    AND " + ArticuloDisponible + @"
                 GROUP BY e.IdEstadosArticulos, e.Nombre
                 ORDER BY e.IdEstadosArticulos";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda) }).ToList();
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pComprometidos = EstadosComprometidos }).ToList();
         }
     }
 
@@ -328,9 +340,19 @@ public static class BD
         }
     }
 
+    // true si el artículo ya está en un intercambio Aceptado o Realizado (ver ArticuloDisponible).
+    public static bool ArticuloComprometido(int idArticulo)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT CAST(CASE WHEN " + ArticuloDisponible + " THEN 0 ELSE 1 END AS bit) FROM Articulos a WHERE a.IdArticulos = @pId";
+            return connection.QueryFirstOrDefault<bool>(query, new { pId = idArticulo, pComprometidos = EstadosComprometidos });
+        }
+    }
+
     // Guarda una propuesta nueva en estado Pendiente con la fecha de hoy y devuelve su IdIntercambios.
-    // Si el usuario ya tiene una propuesta en curso por ese artículo no inserta nada y devuelve null
-    // (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
+    // Si el usuario ya tiene una propuesta en curso por ese artículo, o alguno de los dos artículos ya está comprometido,
+    // no inserta nada y devuelve null (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
     // En la misma transacción le avisa al dueño del artículo pedido (notificación "Propuesta recibida").
     public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido)
     {
@@ -346,7 +368,11 @@ public static class BD
                     WHERE e.Nombre = @pPendiente
                         AND NOT EXISTS (SELECT 1 FROM Intercambios i
                             INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
-                            WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)";
+                            WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)
+                        AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+                            INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
+                            WHERE eic.Nombre IN @pComprometidos
+                                AND (ic.IdArticulos1 IN (@pIdOfrecido, @pIdPedido) OR ic.IdArticulos2 IN (@pIdOfrecido, @pIdPedido)))";
                 int? idIntercambio = connection.QueryFirstOrDefault<int?>(query, new
                 {
                     pIdUsuario = idUsuario,
@@ -354,7 +380,8 @@ public static class BD
                     pIdOfrecido = idArticuloOfrecido,
                     pIdPedido = idArticuloPedido,
                     pPendiente = EstadosIntercambios.Pendiente,
-                    pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+                    pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado },
+                    pComprometidos = EstadosComprometidos
                 }, transaccion);
 
                 if (idIntercambio.HasValue)
@@ -371,7 +398,9 @@ public static class BD
     // Pasa un intercambio de estadoActual a estadoNuevo. Solo lo cambia si el usuario puede hacerlo:
     // soloQuienRecibe = true -> solo el dueño del artículo pedido (aceptar o rechazar); si no, cualquiera de los dos.
     // Si se cambió y viene tipoNotificacion, en la misma transacción le avisa a la otra persona del intercambio.
-    // Devuelve false si no se cambió (no existe, no es del usuario o ya no estaba en estadoActual).
+    // Para pasar a Aceptado, ninguno de los dos artículos puede estar ya en otro intercambio Aceptado o Realizado,
+    // y en la misma transacción se rechazan las otras propuestas pendientes con esos artículos (ver RechazarPendientesDeArticulos).
+    // Devuelve false si no se cambió (no existe, no es del usuario, ya no estaba en estadoActual o el artículo ya está comprometido).
     public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo,
         bool soloQuienRecibe, string? tipoNotificacion = null)
     {
@@ -387,14 +416,20 @@ public static class BD
                     INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
                     INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
                     WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
-                        AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))";
+                        AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))
+                        AND (@pNuevo <> @pAceptado OR NOT EXISTS (SELECT 1 FROM Intercambios ic
+                            INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
+                            WHERE eic.Nombre IN @pComprometidos AND ic.IdIntercambios <> i.IdIntercambios
+                                AND (ic.IdArticulos1 IN (i.IdArticulos1, i.IdArticulos2) OR ic.IdArticulos2 IN (i.IdArticulos1, i.IdArticulos2))))";
                 int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
                 {
                     pId = idIntercambio,
                     pIdUsuario = idUsuario,
                     pActual = estadoActual,
                     pNuevo = estadoNuevo,
-                    pSoloQuienRecibe = soloQuienRecibe
+                    pSoloQuienRecibe = soloQuienRecibe,
+                    pAceptado = EstadosIntercambios.Aceptado,
+                    pComprometidos = EstadosComprometidos
                 }, transaccion);
 
                 if (idOtro.HasValue && tipoNotificacion != null)
@@ -402,9 +437,56 @@ public static class BD
                     CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, tipoNotificacion);
                 }
 
+                if (idOtro.HasValue && estadoNuevo == EstadosIntercambios.Aceptado)
+                {
+                    RechazarPendientesDeArticulos(connection, transaccion, idIntercambio, idUsuario);
+                }
+
                 transaccion.Commit();
                 return idOtro.HasValue;
             }
+        }
+    }
+
+    // Otras propuestas Pendientes que usan alguno de los dos artículos del intercambio (como pedido o como ofrecido).
+    // Son las que se rechazan solas si se acepta este intercambio.
+    private const string CondicionPendientesDeArticulos = @"o.IdIntercambios <> @pId
+        AND EXISTS (SELECT 1 FROM Intercambios acep WHERE acep.IdIntercambios = @pId
+            AND (o.IdArticulos1 IN (acep.IdArticulos1, acep.IdArticulos2) OR o.IdArticulos2 IN (acep.IdArticulos1, acep.IdArticulos2)))";
+
+    // Cuántas propuestas se rechazarían solas al aceptar este intercambio (para avisarle antes a quien acepta).
+    public static int ContarPendientesDeArticulos(int idIntercambio)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT COUNT(*) FROM Intercambios o
+                INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = o.IdEstado
+                WHERE e.Nombre = @pPendiente AND " + CondicionPendientesDeArticulos;
+            return connection.ExecuteScalar<int>(query, new { pId = idIntercambio, pPendiente = EstadosIntercambios.Pendiente });
+        }
+    }
+
+    // Se llama al aceptar un intercambio, dentro de su transacción: pasa a Rechazado las otras propuestas pendientes
+    // con esos artículos y le avisa a quien las hizo ("Propuesta rechazada"). No se avisa a quien acepta (idUsuario),
+    // por ejemplo si él mismo había ofrecido ese artículo en otra propuesta.
+    private static void RechazarPendientesDeArticulos(SqlConnection connection, SqlTransaction transaccion, int idIntercambio, int idUsuario)
+    {
+        string query = @"UPDATE o SET o.IdEstado = rechazado.IdEstadosIntercambios
+            OUTPUT INSERTED.IdIntercambios, INSERTED.IdUsuarios1
+            FROM Intercambios o
+            INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = o.IdEstado
+            INNER JOIN EstadosIntercambios rechazado ON rechazado.Nombre = @pRechazado
+            WHERE e.Nombre = @pPendiente AND " + CondicionPendientesDeArticulos;
+        var rechazadas = connection.Query<(int IdIntercambios, int IdUsuarios1)>(query, new
+        {
+            pId = idIntercambio,
+            pPendiente = EstadosIntercambios.Pendiente,
+            pRechazado = EstadosIntercambios.Rechazado
+        }, transaccion).ToList();
+
+        foreach (var r in rechazadas.Where(r => r.IdUsuarios1 != idUsuario))
+        {
+            CrearNotificacion(connection, transaccion, r.IdUsuarios1, r.IdIntercambios, TipoNotificaciones.PropuestaRechazada);
         }
     }
 
@@ -422,13 +504,24 @@ public static class BD
     // Cada notificación es para un usuario (IdUsuario) sobre un intercambio. El tipo se busca por nombre
     // (ver TipoNotificaciones): si ese tipo no está cargado en la tabla, no se inserta nada.
 
-    // Se llama desde ProponerIntercambio y CambiarEstadoIntercambio, dentro de su transacción.
-    private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, int idUsuario, int idIntercambio, string tipo)
+    // Se llama desde ProponerIntercambio, CambiarEstadoIntercambio y EnviarMensaje, dentro de su transacción.
+    // siNoHayOtraSinLeer = true: no la crea si el usuario ya tiene una sin leer de ese tipo y de ese intercambio
+    // (así un chat con 10 mensajes seguidos deja una sola notificación "Mensaje nuevo").
+    private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, int idUsuario, int idIntercambio, string tipo,
+        bool siNoHayOtraSinLeer = false)
     {
         string query = @"INSERT INTO Notificaciones (IdUsuario, IdIntercambio, IdTipoNotificacion, Leida, Fecha)
             SELECT @pIdUsuario, @pIdIntercambio, t.Id, 0, GETDATE()
-            FROM TipoNotificaciones t WHERE t.Nombre = @pTipo";
-        connection.Execute(query, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio, pTipo = tipo }, transaccion);
+            FROM TipoNotificaciones t WHERE t.Nombre = @pTipo
+                AND (@pSiNoHayOtra = 0 OR NOT EXISTS (SELECT 1 FROM Notificaciones n
+                    WHERE n.IdUsuario = @pIdUsuario AND n.IdIntercambio = @pIdIntercambio AND n.IdTipoNotificacion = t.Id AND n.Leida = 0))";
+        connection.Execute(query, new
+        {
+            pIdUsuario = idUsuario,
+            pIdIntercambio = idIntercambio,
+            pTipo = tipo,
+            pSiNoHayOtra = siNoHayOtraSinLeer
+        }, transaccion);
     }
 
     // Notificaciones del usuario para el pop up del header, lo más nuevo primero.
@@ -459,15 +552,18 @@ public static class BD
         }
     }
 
-    // Marca como leída una notificación del usuario y devuelve su IdIntercambio (null si no es suya o no existe).
-    public static int? MarcarNotificacionLeida(int idNotificacion, int idUsuario)
+    // Marca como leída una notificación del usuario y la devuelve con su IdIntercambio y su Tipo, para saber a dónde llevarlo
+    // (null si no es suya o no existe).
+    public static NotificacionViewModel? MarcarNotificacionLeida(int idNotificacion, int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"UPDATE Notificaciones SET Leida = 1
-                OUTPUT INSERTED.IdIntercambio
-                WHERE Id = @pId AND IdUsuario = @pIdUsuario";
-            return connection.QueryFirstOrDefault<int?>(query, new { pId = idNotificacion, pIdUsuario = idUsuario });
+            string query = @"UPDATE n SET n.Leida = 1
+                OUTPUT INSERTED.Id, INSERTED.IdIntercambio, t.Nombre AS Tipo
+                FROM Notificaciones n
+                INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
+                WHERE n.Id = @pId AND n.IdUsuario = @pIdUsuario";
+            return connection.QueryFirstOrDefault<NotificacionViewModel>(query, new { pId = idNotificacion, pIdUsuario = idUsuario });
         }
     }
 
@@ -477,6 +573,102 @@ public static class BD
         {
             string query = "UPDATE Notificaciones SET Leida = 1 WHERE IdUsuario = @pIdUsuario AND Leida = 0";
             connection.Execute(query, new { pIdUsuario = idUsuario });
+        }
+    }
+
+    // ---------- Chat ----------
+    // Hay un chat por intercambio: Mensajes.IdIntercambio. Solo lo usan las dos partes del intercambio
+    // (todas las consultas lo chequean con ParteDelIntercambio). Se puede escribir mientras el intercambio
+    // está en curso (Pendiente o Aceptado); cuando se rechaza o se realiza, el chat queda para leer.
+
+    // Condición "el usuario @pIdUsuario es una de las dos partes del intercambio @pIdIntercambio".
+    private const string ParteDelIntercambio = @"EXISTS (SELECT 1 FROM Intercambios ip
+        WHERE ip.IdIntercambios = @pIdIntercambio AND (ip.IdUsuarios1 = @pIdUsuario OR ip.IdUsuarios2 = @pIdUsuario))";
+
+    // Último mensaje y cantidad sin ver de cada intercambio del usuario que ya tiene mensajes.
+    public static List<ConversacionViewModel> GetResumenesChat(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT i.IdIntercambios AS IdIntercambio, ult.Texto AS UltimoTexto, ult.FechaEnviado AS UltimaFecha,
+                    CAST(CASE WHEN ult.IdUsuariosManda = @pIdUsuario THEN 1 ELSE 0 END AS bit) AS UltimoEsMio,
+                    (SELECT COUNT(*) FROM Mensajes m
+                        WHERE m.IdIntercambio = i.IdIntercambios AND m.IdUsuariosManda <> @pIdUsuario AND m.fueVisto = 0) AS NoLeidos
+                FROM Intercambios i
+                CROSS APPLY (SELECT TOP 1 m.Texto, m.FechaEnviado, m.IdUsuariosManda FROM Mensajes m
+                    WHERE m.IdIntercambio = i.IdIntercambios ORDER BY m.IdMensajes DESC) ult
+                WHERE i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario";
+            return connection.Query<ConversacionViewModel>(query, new { pIdUsuario = idUsuario }).ToList();
+        }
+    }
+
+    // Mensajes del chat de un intercambio, del más viejo al más nuevo (vacío si el usuario no es parte del intercambio).
+    public static List<Mensajes> GetMensajes(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"SELECT IdMensajes, Texto, fueVisto, FechaEnviado, FechaRecibido, IdUsuariosManda, IdIntercambio
+                FROM Mensajes
+                WHERE IdIntercambio = @pIdIntercambio AND {ParteDelIntercambio}
+                ORDER BY IdMensajes";
+            return connection.Query<Mensajes>(query, new { pIdIntercambio = idIntercambio, pIdUsuario = idUsuario }).ToList();
+        }
+    }
+
+    // Guarda un mensaje del usuario en el chat del intercambio y, en la misma transacción, le avisa a la otra persona
+    // (notificación "Mensaje nuevo", una sola mientras no la lea). Solo lo guarda si el usuario es parte del intercambio
+    // y el intercambio está en curso; si no, devuelve false.
+    public static bool EnviarMensaje(int idIntercambio, int idUsuario, string texto)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                // Busca a la otra persona solo si el usuario es parte y el intercambio está en curso; si la encontró, inserta.
+                // Devuelve el id de la otra persona, o NULL si no se insertó.
+                string query = @"DECLARE @idOtro int;
+                    SELECT @idOtro = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
+                    FROM Intercambios i
+                    INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+                    WHERE i.IdIntercambios = @pIdIntercambio AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)
+                        AND e.Nombre IN @pEnCurso;
+                    IF @idOtro IS NOT NULL
+                        INSERT INTO Mensajes (Texto, fueVisto, FechaEnviado, FechaRecibido, IdUsuariosManda, IdIntercambio)
+                        VALUES (@pTexto, 0, GETDATE(), NULL, @pIdUsuario, @pIdIntercambio);
+                    SELECT @idOtro;";
+                int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
+                {
+                    pIdIntercambio = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pTexto = texto,
+                    pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+                }, transaccion);
+
+                if (idOtro.HasValue)
+                {
+                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, TipoNotificaciones.MensajeNuevo, siNoHayOtraSinLeer: true);
+                }
+
+                transaccion.Commit();
+                return idOtro.HasValue;
+            }
+        }
+    }
+
+    // El usuario abrió el chat: marca como vistos los mensajes que le mandó la otra persona (con la fecha en FechaRecibido)
+    // y como leídas sus notificaciones "Mensaje nuevo" de ese intercambio.
+    public static void MarcarMensajesVistos(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"UPDATE Mensajes SET fueVisto = 1, FechaRecibido = GETDATE()
+                WHERE IdIntercambio = @pIdIntercambio AND IdUsuariosManda <> @pIdUsuario AND fueVisto = 0 AND {ParteDelIntercambio};
+                UPDATE n SET n.Leida = 1
+                FROM Notificaciones n
+                INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
+                WHERE n.IdUsuario = @pIdUsuario AND n.IdIntercambio = @pIdIntercambio AND t.Nombre = @pTipo AND n.Leida = 0";
+            connection.Execute(query, new { pIdIntercambio = idIntercambio, pIdUsuario = idUsuario, pTipo = TipoNotificaciones.MensajeNuevo });
         }
     }
 

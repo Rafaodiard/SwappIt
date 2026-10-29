@@ -3,6 +3,7 @@
     - Propuesta recibida y Pendiente: "Recibiste una propuesta" con Aceptar / Rechazar.
     - El resto: "Intercambio con @usuario", con el avance (Pendiente -> Aceptado -> Realizado, o Rechazado),
       lo que das y lo que recibís, y los próximos pasos (marcar como realizado cuando está aceptado).
+    - Mientras está Pendiente o Aceptado, links al chat del intercambio (Chat/Index/id).
 *@
 @using Swappit.Models
 @{
@@ -21,7 +22,7 @@
                 @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
                              : "Puede que el enlace esté mal o que no seas parte de este intercambio.")
             </p>
-            <a asp-action="Index" class="btn btn-sw-primario">Ir a Mis intercambios</a>
+            <a href="@Url.Action("Index", "Intercambio")" class="btn btn-sw-primario">Ir a Mis intercambios</a>
         </div>
     </div>
     return;
@@ -29,6 +30,13 @@
 
 @{
     string? fotoOtro = ViewBag.fotoOtro;
+    bool articuloComprometido = ViewBag.articuloComprometido;
+    int pendientesQueSeRechazan = ViewBag.pendientesQueSeRechazan;
+    // Si al aceptar se rechazan otras propuestas, antes de aceptar se pide confirmación en un pop up.
+    bool confirmarAceptar = !articuloComprometido && pendientesQueSeRechazan > 0;
+    string avisoRechazos = pendientesQueSeRechazan == 1
+        ? "Hay otra propuesta pendiente que incluye estos artículos: si aceptás, se va a rechazar automáticamente."
+        : $"Hay otras {pendientesQueSeRechazan} propuestas pendientes que incluyen estos artículos: si aceptás, se van a rechazar todas automáticamente.";
     string estado = intercambio.Estado;
     bool porResponder = intercambio.EsRecibido && estado == EstadosIntercambios.Pendiente;
     string inicialesOtro = $"{intercambio.OtroNombre?.FirstOrDefault()}{intercambio.OtroApellido?.FirstOrDefault()}".ToUpper();
@@ -38,7 +46,6 @@
     string? error = TempData["ErrorIntercambio"] as string;
 
     // Tarjeta de uno de los dos artículos ("Te ofrece" / "Por tu" o "Vos das" / "Recibís").
-    // Usa Url.Action y no asp-action porque una función local no puede tener tag helpers.
     void PanelArticulo(string etiqueta, int idArticulo, string nombre, string estadoArticulo, string? imagen, string deQuien)
     {
         <a href="@Url.Action("Detalle", "Articulos", new { id = idArticulo })" class="sw-intercambio-panel">
@@ -69,7 +76,7 @@
         </div>
     }
 
-    <a asp-action="Index" class="sw-volver mb-3"><i class="bi bi-chevron-left" aria-hidden="true"></i> Mis intercambios</a>
+    <a href="@Url.Action("Index", "Intercambio")" class="sw-volver mb-3"><i class="bi bi-chevron-left" aria-hidden="true"></i> Mis intercambios</a>
 
     @if (porResponder)
     {
@@ -99,20 +106,64 @@
                 @{ PanelArticulo("Por tu", intercambio.MiArticuloId, intercambio.MiArticuloNombre, intercambio.MiArticuloEstado, intercambio.MiArticuloImagen, "tuyo"); }
             </div>
 
-            <p class="sw-articulo-propio mt-4 mb-0"><i class="bi bi-info-circle me-1"></i> Si aceptás, coordinan con @intercambio.OtroNombre dónde y cuándo hacer el intercambio.</p>
+            @if (articuloComprometido)
+            {
+                <p class="sw-articulo-propio mt-4 mb-0" role="status"><i class="bi bi-exclamation-circle me-1"></i> Uno de los dos artículos ya tiene otro intercambio aceptado, así que esta propuesta no se puede aceptar.</p>
+            }
+            else
+            {
+                <p class="sw-articulo-propio mt-4 mb-0"><i class="bi bi-info-circle me-1"></i> Si aceptás, coordinan con @intercambio.OtroNombre dónde y cuándo hacer el intercambio.</p>
+                @if (confirmarAceptar)
+                {
+                    <p class="sw-aviso-rechazos mt-2 mb-0" role="note"><i class="bi bi-exclamation-triangle me-1"></i> @avisoRechazos</p>
+                }
+            }
 
             <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pt-4 mt-4 border-top">
-                <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@intercambio.OtroIdUsuario" class="fw-semibold text-decoration-none text-primario">Ver perfil de @intercambio.OtroNombre <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="@Url.Action("Publico", "Perfil", new { id = intercambio.OtroIdUsuario })" class="fw-semibold text-decoration-none text-primario">Ver perfil de @intercambio.OtroNombre <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="fw-semibold text-decoration-none text-primario"><i class="bi bi-chat-dots" aria-hidden="true"></i> Preguntarle algo</a>
+                </div>
                 <div class="d-flex gap-2">
-                    <form method="post" asp-action="Rechazar" asp-route-id="@intercambio.IdIntercambios" class="flex-fill">
+                    <form method="post" action="@Url.Action("Rechazar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
                         <button type="submit" class="btn btn-sw-outline-secundario w-100">Rechazar</button>
                     </form>
-                    <form method="post" asp-action="Aceptar" asp-route-id="@intercambio.IdIntercambios" class="flex-fill">
-                        <button type="submit" class="btn btn-sw-primario w-100">Aceptar intercambio</button>
-                    </form>
+                    @if (confirmarAceptar)
+                    {
+                        <button type="button" class="btn btn-sw-primario flex-fill" data-bs-toggle="modal" data-bs-target="#modal-confirmar-aceptar">Aceptar intercambio</button>
+                    }
+                    else
+                    {
+                        <form method="post" action="@Url.Action("Aceptar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
+                            <button type="submit" class="btn btn-sw-primario w-100" disabled="@articuloComprometido">Aceptar intercambio</button>
+                        </form>
+                    }
                 </div>
             </div>
         </section>
+
+        @if (confirmarAceptar)
+        {
+            <!-- ===== Pop up: confirmar que se rechazan las otras propuestas ===== -->
+            <div class="modal fade sw-modal" id="modal-confirmar-aceptar" tabindex="-1" aria-labelledby="titulo-confirmar-aceptar" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form class="modal-content" method="post" action="@Url.Action("Aceptar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                        <div class="modal-header">
+                            <h2 class="modal-title font-titulo h3 mb-0" id="titulo-confirmar-aceptar">¿Aceptar este intercambio?</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body d-flex flex-column gap-3">
+                            <p class="mb-0">Vas a cambiar tu <strong>@intercambio.MiArticuloNombre</strong> por <strong>@intercambio.SuArticuloNombre</strong> de @@@intercambio.OtroUsuario.</p>
+                            <p class="sw-aviso-rechazos mb-0"><i class="bi bi-exclamation-triangle me-1"></i> @avisoRechazos @(pendientesQueSeRechazan == 1 ? "A quien la hizo le va a llegar una notificación." : "A quienes las hicieron les va a llegar una notificación.")</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sw-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-sw-primario">Sí, aceptar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
     }
     else
     {
@@ -178,21 +229,22 @@
                             <p class="text-suave small mb-0 text-truncate">@@@intercambio.OtroUsuario@(ubicacionOtro != "" ? $" · {ubicacionOtro}" : "")</p>
                         </div>
                     </div>
-                    <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@intercambio.OtroIdUsuario" class="fw-semibold text-decoration-none text-primario small">Ver perfil <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    <a href="@Url.Action("Publico", "Perfil", new { id = intercambio.OtroIdUsuario })" class="fw-semibold text-decoration-none text-primario small">Ver perfil <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                 </section>
 
                 <section class="sw-card p-4" aria-labelledby="titulo-proximos-pasos">
                     <h2 class="h6 fw-bold mb-3" id="titulo-proximos-pasos">Próximos pasos</h2>
                     @if (estado == EstadosIntercambios.Pendiente)
                     {
-                        <p class="text-suave small mb-0">Esperando que @intercambio.OtroNombre responda tu propuesta. Si la acepta, van a poder coordinar dónde y cuándo hacer el intercambio.</p>
+                        <p class="text-suave small mb-3">Esperando que @intercambio.OtroNombre responda tu propuesta. Si la acepta, van a poder coordinar dónde y cuándo hacer el intercambio.</p>
+                        <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn btn-sw-outline w-100"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Escribirle a @intercambio.OtroNombre</a>
                     }
                     else if (estado == EstadosIntercambios.Aceptado)
                     {
                         <p class="text-suave small mb-3">Coordiná con @intercambio.OtroNombre el lugar y el horario. Cuando hayan hecho el intercambio, marcalo como realizado.</p>
                         <div class="d-flex flex-column gap-2">
-                            <a asp-controller="Chat" asp-action="Index" class="btn btn-sw-primario"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
-                            <form method="post" asp-action="MarcarRealizado" asp-route-id="@intercambio.IdIntercambios">
+                            <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn btn-sw-primario"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
+                            <form method="post" action="@Url.Action("MarcarRealizado", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
                                 <button type="submit" class="btn btn-sw-outline w-100">Marcar como realizado</button>
                             </form>
                         </div>
@@ -204,7 +256,7 @@
                     else
                     {
                         <p class="text-suave small mb-3">@(intercambio.EsRecibido ? "Rechazaste esta propuesta." : $"{intercambio.OtroNombre} rechazó tu propuesta.")</p>
-                        <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-outline w-100">Buscar otros artículos</a>
+                        <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-outline w-100">Buscar otros artículos</a>
                     }
                 </section>
             </div>

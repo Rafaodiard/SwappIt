@@ -1,8 +1,10 @@
 // =========================================================
 // SWAPPIT - Pop up de notificaciones del header (se carga en todas las páginas desde _Layout)
-// - La campana (_Layout.cshtml) lo abre y lo cierra, y muestra cuántas hay sin leer (/Notificaciones/NoLeidas).
-// - Al abrirlo se pide la lista a /Notificaciones/Lista (Views/Notificaciones/_Lista.cshtml).
-// - "Marcar todas como leídas" va por fetch a /Notificaciones/MarcarTodasLeidas y vuelve a cargar todo.
+// - La campana (_Layout.cshtml) lo abre y lo cierra, y muestra cuántas hay sin leer (NotificacionesController.NoLeidas).
+// - Al abrirlo se pide la lista a NotificacionesController.Lista (Views/Notificaciones/_Lista.cshtml).
+// - "Marcar todas como leídas" va por fetch a NotificacionesController.MarcarTodasLeidas y vuelve a cargar todo.
+// - Las URLs no se escriben acá: _Layout las genera con @Url.Action y las pasa en data-url-no-leidas / data-url-lista
+//   (la de "Marcar todas" es el action del form). Un .js no puede usar Razor.
 // - Se cierra con Esc (el foco vuelve a la campana), con clic afuera o al salir con Tab.
 // =========================================================
 
@@ -14,6 +16,8 @@
     const contenido = popup.querySelector('[data-notif-contenido]');
     const contador = boton.querySelector('[data-notif-contador]');
     const marcarTodas = popup.querySelector('[data-notif-marcar-todas]');
+    const urlNoLeidas = contenedor.dataset.urlNoLeidas;
+    const urlLista = contenedor.dataset.urlLista;
 
     function abrir(abierto) {
         popup.classList.toggle('abierto', abierto);
@@ -21,7 +25,6 @@
         if (abierto) cargarLista();
     }
 
-    // Contador de la campana. El número también va en el aria-label para los lectores de pantalla.
     function mostrarCantidad(cantidad) {
         contador.hidden = cantidad === 0;
         contador.textContent = cantidad > 9 ? '9+' : String(cantidad);
@@ -31,19 +34,18 @@
 
     async function cargarCantidad() {
         try {
-            const respuesta = await fetch('/Notificaciones/NoLeidas', { cache: 'no-store' });
+            const respuesta = await fetch(urlNoLeidas, { cache: 'no-store' });
             if (!respuesta.ok) return;
             const datos = await respuesta.json();
             mostrarCantidad(datos.cantidad);
         } catch {
-            // Sin conexión: la campana queda sin contador.
         }
     }
 
     async function cargarLista() {
         contenido.setAttribute('aria-busy', 'true');
         try {
-            const respuesta = await fetch('/Notificaciones/Lista', { cache: 'no-store' });
+            const respuesta = await fetch(urlLista, { cache: 'no-store' });
             if (!respuesta.ok) throw new Error(respuesta.status);
             contenido.innerHTML = await respuesta.text();
         } catch {

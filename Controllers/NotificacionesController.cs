@@ -8,9 +8,9 @@ namespace Swappit.Controllers;
 // Notificaciones del pop up del header (campana de _Layout). Las usa notificaciones.js:
 // - GET /Notificaciones/Lista: la lista del pop up (partial), se pide cada vez que se abre.
 // - GET /Notificaciones/NoLeidas: cuántas sin leer hay, para el contador de la campana.
-// - POST /Notificaciones/Ver/5: la marca como leída y lleva al intercambio.
+// - POST /Notificaciones/Ver/5: la marca como leída y lleva al intercambio (o a su chat, si es "Mensaje nuevo").
 // - POST /Notificaciones/MarcarTodasLeidas: botón "Marcar todas como leídas".
-// Las notificaciones se crean en BD.ProponerIntercambio y BD.CambiarEstadoIntercambio.
+// Las notificaciones se crean en BD.ProponerIntercambio, BD.CambiarEstadoIntercambio y BD.EnviarMensaje.
 public class NotificacionesController : Controller
 {
     // Las del pop up (las más nuevas).
@@ -77,10 +77,10 @@ public class NotificacionesController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        int? idIntercambio;
+        NotificacionViewModel? notificacion;
         try
         {
-            idIntercambio = BD.MarcarNotificacionLeida(id, usuarioId.Value);
+            notificacion = BD.MarcarNotificacionLeida(id, usuarioId.Value);
         }
         catch (SqlException ex)
         {
@@ -90,11 +90,16 @@ public class NotificacionesController : Controller
         }
 
         // No es del usuario o no existe.
-        if (idIntercambio == null)
+        if (notificacion == null)
         {
             return NotFound();
         }
-        return RedirectToAction("Detalle", "Intercambio", new { id = idIntercambio });
+        // "Mensaje nuevo" lleva al chat del intercambio; las demás, al intercambio.
+        if (notificacion.Tipo == TipoNotificaciones.MensajeNuevo)
+        {
+            return RedirectToAction("Index", "Chat", new { id = notificacion.IdIntercambio });
+        }
+        return RedirectToAction("Detalle", "Intercambio", new { id = notificacion.IdIntercambio });
     }
 
     // Lo llama notificaciones.js con fetch; después vuelve a pedir la lista y el contador.

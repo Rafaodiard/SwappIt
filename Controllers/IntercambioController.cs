@@ -75,6 +75,13 @@ public class IntercambioController : Controller
             else
             {
                 ViewBag.fotoOtro = BD.GetFotoUsuario(intercambio.OtroIdUsuario);
+                // Una propuesta pendiente no se puede aceptar si alguno de los dos artículos ya se comprometió en otro intercambio.
+                ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
+                    && (BD.ArticuloComprometido(intercambio.MiArticuloId) || BD.ArticuloComprometido(intercambio.SuArticuloId));
+                // Si quien la recibió la acepta, estas otras propuestas pendientes con los mismos artículos se rechazan solas.
+                ViewBag.pendientesQueSeRechazan = intercambio.EsRecibido && intercambio.Estado == EstadosIntercambios.Pendiente
+                    ? BD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
+                    : 0;
             }
             ViewBag.intercambio = intercambio;
         }
@@ -117,6 +124,14 @@ public class IntercambioController : Controller
             {
                 error = "Elegí uno de tus artículos para ofrecer a cambio.";
             }
+            else if (BD.ArticuloComprometido(pedido.IdArticulos))
+            {
+                error = "Este artículo ya tiene un intercambio aceptado.";
+            }
+            else if (BD.ArticuloComprometido(ofrecido.IdArticulos))
+            {
+                error = "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro.";
+            }
 
             if (error != null)
             {
@@ -143,12 +158,29 @@ public class IntercambioController : Controller
     }
 
     // Solo quien recibió la propuesta (dueño del artículo pedido) y mientras esté Pendiente.
+    // Las otras propuestas pendientes con esos artículos se rechazan solas (BD.CambiarEstadoIntercambio).
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Aceptar(int id)
     {
+        string mensaje = "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.";
+        try
+        {
+            int pendientes = BD.ContarPendientesDeArticulos(id);
+            if (pendientes > 0)
+            {
+                mensaje += pendientes == 1
+                    ? " Se rechazó automáticamente otra propuesta que incluía estos artículos."
+                    : $" Se rechazaron automáticamente otras {pendientes} propuestas que incluían estos artículos.";
+            }
+        }
+        catch (SqlException ex)
+        {
+            // Solo es para el mensaje: si falla, CambiarEstado igual intenta aceptar y maneja el error.
+            _logger.LogError(ex, "No se pudieron contar las propuestas pendientes del intercambio {IdIntercambio}", id);
+        }
         return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado, soloQuienRecibe: true,
-            TipoNotificaciones.PropuestaAceptada, "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.");
+            TipoNotificaciones.PropuestaAceptada, mensaje);
     }
 
     [HttpPost]

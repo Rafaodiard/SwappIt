@@ -1,0 +1,40 @@
+@*
+    Mensajes del chat abierto (tabla Mensajes). Lo usan Chat/Index y ChatController.Mensajes,
+    que chat.js pide cada pocos segundos para mostrar los mensajes nuevos.
+    Clase "enviado" si lo mandó el usuario logueado, si no "recibido". Antes del primer mensaje de cada día va la fecha.
+*@
+@{
+    List<Swappit.Models.Mensajes> mensajes = ViewBag.mensajes;
+    int usuarioId = ViewBag.usuarioId;
+    DateTime? diaAnterior = null;
+}
+
+@if (mensajes.Count == 0)
+{
+    <div class="sw-chat-vacio">
+        <i class="bi bi-chat-dots fs-2" aria-hidden="true"></i>
+        <p class="mb-0">Todavía no hay mensajes. Escribí para coordinar el intercambio.</p>
+    </div>
+}
+
+@foreach (Swappit.Models.Mensajes m in mensajes)
+{
+    if (diaAnterior != m.FechaEnviado.Date)
+    {
+        diaAnterior = m.FechaEnviado.Date;
+        int dias = (DateTime.Today - m.FechaEnviado.Date).Days;
+        <div class="sw-chat-dia"><span>@(dias == 0 ? "Hoy" : dias == 1 ? "Ayer" : m.FechaEnviado.ToString("dd/MM/yyyy"))</span></div>
+    }
+    bool esMio = m.IdUsuariosManda == usuarioId;
+    <div class="sw-msg @(esMio ? "enviado" : "recibido")">
+        <div class="sw-msg-burbuja">@m.Texto</div>
+        <div class="sw-msg-hora">
+            <time datetime="@m.FechaEnviado.ToString("yyyy-MM-ddTHH:mm")">@m.FechaEnviado.ToString("HH:mm")</time>
+            @if (esMio)
+            {
+                <i class="bi @(m.fueVisto ? "bi-check2-all visto" : "bi-check2")" aria-hidden="true"></i>
+                <span class="visually-hidden">@(m.fueVisto ? "Visto" : "Enviado")</span>
+            }
+        </div>
+    </div>
+}

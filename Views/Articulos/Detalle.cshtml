@@ -22,7 +22,7 @@
                 @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
                              : "Puede que lo hayan dado de baja o que el enlace esté mal.")
             </p>
-            <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-primario">Ver otros artículos</a>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Ver otros artículos</a>
         </div>
     </div>
     return;
@@ -40,6 +40,7 @@
     bool esPropio = ViewBag.esPropio;
     bool logueado = ViewBag.logueado;
     int? idPropuestaEnCurso = ViewBag.idPropuestaEnCurso;
+    bool comprometido = ViewBag.comprometido;
 
     string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
     // La ubicación que cargó el dueño al publicar; los artículos viejos (sin ubicación) usan su barrio y provincia.
@@ -72,10 +73,10 @@
     <!-- ===== Migas de pan ===== -->
     <nav aria-label="Ubicación" class="mb-4">
         <ol class="breadcrumb small mb-0">
-            <li class="breadcrumb-item"><a asp-controller="Articulos" asp-action="Buscar" class="text-decoration-none text-primario">Artículos</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos")" class="text-decoration-none text-primario">Artículos</a></li>
             @if (categoria != null)
             {
-                <li class="breadcrumb-item"><a asp-controller="Articulos" asp-action="Buscar" asp-route-categoria="@categoria.IdCategorias" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos", new { categoria = categoria.IdCategorias })" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
             }
             <li class="breadcrumb-item active text-truncate" aria-current="page">@articulo.Nombre</li>
         </ol>
@@ -114,6 +115,10 @@
                 @if (esPropio)
                 {
                     <p class="sw-articulo-propio mb-0" role="status"><i class="bi bi-person-check-fill me-1"></i> Este artículo es tuyo. Así lo ven los demás usuarios.</p>
+                }
+                @if (comprometido)
+                {
+                    <p class="sw-articulo-propio mb-0" role="status"><i class="bi bi-arrow-left-right me-1"></i> Este artículo ya tiene un intercambio aceptado, así que no aparece en el catálogo.</p>
                 }
 
                 <div>
@@ -174,14 +179,18 @@
                             <i class="bi bi-pencil-square me-1"></i> Editar artículo
                         </button>
                         <span id="editar-pendiente" class="text-suave small text-center">La edición de artículos todavía no está disponible.</span>
-                        <a asp-controller="Perfil" asp-action="Index" class="btn btn-sw-outline">Ver mis artículos publicados</a>
+                        <a href="@Url.Action("Index", "Perfil")" class="btn btn-sw-outline">Ver mis artículos publicados</a>
                     }
                     else if (idPropuestaEnCurso != null)
                     {
-                        <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@idPropuestaEnCurso" class="btn btn-sw-primario btn-lg" aria-describedby="propuesta-enviada">
+                        <a href="@Url.Action("Detalle", "Intercambio", new { id = idPropuestaEnCurso })" class="btn btn-sw-primario btn-lg" aria-describedby="propuesta-enviada">
                             <i class="bi bi-arrow-repeat me-1"></i> Propuesta enviada
                         </a>
                         <span id="propuesta-enviada" class="text-suave small text-center">Ya propusiste un intercambio por este artículo. Tocá el botón para ver cómo sigue.</span>
+                    }
+                    else if (comprometido)
+                    {
+                        <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-outline btn-lg">Buscar otros artículos</a>
                     }
                     else if (logueado)
                     {
@@ -191,7 +200,7 @@
                     }
                     else
                     {
-                        <a asp-controller="Account" asp-action="Index" class="btn btn-sw-primario btn-lg">
+                        <a href="@Url.Action("Index", "Account")" class="btn btn-sw-primario btn-lg">
                             <i class="bi bi-arrow-left-right me-1"></i> Proponer intercambio
                         </a>
                         <span class="text-suave small text-center">Iniciá sesión para proponer un intercambio.</span>
@@ -211,7 +220,7 @@
                         </h2>
                         @if (!esPropio)
                         {
-                            <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@dueno.IdUsuarios" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+                            <a href="@Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios })" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
                         }
                     </div>
                     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
@@ -227,14 +236,14 @@
     </div>
 </div>
 
-@if (logueado && !esPropio && idPropuestaEnCurso == null)
+@if (logueado && !esPropio && idPropuestaEnCurso == null && !comprometido)
 {
     <!-- ===== Pop up: Proponer intercambio =====
          El usuario elige cuál de sus artículos ofrece a cambio. IntercambioController.Proponer lo guarda en Intercambios
          como Pendiente: quien propone en IdUsuarios1/IdArticulos1 y el dueño de este artículo en IdUsuarios2/IdArticulos2. -->
     <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <form class="modal-content" method="post" asp-controller="Intercambio" asp-action="Proponer">
+            <form class="modal-content" method="post" action="@Url.Action("Proponer", "Intercambio")" asp-antiforgery="true">
                 <input type="hidden" name="idArticuloPedido" value="@articulo.IdArticulos">
                 <div class="modal-header">
                     <h2 class="modal-title font-titulo h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
@@ -273,7 +282,7 @@
                         <div class="text-center py-3">
                             <i class="bi bi-box-seam fs-1 text-suave"></i>
                             <p class="text-suave mt-2 mb-3">Para proponer un intercambio necesitás tener al menos un artículo publicado.</p>
-                            <a asp-controller="Publicar" asp-action="Index" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
+                            <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
                         </div>
                     }
 

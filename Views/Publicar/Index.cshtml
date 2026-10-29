@@ -22,7 +22,7 @@
             <p class="sw-auth-subtitulo">Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio</p>
         </header>
 
-        <form class="sw-publicar-card" method="post" enctype="multipart/form-data" asp-controller="Publicar" asp-action="Index" novalidate>
+        <form class="sw-publicar-card" method="post" enctype="multipart/form-data" action="@Url.Action("Index", "Publicar")" asp-antiforgery="true" novalidate>
 
             <!-- ===== Columna izquierda: fotos ===== -->
             <div class="sw-publicar-fotos">
@@ -114,7 +114,7 @@
                 <hr class="sw-divisor">
 
                 <div class="sw-publicar-acciones">
-                    <a asp-controller="Home" asp-action="Index" class="sw-btn sw-btn-contorno">Cancelar</a>
+                    <a href="@Url.Action("Index", "Home")" class="sw-btn sw-btn-contorno">Cancelar</a>
                     <button type="submit" class="sw-btn sw-btn-solido">Publicar objeto</button>
                 </div>
             </div>

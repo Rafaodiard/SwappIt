@@ -456,9 +456,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[RegistrarMensaje]
-	@texto varchar(50),
+	@texto varchar(500),
 	@fueVisto bit,
-	@fechaEnviado date,
+	@fechaEnviado datetime,
 	@usuariomanda varchar(50),
 	@usuariorecibe varchar(50),
 	@idIntercambio int

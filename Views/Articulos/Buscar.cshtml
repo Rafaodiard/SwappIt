@@ -22,7 +22,7 @@
             </button>
 
             <!-- Se envía por GET a Buscar: los filtros quedan en la URL y se combinan con la búsqueda (q) -->
-            <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" asp-action="Buscar">
+            <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
                 @if (!string.IsNullOrEmpty(busqueda))
                 {
                     <input type="hidden" name="q" value="@busqueda">
@@ -31,7 +31,7 @@
                     <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
                     @if (hayFiltros)
                     {
-                        <a asp-action="Buscar" asp-route-q="@busqueda" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
+                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
                     }
                 </div>
 
