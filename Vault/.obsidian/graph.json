@@ -1,0 +1,86 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "path:Controllers",
+      "color": {
+        "a": 1,
+        "rgb": 874858
+      }
+    },
+    {
+      "query": "path:Vistas",
+      "color": {
+        "a": 1,
+        "rgb": 7220282
+      }
+    },
+    {
+      "query": "path:Modelos",
+      "color": {
+        "a": 1,
+        "rgb": 15525592
+      }
+    },
+    {
+      "query": "path:\"Base de datos\"",
+      "color": {
+        "a": 1,
+        "rgb": 10861246
+      }
+    },
+    {
+      "query": "path:Frontend",
+      "color": {
+        "a": 1,
+        "rgb": 5217641
+      }
+    },
+    {
+      "query": "path:Grafo",
+      "color": {
+        "a": 1,
+        "rgb": 6052956
+      }
+    },
+    {
+      "query": "path:Flujos",
+      "color": {
+        "a": 1,
+        "rgb": 9211020
+      }
+    },
+    {
+      "query": "path:Proyecto",
+      "color": {
+        "a": 1,
+        "rgb": 9211020
+      }
+    },
+    {
+      "query": "path:Memoria",
+      "color": {
+        "a": 1,
+        "rgb": 13214247
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": false,
+  "centerStrength": 0.5,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 0.3628873693012104,
+  "close": true
+}

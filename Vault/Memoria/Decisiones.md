@@ -1,0 +1,21 @@
+---
+tipo: general
+tags:
+  - tipo/general
+---
+# Decisiones
+
+| Fecha | Decisión | Motivo / nota |
+|---|---|---|
+| 22/10 | Filtros de Buscar: categoría y estado desde la base | Distancia queda visual (no hay coordenadas) |
+| 25/10 | Paleta oficial en todo el sitio (`#0d596a`, `#6e2c3a`, `#a5babe`, `#ece6d8`) | Elegido por Rafael |
+| 25/10 | Contraseñas con `PasswordHasher`, sin paquetes extra | Las de prueba se re-hashean al primer login |
+| 25/10 | "Proponer intercambio" queda visual por ahora | Plan propuesto: insertar en Intercambios con estado Pendiente, sin usar RegistrarIntercambio |
+| 25/10 | Perfil público sin mail, teléfono ni edad | Privacidad |
+| 26/10 | Notificaciones como pop up de la campana, no como página | Pedido de Rafael |
+| 27/10 | Fotos de artículos: hasta 6, JPG/PNG, 10 MB; se guardan en `wwwroot/img/articulos` | |
+| 28/10 | Estados como tablas: EstadosArticulos y EstadosIntercambios, con IdEstado FK | Estados de intercambio: Pendiente, **Aceptado**, Rechazado, Realizado (Figma dice "En curso") |
+| 28/10 | Controllers separados por tema, con URLs nuevas | Articulos, Publicar, Perfil, Chat, Account, Home |
+| 28/10 | Tipografías Century Gothic (texto) + Forum (títulos) | Aunque Figma use Jost en algunos lugares |
+| 28/10 | Scripts sueltos de `BaseDatos/` que ya estaban en los de creación se borraron | Quedan Estructura, Datos, StoredProcedures (+ Estados.sql hasta que Rafael lo corra) |
+| 29/10 | Vault de Obsidian + grafo de graphify como documentación y memoria | Ver [[Cómo usar esta vault]] |
