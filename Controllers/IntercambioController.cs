@@ -10,7 +10,8 @@ namespace Swappit.Controllers;
 // - Mis intercambios, enviados y recibidos, con filtro por estado (/Intercambio?estado=Pendiente).
 // - Ver un intercambio (/Intercambio/Detalle/5): quien lo recibe lo acepta o lo rechaza, y cuando está
 //   aceptado cualquiera de los dos lo marca como realizado.
-// Todavía no se avisa al otro usuario (notificaciones): ve la propuesta al entrar a Mis intercambios o a su perfil.
+// Al proponer, aceptar o rechazar se le avisa a la otra persona con una notificación (ver NotificacionesController).
+// Marcar como realizado no avisa: no hay tipo de notificación para eso.
 public class IntercambioController : Controller
 {
     private readonly ILogger<IntercambioController> _logger;
@@ -147,7 +148,7 @@ public class IntercambioController : Controller
     public IActionResult Aceptar(int id)
     {
         return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado, soloQuienRecibe: true,
-            "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.");
+            TipoNotificaciones.PropuestaAceptada, "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.");
     }
 
     [HttpPost]
@@ -155,7 +156,7 @@ public class IntercambioController : Controller
     public IActionResult Rechazar(int id)
     {
         return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Rechazado, soloQuienRecibe: true,
-            "Rechazaste la propuesta.");
+            TipoNotificaciones.PropuestaRechazada, "Rechazaste la propuesta.");
     }
 
     // Cualquiera de los dos, una vez aceptado.
@@ -164,10 +165,12 @@ public class IntercambioController : Controller
     public IActionResult MarcarRealizado(int id)
     {
         return CambiarEstado(id, EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado, soloQuienRecibe: false,
-            "¡Intercambio realizado!");
+            tipoNotificacion: null, "¡Intercambio realizado!");
     }
 
-    private IActionResult CambiarEstado(int id, string estadoActual, string estadoNuevo, bool soloQuienRecibe, string mensaje)
+    // tipoNotificacion: la que le llega a la otra persona si el cambio se hizo (null = no se avisa).
+    private IActionResult CambiarEstado(int id, string estadoActual, string estadoNuevo, bool soloQuienRecibe,
+        string? tipoNotificacion, string mensaje)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -177,7 +180,7 @@ public class IntercambioController : Controller
 
         try
         {
-            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe))
+            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion))
             {
                 TempData["MensajeIntercambio"] = mensaje;
             }

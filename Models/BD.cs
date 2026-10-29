@@ -331,51 +331,80 @@ public static class BD
     // Guarda una propuesta nueva en estado Pendiente con la fecha de hoy y devuelve su IdIntercambios.
     // Si el usuario ya tiene una propuesta en curso por ese artículo no inserta nada y devuelve null
     // (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
+    // En la misma transacción le avisa al dueño del artículo pedido (notificación "Propuesta recibida").
     public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
-                OUTPUT INSERTED.IdIntercambios
-                SELECT CAST(GETDATE() AS date), e.IdEstadosIntercambios, @pIdUsuario, @pIdDueno, @pIdOfrecido, @pIdPedido
-                FROM EstadosIntercambios e
-                WHERE e.Nombre = @pPendiente
-                    AND NOT EXISTS (SELECT 1 FROM Intercambios i
-                        INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
-                        WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)";
-            return connection.QueryFirstOrDefault<int?>(query, new
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                pIdUsuario = idUsuario,
-                pIdDueno = idDueno,
-                pIdOfrecido = idArticuloOfrecido,
-                pIdPedido = idArticuloPedido,
-                pPendiente = EstadosIntercambios.Pendiente,
-                pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
-            });
+                string query = @"INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                    OUTPUT INSERTED.IdIntercambios
+                    SELECT CAST(GETDATE() AS date), e.IdEstadosIntercambios, @pIdUsuario, @pIdDueno, @pIdOfrecido, @pIdPedido
+                    FROM EstadosIntercambios e
+                    WHERE e.Nombre = @pPendiente
+                        AND NOT EXISTS (SELECT 1 FROM Intercambios i
+                            INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                            WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)";
+                int? idIntercambio = connection.QueryFirstOrDefault<int?>(query, new
+                {
+                    pIdUsuario = idUsuario,
+                    pIdDueno = idDueno,
+                    pIdOfrecido = idArticuloOfrecido,
+                    pIdPedido = idArticuloPedido,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+                }, transaccion);
+
+                if (idIntercambio.HasValue)
+                {
+                    CrearNotificacion(connection, transaccion, idDueno, idIntercambio.Value, TipoNotificaciones.PropuestaRecibida);
+                }
+
+                transaccion.Commit();
+                return idIntercambio;
+            }
         }
     }
 
     // Pasa un intercambio de estadoActual a estadoNuevo. Solo lo cambia si el usuario puede hacerlo:
     // soloQuienRecibe = true -> solo el dueño del artículo pedido (aceptar o rechazar); si no, cualquiera de los dos.
+    // Si se cambió y viene tipoNotificacion, en la misma transacción le avisa a la otra persona del intercambio.
     // Devuelve false si no se cambió (no existe, no es del usuario o ya no estaba en estadoActual).
-    public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo, bool soloQuienRecibe)
+    public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo,
+        bool soloQuienRecibe, string? tipoNotificacion = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
-                FROM Intercambios i
-                INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
-                INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
-                WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
-                    AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))";
-            return connection.Execute(query, new
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                pId = idIntercambio,
-                pIdUsuario = idUsuario,
-                pActual = estadoActual,
-                pNuevo = estadoNuevo,
-                pSoloQuienRecibe = soloQuienRecibe
-            }) > 0;
+                // Devuelve el id de la otra persona, o nada si no se actualizó ninguna fila.
+                string query = @"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
+                    OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
+                    FROM Intercambios i
+                    INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
+                    INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
+                    WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
+                        AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))";
+                int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
+                {
+                    pId = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pActual = estadoActual,
+                    pNuevo = estadoNuevo,
+                    pSoloQuienRecibe = soloQuienRecibe
+                }, transaccion);
+
+                if (idOtro.HasValue && tipoNotificacion != null)
+                {
+                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, tipoNotificacion);
+                }
+
+                transaccion.Commit();
+                return idOtro.HasValue;
+            }
         }
     }
 
@@ -386,6 +415,68 @@ public static class BD
         {
             string query = "SELECT IdEstadosIntercambios, Nombre FROM EstadosIntercambios ORDER BY IdEstadosIntercambios";
             return connection.Query<EstadosIntercambios>(query).ToList();
+        }
+    }
+
+    // ---------- Notificaciones ----------
+    // Cada notificación es para un usuario (IdUsuario) sobre un intercambio. El tipo se busca por nombre
+    // (ver TipoNotificaciones): si ese tipo no está cargado en la tabla, no se inserta nada.
+
+    // Se llama desde ProponerIntercambio y CambiarEstadoIntercambio, dentro de su transacción.
+    private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, int idUsuario, int idIntercambio, string tipo)
+    {
+        string query = @"INSERT INTO Notificaciones (IdUsuario, IdIntercambio, IdTipoNotificacion, Leida, Fecha)
+            SELECT @pIdUsuario, @pIdIntercambio, t.Id, 0, GETDATE()
+            FROM TipoNotificaciones t WHERE t.Nombre = @pTipo";
+        connection.Execute(query, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio, pTipo = tipo }, transaccion);
+    }
+
+    // Notificaciones del usuario para el pop up del header, lo más nuevo primero.
+    // "Otro" es la otra persona del intercambio y el artículo es el pedido (IdArticulos2).
+    public static List<NotificacionViewModel> GetNotificaciones(int idUsuario, int cantidad)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT TOP (@pCantidad) n.Id, t.Nombre AS Tipo, n.Leida, n.Fecha, n.IdIntercambio,
+                    u.Nombre AS OtroNombre, a.Nombre AS ArticuloNombre
+                FROM Notificaciones n
+                INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
+                INNER JOIN Intercambios i ON i.IdIntercambios = n.IdIntercambio
+                INNER JOIN Usuarios u ON u.IdUsuarios = CASE WHEN i.IdUsuarios1 = n.IdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
+                INNER JOIN Articulos a ON a.IdArticulos = i.IdArticulos2
+                WHERE n.IdUsuario = @pIdUsuario
+                ORDER BY n.Fecha DESC, n.Id DESC";
+            return connection.Query<NotificacionViewModel>(query, new { pIdUsuario = idUsuario, pCantidad = cantidad }).ToList();
+        }
+    }
+
+    public static int GetCantidadNotificacionesNoLeidas(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT COUNT(*) FROM Notificaciones WHERE IdUsuario = @pIdUsuario AND Leida = 0";
+            return connection.ExecuteScalar<int>(query, new { pIdUsuario = idUsuario });
+        }
+    }
+
+    // Marca como leída una notificación del usuario y devuelve su IdIntercambio (null si no es suya o no existe).
+    public static int? MarcarNotificacionLeida(int idNotificacion, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"UPDATE Notificaciones SET Leida = 1
+                OUTPUT INSERTED.IdIntercambio
+                WHERE Id = @pId AND IdUsuario = @pIdUsuario";
+            return connection.QueryFirstOrDefault<int?>(query, new { pId = idNotificacion, pIdUsuario = idUsuario });
+        }
+    }
+
+    public static void MarcarNotificacionesLeidas(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "UPDATE Notificaciones SET Leida = 1 WHERE IdUsuario = @pIdUsuario AND Leida = 0";
+            connection.Execute(query, new { pIdUsuario = idUsuario });
         }
     }
 

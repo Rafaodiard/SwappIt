@@ -1,0 +1,117 @@
+@using Swappit.Models.ViewModels
+@*
+    Contenido del pop up de notificaciones (lo devuelve NotificacionesController.Lista y lo pone
+    notificaciones.js dentro de _PopupNotificaciones.cshtml cada vez que se abre).
+    Nuevas = sin leer, Anteriores = ya leídas. "Ver ..." la marca como leída y lleva al intercambio.
+*@
+@functions {
+    // "Hace 10 min", "Ayer", "Hace 3 días" o la fecha.
+    private static string Hace(DateTime fecha)
+    {
+        TimeSpan paso = DateTime.Now - fecha;
+        if (paso.TotalMinutes < 1) return "Recién";
+        if (paso.TotalHours < 1) return $"Hace {(int)paso.TotalMinutes} min";
+        if (paso.TotalDays < 1) return $"Hace {(int)paso.TotalHours} h";
+        int dias = (DateTime.Today - fecha.Date).Days;
+        if (dias == 1) return "Ayer";
+        if (dias < 7) return $"Hace {dias} días";
+        return fecha.ToString("dd/MM/yyyy");
+    }
+}
+@{
+    List<NotificacionViewModel> notificaciones = ViewBag.notificaciones;
+    bool errorCarga = ViewBag.errorCarga;
+    List<NotificacionViewModel> nuevas = notificaciones.Where(n => !n.Leida).ToList();
+    List<NotificacionViewModel> anteriores = notificaciones.Where(n => n.Leida).ToList();
+
+    // Una fila. El ícono, el texto y la acción dependen del tipo (ver TipoNotificaciones).
+    // Usa Url.Action y <!form> (sin tag helper) porque una función local no puede tener tag helpers;
+    // por eso el token antifalsificación va a mano.
+    void Item(NotificacionViewModel n)
+    {
+        bool rechazo = n.Tipo == TipoNotificaciones.PropuestaRechazada;
+        string icono = n.Tipo switch
+        {
+            TipoNotificaciones.PropuestaRecibida => "bi-arrow-left-right",
+            TipoNotificaciones.PropuestaAceptada => "bi-check-lg",
+            TipoNotificaciones.PropuestaRechazada => "bi-x-lg",
+            TipoNotificaciones.MensajeNuevo => "bi-chat-dots",
+            _ => "bi-bell"
+        };
+        string accion = n.Tipo == TipoNotificaciones.PropuestaAceptada || n.Tipo == TipoNotificaciones.MensajeNuevo
+            ? "Ver intercambio" : "Ver propuesta";
+
+        <li class="sw-notif-item @(n.Leida ? "" : "sw-notif-item--sin-leer")">
+            <span class="sw-notif-icono @(rechazo ? "sw-notif-icono--bordo" : "")" aria-hidden="true"><i class="bi @icono"></i></span>
+            <div class="sw-notif-texto">
+                <p class="mb-0">
+                    @switch (n.Tipo)
+                    {
+                        case TipoNotificaciones.PropuestaRecibida:
+                            @:<strong>@n.OtroNombre</strong> te propuso un intercambio por tu <strong>@n.ArticuloNombre</strong>.
+                            break;
+                        case TipoNotificaciones.PropuestaAceptada:
+                            @:<strong>@n.OtroNombre</strong> aceptó tu propuesta por su <strong>@n.ArticuloNombre</strong>.
+                            break;
+                        case TipoNotificaciones.PropuestaRechazada:
+                            @:<strong>@n.OtroNombre</strong> rechazó tu propuesta por su <strong>@n.ArticuloNombre</strong>.
+                            break;
+                        case TipoNotificaciones.MensajeNuevo:
+                            @:<strong>@n.OtroNombre</strong> te mandó un mensaje.
+                            break;
+                        default:
+                            @:@n.Tipo
+                            break;
+                    }
+                </p>
+                <div class="sw-notif-meta">
+                    <time datetime="@n.Fecha.ToString("yyyy-MM-ddTHH:mm")">@Hace(n.Fecha)</time>
+                    <!form action="@Url.Action("Ver", "Notificaciones", new { id = n.Id })" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="sw-notif-accion @(rechazo ? "sw-notif-accion--bordo" : "")">@accion <i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                    </!form>
+                </div>
+            </div>
+            @if (!n.Leida)
+            {
+                <span class="sw-notif-punto"><span class="visually-hidden">Sin leer</span></span>
+            }
+        </li>
+    }
+}
+
+@if (errorCarga)
+{
+    <div class="sw-notif-vacio">
+        <span class="sw-notif-icono sw-notif-icono--bordo" aria-hidden="true"><i class="bi bi-exclamation-lg"></i></span>
+        <p class="sw-notif-vacio-titulo">No pudimos cargar tus notificaciones</p>
+        <p class="sw-notif-vacio-texto">Probá de nuevo en un rato.</p>
+    </div>
+}
+else if (notificaciones.Count == 0)
+{
+    <div class="sw-notif-vacio">
+        <span class="sw-notif-icono" aria-hidden="true"><i class="bi bi-bell"></i></span>
+        <p class="sw-notif-vacio-titulo">No tenés notificaciones</p>
+        <p class="sw-notif-vacio-texto">Acá vas a ver las propuestas de intercambio, los mensajes nuevos y cuándo calificar un intercambio.</p>
+    </div>
+}
+else
+{
+    <div class="sw-notif-lista">
+        @if (nuevas.Count > 0)
+        {
+            <h3 class="sw-notif-grupo">Nuevas</h3>
+            <ul class="list-unstyled mb-0">
+                @foreach (NotificacionViewModel n in nuevas) { Item(n); }
+            </ul>
+        }
+        @if (anteriores.Count > 0)
+        {
+            <h3 class="sw-notif-grupo">Anteriores</h3>
+            <ul class="list-unstyled mb-0">
+                @foreach (NotificacionViewModel n in anteriores) { Item(n); }
+            </ul>
+        }
+    </div>
+}

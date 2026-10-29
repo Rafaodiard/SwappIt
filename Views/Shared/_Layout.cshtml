@@ -53,7 +53,7 @@
                     <a asp-controller="Chat" asp-action="Index" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
                     <!-- Notificaciones: el pop up va justo después del botón para que el Tab entre en él -->
                     <div class="sw-notif" data-notif>
-                        <button type="button" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones" aria-expanded="false" aria-controls="popup-notificaciones" data-notif-boton><i class="bi bi-bell" aria-hidden="true"></i></button>
+                        <button type="button" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones" aria-expanded="false" aria-controls="popup-notificaciones" data-notif-boton><i class="bi bi-bell" aria-hidden="true"></i><span class="sw-notif-contador" data-notif-contador aria-hidden="true" hidden></span></button>
                         <partial name="_PopupNotificaciones" />
                     </div>
                     <a asp-controller="Perfil" asp-action="Index" class="sw-avatar mx-1" data-iniciales="@iniciales" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>

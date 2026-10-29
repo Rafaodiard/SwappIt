@@ -23,7 +23,6 @@ IF OBJECT_ID('dbo.EstadosArticulos', 'U') IS NULL
 	)
 GO
 SET IDENTITY_INSERT [dbo].[EstadosArticulos] ON
-IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosArticulos] WHERE [IdEstadosArticulos] = 1) INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (1, N'Como nuevo')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosArticulos] WHERE [IdEstadosArticulos] = 2) INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (2, N'Muy buen estado')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosArticulos] WHERE [IdEstadosArticulos] = 3) INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (3, N'Buen estado')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosArticulos] WHERE [IdEstadosArticulos] = 4) INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (4, N'Usado')

@@ -200,6 +200,24 @@ CREATE TABLE [dbo].[Mensajes](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[Notificaciones]    Script Date: 29/10/2026 13:39:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Notificaciones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdUsuario] [int] NOT NULL,
+	[IdIntercambio] [int] NOT NULL,
+	[IdTipoNotificacion] [int] NOT NULL,
+	[Leida] [bit] NOT NULL,
+	[Fecha] [datetime] NOT NULL,
+ CONSTRAINT [PK_Notificaciones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Provincias]    Script Date: 23/10/2026 09:04:02 ******/
 SET ANSI_NULLS ON
 GO
@@ -211,6 +229,20 @@ CREATE TABLE [dbo].[Provincias](
  CONSTRAINT [PK_Provincias] PRIMARY KEY CLUSTERED 
 (
 	[IdProvincia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TipoNotificaciones]    Script Date: 29/10/2026 13:39:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TipoNotificaciones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_TipoNotificaciones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -297,6 +329,21 @@ ALTER TABLE [dbo].[Mensajes]  WITH CHECK ADD  CONSTRAINT [FK_Mensajes_Usuarios2]
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Mensajes] CHECK CONSTRAINT [FK_Mensajes_Usuarios2]
+GO
+ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_Intercambios] FOREIGN KEY([IdIntercambio])
+REFERENCES [dbo].[Intercambios] ([IdIntercambios])
+GO
+ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_Intercambios]
+GO
+ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_TipoNotificaciones] FOREIGN KEY([IdTipoNotificacion])
+REFERENCES [dbo].[TipoNotificaciones] ([Id])
+GO
+ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_TipoNotificaciones]
+GO
+ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_Usuarios] FOREIGN KEY([IdUsuario])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_Usuarios]
 GO
 ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD  CONSTRAINT [FK_Usuarios_Provincias] FOREIGN KEY([IdProvincias])
 REFERENCES [dbo].[Provincias] ([IdProvincia])
