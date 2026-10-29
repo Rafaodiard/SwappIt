@@ -10,7 +10,8 @@ namespace Swappit.Controllers;
 // - Mis intercambios, enviados y recibidos, con filtro por estado (/Intercambio?estado=Pendiente).
 // - Ver un intercambio (/Intercambio/Detalle/5): quien lo recibe lo acepta o lo rechaza, y cuando está
 //   aceptado cualquiera de los dos lo marca como realizado.
-// Al proponer, aceptar o rechazar se le avisa a la otra persona con una notificación (ver NotificacionesController).
+// - Cancelarlo: quien propuso retira su propuesta pendiente, o cualquiera de los dos cancela uno aceptado.
+// Al proponer, aceptar, rechazar o cancelar se le avisa a la otra persona con una notificación (ver NotificacionesController).
 // Marcar como realizado no avisa: no hay tipo de notificación para eso.
 public class IntercambioController : Controller
 {
@@ -198,6 +199,38 @@ public class IntercambioController : Controller
     {
         return CambiarEstado(id, EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado, soloQuienRecibe: false,
             tipoNotificacion: null, "¡Intercambio realizado!");
+    }
+
+    // Quien propuso, mientras está Pendiente, o cualquiera de los dos, una vez aceptado.
+    // A la otra persona le llega "Intercambio cancelado" (BD.CancelarIntercambio).
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Cancelar(int id)
+    {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+        {
+            return RedirectToAction("Index", "Account");
+        }
+
+        try
+        {
+            if (BD.CancelarIntercambio(id, usuarioId.Value))
+            {
+                TempData["MensajeIntercambio"] = "Cancelaste el intercambio. Le avisamos a la otra persona.";
+            }
+            else
+            {
+                // No es parte del intercambio, no le toca a él o el estado ya cambió (por ejemplo, la otra persona ya respondió).
+                TempData["ErrorIntercambio"] = "No se pudo cancelar el intercambio. Puede que ya haya cambiado de estado.";
+            }
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudo cancelar el intercambio {IdIntercambio}", id);
+            TempData["ErrorIntercambio"] = "No pudimos cancelar el intercambio. Probá de nuevo en un rato.";
+        }
+        return RedirectToAction("Detalle", new { id });
     }
 
     // tipoNotificacion: la que le llega a la otra persona si el cambio se hizo (null = no se avisa).

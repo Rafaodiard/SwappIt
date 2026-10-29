@@ -1,8 +1,9 @@
 @*
     Ver un intercambio (IntercambioController.Detalle). Solo lo ven las dos partes.
     - Propuesta recibida y Pendiente: "Recibiste una propuesta" con Aceptar / Rechazar.
-    - El resto: "Intercambio con @usuario", con el avance (Pendiente -> Aceptado -> Realizado, o Rechazado),
+    - El resto: "Intercambio con @usuario", con el avance (Pendiente -> Aceptado -> Realizado, o Rechazado / Cancelado),
       lo que das y lo que recibís, y los próximos pasos (marcar como realizado cuando está aceptado).
+    - Cancelar (con un pop up de confirmación): quien propuso, mientras está Pendiente; cualquiera de los dos, si está Aceptado.
     - Mientras está Pendiente o Aceptado, links al chat del intercambio (Chat/Index/id).
 *@
 @using Swappit.Models
@@ -169,6 +170,9 @@
     {
         <!-- ===== Seguimiento del intercambio ===== -->
         bool rechazado = estado == EstadosIntercambios.Rechazado;
+        bool cancelado = estado == EstadosIntercambios.Cancelado;
+        // En este bloque, una Pendiente siempre es una propuesta que hizo el usuario (las recibidas van arriba).
+        bool puedeCancelar = estado == EstadosIntercambios.Pendiente || estado == EstadosIntercambios.Aceptado;
         bool aceptadoOMas = estado == EstadosIntercambios.Aceptado || estado == EstadosIntercambios.Realizado;
         bool realizado = estado == EstadosIntercambios.Realizado;
 
@@ -189,11 +193,11 @@
                             <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
                             <span><span class="d-block fw-semibold">Propuesta enviada</span><span class="d-block text-suave small">@intercambio.Fecha.ToString("dd/MM")</span></span>
                         </li>
-                        @if (rechazado)
+                        @if (rechazado || cancelado)
                         {
                             <li class="sw-avance-paso rechazado">
                                 <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-x-lg"></i></span>
-                                <span class="fw-semibold">Rechazada</span>
+                                <span class="fw-semibold">@(rechazado ? "Rechazada" : "Cancelado")</span>
                             </li>
                         }
                         else
@@ -237,7 +241,10 @@
                     @if (estado == EstadosIntercambios.Pendiente)
                     {
                         <p class="text-suave small mb-3">Esperando que @intercambio.OtroNombre responda tu propuesta. Si la acepta, van a poder coordinar dónde y cuándo hacer el intercambio.</p>
-                        <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn btn-sw-outline w-100"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Escribirle a @intercambio.OtroNombre</a>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn btn-sw-outline"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Escribirle a @intercambio.OtroNombre</a>
+                            <button type="button" class="btn btn-sw-outline-secundario" data-bs-toggle="modal" data-bs-target="#modal-cancelar">Cancelar propuesta</button>
+                        </div>
                     }
                     else if (estado == EstadosIntercambios.Aceptado)
                     {
@@ -247,11 +254,17 @@
                             <form method="post" action="@Url.Action("MarcarRealizado", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
                                 <button type="submit" class="btn btn-sw-outline w-100">Marcar como realizado</button>
                             </form>
+                            <button type="button" class="btn btn-sw-outline-secundario" data-bs-toggle="modal" data-bs-target="#modal-cancelar">Cancelar intercambio</button>
                         </div>
                     }
                     else if (realizado)
                     {
                         <p class="text-suave small mb-0"><i class="bi bi-check-circle-fill text-primario me-1" aria-hidden="true"></i> ¡Listo! Este intercambio ya se hizo.</p>
+                    }
+                    else if (cancelado)
+                    {
+                        <p class="text-suave small mb-3">Este intercambio se canceló. El chat queda para leer.</p>
+                        <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-outline w-100">Buscar otros artículos</a>
                     }
                     else
                     {
@@ -261,5 +274,29 @@
                 </section>
             </div>
         </div>
+
+        @if (puedeCancelar)
+        {
+            bool esPropuesta = estado == EstadosIntercambios.Pendiente;
+            <!-- ===== Pop up: confirmar la cancelación ===== -->
+            <div class="modal fade sw-modal" id="modal-cancelar" tabindex="-1" aria-labelledby="titulo-cancelar" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form class="modal-content" method="post" action="@Url.Action("Cancelar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                        <div class="modal-header">
+                            <h2 class="modal-title font-titulo h3 mb-0" id="titulo-cancelar">@(esPropuesta ? "¿Cancelar tu propuesta?" : "¿Cancelar este intercambio?")</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body d-flex flex-column gap-3">
+                            <p class="mb-0">Ya no vas a cambiar tu <strong>@intercambio.MiArticuloNombre</strong> por <strong>@intercambio.SuArticuloNombre</strong> de @@@intercambio.OtroUsuario.</p>
+                            <p class="sw-aviso-rechazos mb-0"><i class="bi bi-exclamation-triangle me-1"></i> No se puede deshacer. A @intercambio.OtroNombre le va a llegar una notificación@(esPropuesta ? "" : " y los dos artículos vuelven a aparecer en el catálogo").</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sw-outline" data-bs-dismiss="modal">Volver</button>
+                            <button type="submit" class="btn btn-sw-secundario">Sí, cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
     }
 </div>

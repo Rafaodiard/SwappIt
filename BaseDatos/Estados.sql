@@ -1,6 +1,6 @@
 ﻿/****** Estados de artículos y de intercambios como tablas, para bases ya creadas.
    - EstadosArticulos (antes Estados): opciones de "Estado del objeto" en Publicar.
-   - EstadosIntercambios: Pendiente, Aceptado, Rechazado y Realizado.
+   - EstadosIntercambios: Pendiente, Aceptado, Rechazado, Realizado y Cancelado.
    - Articulos.Estado e Intercambios.Estado (texto) pasan a IdEstado, con clave foránea a su tabla.
    Los textos que ya había se convierten a su Id. Si alguno no coincide con un estado de la tabla,
    el script se corta antes de borrar la columna vieja y no se pierde nada.
@@ -41,6 +41,7 @@ IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosIntercambios] WHERE [IdEstadosInterca
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosIntercambios] WHERE [IdEstadosIntercambios] = 2) INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (2, N'Aceptado')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosIntercambios] WHERE [IdEstadosIntercambios] = 3) INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (3, N'Rechazado')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosIntercambios] WHERE [IdEstadosIntercambios] = 4) INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (4, N'Realizado')
+IF NOT EXISTS (SELECT 1 FROM [dbo].[EstadosIntercambios] WHERE [IdEstadosIntercambios] = 5) INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (5, N'Cancelado')
 SET IDENTITY_INSERT [dbo].[EstadosIntercambios] OFF
 GO
 /****** 3. Articulos.Estado (texto) -> Articulos.IdEstado.

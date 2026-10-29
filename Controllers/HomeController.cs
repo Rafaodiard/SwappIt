@@ -15,8 +15,15 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    // "/" muestra la landing a quien no inició sesión y el inicio (Views/Home/Inicio.cshtml) a quien sí.
     public IActionResult Index()
     {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId != null)
+        {
+            return Inicio(usuarioId.Value);
+        }
+
         try
         {
             ViewBag.destacados = BD.GetArticulosCatalogo(cantidad: 4);
@@ -27,6 +34,61 @@ public class HomeController : Controller
             ViewBag.destacados = new List<ArticuloCardViewModel>();
         }
         return View();
+    }
+
+    // Inicio del usuario logueado: sus intercambios en curso (primero los que tiene que responder),
+    // un resumen de lo que tiene pendiente y los artículos que publicaron los demás.
+    private IActionResult Inicio(int usuarioId)
+    {
+        ViewBag.nombre = null;
+        ViewBag.intercambios = new List<IntercambioViewModel>();
+        ViewBag.porResponder = 0;
+        ViewBag.cantidadEnCurso = 0;
+        ViewBag.cantidadArticulos = 0;
+        ViewBag.novedades = new List<ArticuloCardViewModel>();
+        ViewBag.mensajesSinLeer = null;
+        ViewBag.errorCarga = false;
+        try
+        {
+            ViewBag.nombre = BD.GetUsuarioById(usuarioId)?.Nombre;
+
+            List<IntercambioViewModel> enCurso = BD.GetIntercambios(usuarioId)
+                .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
+                .ToList();
+
+            // GetIntercambios ya viene del más nuevo al más viejo: acá solo se suben los que esperan respuesta.
+            ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
+            ViewBag.porResponder = enCurso.Count(PorResponder);
+            ViewBag.cantidadEnCurso = enCurso.Count;
+            ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
+            ViewBag.novedades = BD.GetArticulosCatalogo(cantidad: CantidadNovedadesInicio, excluirUsuario: usuarioId);
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudo cargar el inicio del usuario {UsuarioId}", usuarioId);
+            ViewBag.errorCarga = true;
+        }
+
+        // Aparte: si falta correr BaseDatos/Chat.sql no se rompe todo el inicio, solo no se muestra ese número.
+        try
+        {
+            ViewBag.mensajesSinLeer = BD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron contar los mensajes sin leer del usuario {UsuarioId}", usuarioId);
+        }
+
+        return View("Inicio");
+    }
+
+    private const int CantidadIntercambiosInicio = 3;
+    private const int CantidadNovedadesInicio = 8;
+
+    // Propuesta que le llegó al usuario y que todavía tiene que aceptar o rechazar.
+    private static bool PorResponder(IntercambioViewModel i)
+    {
+        return i.EsRecibido && i.Estado == EstadosIntercambios.Pendiente;
     }
 
     public IActionResult Privacy()

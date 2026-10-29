@@ -338,6 +338,7 @@ INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (1
 INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (2, N'Aceptado')
 INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (3, N'Rechazado')
 INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (4, N'Realizado')
+INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (5, N'Cancelado')
 SET IDENTITY_INSERT [dbo].[EstadosIntercambios] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Imagenes] ON 
@@ -423,6 +424,7 @@ INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (1, N'Propuesta recibi
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (2, N'Propuesta aceptada')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (3, N'Propuesta rechazada')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (4, N'Mensaje nuevo')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (5, N'Intercambio cancelado')
 SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 

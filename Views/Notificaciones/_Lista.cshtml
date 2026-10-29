@@ -29,19 +29,21 @@
     // por eso el token antifalsificación va a mano.
     void Item(NotificacionViewModel n)
     {
-        bool rechazo = n.Tipo == TipoNotificaciones.PropuestaRechazada;
+        bool rechazo = n.Tipo == TipoNotificaciones.PropuestaRechazada || n.Tipo == TipoNotificaciones.IntercambioCancelado;
         string icono = n.Tipo switch
         {
             TipoNotificaciones.PropuestaRecibida => "bi-arrow-left-right",
             TipoNotificaciones.PropuestaAceptada => "bi-check-lg",
             TipoNotificaciones.PropuestaRechazada => "bi-x-lg",
             TipoNotificaciones.MensajeNuevo => "bi-chat-dots",
+            TipoNotificaciones.IntercambioCancelado => "bi-x-circle",
             _ => "bi-bell"
         };
         string accion = n.Tipo switch
         {
             TipoNotificaciones.PropuestaAceptada => "Ver intercambio",
             TipoNotificaciones.MensajeNuevo => "Ver chat",
+            TipoNotificaciones.IntercambioCancelado => "Ver intercambio",
             _ => "Ver propuesta"
         };
 
@@ -62,6 +64,9 @@
                             break;
                         case TipoNotificaciones.MensajeNuevo:
                             @:<strong>@n.OtroNombre</strong> te mandó un mensaje por el intercambio de <strong>@n.ArticuloNombre</strong>.
+                            break;
+                        case TipoNotificaciones.IntercambioCancelado:
+                            @:<strong>@n.OtroNombre</strong> canceló el intercambio de <strong>@n.ArticuloNombre</strong>.
                             break;
                         default:
                             @:@n.Tipo

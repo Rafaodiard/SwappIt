@@ -49,7 +49,6 @@
             else
             {
                 <nav class="d-flex align-items-center gap-1 gap-sm-2 ms-auto" aria-label="Mi cuenta">
-                    <a href="#" class="sw-header-accion" title="Favoritos" aria-label="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
                     <a href="@Url.Action("Index", "Chat")" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
                     <!-- Notificaciones: el pop up va justo después del botón para que el Tab entre en él -->
                     <div class="sw-notif" data-notif data-url-no-leidas="@Url.Action("NoLeidas", "Notificaciones")" data-url-lista="@Url.Action("Lista", "Notificaciones")">
@@ -119,7 +118,6 @@
     <!-- JS de todas las páginas (cada archivo dice arriba qué maneja). El JS propio de una página va en su sección Scripts. -->
     <script src="~/js/plantillas.js" asp-append-version="true"></script>
     <script src="~/js/imagenes.js" asp-append-version="true"></script>
-    <script src="~/js/favoritos.js" asp-append-version="true"></script>
     <script src="~/js/notificaciones.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

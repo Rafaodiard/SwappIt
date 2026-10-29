@@ -946,4 +946,4 @@ C:\Users\49758734\AppData\Local\Temp\claude\C--Users-49758734-Desktop-swappit\4f
 C:\Users\49758734\AppData\Local\Temp\claude\C--Users-49758734-Desktop-swappit\4fdb00c4-cfe6-4a53-be5d-711eaf302d46\scratchpad\out\Swappit.pdb
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\26qer9o0kt-vyfky7gjmy.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\vnh0ekjncn-m30ugodwrw.gz
-C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-mmiszz9iff.gz
+C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-yqz1goxv43.gz

@@ -126,8 +126,11 @@ public static class BD
 
     private static readonly string[] EstadosComprometidos = { EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado };
 
+    // idUsuario: solo los artículos de ese usuario (perfiles). excluirUsuario: todos menos los de ese usuario
+    // (en Explorar no se muestran los artículos propios del que está logueado).
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
-        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null)
+        IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null,
+        int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -135,6 +138,7 @@ public static class BD
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
             if (estados is { Count: > 0 }) condiciones.Add("a.IdEstado IN @pEstados");
             if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
+            if (excluirUsuario.HasValue) condiciones.Add("a.IdUsuarios <> @pExcluirUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
             // Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
@@ -153,6 +157,7 @@ public static class BD
                 pCategorias = categorias,
                 pEstados = estados,
                 pIdUsuario = idUsuario,
+                pExcluirUsuario = excluirUsuario,
                 pComprometidos = EstadosComprometidos
             }).ToList();
         }
@@ -242,7 +247,8 @@ public static class BD
         }
     }
 
-    public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null)
+    // excluirUsuario: no cuenta los artículos de ese usuario (igual que GetArticulosCatalogo en Explorar).
+    public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null, int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -250,15 +256,16 @@ public static class BD
                 FROM Categorias c
                 LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
                     AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                    AND (@pExcluirUsuario IS NULL OR a.IdUsuarios <> @pExcluirUsuario)
                     AND " + ArticuloDisponible + @"
                 GROUP BY c.IdCategorias, c.Nombre
                 ORDER BY c.Nombre";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pComprometidos = EstadosComprometidos }).ToList();
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pExcluirUsuario = excluirUsuario, pComprometidos = EstadosComprometidos }).ToList();
         }
     }
 
     // Estados para el filtro de Buscar: todos los de EstadosArticulos (como las categorías), de mejor a peor.
-    public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null)
+    public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null, int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -266,10 +273,11 @@ public static class BD
                 FROM EstadosArticulos e
                 LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
                     AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
+                    AND (@pExcluirUsuario IS NULL OR a.IdUsuarios <> @pExcluirUsuario)
                     AND " + ArticuloDisponible + @"
                 GROUP BY e.IdEstadosArticulos, e.Nombre
                 ORDER BY e.IdEstadosArticulos";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pComprometidos = EstadosComprometidos }).ToList();
+            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pExcluirUsuario = excluirUsuario, pComprometidos = EstadosComprometidos }).ToList();
         }
     }
 
@@ -448,6 +456,46 @@ public static class BD
         }
     }
 
+    // Pasa el intercambio a Cancelado y le avisa a la otra persona ("Intercambio cancelado"), en una transacción.
+    // Una propuesta Pendiente solo la cancela quien la hizo (quien la recibió la rechaza); uno Aceptado, cualquiera de los dos.
+    // Devuelve false si el usuario no puede cancelarlo o si ya cambió de estado.
+    // Al dejar de estar Aceptado, los dos artículos vuelven a estar disponibles (ver ArticuloDisponible).
+    public static bool CancelarIntercambio(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                // Devuelve el id de la otra persona, o nada si no se actualizó ninguna fila.
+                string query = @"UPDATE i SET i.IdEstado = cancelado.IdEstadosIntercambios
+                    OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
+                    FROM Intercambios i
+                    INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
+                    INNER JOIN EstadosIntercambios cancelado ON cancelado.Nombre = @pCancelado
+                    WHERE i.IdIntercambios = @pId
+                        AND ((actual.Nombre = @pPendiente AND i.IdUsuarios1 = @pIdUsuario)
+                            OR (actual.Nombre = @pAceptado AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)))";
+                int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
+                {
+                    pId = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pCancelado = EstadosIntercambios.Cancelado,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pAceptado = EstadosIntercambios.Aceptado
+                }, transaccion);
+
+                if (idOtro.HasValue)
+                {
+                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, TipoNotificaciones.IntercambioCancelado);
+                }
+
+                transaccion.Commit();
+                return idOtro.HasValue;
+            }
+        }
+    }
+
     // Otras propuestas Pendientes que usan alguno de los dos artículos del intercambio (como pedido o como ofrecido).
     // Son las que se rechazan solas si se acepta este intercambio.
     private const string CondicionPendientesDeArticulos = @"o.IdIntercambios <> @pId
@@ -504,7 +552,7 @@ public static class BD
     // Cada notificación es para un usuario (IdUsuario) sobre un intercambio. El tipo se busca por nombre
     // (ver TipoNotificaciones): si ese tipo no está cargado en la tabla, no se inserta nada.
 
-    // Se llama desde ProponerIntercambio, CambiarEstadoIntercambio y EnviarMensaje, dentro de su transacción.
+    // Se llama desde ProponerIntercambio, CambiarEstadoIntercambio, CancelarIntercambio y EnviarMensaje, dentro de su transacción.
     // siNoHayOtraSinLeer = true: no la crea si el usuario ya tiene una sin leer de ese tipo y de ese intercambio
     // (así un chat con 10 mensajes seguidos deja una sola notificación "Mensaje nuevo").
     private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, int idUsuario, int idIntercambio, string tipo,

@@ -21,8 +21,10 @@ public class ArticulosController : Controller
     }
 
     // q: texto del buscador del header. categoria / estado: checkboxes del panel de filtros (se pueden marcar varios).
+    // Si hay alguien logueado, no ve sus propios artículos (están en su perfil); los contadores de los filtros tampoco los cuentan.
     public IActionResult Buscar(string? q, int[]? categoria, int[]? estado)
     {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         string? busqueda = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
         List<int> categoriasSeleccionadas = (categoria ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
         List<int> estadosSeleccionados = (estado ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
@@ -35,9 +37,9 @@ public class ArticulosController : Controller
 
         try
         {
-            articulos = BD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados);
-            categorias = BD.GetFiltroCategorias(busqueda);
-            estados = BD.GetFiltroEstados(busqueda);
+            articulos = BD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
+            categorias = BD.GetFiltroCategorias(busqueda, usuarioId);
+            estados = BD.GetFiltroEstados(busqueda, usuarioId);
         }
         catch (SqlException ex)
         {

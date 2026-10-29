@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Swappit")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83e0842257e4e6641e4d4cba193ba0ada43e249a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+69713194b2470aa9fc4a1ddf8a77f5ca8845e6af")]
 [assembly: System.Reflection.AssemblyProductAttribute("Swappit")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Swappit")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

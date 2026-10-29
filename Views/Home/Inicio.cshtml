@@ -1,0 +1,152 @@
+﻿@*
+    Inicio del usuario logueado (HomeController.Index cuando hay sesión; sin sesión se ve la landing, Index.cshtml).
+    - Saludo con accesos a Publicar y a Buscar, y un resumen: propuestas por responder, mensajes sin leer y artículos publicados.
+    - Intercambios en curso (Pendiente o Aceptado), primero los que el usuario tiene que responder. Reusa _FilaIntercambio.
+    - Recién publicados: los últimos artículos disponibles de los demás usuarios (sin los suyos). Reusa _CardObjeto.
+    Las notificaciones no se repiten acá: ya están en la campana del header.
+*@
+@{
+    ViewData["Title"] = "Inicio";
+    string? nombre = ViewBag.nombre;
+    List<Swappit.Models.ViewModels.IntercambioViewModel> intercambios = ViewBag.intercambios;
+    int porResponder = ViewBag.porResponder;
+    int cantidadEnCurso = ViewBag.cantidadEnCurso;
+    int cantidadArticulos = ViewBag.cantidadArticulos;
+    int? mensajesSinLeer = ViewBag.mensajesSinLeer;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> novedades = ViewBag.novedades;
+    bool errorCarga = ViewBag.errorCarga;
+}
+
+<!-- ===== Saludo + resumen ===== -->
+<section class="sw-inicio-saludo" aria-labelledby="titulo-inicio">
+    <div class="container-xl">
+        <div class="row align-items-center gx-4 gy-4">
+            <div class="col-lg-5">
+                <h1 class="mb-2" id="titulo-inicio">@(string.IsNullOrWhiteSpace(nombre) ? "¡Hola!" : $"¡Hola, {nombre}!")</h1>
+                <p class="text-suave mb-4">¿Qué vas a intercambiar hoy?</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar un artículo</a>
+                    <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-outline">Explorar artículos</a>
+                </div>
+            </div>
+
+            @if (!errorCarga)
+            {
+                <div class="col-lg-7">
+                    <ul class="row row-cols-3 g-2 g-sm-3 list-unstyled mb-0" aria-label="Tu resumen">
+                        <li class="col">
+                            <a href="@Url.Action("Index", "Intercambio", new { estado = Swappit.Models.EstadosIntercambios.Pendiente })" class="sw-resumen @(porResponder > 0 ? "sw-resumen--alerta" : "")">
+                                <span class="sw-resumen-icono"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+                                <span>
+                                    <span class="sw-resumen-numero">@porResponder</span>
+                                    <span class="sw-resumen-texto">@(porResponder == 1 ? "propuesta por responder" : "propuestas por responder")</span>
+                                </span>
+                            </a>
+                        </li>
+                        @if (mensajesSinLeer != null)
+                        {
+                            <li class="col">
+                                <a href="@Url.Action("Index", "Chat")" class="sw-resumen @(mensajesSinLeer > 0 ? "sw-resumen--alerta" : "")">
+                                    <span class="sw-resumen-icono"><i class="bi bi-chat-dots" aria-hidden="true"></i></span>
+                                    <span>
+                                        <span class="sw-resumen-numero">@mensajesSinLeer</span>
+                                        <span class="sw-resumen-texto">@(mensajesSinLeer == 1 ? "mensaje sin leer" : "mensajes sin leer")</span>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                        <li class="col">
+                            <a href="@Url.Action("Index", "Perfil")" class="sw-resumen">
+                                <span class="sw-resumen-icono"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+                                <span>
+                                    <span class="sw-resumen-numero">@cantidadArticulos</span>
+                                    <span class="sw-resumen-texto">@(cantidadArticulos == 1 ? "artículo publicado" : "artículos publicados")</span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="container-xl py-4 py-lg-5">
+    @if (errorCarga)
+    {
+        <div class="sw-card p-5 text-center">
+            <i class="bi bi-exclamation-triangle fs-1 text-suave"></i>
+            <h2 class="font-titulo h3 mt-3">No pudimos cargar tu inicio</h2>
+            <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+        </div>
+        return;
+    }
+
+    <!-- Sin artículos propios no se puede proponer un intercambio (la propuesta ofrece uno de los tuyos) -->
+    @if (cantidadArticulos == 0)
+    {
+        <section class="sw-inicio-aviso mb-4 mb-lg-5" aria-labelledby="titulo-aviso">
+            <span class="sw-resumen-icono"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
+            <div class="flex-grow-1">
+                <h2 class="h6 fw-bold mb-1" id="titulo-aviso">Publicá tu primer artículo</h2>
+                <p class="text-suave small mb-0">Para proponer un intercambio necesitás ofrecer algo tuyo. Subí un objeto que ya no uses y empezá a intercambiar.</p>
+            </div>
+            <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario btn-sm text-nowrap">Publicar</a>
+        </section>
+    }
+
+    <!-- ===== Intercambios en curso ===== -->
+    <section class="sw-card p-3 p-md-4 mb-4 mb-lg-5" aria-labelledby="titulo-en-curso">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
+            <h2 class="font-titulo h3 mb-0" id="titulo-en-curso">Tus intercambios en curso</h2>
+            @if (cantidadEnCurso > intercambios.Count)
+            {
+                <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos (@cantidadEnCurso) <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+            }
+        </div>
+
+        @if (intercambios.Count > 0)
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var intercambio in intercambios)
+                {
+                    ViewBag.fila = intercambio;
+                    <partial name="_FilaIntercambio" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="bi bi-arrow-left-right fs-1 text-suave"></i>
+                <p class="text-suave mt-2 mb-0">No tenés intercambios en curso. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
+            </div>
+        }
+    </section>
+
+    <!-- ===== Recién publicados (los últimos artículos de los demás) ===== -->
+    <section aria-labelledby="titulo-novedades">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
+            <h2 class="font-titulo h3 text-primario mb-0" id="titulo-novedades">Recién publicados</h2>
+            <a href="@Url.Action("Buscar", "Articulos")" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+        </div>
+
+        @if (novedades.Count > 0)
+        {
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                @foreach (var articulo in novedades)
+                {
+                    ViewBag.articulo = articulo;
+                    <partial name="_CardObjeto" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="sw-card p-5 text-center">
+                <i class="bi bi-box-seam fs-1 text-suave"></i>
+                <p class="text-suave mt-2 mb-0">Todavía no hay artículos de otras personas para intercambiar.</p>
+            </div>
+        }
+    </section>
+</div>

@@ -1,5 +1,5 @@
 ﻿/****** Notificaciones y sus tipos, para bases ya creadas.
-   - TipoNotificaciones: Propuesta recibida, Propuesta aceptada, Propuesta rechazada y Mensaje nuevo.
+   - TipoNotificaciones: Propuesta recibida, Propuesta aceptada, Propuesta rechazada, Mensaje nuevo e Intercambio cancelado.
    - Notificaciones: aviso para un usuario sobre un intercambio, con su tipo, si ya la leyó y la fecha.
    Mismas tablas y claves foráneas que SQLSwappit.sql. Solo crea lo que falta (tablas, claves foráneas y tipos).
    Se puede volver a ejecutar sin problema. ******/
@@ -18,6 +18,7 @@ IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoNotificaciones] WHERE [Id] = 1) INSERT [
 IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoNotificaciones] WHERE [Id] = 2) INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (2, N'Propuesta aceptada')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoNotificaciones] WHERE [Id] = 3) INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (3, N'Propuesta rechazada')
 IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoNotificaciones] WHERE [Id] = 4) INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (4, N'Mensaje nuevo')
+IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoNotificaciones] WHERE [Id] = 5) INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (5, N'Intercambio cancelado')
 SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 /****** 2. Notificaciones. ******/
