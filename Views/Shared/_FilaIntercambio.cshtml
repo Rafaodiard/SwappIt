@@ -1,0 +1,39 @@
+@*
+    Fila de un intercambio (Mis intercambios y el historial de Mi perfil).
+    Se renderiza con un IntercambioViewModel en ViewBag.fila:
+    ViewBag.fila = intercambio;
+    <partial name="_FilaIntercambio" />
+
+    Arriba va lo que recibe el usuario logueado y abajo (con las flechas) lo que da.
+*@
+@{
+    Swappit.Models.ViewModels.IntercambioViewModel fila = ViewBag.fila;
+    bool porResponder = fila.EsRecibido && fila.Estado == Swappit.Models.EstadosIntercambios.Pendiente;
+}
+<article class="sw-historial-item d-flex flex-column flex-md-row align-items-md-center gap-3">
+    <div class="sw-historial-img sw-img"><img src="@fila.SuArticuloImagen" alt=""></div>
+    <div class="flex-grow-1 min-w-0">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+            <h3 class="h5 fw-bold mb-0 text-truncate">@fila.SuArticuloNombre</h3>
+            <span class="sw-badge @(fila.EsRecibido ? "sw-badge-recibido" : "sw-badge-enviado")">@(fila.EsRecibido ? "Recibido" : "Enviado")</span>
+        </div>
+        <div class="text-suave small mb-1">
+            <i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @fila.MiArticuloNombre
+        </div>
+        <div class="d-flex flex-wrap column-gap-3 row-gap-1 text-suave small">
+            <span><i class="bi bi-person" aria-hidden="true"></i> Intercambio con @@@fila.OtroUsuario</span>
+            <span><i class="bi bi-calendar3" aria-hidden="true"></i> Fecha: @fila.Fecha.ToString("dd/MM/yyyy")</span>
+        </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 flex-shrink-0">
+        <span class="sw-estado-intercambio sw-estado-intercambio--@fila.Estado.ToLowerInvariant()">@fila.Estado</span>
+        @if (porResponder)
+        {
+            <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@fila.IdIntercambios" class="btn btn-sw-primario btn-sm">Responder</a>
+        }
+        else
+        {
+            <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@fila.IdIntercambios" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+        }
+    </div>
+</article>

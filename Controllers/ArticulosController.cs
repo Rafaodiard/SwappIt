@@ -93,6 +93,10 @@ public class ArticulosController : Controller
             ViewBag.misArticulos = usuarioId != null && !esPropio
                 ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
                 : new List<ArticuloCardViewModel>();
+            // Si ya propuso un intercambio por este artículo (Pendiente o Aceptado), se muestra "Propuesta enviada".
+            ViewBag.idPropuestaEnCurso = usuarioId != null && !esPropio
+                ? BD.GetIdPropuestaEnCurso(usuarioId.Value, articulo.IdArticulos)
+                : null;
         }
         catch (SqlException ex)
         {

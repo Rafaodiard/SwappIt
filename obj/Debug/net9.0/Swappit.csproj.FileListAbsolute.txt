@@ -927,7 +927,6 @@ C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\vnh0ekjncn-sjd1v
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\4ch4uxh4d7-mt1d3nc9p7.gz
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\q7dg00387n-43tpqessqk.gz
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\m5q5qmvx59-eer3espfkx.gz
-C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-ntnr9tq12j.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\1xws7mzh39-l0aoequri6.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\qk3zvwg1xn-co848rknyr.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\smaad7afoy-sis3452g3z.gz
@@ -936,3 +935,4 @@ C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\4ch4uxh4d7-mt1d3nc
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\q7dg00387n-43tpqessqk.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\m5q5qmvx59-eer3espfkx.gz
 C:\Users\49758734\Desktop\swappit\bin\Debug\net9.0\Vault\Grafo\graph.json
+C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-fim3sf91f6.gz

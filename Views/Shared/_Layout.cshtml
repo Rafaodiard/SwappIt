@@ -1,7 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 @{
-    // Si no hay usuario en la sesión (ver AccountController) se muestra el header de visitante
     var esVisitante = Context.Session.GetInt32("UsuarioId") == null;
     var iniciales = Context.Session.GetString("Iniciales");
     var foto = Context.Session.GetString("Foto");

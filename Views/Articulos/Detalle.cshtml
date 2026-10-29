@@ -1,7 +1,8 @@
 @*
     Detalle de un artículo (ArticulosController.Detalle).
     Datos: Articulos + Imagenes (fotos del artículo) + Categorias + Usuarios (dueño) + Provincias.
-    - Artículo de otra persona: botón "Proponer intercambio" (pop up para elegir qué artículo ofrecés).
+    - Artículo de otra persona: botón "Proponer intercambio" (pop up para elegir qué artículo ofrecés,
+      lo guarda IntercambioController.Proponer). Si ya hay una propuesta en curso, "Propuesta enviada".
     - Artículo propio (el dueño es el usuario logueado): aviso "Es tu artículo" y acciones del dueño.
     - Visitante (sin sesión): "Proponer intercambio" lleva a iniciar sesión.
 *@
@@ -38,6 +39,7 @@
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> misArticulos = ViewBag.misArticulos;
     bool esPropio = ViewBag.esPropio;
     bool logueado = ViewBag.logueado;
+    int? idPropuestaEnCurso = ViewBag.idPropuestaEnCurso;
 
     string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
     // La ubicación que cargó el dueño al publicar; los artículos viejos (sin ubicación) usan su barrio y provincia.
@@ -47,6 +49,8 @@
     string? fotoPrincipal = imagenes.FirstOrDefault();
     // Viene de PublicarController después de guardar el artículo.
     string? mensajeArticulo = TempData["MensajeArticulo"] as string;
+    // Viene de IntercambioController.Proponer si no se pudo guardar la propuesta.
+    string? errorArticulo = TempData["ErrorArticulo"] as string;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -54,6 +58,13 @@
     {
         <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
             <i class="bi bi-check-circle-fill me-1"></i> @mensajeArticulo
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+    @if (errorArticulo != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @errorArticulo
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     }
@@ -165,6 +176,13 @@
                         <span id="editar-pendiente" class="text-suave small text-center">La edición de artículos todavía no está disponible.</span>
                         <a asp-controller="Perfil" asp-action="Index" class="btn btn-sw-outline">Ver mis artículos publicados</a>
                     }
+                    else if (idPropuestaEnCurso != null)
+                    {
+                        <a asp-controller="Intercambio" asp-action="Detalle" asp-route-id="@idPropuestaEnCurso" class="btn btn-sw-primario btn-lg" aria-describedby="propuesta-enviada">
+                            <i class="bi bi-arrow-repeat me-1"></i> Propuesta enviada
+                        </a>
+                        <span id="propuesta-enviada" class="text-suave small text-center">Ya propusiste un intercambio por este artículo. Tocá el botón para ver cómo sigue.</span>
+                    }
                     else if (logueado)
                     {
                         <button type="button" class="btn btn-sw-primario btn-lg" data-bs-toggle="modal" data-bs-target="#modal-proponer">
@@ -209,14 +227,15 @@
     </div>
 </div>
 
-@if (logueado && !esPropio)
+@if (logueado && !esPropio && idPropuestaEnCurso == null)
 {
     <!-- ===== Pop up: Proponer intercambio =====
-         El usuario elige cuál de sus artículos ofrece a cambio (Intercambios.IdArticulos2).
-         TODO: falta guardar la propuesta en Intercambios. -->
+         El usuario elige cuál de sus artículos ofrece a cambio. IntercambioController.Proponer lo guarda en Intercambios
+         como Pendiente: quien propone en IdUsuarios1/IdArticulos1 y el dueño de este artículo en IdUsuarios2/IdArticulos2. -->
     <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <form class="modal-content" method="post" onsubmit="return false">
+            <form class="modal-content" method="post" asp-controller="Intercambio" asp-action="Proponer">
+                <input type="hidden" name="idArticuloPedido" value="@articulo.IdArticulos">
                 <div class="modal-header">
                     <h2 class="modal-title font-titulo h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -232,7 +251,7 @@
                             @foreach (var mio in misArticulos)
                             {
                                 <label class="sw-opcion-articulo">
-                                    <input type="radio" class="sw-estado-radio" name="IdArticuloOfrecido" value="@mio.IdArticulos" required>
+                                    <input type="radio" class="sw-estado-radio" name="idArticuloOfrecido" value="@mio.IdArticulos" required>
                                     <span class="sw-opcion-articulo-cuerpo">
                                         <span class="sw-img sw-opcion-articulo-img">
                                             @if (!string.IsNullOrEmpty(mio.Imagen))
@@ -258,12 +277,15 @@
                         </div>
                     }
 
-                    <p class="sw-nota mb-0"><i class="bi bi-info-circle me-1"></i> El envío de propuestas todavía no está conectado: por ahora podés elegir el artículo, pero no se guarda.</p>
+                    @if (misArticulos.Count > 0)
+                    {
+                        <p class="sw-nota mb-0"><i class="bi bi-info-circle me-1"></i> @dueno.Nombre va a poder aceptar o rechazar tu propuesta. La seguís desde Mis intercambios.</p>
+                    }
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="sw-btn sw-btn-solido" disabled>Enviar propuesta</button>
+                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@(misArticulos.Count == 0)">Enviar propuesta</button>
                 </div>
             </form>
         </div>

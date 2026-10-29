@@ -1,0 +1,213 @@
+@*
+    Ver un intercambio (IntercambioController.Detalle). Solo lo ven las dos partes.
+    - Propuesta recibida y Pendiente: "Recibiste una propuesta" con Aceptar / Rechazar.
+    - El resto: "Intercambio con @usuario", con el avance (Pendiente -> Aceptado -> Realizado, o Rechazado),
+      lo que das y lo que recibís, y los próximos pasos (marcar como realizado cuando está aceptado).
+*@
+@using Swappit.Models
+@{
+    Swappit.Models.ViewModels.IntercambioViewModel? intercambio = ViewBag.intercambio;
+    bool errorCarga = ViewBag.errorCarga;
+    ViewData["Title"] = intercambio != null ? $"Intercambio con @{intercambio.OtroUsuario}" : "Intercambio";
+}
+
+@if (intercambio == null)
+{
+    <div class="container-xl py-5">
+        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
+            <i class="bi @(errorCarga ? "bi-exclamation-triangle" : "bi-search") fs-1 text-suave"></i>
+            <h1 class="font-titulo h2 mt-3">@(errorCarga ? "No pudimos cargar el intercambio" : "Este intercambio no existe")</h1>
+            <p class="text-suave mb-4">
+                @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
+                             : "Puede que el enlace esté mal o que no seas parte de este intercambio.")
+            </p>
+            <a asp-action="Index" class="btn btn-sw-primario">Ir a Mis intercambios</a>
+        </div>
+    </div>
+    return;
+}
+
+@{
+    string? fotoOtro = ViewBag.fotoOtro;
+    string estado = intercambio.Estado;
+    bool porResponder = intercambio.EsRecibido && estado == EstadosIntercambios.Pendiente;
+    string inicialesOtro = $"{intercambio.OtroNombre?.FirstOrDefault()}{intercambio.OtroApellido?.FirstOrDefault()}".ToUpper();
+    string ubicacionOtro = string.Join(", ", new[] { intercambio.OtroBarrio, intercambio.OtroProvincia }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string fecha = intercambio.Fecha.ToString("dd/MM/yyyy");
+    string? mensaje = TempData["MensajeIntercambio"] as string;
+    string? error = TempData["ErrorIntercambio"] as string;
+
+    // Tarjeta de uno de los dos artículos ("Te ofrece" / "Por tu" o "Vos das" / "Recibís").
+    // Usa Url.Action y no asp-action porque una función local no puede tener tag helpers.
+    void PanelArticulo(string etiqueta, int idArticulo, string nombre, string estadoArticulo, string? imagen, string deQuien)
+    {
+        <a href="@Url.Action("Detalle", "Articulos", new { id = idArticulo })" class="sw-intercambio-panel">
+            <span class="sw-intercambio-etiqueta">@etiqueta</span>
+            <span class="sw-img sw-intercambio-foto"><img src="@imagen" alt=""></span>
+            <span class="d-block h5 fw-bold mt-3 mb-2">@nombre</span>
+            <span class="d-flex flex-wrap align-items-center gap-2 small">
+                <span class="sw-articulo-estado">@estadoArticulo</span>
+                <span class="text-suave">@deQuien</span>
+            </span>
+        </a>
+    }
+}
+
+<div class="container-xl py-4 py-lg-5">
+    @if (mensaje != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
+            <i class="bi bi-check-circle-fill me-1"></i> @mensaje
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+    @if (error != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @error
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    <a asp-action="Index" class="sw-volver mb-3"><i class="bi bi-chevron-left" aria-hidden="true"></i> Mis intercambios</a>
+
+    @if (porResponder)
+    {
+        <!-- ===== Propuesta recibida: Aceptar / Rechazar ===== -->
+        <header class="text-center mb-4">
+            <h1 class="font-titulo display-5 text-primario mb-2">Recibiste una propuesta</h1>
+            <p class="text-suave mb-0">@intercambio.OtroNombre quiere intercambiar su @intercambio.SuArticuloNombre por tu @intercambio.MiArticuloNombre.</p>
+        </header>
+
+        <section class="sw-card p-4 p-lg-5 mx-auto sw-intercambio-propuesta" aria-label="Propuesta de intercambio">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-4 mb-4 border-bottom">
+                <div class="d-flex align-items-center gap-3 min-w-0">
+                    <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesOtro">
+                        @if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { <span aria-hidden="true">@inicialesOtro</span> }
+                    </span>
+                    <div class="min-w-0">
+                        <p class="fw-bold mb-0 text-truncate">@intercambio.OtroNombre @intercambio.OtroApellido</p>
+                        <p class="text-suave small mb-0 text-truncate">@@@intercambio.OtroUsuario@(ubicacionOtro != "" ? $" · {ubicacionOtro}" : "")</p>
+                    </div>
+                </div>
+                <span class="text-suave small">Recibida el @fecha</span>
+            </div>
+
+            <div class="sw-intercambio-articulos">
+                @{ PanelArticulo("Te ofrece", intercambio.SuArticuloId, intercambio.SuArticuloNombre, intercambio.SuArticuloEstado, intercambio.SuArticuloImagen, $"de @{intercambio.OtroUsuario}"); }
+                <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
+                @{ PanelArticulo("Por tu", intercambio.MiArticuloId, intercambio.MiArticuloNombre, intercambio.MiArticuloEstado, intercambio.MiArticuloImagen, "tuyo"); }
+            </div>
+
+            <p class="sw-articulo-propio mt-4 mb-0"><i class="bi bi-info-circle me-1"></i> Si aceptás, coordinan con @intercambio.OtroNombre dónde y cuándo hacer el intercambio.</p>
+
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pt-4 mt-4 border-top">
+                <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@intercambio.OtroIdUsuario" class="fw-semibold text-decoration-none text-primario">Ver perfil de @intercambio.OtroNombre <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                <div class="d-flex gap-2">
+                    <form method="post" asp-action="Rechazar" asp-route-id="@intercambio.IdIntercambios" class="flex-fill">
+                        <button type="submit" class="btn btn-sw-outline-secundario w-100">Rechazar</button>
+                    </form>
+                    <form method="post" asp-action="Aceptar" asp-route-id="@intercambio.IdIntercambios" class="flex-fill">
+                        <button type="submit" class="btn btn-sw-primario w-100">Aceptar intercambio</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <!-- ===== Seguimiento del intercambio ===== -->
+        bool rechazado = estado == EstadosIntercambios.Rechazado;
+        bool aceptadoOMas = estado == EstadosIntercambios.Aceptado || estado == EstadosIntercambios.Realizado;
+        bool realizado = estado == EstadosIntercambios.Realizado;
+
+        <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+            <div>
+                <h1 class="font-titulo display-5 text-primario mb-1">Intercambio con @@@intercambio.OtroUsuario</h1>
+                <p class="text-suave mb-0">@(intercambio.EsRecibido ? $"Propuesto por @{intercambio.OtroUsuario}" : "Propuesto por vos") el @fecha</p>
+            </div>
+            <span class="sw-estado-intercambio sw-estado-intercambio--@estado.ToLowerInvariant() mt-2">@estado</span>
+        </header>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <section class="sw-card p-4 h-100" aria-label="Detalle del intercambio">
+                    <!-- Avance: solo se guarda la fecha de la propuesta (Intercambios.Fecha) -->
+                    <ol class="sw-avance pb-4 mb-4 border-bottom">
+                        <li class="sw-avance-paso hecho">
+                            <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
+                            <span><span class="d-block fw-semibold">Propuesta enviada</span><span class="d-block text-suave small">@intercambio.Fecha.ToString("dd/MM")</span></span>
+                        </li>
+                        @if (rechazado)
+                        {
+                            <li class="sw-avance-paso rechazado">
+                                <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-x-lg"></i></span>
+                                <span class="fw-semibold">Rechazada</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="sw-avance-paso @(aceptadoOMas ? "hecho" : "actual")" aria-current="@(aceptadoOMas ? null : "step")">
+                                <span class="sw-avance-icono" aria-hidden="true">@if (aceptadoOMas) { <i class="bi bi-check-lg"></i> }</span>
+                                <span class="fw-semibold">@(aceptadoOMas ? "Aceptada" : "Esperando respuesta")</span>
+                            </li>
+                            <li class="sw-avance-paso @(realizado ? "hecho" : aceptadoOMas ? "actual" : "")" aria-current="@(estado == EstadosIntercambios.Aceptado ? "step" : null)">
+                                <span class="sw-avance-icono" aria-hidden="true">@if (realizado) { <i class="bi bi-check-lg"></i> }</span>
+                                <span class="fw-semibold">Realizado</span>
+                            </li>
+                        }
+                    </ol>
+
+                    <div class="sw-intercambio-articulos">
+                        @{ PanelArticulo("Vos das", intercambio.MiArticuloId, intercambio.MiArticuloNombre, intercambio.MiArticuloEstado, intercambio.MiArticuloImagen, "tuyo"); }
+                        <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
+                        @{ PanelArticulo("Recibís", intercambio.SuArticuloId, intercambio.SuArticuloNombre, intercambio.SuArticuloEstado, intercambio.SuArticuloImagen, $"de @{intercambio.OtroUsuario}"); }
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-lg-4 d-flex flex-column gap-4">
+                <section class="sw-card p-4" aria-labelledby="titulo-con-quien">
+                    <h2 class="h6 fw-bold mb-3" id="titulo-con-quien">Con quién</h2>
+                    <div class="d-flex align-items-center gap-3 mb-3 min-w-0">
+                        <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesOtro">
+                            @if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { <span aria-hidden="true">@inicialesOtro</span> }
+                        </span>
+                        <div class="min-w-0">
+                            <p class="fw-bold mb-0 text-truncate">@intercambio.OtroNombre @intercambio.OtroApellido</p>
+                            <p class="text-suave small mb-0 text-truncate">@@@intercambio.OtroUsuario@(ubicacionOtro != "" ? $" · {ubicacionOtro}" : "")</p>
+                        </div>
+                    </div>
+                    <a asp-controller="Perfil" asp-action="Publico" asp-route-id="@intercambio.OtroIdUsuario" class="fw-semibold text-decoration-none text-primario small">Ver perfil <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                </section>
+
+                <section class="sw-card p-4" aria-labelledby="titulo-proximos-pasos">
+                    <h2 class="h6 fw-bold mb-3" id="titulo-proximos-pasos">Próximos pasos</h2>
+                    @if (estado == EstadosIntercambios.Pendiente)
+                    {
+                        <p class="text-suave small mb-0">Esperando que @intercambio.OtroNombre responda tu propuesta. Si la acepta, van a poder coordinar dónde y cuándo hacer el intercambio.</p>
+                    }
+                    else if (estado == EstadosIntercambios.Aceptado)
+                    {
+                        <p class="text-suave small mb-3">Coordiná con @intercambio.OtroNombre el lugar y el horario. Cuando hayan hecho el intercambio, marcalo como realizado.</p>
+                        <div class="d-flex flex-column gap-2">
+                            <a asp-controller="Chat" asp-action="Index" class="btn btn-sw-primario"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
+                            <form method="post" asp-action="MarcarRealizado" asp-route-id="@intercambio.IdIntercambios">
+                                <button type="submit" class="btn btn-sw-outline w-100">Marcar como realizado</button>
+                            </form>
+                        </div>
+                    }
+                    else if (realizado)
+                    {
+                        <p class="text-suave small mb-0"><i class="bi bi-check-circle-fill text-primario me-1" aria-hidden="true"></i> ¡Listo! Este intercambio ya se hizo.</p>
+                    }
+                    else
+                    {
+                        <p class="text-suave small mb-3">@(intercambio.EsRecibido ? "Rechazaste esta propuesta." : $"{intercambio.OtroNombre} rechazó tu propuesta.")</p>
+                        <a asp-controller="Articulos" asp-action="Buscar" class="btn btn-sw-outline w-100">Buscar otros artículos</a>
+                    }
+                </section>
+            </div>
+        </div>
+    }
+</div>
