@@ -262,6 +262,24 @@ button.sw-header-accion { border: 0; padding: 0; background: transparent; }
 .sw-header-accion[aria-expanded="true"] { color: var(--sw-primario); background: rgba(255, 255, 255, .6); }
 
 .sw-notif { position: relative; }
+/* Contador de no leídas sobre la campana (notificaciones.js) */
+.sw-notif-contador {
+    position: absolute;
+    top: 3px;
+    right: 1px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    border: 1.5px solid var(--sw-gris);
+    background: var(--sw-secundario);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+}
+.sw-notif-contador[hidden] { display: none; }
 .sw-notif-popup {
     --sw-notif-rosa: #f3e9eb;
     position: absolute;
@@ -300,7 +318,11 @@ button.sw-header-accion { border: 0; padding: 0; background: transparent; }
 }
 .sw-notif-titulo { margin: 0; font-family: var(--sw-font-titulo); font-size: 24px; color: var(--sw-primario); }
 
-/* Estado vacío (por ahora es lo único que se muestra: todavía no hay backend de notificaciones) */
+/* Lo que carga notificaciones.js (Views/Notificaciones/_Lista.cshtml): la lista crece y scrollea adentro */
+.sw-notif-cuerpo { display: flex; flex-direction: column; min-height: 0; }
+.sw-notif-cargando { margin: 0; padding: 28px 24px; text-align: center; font-size: 14px; color: var(--sw-texto-suave); }
+
+/* Estado vacío */
 .sw-notif-vacio {
     display: flex;
     flex-direction: column;
@@ -356,8 +378,10 @@ button.sw-header-accion { border: 0; padding: 0; background: transparent; }
 .sw-notif-meta { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; color: var(--sw-texto-suave); }
 .sw-notif-accion { font-size: 13px; font-weight: 600; color: var(--sw-primario); text-decoration: none; }
 .sw-notif-accion .bi { font-size: .7em; margin-left: .15rem; }
-a.sw-notif-accion:hover { color: var(--sw-primario-hover); text-decoration: underline; }
+button.sw-notif-accion { border: 0; padding: 0; background: none; }
+a.sw-notif-accion:hover, button.sw-notif-accion:hover { color: var(--sw-primario-hover); text-decoration: underline; }
 .sw-notif-accion--bordo { color: var(--sw-secundario); }
+button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 
 /* Puntito de "sin leer" a la derecha de la fila */
 .sw-notif-punto { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--sw-primario); flex-shrink: 0; }

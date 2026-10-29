@@ -1,5 +1,5 @@
 ﻿/****** 2 de 3: Datos insertados. Ejecutar después de Estructura.sql. ******/
-/****** Orden: Categorias, EstadosArticulos, EstadosIntercambios, Provincias, Usuarios, Articulos, Imagenes (para respetar las claves foráneas) ******/
+/****** Orden: Categorias, EstadosArticulos, EstadosIntercambios, Provincias, TipoNotificaciones, Usuarios, Articulos, Imagenes (para respetar las claves foráneas) ******/
 USE [Base_De_Datos_Swappit]
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -14,7 +14,6 @@ SET IDENTITY_INSERT [dbo].[Categorias] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EstadosArticulos] ON 
 
-INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (1, N'Como nuevo')
 INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (2, N'Muy buen estado')
 INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (3, N'Buen estado')
 INSERT [dbo].[EstadosArticulos] ([IdEstadosArticulos], [Nombre]) VALUES (4, N'Usado')
@@ -79,6 +78,14 @@ INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (46, N'Santiago del E
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (47, N'Tierra del Fuego')
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (48, N'Tucumán')
 SET IDENTITY_INSERT [dbo].[Provincias] OFF
+GO
+SET IDENTITY_INSERT [dbo].[TipoNotificaciones] ON 
+
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (1, N'Propuesta recibida')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (2, N'Propuesta aceptada')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (3, N'Propuesta rechazada')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (4, N'Mensaje nuevo')
+SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 
 
