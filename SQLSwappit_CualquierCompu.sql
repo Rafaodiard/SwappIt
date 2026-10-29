@@ -138,7 +138,7 @@ CREATE TABLE [dbo].[Categorias](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -152,7 +152,7 @@ CREATE TABLE [dbo].[EstadosArticulos](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -261,26 +261,26 @@ CREATE TABLE [dbo].[Usuarios](
 GO
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
 
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', 2, 3, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', 3, 3, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', 3, 4, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', 2, 4, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', 3, 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', 2, 5, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', 2, 6, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', 3, 6, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', 3, 7, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', 2, 7, 2)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', 3, 8, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', 3, 8, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', 2, 9, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', 3, 9, 5)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', 3, 10, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', 2, 10, 1)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', 2, 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', 3, 11, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', 2, 12, 4)
-INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', 3, 12, 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', 2, 3, 1, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (2, N'Juego de sábanas 2 plazas', N'Algodón, lavadas y planchadas', 3, 3, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (3, N'Mesa de luz', N'Madera, con un cajón', 3, 4, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (4, N'Pava eléctrica', N'1,7 L, con corte automático', 2, 4, 1, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (5, N'Sillas de comedor x2', N'Madera maciza, firmes', 3, 5, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (6, N'Sartén antiadherente', N'28 cm, sin rayones', 2, 5, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (7, N'Escritorio plegable', N'Ideal para monoambiente', 2, 6, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (8, N'Router WiFi', N'Incluye fuente, funciona bien', 3, 6, 1, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (9, N'Juego de ollas', N'Tres ollas de acero con tapa', 3, 7, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (10, N'Libro de recetas fáciles', N'Recetas simples para el día a día', 2, 7, 2, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (11, N'Estantería de 4 estantes', N'Melamina blanca, fácil de armar', 3, 8, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (12, N'Aspiradora', N'Buena succión, con accesorios', 3, 8, 1, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (13, N'Cortinas blackout', N'Par de paños, color gris', 2, 9, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (14, N'Bicicleta urbana', N'Rodado 26, ideal para la ciudad', 3, 9, 5, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (15, N'Colchón de 1 plaza', N'Espuma, sin manchas', 3, 10, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (16, N'Tostadora', N'Dos ranuras, funciona bien', 2, 10, 1, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (17, N'Vajilla para 4 personas', N'Platos, vasos y cubiertos', 2, 11, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (18, N'Perchero de pie', N'Metal negro, estable', 3, 11, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (19, N'Espejo de pie', N'Marco de madera, sin rayones', 2, 12, 4, NULL, NULL)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [ACambio]) VALUES (20, N'Ventilador de pie', N'Tres velocidades, silencioso', 3, 12, 1, NULL, NULL)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -467,7 +467,394 @@ REFERENCES [dbo].[Provincias] ([IdProvincia])
 GO
 ALTER TABLE [dbo].[Usuarios] CHECK CONSTRAINT [FK_Usuarios_Provincias]
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarArticulo]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarContrasena]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[ActualizarContrasena]
+	@idUsuario int,
+	@contrasenaHash varchar(100)
+AS
+BEGIN
+	UPDATE Usuarios SET Contraseña = @contrasenaHash 
+	WHERE IdUsuarios = @idUsuario
+END
+GO
+/****** Object:  StoredProcedure [dbo].[BorrarFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[BorrarFotoUsuario]
+	@idUsuario int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DELETE FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetArticuloById]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetArticuloById]
+	-- Add the parameters for the stored procedure here
+	@id int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+		SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio
+        FROM Articulos WHERE IdArticulos = @id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetArticulosCatalogo]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetArticulosCatalogo]
+	@busqueda varchar(150) = NULL,
+	@cantidad int = NULL,
+	@categorias varchar(max) = NULL,
+	@estados varchar(max) = NULL,
+	@idUsuario int = NULL
+AS
+BEGIN
+	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda), por eso entra hasta el triple de Articulos.Nombre.
+	-- @categorias y @estados: Ids separados por coma ('1,4'); NULL o vacío no filtra.
+	-- Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
+	SET NOCOUNT ON;
+	SELECT TOP (ISNULL(@cantidad, 2147483647)) a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
+		(SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
+	FROM Articulos a
+	INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
+	WHERE (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
+		AND (NULLIF(@categorias, '') IS NULL OR a.IdCategorias IN (SELECT CAST(value AS int) FROM STRING_SPLIT(@categorias, ',')))
+		AND (NULLIF(@estados, '') IS NULL OR a.IdEstado IN (SELECT CAST(value AS int) FROM STRING_SPLIT(@estados, ',')))
+		AND (@idUsuario IS NULL OR a.IdUsuarios = @idUsuario)
+	ORDER BY a.IdArticulos DESC
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetCategoriaById]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetCategoriaById]
+	-- Add the parameters for the stored procedure here
+	@id int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT IdCategorias, Nombre FROM Categorias WHERE IdCategorias = @id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetCategorias]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetCategorias]
+	-- Add the parameters for the stored procedure here
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT IdCategorias, Nombre FROM Categorias ORDER BY Nombre
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetEstadoArticuloById]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetEstadoArticuloById]
+	-- Add the parameters for the stored procedure here
+	@id int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos WHERE IdEstadosArticulos = @id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetEstadosArticulos]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetEstadosArticulos]
+	-- Add the parameters for the stored procedure here
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos ORDER BY IdEstadosArticulos
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetFiltroCategorias]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetFiltroCategorias]
+	@busqueda varchar(150) = NULL
+AS
+BEGIN
+	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda).
+	SET NOCOUNT ON;
+	SELECT CAST(c.IdCategorias AS varchar(10)) AS Valor, c.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
+	FROM Categorias c
+	LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
+		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
+	GROUP BY c.IdCategorias, c.Nombre
+	ORDER BY c.Nombre
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetFiltroEstados]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetFiltroEstados]
+	@busqueda varchar(150) = NULL
+AS
+BEGIN
+	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda). Estados de mejor a peor.
+	SET NOCOUNT ON;
+	SELECT CAST(e.IdEstadosArticulos AS varchar(10)) AS Valor, e.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
+	FROM EstadosArticulos e
+	LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
+		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
+	GROUP BY e.IdEstadosArticulos, e.Nombre
+	ORDER BY e.IdEstadosArticulos
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetFotoUsuario]
+	-- Add the parameters for the stored procedure here
+	@idUsuario int
+	AS
+BEGIN
+	SELECT TOP 1 Ruta FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL ORDER BY IdImagenes DESC
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetImagenesArticulo]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetImagenesArticulo]
+	-- Add the parameters for the stored procedure here
+	@idArticulo int
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT Ruta FROM Imagenes WHERE IdArticulos = @idArticulo ORDER BY IdImagenes
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetProvinciaById]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProvinciaById]
+	-- Add the parameters for the stored procedure here
+	@id int
+AS
+BEGIN
+	SELECT IdProvincia, Nombre 
+	FROM Provincias 
+	WHERE IdProvincia = @id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetProvincias]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProvincias] 
+
+AS
+BEGIN
+	SELECT IdProvincia, Nombre FROM Provincias ORDER BY Nombre
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetUsuarioById]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE  [dbo].[GetUsuarioById]
+	@id int
+AS
+BEGIN
+	SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion 
+		FROM Usuarios
+		 WHERE IdUsuarios = @id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetUsuarioByMail]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetUsuarioByMail]
+	@Mail varchar(50)
+AS
+BEGIN
+ SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion FROM Usuarios
+		WHERE Mail = @Mail
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GuardarFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[GuardarFotoUsuario]
+	@idUsuario int,
+	@ruta varchar(100)
+	
+	AS
+BEGIN
+	DELETE FROM Imagenes 
+	WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL;
+    INSERT INTO Imagenes (Ruta, IdUsuarios) VALUES (@ruta, @idUsuario)
+END
+GO
+/****** Object:  StoredProcedure [dbo].[PublicarArticulo]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[PublicarArticulo]
+	@nombre varchar(50),
+	@descripcion varchar(500),
+	@idEstado int,
+	@idUsuario int,
+	@idCategoria int,
+	@ubicacion varchar(100),
+	@aCambio varchar(100) = NULL,
+	@rutasFotos varchar(max) = NULL
+AS
+BEGIN
+	-- Guarda el artículo y sus fotos en una transacción: si falla algo, no queda un artículo a medias.
+	-- @rutasFotos: rutas separadas por '|' (no puede aparecer en un nombre de archivo); la primera es la portada.
+	-- Devuelve el IdArticulos nuevo.
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+	DECLARE @idArticulo int, @ruta varchar(max), @pos int
+
+	BEGIN TRANSACTION
+	INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
+	VALUES (@nombre, @descripcion, @idEstado, @idUsuario, @idCategoria, @ubicacion, @aCambio)
+	SET @idArticulo = SCOPE_IDENTITY()
+
+	-- Se recorren en orden (STRING_SPLIT no lo garantiza): la portada es la foto de menor IdImagenes.
+	WHILE LEN(@rutasFotos) > 0
+	BEGIN
+		SET @pos = CHARINDEX('|', @rutasFotos)
+		IF @pos = 0 SET @pos = LEN(@rutasFotos) + 1
+		SET @ruta = LEFT(@rutasFotos, @pos - 1)
+		SET @rutasFotos = SUBSTRING(@rutasFotos, @pos + 1, LEN(@rutasFotos))
+		IF @ruta <> '' INSERT INTO Imagenes (Ruta, IdArticulos) VALUES (@ruta, @idArticulo)
+	END
+	COMMIT TRANSACTION
+
+	SELECT @idArticulo AS IdArticulos
+END
+GO
+/****** Object:  StoredProcedure [dbo].[RegistrarArticulo]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -490,8 +877,9 @@ BEGIN
             END
         END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarIntercambio]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarIntercambio]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -528,8 +916,9 @@ BEGIN
         END
     END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarMensaje]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarMensaje]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -557,8 +946,9 @@ BEGIN
         END
     END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 28/10/2026 12:02:01 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -583,6 +973,46 @@ BEGIN
 			VALUES(@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @idProvincia)
 		END
 	END
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[UpdateUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[UpdateUsuario]
+	@idUsuario int,
+	@nombre varchar(50),
+	@apellido varchar(50),
+	@usuario varchar(50),
+	@mail varchar(50),
+	@telefono int,
+	@contraseña varchar(100),
+	@barrio varchar(50),
+	@fechaNacimiento date,
+	@edad int,
+	@idProvincia int,
+	@descripcion varchar(500)
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE Usuarios SET Nombre = @nombre, Apellido = @apellido, Usuario = @usuario, Mail = @mail,
+		Telefono = @telefono, Contraseña = @contraseña, Barrio = @barrio, [Fecha nacimiento] = @fechaNacimiento,
+		Edad = @edad, IdProvincias = @idProvincia, Descripcion = @descripcion
+	WHERE IdUsuarios = @idUsuario
+END
+GO
+/****** Object:  StoredProcedure [dbo].[UsuarioExiste]    Script Date: 28/10/2026 12:02:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[UsuarioExiste]
+	@mail varchar(50)
+AS
+BEGIN
+	SELECT COUNT(*) FROM Usuarios WHERE Mail = @mail
 END
 GO
 USE [master]

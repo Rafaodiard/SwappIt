@@ -6,7 +6,6 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Páginas generales del sitio: inicio, términos y privacidad, y la página de error.
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -18,7 +17,6 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        // Objetos destacados: los 4 más recientes. Si la BD falla, la home se muestra igual sin destacados.
         try
         {
             ViewBag.destacados = BD.GetArticulosCatalogo(cantidad: 4);
