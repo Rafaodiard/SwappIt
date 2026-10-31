@@ -32,3 +32,5 @@ Comunidad del grafo: [[Comunidad - Configuración de arranque]]
 
 ## Contenido
 `ASPNETCORE_ENVIRONMENT` · `applicationUrl` · `commandName` · `dotnetRunMessages` · `environmentVariables` · `launchBrowser` · `profiles` · `http` · `https` · `$schema`
+
+## Conexiones en el grafo (graphify)

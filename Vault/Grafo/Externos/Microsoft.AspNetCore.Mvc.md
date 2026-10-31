@@ -20,5 +20,7 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[ArticulosController]] la importa · `imports` EXTRACTED
 - [[ChatController]] la importa · `imports` EXTRACTED
 - [[HomeController]] la importa · `imports` EXTRACTED
+- [[IntercambioController]] la importa · `imports` EXTRACTED
+- [[NotificacionesController]] la importa · `imports` EXTRACTED
 - [[PerfilController]] la importa · `imports` EXTRACTED
 - [[PublicarController]] la importa · `imports` EXTRACTED

@@ -19,16 +19,24 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 **Desde otras notas:**
 - [[ArticuloCardViewModel]] la contiene · `contains` EXTRACTED
+- [[ConversacionViewModel]] la contiene · `contains` EXTRACTED
 - [[EditarPerfilViewModel]] la contiene · `contains` EXTRACTED
+- [[IntercambioViewModel]] la contiene · `contains` EXTRACTED
 - [[LoginViewModel]] la contiene · `contains` EXTRACTED
+- [[NotificacionViewModel]] la contiene · `contains` EXTRACTED
 - [[OpcionFiltroViewModel]] la contiene · `contains` EXTRACTED
 - [[PublicarArticuloViewModel]] la contiene · `contains` EXTRACTED
 - [[RegistroViewModel]] la contiene · `contains` EXTRACTED
 - [[AccountController]] la importa · `imports` EXTRACTED
 - [[ArticulosController]] la importa · `imports` EXTRACTED
 - [[BD]] la importa · `imports` EXTRACTED
+- [[ChatController]] la importa · `imports` EXTRACTED
 - [[HomeController]] la importa · `imports` EXTRACTED
+- [[IntercambioController]] la importa · `imports` EXTRACTED
+- [[NotificacionesController]] la importa · `imports` EXTRACTED
 - [[PerfilController]] la importa · `imports` EXTRACTED
 - [[PublicarController]] la importa · `imports` EXTRACTED
 - [[Vista Articulos-Buscar]] la importa · `imports` EXTRACTED
+- [[Vista Chat-Index]] la importa · `imports` EXTRACTED
+- [[Vista Notificaciones-_Lista]] la importa · `imports` EXTRACTED
 - [[Vista Publicar-Index]] la importa · `imports` EXTRACTED

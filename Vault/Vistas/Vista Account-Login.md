@@ -22,3 +22,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[AccountController.Index()]] muestra esta vista · `renders` EXTRACTED
+- [[AccountController.Login()]] muestra esta vista · `renders` EXTRACTED

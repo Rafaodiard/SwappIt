@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Intercambios y mensajes"
+comunidad: "Modelo Intercambios"
 archivos:
   - "Models/Intercambios.cs"
 graphify_ids:
@@ -15,13 +15,13 @@ graphify_ids:
   - "models_intercambios_swappit_models_intercambios_idusuarios2"
 tags:
   - tipo/modelo
-  - comunidad/Intercambios_y_mensajes
+  - comunidad/Modelo_Intercambios
 ---
 # Intercambios (modelo)
 
-`Models/Intercambios.cs` · [[Tabla Intercambios]]: dos usuarios (`IdUsuarios1`, `IdUsuarios2`) y dos artículos (`IdArticulos1`, `IdArticulos2`). Todavía no hay código que diga cuál es el que propone; el comentario del pop up en [[Vista Articulos-Detalle]] dice que el artículo ofrecido iría en `IdArticulos2`. Le falta la propiedad `Ubicacion` que sí tiene la tabla. Sin uso por ahora ([[Flujo Proponer intercambio]]).
+`Models/Intercambios.cs` · [[Tabla Intercambios]]: dos usuarios (`IdUsuarios1`, `IdUsuarios2`) y dos artículos (`IdArticulos1`, `IdArticulos2`). Quien propone va en `IdUsuarios1`/`IdArticulos1` y el dueño del artículo pedido en `IdUsuarios2`/`IdArticulos2` (decisión del 29/10). Le falta la propiedad `Ubicacion` que sí tiene la tabla. Las pantallas no usan esta clase: leen [[IntercambioViewModel]] ([[Flujo Proponer intercambio]]).
 
-Comunidad del grafo: [[Comunidad - Intercambios y mensajes]]
+Comunidad del grafo: [[Comunidad - Modelo Intercambios]]
 
 ## Propiedades
 `Fecha` · `IdArticulos1` · `IdArticulos2` · `IdEstado` · `IdIntercambios` · `IdUsuarios1` · `IdUsuarios2`

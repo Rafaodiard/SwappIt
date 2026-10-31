@@ -15,4 +15,4 @@ tags:
 3. [[Vista Articulos-Buscar]] dibuja el panel de filtros y una [[Vista _CardObjeto]] por artículo.
 4. [[buscar.js]]: al marcar o desmarcar un filtro se reenvía el form (los filtros quedan en la URL); botones grilla/lista.
 
-**Solo visual:** filtro de distancia y el select "Más cercanos / Más recientes / A-Z" (el orden es siempre el más nuevo primero).
+**Solo visual:** el select "Más recientes / A - Z" (el orden es siempre el más nuevo primero, así que "A - Z" no hace nada). El filtro de distancia y "Más cercanos" se sacaron el 30/10 (no hay coordenadas en la base).

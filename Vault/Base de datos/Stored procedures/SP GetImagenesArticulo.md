@@ -3,15 +3,19 @@ tipo: sp
 comunidad: "SQLSwappit.sql y SPs nuevos"
 archivos:
   - "SQLSwappit.sql"
+  - "SQLSwappit_CualquierCompu.sql"
+  - "BaseDatos/StoredProcedures.sql"
 graphify_ids:
   - "sqlswappit_dbo_getimagenesarticulo"
+  - "sqlswappit_cualquiercompu_dbo_getimagenesarticulo"
+  - "basedatos_storedprocedures_dbo_getimagenesarticulo"
 tags:
   - tipo/sp
   - comunidad/SQLSwappit_sql_y_SPs_nuevos
 ---
 # SP GetImagenesArticulo
 
-Stored procedure `dbo.GetImagenesArticulo`. Está en: [[Script SQLSwappit.sql]].
+Stored procedure `dbo.GetImagenesArticulo`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
 Es la copia en SQL de [[BD]].GetImagenesArticulo, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
 
@@ -22,4 +26,6 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
 **Desde otras notas:**
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
+- [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
+- [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
 - [[BD.GetImagenesArticulo()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

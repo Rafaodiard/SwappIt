@@ -24,4 +24,11 @@ Repositorio: `github.com/rafaodiard/swappit`, rama `main`. Autores: **Martina Dr
 | 27/10 | Rafael | Publicar artículo ([[Flujo Publicar artículo]]) |
 | 28/10 | Martina | Estados como tablas, diseño de notificaciones, rutas de imágenes de prueba |
 | 28/10 | Martina | Organización de controllers (Articulos, Publicar, Perfil, Chat) |
-| 28/10 | Martina | Stored procedures nuevos en [[Script SQLSwappit.sql]] (`cc3a330`, el último) |
+| 28/10 | Martina | Stored procedures nuevos en [[Script SQLSwappit.sql]] (`cc3a330`) |
+| 29/10 | Rafael | Scripts y SP arreglados (SP vacíos completados, varchar corregidos) |
+| 29/10 | Rafael | Vault de Obsidian con el grafo de graphify |
+| 29/10 | Martina | Favicon (PR #3) |
+| 29/10 | Rafael | Intercambios: proponer, aceptar, rechazar, realizado, Mis intercambios ([[Flujo Proponer intercambio]], PR #4) |
+| 29/10 | Rafael | Notificaciones de intercambio ([[Flujo Notificaciones y favoritos]], PR #5) |
+| 29/10 | Rafael | Chat y notificaciones de mensajes ([[Flujo Chat]], PR #6) |
+| 29/10 | Rafael | Pantalla de inicio para usuarios logueados ([[Vista Home-Inicio]]) (`f639baa`, el último) |

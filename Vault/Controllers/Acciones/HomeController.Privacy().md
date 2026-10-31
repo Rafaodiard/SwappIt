@@ -11,7 +11,7 @@ tags:
 ---
 # HomeController.Privacy()
 
-Método de [[HomeController]] · `Controllers/HomeController.cs` línea 34.
+Método de [[HomeController]] · `Controllers/HomeController.cs` línea 96.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

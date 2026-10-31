@@ -20,5 +20,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[ArticulosController]] hereda de acá · `inherits` EXTRACTED
 - [[ChatController]] hereda de acá · `inherits` EXTRACTED
 - [[HomeController]] hereda de acá · `inherits` EXTRACTED
+- [[IntercambioController]] hereda de acá · `inherits` EXTRACTED
+- [[NotificacionesController]] hereda de acá · `inherits` EXTRACTED
 - [[PerfilController]] hereda de acá · `inherits` EXTRACTED
 - [[PublicarController]] hereda de acá · `inherits` EXTRACTED

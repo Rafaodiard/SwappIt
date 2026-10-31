@@ -22,5 +22,7 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[ArticulosController]] la contiene · `contains` EXTRACTED
 - [[ChatController]] la contiene · `contains` EXTRACTED
 - [[HomeController]] la contiene · `contains` EXTRACTED
+- [[IntercambioController]] la contiene · `contains` EXTRACTED
+- [[NotificacionesController]] la contiene · `contains` EXTRACTED
 - [[PerfilController]] la contiene · `contains` EXTRACTED
 - [[PublicarController]] la contiene · `contains` EXTRACTED

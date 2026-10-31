@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Tablas y acceso a datos"
+comunidad: "Namespaces y formularios"
 archivos:
   - "Models/ViewModels/OpcionFiltroViewModel.cs"
   - "Views/Articulos/Buscar.cshtml"
@@ -13,16 +13,16 @@ graphify_ids:
   - "views_articulos_buscar_cshtml_opcionfiltroviewmodel"
 tags:
   - tipo/modelo
-  - comunidad/Tablas_y_acceso_a_datos
+  - comunidad/Namespaces_y_formularios
 ---
 # OpcionFiltroViewModel
 
 `Models/ViewModels/OpcionFiltroViewModel.cs` · Una opción de los filtros de [[Vista Articulos-Buscar]] (categoría o estado): Valor, Texto y Cantidad de artículos. Lo devuelven [[BD]].GetFiltroCategorias y GetFiltroEstados.
 
-Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
+Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 ## Propiedades
-`Cantidad` · `Texto` · `Valor`
+`Cantidad` · `OpcionFiltroViewModel` · `Texto` · `Valor`
 
 ## Conexiones en el grafo (graphify)
 - contiene [[Namespace Swappit.Models.ViewModels]] · `contains` EXTRACTED

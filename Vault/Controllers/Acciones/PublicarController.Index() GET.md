@@ -26,7 +26,8 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - muestra la vista [[Vista Publicar-Index]] · `renders` INFERRED
 
 **Desde otras notas:**
-- [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
-- [[Vista Perfil-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Home-Inicio]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Perfil-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[PublicarController]] la tiene como método · `method` EXTRACTED

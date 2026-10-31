@@ -1,19 +1,19 @@
 ---
 tipo: metodo
-comunidad: "Tablas y acceso a datos"
+comunidad: "Controllers, vistas y JS"
 archivos:
   - "Models/BD.cs"
 graphify_ids:
   - "models_bd_swappit_models_bd_getprovinciabyid"
 tags:
   - tipo/metodo
-  - comunidad/Tablas_y_acceso_a_datos
+  - comunidad/Controllers_vistas_y_JS
 ---
 # BD.GetProvinciaById()
 
 Método de [[BD]] · `Models/BD.cs` línea 52. Parámetros: `int`.
 
-Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
+Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
 - lee de [[Tabla Provincias]] · `reads_from` EXTRACTED

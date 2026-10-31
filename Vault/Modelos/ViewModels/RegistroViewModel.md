@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Intercambios y mensajes"
+comunidad: "Registro"
 archivos:
   - "Models/ViewModels/RegistroViewModel.cs"
 graphify_ids:
@@ -14,13 +14,13 @@ graphify_ids:
   - "models_viewmodels_registroviewmodel_swappit_models_viewmodels_registroviewmodel_telefono"
 tags:
   - tipo/modelo
-  - comunidad/Intercambios_y_mensajes
+  - comunidad/Registro
 ---
 # RegistroViewModel
 
 `Models/ViewModels/RegistroViewModel.cs` · Form de [[Vista Account-Registro]]: Nombre, Apellido, Mail (50), Contrasena (8 a 50), FechaNacimiento, Telefono. Tiene un TODO: la tabla también pide Usuario, Barrio e IdProvincias, que el diseño de Figma no incluye ([[AccountController]] los completa solo).
 
-Comunidad del grafo: [[Comunidad - Intercambios y mensajes]]
+Comunidad del grafo: [[Comunidad - Registro]]
 
 ## Propiedades
 `Apellido` · `Contrasena` · `FechaNacimiento` · `Mail` · `Nombre` · `Telefono`

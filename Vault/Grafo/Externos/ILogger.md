@@ -17,5 +17,8 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[ArticulosController]] la usa como tipo · `references` EXTRACTED
+- [[ChatController]] la usa como tipo · `references` EXTRACTED
 - [[HomeController]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController]] la usa como tipo · `references` EXTRACTED
+- [[NotificacionesController]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController]] la usa como tipo · `references` EXTRACTED

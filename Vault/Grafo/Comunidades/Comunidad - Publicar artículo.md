@@ -1,6 +1,6 @@
 ---
 tipo: comunidad
-nodos_graphify: 31
+nodos_graphify: 28
 tags:
   - tipo/comunidad
 ---
@@ -8,17 +8,18 @@ tags:
 
 # Comunidad - Publicar artículo
 
-Comunidad 3 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene 31 nodos del grafo, que en la vault son 21 notas.
+Comunidad 3 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene 28 nodos del grafo, que en la vault son 21 notas.
 
 ## Notas
 
-- [[BD.GetCategoriaById()]]
-- [[BD.GetCategorias()]]
-- [[BD.PublicarArticulo()]]
-- [[Categorias]]
 - [[IFormFile]]
-- [[IWebHostEnvironment]]
-- [[List]]
+- [[Microsoft.AspNetCore.Mvc.Rendering]]
+- [[publicar.js]]
+- [[publicar.js actualizar()]]
+- [[publicar.js agregar()]]
+- [[publicar.js dibujarMiniaturas()]]
+- [[publicar.js mostrarAviso()]]
+- [[publicar.js quitar()]]
 - [[PublicarArticuloViewModel]]
 - [[PublicarController]]
 - [[PublicarController.AvisarFotosDeNuevo()]]
@@ -30,16 +31,14 @@ Comunidad 3 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene
 - [[PublicarController.ValidarFotos()]]
 - [[RequestFormLimits]]
 - [[RequestSizeLimit]]
-- [[SP PublicarArticulo]]
-- [[Tabla Categorias]]
-- [[ValidateAntiForgeryToken]]
+- [[SelectListItem]]
+- [[Vista Publicar-Index]]
 
 ## Conectada con
 
-- [[Comunidad - Tablas y acceso a datos]] (15 conexiones)
-- [[Comunidad - Controllers, vistas y JS]] (13 conexiones)
-- [[Comunidad - Namespaces y formularios]] (11 conexiones)
-- [[Comunidad - SQLSwappit.sql y SPs nuevos]] (7 conexiones)
-- [[Comunidad - Modelo Articulos]] (2 conexiones)
+- [[Comunidad - Controllers, vistas y JS]] (16 conexiones)
+- [[Comunidad - Tablas y acceso a datos]] (10 conexiones)
+- [[Comunidad - Namespaces y formularios]] (4 conexiones)
+- [[Comunidad - Categorías]] (1 conexiones)
 - [[Comunidad - Editar perfil]] (1 conexiones)
-- [[Comunidad - Script portable]] (1 conexiones)
+- [[Comunidad - Modelo Articulos]] (1 conexiones)

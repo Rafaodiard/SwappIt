@@ -11,7 +11,7 @@ tags:
 ---
 # BD.GetImagenesArticulo()
 
-Método de [[BD]] · `Models/BD.cs` línea 188. Parámetros: `int`.
+Método de [[BD]] · `Models/BD.cs` línea 203. Parámetros: `int`.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

@@ -9,6 +9,7 @@ graphify_ids:
   - "basedatos_estructura_dbo_provincias"
   - "sqlswappit_dbo_provincias"
   - "sqlswappit_cualquiercompu_dbo_provincias"
+  - "basedatos_storedprocedures_sql_provincias"
 tags:
   - tipo/tabla
   - comunidad/Tablas_y_acceso_a_datos
@@ -26,8 +27,10 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Provincias]] es su clase en C# · `maps_to` INFERRED
+- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetProvinciaById()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetProvincias()]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetProvinciaById]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetProvincias]] lee de acá · `reads_from` EXTRACTED
-- [[Tabla Mensajes]] la usa como tipo · `references` EXTRACTED
+- [[Tabla Notificaciones]] la usa como tipo · `references` EXTRACTED

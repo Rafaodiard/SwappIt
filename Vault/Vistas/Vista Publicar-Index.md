@@ -1,19 +1,19 @@
 ---
 tipo: vista
-comunidad: "Namespaces y formularios"
+comunidad: "Publicar artículo"
 archivos:
   - "Views/Publicar/Index.cshtml"
 graphify_ids:
   - "views_publicar_index"
 tags:
   - tipo/vista
-  - comunidad/Namespaces_y_formularios
+  - comunidad/Publicar_artículo
 ---
 # Vista: Publicar / Index
 
 `Views/Publicar/Index.cshtml` · Form `multipart/form-data` POST a [[PublicarController]].Index. Columna izquierda: zona de carga de fotos (clic o arrastrar), 4 miniaturas, aviso de límites. Columna derecha: Título, Categoría (select), Ubicación, Estado del objeto (radios con forma de chip, de [[Tabla EstadosArticulos]]), Descripción con contador, "¿Qué te gustaría recibir a cambio?". Botones Cancelar / Publicar objeto. Scripts: jQuery, [[Vista _ValidationScriptsPartial]], [[publicar.js]]. Modelo: [[PublicarArticuloViewModel]].
 
-Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
+Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 ## Conexiones en el grafo (graphify)
 - llama a [[SelectListItem]] · `calls` EXTRACTED
@@ -26,3 +26,4 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 **Desde otras notas:**
 - [[PublicarController.Index() GET]] muestra esta vista · `renders` INFERRED
+- [[PublicarController.Index() POST]] muestra esta vista · `renders` INFERRED

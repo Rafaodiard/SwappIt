@@ -11,7 +11,7 @@ tags:
 ---
 # PerfilController.GuardarFoto()
 
-Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 136. Parámetros: `IFormFile,int,string`.
+Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 138. Parámetros: `IFormFile,int,string`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

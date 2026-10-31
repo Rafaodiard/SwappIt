@@ -11,7 +11,7 @@ tags:
 ---
 # buscar.js
 
-`wwwroot/js/buscar.js` · [[Vista Articulos-Buscar]]. Al cambiar un checkbox de categoría o estado envía el form de filtros (el filtrado lo hace [[ArticulosController]]). Actualiza el texto del rango de distancia (solo visual). Botones grilla/lista: agregan la clase `vista-lista` a `#lista-objetos`.
+`wwwroot/js/buscar.js` · [[Vista Articulos-Buscar]]. Al cambiar un checkbox de categoría o estado envía el form de filtros (el filtrado lo hace [[ArticulosController]]). Botones grilla/lista: agregan la clase `vista-lista` a `#lista-objetos`.
 
 Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 

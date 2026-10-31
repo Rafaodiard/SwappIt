@@ -37,7 +37,7 @@ public class HomeController : Controller
     }
 
     // Inicio del usuario logueado: sus intercambios en curso (primero los que tiene que responder),
-    // un resumen de lo que tiene pendiente y los artículos que publicaron los demás.
+    // un resumen de lo que tiene pendiente y artículos recomendados de los demás.
     private IActionResult Inicio(int usuarioId)
     {
         ViewBag.nombre = null;
@@ -45,7 +45,7 @@ public class HomeController : Controller
         ViewBag.porResponder = 0;
         ViewBag.cantidadEnCurso = 0;
         ViewBag.cantidadArticulos = 0;
-        ViewBag.novedades = new List<ArticuloCardViewModel>();
+        ViewBag.recomendados = new List<ArticuloCardViewModel>();
         ViewBag.mensajesSinLeer = null;
         ViewBag.errorCarga = false;
         try
@@ -61,7 +61,9 @@ public class HomeController : Controller
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
             ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
-            ViewBag.novedades = BD.GetArticulosCatalogo(cantidad: CantidadNovedadesInicio, excluirUsuario: usuarioId);
+            // Por ahora los recomendados son los últimos artículos disponibles de los demás:
+            // no hay datos de gustos ni de búsquedas del usuario para elegirlos de otra forma.
+            ViewBag.recomendados = BD.GetArticulosCatalogo(cantidad: CantidadRecomendadosInicio, excluirUsuario: usuarioId);
         }
         catch (SqlException ex)
         {
@@ -82,8 +84,8 @@ public class HomeController : Controller
         return View("Inicio");
     }
 
-    private const int CantidadIntercambiosInicio = 3;
-    private const int CantidadNovedadesInicio = 8;
+    private const int CantidadIntercambiosInicio = 4;
+    private const int CantidadRecomendadosInicio = 9;
 
     // Propuesta que le llegó al usuario y que todavía tiene que aceptar o rechazar.
     private static bool PorResponder(IntercambioViewModel i)

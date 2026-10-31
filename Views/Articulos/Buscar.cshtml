@@ -50,17 +50,6 @@
                     }
                 </div>
 
-                <h6>Distancia</h6>
-                <div class="mb-4">
-                    @* Sin name: todavía no hay datos de ubicación en la BD para filtrar por distancia *@
-                    <input type="range" class="form-range" id="filtro-distancia" min="0" max="20" value="5">
-                    <div class="d-flex justify-content-between small text-suave">
-                        <span>0 km</span>
-                        <span class="fw-semibold text-dark">Hasta <span id="distancia-valor">5</span> km</span>
-                        <span>20 km</span>
-                    </div>
-                </div>
-
                 <!-- Estado: filas de la tabla EstadosArticulos -->
                 <h6>Estado</h6>
                 <div>
@@ -87,8 +76,7 @@
                 </h1>
                 <div class="d-flex align-items-center gap-2">
                     <select class="form-select form-select-sm" id="ordenar" aria-label="Ordenar por" style="width:auto">
-                        <option value="cercanos" selected>Más cercanos</option>
-                        <option value="recientes">Más recientes</option>
+                        <option value="recientes" selected>Más recientes</option>
                         <option value="az">A - Z</option>
                     </select>
                     <div class="btn-group btn-group-sm sw-vista-toggle" role="group" aria-label="Vista">

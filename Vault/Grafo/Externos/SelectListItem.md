@@ -1,19 +1,19 @@
 ---
 tipo: externo
-comunidad: "Namespaces y formularios"
+comunidad: "Publicar artículo"
 archivos:
   - "Views/Publicar/Index.cshtml"
 graphify_ids:
   - "views_publicar_index_cshtml_selectlistitem"
 tags:
   - tipo/externo
-  - comunidad/Namespaces_y_formularios
+  - comunidad/Publicar_artículo
 ---
 # SelectListItem
 
 Tipo o paquete externo al proyecto que aparece en el código. Nodo del grafo de graphify.
 
-Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
+Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 ## Conexiones en el grafo (graphify)
 

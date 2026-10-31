@@ -24,7 +24,7 @@ tags:
 Comunidad del grafo: [[Comunidad - Card de artículo]]
 
 ## Propiedades
-`Barrio` · `Estado` · `IdArticulos` · `Imagen` · `Nombre`
+`ArticuloCardViewModel` · `Barrio` · `Estado` · `IdArticulos` · `Imagen` · `Nombre`
 
 ## Conexiones en el grafo (graphify)
 - contiene [[Namespace Swappit.Models.ViewModels]] · `contains` EXTRACTED

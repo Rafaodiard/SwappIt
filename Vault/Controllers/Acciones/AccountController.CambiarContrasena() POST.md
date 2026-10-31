@@ -23,6 +23,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
+- muestra la vista [[Vista Account-CambiarContrasena]] · `renders` INFERRED
 
 **Desde otras notas:**
 - [[AccountController]] la tiene como método · `method` EXTRACTED

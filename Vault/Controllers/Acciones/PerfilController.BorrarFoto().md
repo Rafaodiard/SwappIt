@@ -11,7 +11,7 @@ tags:
 ---
 # PerfilController.BorrarFoto()
 
-Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 151. Parámetros: `string?`.
+Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 153. Parámetros: `string?`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

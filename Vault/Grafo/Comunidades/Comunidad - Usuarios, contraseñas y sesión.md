@@ -1,6 +1,6 @@
 ---
 tipo: comunidad
-nodos_graphify: 27
+nodos_graphify: 26
 tags:
   - tipo/comunidad
 ---
@@ -8,12 +8,11 @@ tags:
 
 # Comunidad - Usuarios, contraseñas y sesión
 
-Comunidad 5 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene 27 nodos del grafo, que en la vault son 12 notas.
+Comunidad 5 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene 26 nodos del grafo, que en la vault son 11 notas.
 
 ## Notas
 
 - [[BD.GetUsuarioByMail()]]
-- [[BD.Register()]]
 - [[Contrasenas]]
 - [[Contrasenas.EsHash()]]
 - [[Contrasenas.Verificar()]]
@@ -27,8 +26,8 @@ Comunidad 5 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene
 
 ## Conectada con
 
-- [[Comunidad - Controllers, vistas y JS]] (13 conexiones)
-- [[Comunidad - Tablas y acceso a datos]] (6 conexiones)
+- [[Comunidad - Controllers, vistas y JS]] (12 conexiones)
+- [[Comunidad - Tablas y acceso a datos]] (5 conexiones)
 - [[Comunidad - Namespaces y formularios]] (3 conexiones)
+- [[Comunidad - Resumen del chat]] (1 conexiones)
 - [[Comunidad - SQLSwappit.sql y SPs nuevos]] (1 conexiones)
-- [[Comunidad - Intercambios y mensajes]] (1 conexiones)

@@ -1,19 +1,19 @@
 ---
 tipo: metodo
-comunidad: "Publicar artículo"
+comunidad: "Tablas y acceso a datos"
 archivos:
   - "Models/BD.cs"
 graphify_ids:
   - "models_bd_swappit_models_bd_publicararticulo"
 tags:
   - tipo/metodo
-  - comunidad/Publicar_artículo
+  - comunidad/Tablas_y_acceso_a_datos
 ---
 # BD.PublicarArticulo()
 
-Método de [[BD]] · `Models/BD.cs` línea 163. Parámetros: `Articulos,List&lt;string&gt;`.
+Método de [[BD]] · `Models/BD.cs` línea 178. Parámetros: `Articulos,List&lt;string&gt;`.
 
-Comunidad del grafo: [[Comunidad - Publicar artículo]]
+Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Conexiones en el grafo (graphify)
 - usa el tipo [[Articulos]] · `references` EXTRACTED

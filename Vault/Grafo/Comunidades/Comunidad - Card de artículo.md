@@ -16,5 +16,5 @@ Comunidad 12 que detectó graphify (agrupa nodos muy conectados entre sí). Tien
 
 ## Conectada con
 
-- [[Comunidad - Namespaces y formularios]] (2 conexiones)
 - [[Comunidad - Tablas y acceso a datos]] (1 conexiones)
+- [[Comunidad - Namespaces y formularios]] (1 conexiones)

@@ -11,7 +11,7 @@ tags:
 ---
 # BD.GetEstadoArticuloById()
 
-Método de [[BD]] · `Models/BD.cs` línea 226. Parámetros: `int`.
+Método de [[BD]] · `Models/BD.cs` línea 241. Parámetros: `int`.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

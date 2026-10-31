@@ -32,6 +32,7 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 - usa el tipo [[RequestFormLimits]] · `references` EXTRACTED
 - usa el tipo [[RequestSizeLimit]] · `references` EXTRACTED
 - usa el tipo [[ValidateAntiForgeryToken]] · `references` EXTRACTED
+- muestra la vista [[Vista Publicar-Index]] · `renders` INFERRED
 
 **Desde otras notas:**
 - [[PublicarController]] la tiene como método · `method` EXTRACTED

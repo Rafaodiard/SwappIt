@@ -1,6 +1,6 @@
 ---
 tipo: tabla
-comunidad: "Publicar artículo"
+comunidad: "Categorías"
 archivos:
   - "BaseDatos/Estructura.sql"
   - "SQLSwappit.sql"
@@ -12,13 +12,13 @@ graphify_ids:
   - "basedatos_storedprocedures_sql_categorias"
 tags:
   - tipo/tabla
-  - comunidad/Publicar_artículo
+  - comunidad/Categorías
 ---
 # Tabla Categorias
 
 `IdCategorias` (PK) y `Nombre`. Datos: 1 Tecnología, 2 Libros, 3 Ropa, 4 Hogar, 5 Deportes, 6 Música. Modelo: [[Categorias]].
 
-Comunidad del grafo: [[Comunidad - Publicar artículo]]
+Comunidad del grafo: [[Comunidad - Categorías]]
 
 ## Conexiones en el grafo (graphify)
 
@@ -32,4 +32,5 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 - [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetCategoriaById]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetCategorias]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFiltroCategorias]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarArticulo]] lee de acá · `reads_from` EXTRACTED

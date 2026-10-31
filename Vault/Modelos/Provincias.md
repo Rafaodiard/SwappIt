@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Tablas y acceso a datos"
+comunidad: "Namespaces y formularios"
 archivos:
   - "Models/Provincia.cs"
 graphify_ids:
@@ -10,13 +10,13 @@ graphify_ids:
   - "models_provincia_swappit_models_provincias_nombre"
 tags:
   - tipo/modelo
-  - comunidad/Tablas_y_acceso_a_datos
+  - comunidad/Namespaces_y_formularios
 ---
 # Provincias (modelo)
 
 `Models/Provincia.cs` (el archivo se llama en singular, la clase en plural) · [[Tabla Provincias]]. Se usa en el perfil y en el detalle del artículo.
 
-Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
+Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 ## Propiedades
 `IdProvincia` · `Nombre`

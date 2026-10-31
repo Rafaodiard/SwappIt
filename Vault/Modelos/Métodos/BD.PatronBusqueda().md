@@ -11,7 +11,7 @@ tags:
 ---
 # BD.PatronBusqueda()
 
-Método de [[BD]] · `Models/BD.cs` línea 264. Parámetros: `string?`.
+Método de [[BD]] · `Models/BD.cs` línea 723. Parámetros: `string?`.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

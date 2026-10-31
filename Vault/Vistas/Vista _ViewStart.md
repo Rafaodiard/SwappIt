@@ -14,3 +14,5 @@ tags:
 `Views/_ViewStart.cshtml` · `Layout = "_Layout"`: todas las vistas usan [[Vista _Layout]].
 
 Comunidad del grafo: [[Comunidad - ViewStart]]
+
+## Conexiones en el grafo (graphify)

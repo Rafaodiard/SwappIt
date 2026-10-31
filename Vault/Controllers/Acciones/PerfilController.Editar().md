@@ -11,7 +11,7 @@ tags:
 ---
 # PerfilController.Editar()
 
-Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 70. Parámetros: `EditarPerfilViewModel`.
+Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 72. Parámetros: `EditarPerfilViewModel`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

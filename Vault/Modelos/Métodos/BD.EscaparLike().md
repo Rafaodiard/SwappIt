@@ -11,7 +11,7 @@ tags:
 ---
 # BD.EscaparLike()
 
-Método de [[BD]] · `Models/BD.cs` línea 268. Parámetros: `string`.
+Método de [[BD]] · `Models/BD.cs` línea 727. Parámetros: `string`.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

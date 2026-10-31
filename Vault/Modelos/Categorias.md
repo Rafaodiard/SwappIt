@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Publicar artículo"
+comunidad: "Categorías"
 archivos:
   - "Models/Categorias.cs"
 graphify_ids:
@@ -10,13 +10,13 @@ graphify_ids:
   - "models_categorias_swappit_models_categorias_nombre"
 tags:
   - tipo/modelo
-  - comunidad/Publicar_artículo
+  - comunidad/Categorías
 ---
 # Categorias (modelo)
 
 `Models/Categorias.cs` · [[Tabla Categorias]]: Tecnología, Libros, Ropa, Hogar, Deportes, Música.
 
-Comunidad del grafo: [[Comunidad - Publicar artículo]]
+Comunidad del grafo: [[Comunidad - Categorías]]
 
 ## Propiedades
 `IdCategorias` · `Nombre`

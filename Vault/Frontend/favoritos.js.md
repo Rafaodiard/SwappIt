@@ -1,21 +1,18 @@
 ---
 tipo: js
-comunidad: "Controllers, vistas y JS"
+comunidad: "Favoritos (sin usar)"
 archivos:
   - "wwwroot/js/favoritos.js"
 graphify_ids:
   - "wwwroot_js_favoritos"
 tags:
   - tipo/js
-  - comunidad/Controllers_vistas_y_JS
+  - comunidad/Favoritos_sin_usar
 ---
 # favoritos.js
 
-`wwwroot/js/favoritos.js` · Todas las páginas. Clic en `.card-objeto-fav` ([[Vista _CardObjeto]]) alterna `bi-heart` / `bi-heart-fill`. **No guarda nada** ([[Flujo Notificaciones y favoritos]]).
+`wwwroot/js/favoritos.js` · Clic en `.card-objeto-fav` alterna `bi-heart` / `bi-heart-fill`. **No guarda nada** ([[Flujo Notificaciones y favoritos]]). Desde el commit "pantalla incio" (f639baa) [[Vista _Layout]] ya no lo carga y la card no tiene el corazón: el archivo quedó sin usar.
 
-Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
+Comunidad del grafo: [[Comunidad - Favoritos (sin usar)]]
 
 ## Conexiones en el grafo (graphify)
-
-**Desde otras notas:**
-- [[Vista _Layout]] carga este script · `loads_script` EXTRACTED

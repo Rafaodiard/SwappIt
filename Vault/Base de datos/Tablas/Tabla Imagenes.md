@@ -9,6 +9,7 @@ graphify_ids:
   - "basedatos_estructura_dbo_imagenes"
   - "sqlswappit_dbo_imagenes"
   - "sqlswappit_cualquiercompu_dbo_imagenes"
+  - "imagenes"
 tags:
   - tipo/tabla
   - comunidad/Tablas_y_acceso_a_datos
@@ -35,6 +36,9 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetFotoUsuario()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetImagenesArticulo()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetFotoUsuario]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetImagenesArticulo]] lee de acá · `reads_from` EXTRACTED
 - [[BD.BorrarFotoUsuario()]] escribe acá · `writes_to` EXTRACTED
@@ -42,3 +46,4 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[BD.PublicarArticulo()]] escribe acá · `writes_to` EXTRACTED
 - [[SP BorrarFotoUsuario]] escribe acá · `writes_to` EXTRACTED
 - [[SP GuardarFotoUsuario]] escribe acá · `writes_to` EXTRACTED
+- [[SP PublicarArticulo]] escribe acá · `writes_to` EXTRACTED

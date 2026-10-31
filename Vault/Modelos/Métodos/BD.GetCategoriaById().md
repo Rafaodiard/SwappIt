@@ -1,19 +1,19 @@
 ---
 tipo: metodo
-comunidad: "Publicar artículo"
+comunidad: "Categorías"
 archivos:
   - "Models/BD.cs"
 graphify_ids:
   - "models_bd_swappit_models_bd_getcategoriabyid"
 tags:
   - tipo/metodo
-  - comunidad/Publicar_artículo
+  - comunidad/Categorías
 ---
 # BD.GetCategoriaById()
 
-Método de [[BD]] · `Models/BD.cs` línea 197. Parámetros: `int`.
+Método de [[BD]] · `Models/BD.cs` línea 212. Parámetros: `int`.
 
-Comunidad del grafo: [[Comunidad - Publicar artículo]]
+Comunidad del grafo: [[Comunidad - Categorías]]
 
 ## Conexiones en el grafo (graphify)
 - lee de [[Tabla Categorias]] · `reads_from` EXTRACTED

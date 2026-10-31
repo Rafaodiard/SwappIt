@@ -25,6 +25,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - usa el tipo [[LoginViewModel]] · `references` EXTRACTED
+- muestra la vista [[Vista Account-Login]] · `renders` EXTRACTED
 
 **Desde otras notas:**
 - [[AccountController]] la tiene como método · `method` EXTRACTED

@@ -11,7 +11,7 @@ tags:
 ---
 # HomeController.Error()
 
-Método de [[HomeController]] · `Controllers/HomeController.cs` línea 39.
+Método de [[HomeController]] · `Controllers/HomeController.cs` línea 101.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

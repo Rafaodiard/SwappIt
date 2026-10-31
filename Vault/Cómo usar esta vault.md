@@ -29,4 +29,4 @@ tags:
 - Las propiedades de las clases (ej. `Usuarios.Apellido`) no tienen nota propia: están listadas dentro de la nota de su clase para que el grafo no se llene de puntitos.
 
 ## Volver a generar el grafo
-Si el código cambia mucho, pedile a Claude "actualizá la vault y el grafo de Swappit". El grafo se generó con graphify 0.9.95 sobre el código de `main` (sin `bin/`, `obj/`, `wwwroot/lib` ni imágenes).
+Si el código cambia mucho, pedile a Claude "actualizá la vault y el grafo de Swappit". El grafo se generó con graphify 0.9.95 (con el complemento de SQL, `graphifyy[sql]`) sobre el código de `main` (sin `bin/`, `obj/`, `wwwroot/lib` ni imágenes). Última actualización: 30/10, sobre `f639baa` más el rediseño del inicio sin commit (492 nodos, 1119 conexiones, 31 comunidades).

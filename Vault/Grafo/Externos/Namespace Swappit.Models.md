@@ -29,10 +29,16 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[Provincias]] la contiene · `contains` EXTRACTED
 - [[SesionUsuario]] la contiene · `contains` EXTRACTED
 - [[Telefonos]] la contiene · `contains` EXTRACTED
+- [[TipoNotificaciones]] la contiene · `contains` EXTRACTED
 - [[Usuarios]] la contiene · `contains` EXTRACTED
 - [[AccountController]] la importa · `imports` EXTRACTED
 - [[ArticulosController]] la importa · `imports` EXTRACTED
+- [[ChatController]] la importa · `imports` EXTRACTED
 - [[HomeController]] la importa · `imports` EXTRACTED
+- [[IntercambioController]] la importa · `imports` EXTRACTED
+- [[NotificacionesController]] la importa · `imports` EXTRACTED
 - [[PerfilController]] la importa · `imports` EXTRACTED
 - [[PublicarController]] la importa · `imports` EXTRACTED
 - [[Vista _ViewImports]] la importa · `imports` EXTRACTED
+- [[Vista Chat-Index]] la importa · `imports` EXTRACTED
+- [[Vista Intercambio-Detalle]] la importa · `imports` EXTRACTED

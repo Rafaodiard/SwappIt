@@ -15,10 +15,10 @@ tags:
 
 - **Header:** logo, buscador (GET a `/Articulos/Buscar?q=`), botón de ubicación con texto fijo "Palermo, CABA".
   - Visitante (sin `UsuarioId` en sesión): "Iniciar sesión" y "Registrarse".
-  - Logueado: favoritos (`#`), mensajes ([[ChatController]]), campana con [[Vista _PopupNotificaciones]], avatar con foto o iniciales (de la sesión, ver [[SesionUsuario]]) → [[PerfilController]], "Publicar" ([[PublicarController]]), cerrar sesión.
+  - Logueado: mensajes ([[ChatController]]), campana con [[Vista _PopupNotificaciones]] y contador de no leídas (las URLs de `NoLeidas` y `Lista` de [[NotificacionesController]] van en `data-url-*` para [[notificaciones.js]]), avatar con foto o iniciales (de la sesión, ver [[SesionUsuario]]) → [[PerfilController]], "Publicar" ([[PublicarController]]), cerrar sesión.
   - En celulares el buscador pasa a una segunda fila y "Publicar" queda como ícono "+".
 - **Footer:** eslogan, links (Cómo funciona → `#como-funciona` de [[Vista Home-Index]], Términos y privacidad → [[Vista Home-Privacy]]); el resto apunta a `#`.
-- **Recursos:** Google Fonts (Forum y Questrial), Bootstrap local, Bootstrap Icons 1.11.3 por CDN, [[site.css]]; scripts comunes [[plantillas.js]], [[imagenes.js]], [[favoritos.js]], [[notificaciones.js]] y la sección `Scripts` de cada página.
+- **Recursos:** Google Fonts (Forum y Questrial), Bootstrap local, Bootstrap Icons 1.11.3 por CDN, [[site.css]]; scripts comunes [[plantillas.js]], [[imagenes.js]], [[notificaciones.js]] y la sección `Scripts` de cada página. Ya no carga [[favoritos.js]].
 - Accesibilidad: link "Saltar al contenido", `aria-label` en los íconos, `main` con `tabindex="-1"`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
@@ -32,9 +32,10 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - tiene un link a [[ChatController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[HomeController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[HomeController.Privacy()]] · `links_to` EXTRACTED
+- tiene un link a [[NotificacionesController.Lista()]] · `links_to` EXTRACTED
+- tiene un link a [[NotificacionesController.NoLeidas()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
-- carga el script [[favoritos.js]] · `loads_script` EXTRACTED
 - carga el script [[imagenes.js]] · `loads_script` EXTRACTED
 - carga el script [[notificaciones.js]] · `loads_script` EXTRACTED
 - carga el script [[plantillas.js]] · `loads_script` EXTRACTED

@@ -11,7 +11,7 @@ tags:
 ---
 # Script SQLSwappit.sql
 
-Raíz del repo, **UTF-16**, ~980 líneas. Crea la base con rutas de archivos de `MSSQL14.MSSQLSERVER` (fallan en una compu con otra versión de SQL Server), el usuario `alumno`, las 9 tablas con sus FK, los datos de prueba y **24 stored procedures**: los 4 originales y 20 nuevos del 28/10 (uno por método de [[BD]]). Se suele regenerar desde SSMS con "Generate Scripts", lo que ya borró columnas alguna vez: revisarlo después de regenerar. Ver [[Base de datos]].
+Raíz del repo, **UTF-16**, ~1060 líneas. Crea la base con rutas de archivos de `MSSQL14.MSSQLSERVER` (fallan en una compu con otra versión de SQL Server), el usuario `alumno`, las 11 tablas con sus FK (con [[Tabla Notificaciones]] y [[Tabla TipoNotificaciones]]), los datos de prueba y **24 stored procedures**: los 4 originales y 20 nuevos del 28/10 (uno por método de [[BD]]). Se suele regenerar desde SSMS con "Generate Scripts", lo que ya borró columnas alguna vez: revisarlo después de regenerar. Ver [[Base de datos]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -47,5 +47,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - contiene [[Tabla Imagenes]] · `contains` EXTRACTED
 - contiene [[Tabla Intercambios]] · `contains` EXTRACTED
 - contiene [[Tabla Mensajes]] · `contains` EXTRACTED
+- contiene [[Tabla Notificaciones]] · `contains` EXTRACTED
 - contiene [[Tabla Provincias]] · `contains` EXTRACTED
+- contiene [[Tabla TipoNotificaciones]] · `contains` EXTRACTED
 - contiene [[Tabla Usuarios]] · `contains` EXTRACTED

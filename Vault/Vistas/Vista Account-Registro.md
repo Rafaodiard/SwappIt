@@ -22,3 +22,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[AccountController.Registro() GET]] muestra esta vista · `renders` INFERRED
+- [[AccountController.Registro() POST]] muestra esta vista · `renders` INFERRED

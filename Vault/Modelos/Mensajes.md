@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Intercambios y mensajes"
+comunidad: "Modelo Mensajes"
 archivos:
   - "Models/Mensajes.cs"
 graphify_ids:
@@ -15,13 +15,13 @@ graphify_ids:
   - "models_mensajes_swappit_models_mensajes_texto"
 tags:
   - tipo/modelo
-  - comunidad/Intercambios_y_mensajes
+  - comunidad/Modelo_Mensajes
 ---
 # Mensajes (modelo)
 
-`Models/Mensajes.cs` · [[Tabla Mensajes]]: mensajes del chat de un intercambio. Sin uso por ahora ([[Flujo Chat]]).
+`Models/Mensajes.cs` · [[Tabla Mensajes]]: mensajes del chat de un intercambio, que manda una de las dos partes (`IdUsuariosManda`). `fueVisto` y `FechaRecibido` se completan cuando la otra persona abre el chat ([[BD.MarcarMensajesVistos()]]). Constante `LargoMaximoTexto = 500` ([[Flujo Chat]]).
 
-Comunidad del grafo: [[Comunidad - Intercambios y mensajes]]
+Comunidad del grafo: [[Comunidad - Modelo Mensajes]]
 
 ## Propiedades
 `FechaEnviado` · `FechaRecibido` · `fueVisto` · `IdIntercambio` · `IdMensajes` · `IdUsuariosManda` · `Texto`
@@ -30,3 +30,6 @@ Comunidad del grafo: [[Comunidad - Intercambios y mensajes]]
 - contiene [[Namespace Swappit.Models]] · `contains` EXTRACTED
 - corresponde a la tabla [[Tabla Mensajes]] · `maps_to` INFERRED
 - usa el tipo [[DateTime]] · `references` EXTRACTED
+
+**Desde otras notas:**
+- [[BD.GetMensajes()]] la usa como tipo · `references` EXTRACTED

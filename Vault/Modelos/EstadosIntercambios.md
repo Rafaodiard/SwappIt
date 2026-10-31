@@ -1,6 +1,6 @@
 ---
 tipo: modelo
-comunidad: "Namespaces y formularios"
+comunidad: "Tablas y acceso a datos"
 archivos:
   - "Models/EstadosIntercambios.cs"
 graphify_ids:
@@ -10,13 +10,13 @@ graphify_ids:
   - "models_estadosintercambios_swappit_models_estadosintercambios_nombre"
 tags:
   - tipo/modelo
-  - comunidad/Namespaces_y_formularios
+  - comunidad/Tablas_y_acceso_a_datos
 ---
 # EstadosIntercambios (modelo)
 
-`Models/EstadosIntercambios.cs` · [[Tabla EstadosIntercambios]]: Pendiente, Aceptado, Rechazado, Realizado. Todavía no se usa en el código.
+`Models/EstadosIntercambios.cs` · [[Tabla EstadosIntercambios]]: Pendiente, Aceptado, Rechazado, Realizado y Cancelado. Tiene constantes con esos nombres: [[BD]] busca los estados por nombre y [[IntercambioController]] las usa para validar cada cambio de estado.
 
-Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
+Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Propiedades
 `IdEstadosIntercambios` · `Nombre`
@@ -24,3 +24,6 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 ## Conexiones en el grafo (graphify)
 - contiene [[Namespace Swappit.Models]] · `contains` EXTRACTED
 - corresponde a la tabla [[Tabla EstadosIntercambios]] · `maps_to` INFERRED
+
+**Desde otras notas:**
+- [[BD.GetEstadosIntercambios()]] la usa como tipo · `references` EXTRACTED

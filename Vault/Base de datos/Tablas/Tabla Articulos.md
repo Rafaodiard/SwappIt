@@ -40,13 +40,21 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Articulos]] es su clase en C# · `maps_to` INFERRED
+- [[BD.ArticuloComprometido()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetArticuloById()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
 - [[BD.GetFiltroEstados()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetArticuloById]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFiltroCategorias]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFiltroEstados]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarIntercambio]] lee de acá · `reads_from` EXTRACTED
 - [[Tabla Imagenes]] la usa como tipo · `references` EXTRACTED
 - [[Tabla Intercambios]] la usa como tipo · `references` EXTRACTED
 - [[BD.PublicarArticulo()]] escribe acá · `writes_to` EXTRACTED
+- [[SP PublicarArticulo]] escribe acá · `writes_to` EXTRACTED
 - [[SP RegistrarArticulo]] escribe acá · `writes_to` EXTRACTED

@@ -21,3 +21,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[AccountController.CambiarContrasena() GET]] muestra esta vista · `renders` INFERRED
+- [[AccountController.CambiarContrasena() POST]] muestra esta vista · `renders` INFERRED

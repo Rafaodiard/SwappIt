@@ -11,7 +11,7 @@ tags:
 ---
 # BD.GetEstadosArticulos()
 
-Método de [[BD]] · `Models/BD.cs` línea 217.
+Método de [[BD]] · `Models/BD.cs` línea 232.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

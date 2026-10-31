@@ -21,6 +21,8 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[ArticulosController.Detalle()]] la llama · `calls` EXTRACTED
+- [[ChatController.Index()]] la llama · `calls` EXTRACTED
+- [[IntercambioController.Detalle()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Editar()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Index()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Publico()]] la llama · `calls` EXTRACTED

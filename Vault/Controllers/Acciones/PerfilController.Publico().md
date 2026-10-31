@@ -11,7 +11,7 @@ tags:
 ---
 # PerfilController.Publico()
 
-Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 40. Parámetros: `int`.
+Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 42. Parámetros: `int`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
@@ -27,4 +27,6 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Chat-Index]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Intercambio-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[PerfilController]] la tiene como método · `method` EXTRACTED

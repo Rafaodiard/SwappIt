@@ -14,7 +14,7 @@
               "type": "graph",
               "state": {},
               "icon": "lucide-git-fork",
-              "title": "Vista gráfica"
+              "title": "Graph view"
             }
           }
         ]
@@ -42,7 +42,7 @@
                 "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
-              "title": "Explorador de archivos"
+              "title": "Files"
             }
           },
           {
@@ -172,45 +172,45 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Abrir selector rápido": false,
-      "graph:Abrir vista gráfica": false,
-      "canvas:Crear nuevo lienzo": false,
-      "daily-notes:Abrir la nota de hoy": false,
-      "templates:Insertar plantilla": false,
-      "command-palette:Abrir paleta de comandos": false,
-      "bases:Crear nueva base": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
     }
   },
   "active": "ca1f8ab62a5e35b2",
   "lastOpenFiles": [
-    "Vistas/Vista _ViewStart.md",
-    "Vistas/Vista _ViewImports.md",
-    "Vistas/Vista _ValidationScriptsPartial.md",
-    "Vistas/Vista _PopupNotificaciones.md",
-    "Vistas/Vista _Layout.md",
-    "Vistas/Vista _CardObjeto.md",
-    "Vistas/Vista Publicar-Index.md",
-    "Vistas/Vista Perfil-Publico.md",
-    "Vistas/Vista Perfil-Index.md",
-    "Vistas/Vista Home-Privacy.md",
-    "Vistas/Vista Home-Index.md",
-    "Vistas/Vista Error.md",
-    "Vistas/Vista Chat-Index.md",
-    "Vistas/Vista Articulos-Detalle.md",
-    "Vistas/Vista Articulos-Buscar.md",
-    "Vistas/Vista Account-Registro.md",
-    "Vistas/Vista Account-Login.md",
-    "Vistas/Vista Account-CambiarContrasena.md",
+    "Grafo/Comunidades/Comunidad - Favoritos (sin usar).md",
+    "Frontend/chat.js.md",
+    "Vistas/Vista _FilaIntercambio.md",
+    "Vistas/Vista Notificaciones-_Lista.md",
+    "Vistas/Vista Intercambio-Index.md",
+    "Vistas/Vista Intercambio-Detalle.md",
+    "Vistas/Vista Home-Inicio.md",
+    "Vistas/Vista Chat-_Mensajes.md",
+    "Base de datos/Scripts/Script Notificaciones.sql.md",
+    "Base de datos/Scripts/Script Chat.sql.md",
+    "Base de datos/Scripts/Script Cancelado.sql.md",
+    "Modelos/ViewModels/IntercambioViewModel.md",
+    "Controllers/Acciones/IntercambioController.Rechazar().md",
+    "Controllers/Acciones/IntercambioController.Proponer().md",
+    "Controllers/Acciones/IntercambioController.MarcarRealizado().md",
+    "Controllers/Acciones/IntercambioController.Index().md",
+    "Controllers/Acciones/IntercambioController.Detalle().md",
+    "Controllers/Acciones/IntercambioController.Cancelar().md",
+    "Controllers/Acciones/IntercambioController.CambiarEstado().md",
+    "Controllers/Acciones/IntercambioController.Aceptar().md",
+    "Controllers/IntercambioController.md",
+    "Modelos/Métodos/BD.EnviarMensaje().md",
+    "Modelos/Métodos/BD.CrearNotificacion().md",
+    "Modelos/Métodos/BD.ContarPendientesDeArticulos().md",
+    "Modelos/Métodos/BD.CancelarIntercambio().md",
+    "Modelos/Métodos/BD.CambiarEstadoIntercambio().md",
     "Vistas",
-    "Proyecto/launchSettings.json.md",
-    "Proyecto/appsettings.json.md",
-    "Proyecto/Swappit.csproj.md",
-    "Proyecto/Program.cs.md",
     "Proyecto",
-    "Pendientes y problemas.md",
-    "Modelos/ViewModels/RegistroViewModel.md",
-    "Modelos/ViewModels/PublicarArticuloViewModel.md",
-    "Modelos/ViewModels/OpcionFiltroViewModel.md",
     "Modelos/ViewModels",
     "Modelos/Métodos",
     "Modelos",

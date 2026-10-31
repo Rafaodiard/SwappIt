@@ -22,3 +22,5 @@ Comunidad del grafo: [[Comunidad - Proyecto y paquetes NuGet]]
 
 ## Contenido
 `Dapper (2.1.89)` · `Microsoft.AspNetCore.Session (2.3.13)` · `Microsoft.Data.SqlClient (7.1.1)` · `net9.0` · `Microsoft.NET.Sdk.Web`
+
+## Conexiones en el grafo (graphify)

@@ -23,5 +23,7 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - contiene [[Tabla Imagenes]] · `contains` EXTRACTED
 - contiene [[Tabla Intercambios]] · `contains` EXTRACTED
 - contiene [[Tabla Mensajes]] · `contains` EXTRACTED
+- contiene [[Tabla Notificaciones]] · `contains` EXTRACTED
 - contiene [[Tabla Provincias]] · `contains` EXTRACTED
+- contiene [[Tabla TipoNotificaciones]] · `contains` EXTRACTED
 - contiene [[Tabla Usuarios]] · `contains` EXTRACTED

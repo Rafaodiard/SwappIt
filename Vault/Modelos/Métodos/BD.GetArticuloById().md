@@ -11,7 +11,7 @@ tags:
 ---
 # BD.GetArticuloById()
 
-Método de [[BD]] · `Models/BD.cs` línea 151. Parámetros: `int`.
+Método de [[BD]] · `Models/BD.cs` línea 166. Parámetros: `int`.
 
 Comunidad del grafo: [[Comunidad - Modelo Articulos]]
 
@@ -22,4 +22,5 @@ Comunidad del grafo: [[Comunidad - Modelo Articulos]]
 
 **Desde otras notas:**
 - [[ArticulosController.Detalle()]] la llama · `calls` EXTRACTED
+- [[IntercambioController.Proponer()]] la llama · `calls` EXTRACTED
 - [[BD]] la tiene como método · `method` EXTRACTED

@@ -20,7 +20,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - muestra la vista [[Vista Account-Registro]] · `renders` INFERRED
 
 **Desde otras notas:**
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Account-Login]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Home-Index]] tiene un link acá · `links_to` EXTRACTED
-- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED

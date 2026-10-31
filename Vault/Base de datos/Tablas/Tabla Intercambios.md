@@ -25,7 +25,7 @@ tags:
 | IdArticulos1, IdArticulos2 | int NOT NULL, FK → [[Tabla Articulos]] |
 | Ubicacion | varchar(50) NULL (punto de encuentro) |
 
-Sin datos de prueba y sin uso en el código todavía ([[Flujo Proponer intercambio]]). Modelo: [[Intercambios]] (le falta `Ubicacion`).
+Quien propone queda en `IdUsuarios1`/`IdArticulos1` (lo que ofrece) y el dueño del artículo pedido en `IdUsuarios2`/`IdArticulos2` ([[Flujo Proponer intercambio]]). Sin datos de prueba. Modelo: [[Intercambios]] (le falta `Ubicacion`, que no se usa). Para la pantalla se lee con [[BD.GetIntercambios()]] como [[IntercambioViewModel]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
@@ -39,5 +39,26 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Intercambios]] es su clase en C# · `maps_to` INFERRED
+- [[BD.ArticuloComprometido()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.CambiarEstadoIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.ContarPendientesDeArticulos()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.EnviarMensaje()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetFiltroEstados()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIdPropuestaEnCurso()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetMensajes()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.GetResumenesChat()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.MarcarMensajesVistos()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.ProponerIntercambio()]] lee de acá · `reads_from` EXTRACTED
+- [[BD.RechazarPendientesDeArticulos()]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarMensaje]] lee de acá · `reads_from` EXTRACTED
+- [[Tabla Mensajes]] la usa como tipo · `references` EXTRACTED
+- [[BD.CambiarEstadoIntercambio()]] escribe acá · `writes_to` EXTRACTED
+- [[BD.CancelarIntercambio()]] escribe acá · `writes_to` EXTRACTED
+- [[BD.ProponerIntercambio()]] escribe acá · `writes_to` EXTRACTED
+- [[BD.RechazarPendientesDeArticulos()]] escribe acá · `writes_to` EXTRACTED
 - [[SP RegistrarIntercambio]] escribe acá · `writes_to` EXTRACTED

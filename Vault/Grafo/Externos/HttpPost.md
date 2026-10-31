@@ -19,5 +19,13 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[AccountController.CambiarContrasena() POST]] la usa como tipo · `references` EXTRACTED
 - [[AccountController.Login()]] la usa como tipo · `references` EXTRACTED
 - [[AccountController.Registro() POST]] la usa como tipo · `references` EXTRACTED
+- [[ChatController.Enviar()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController.Aceptar()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController.Cancelar()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController.MarcarRealizado()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController.Proponer()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambioController.Rechazar()]] la usa como tipo · `references` EXTRACTED
+- [[NotificacionesController.MarcarTodasLeidas()]] la usa como tipo · `references` EXTRACTED
+- [[NotificacionesController.Ver()]] la usa como tipo · `references` EXTRACTED
 - [[PerfilController.Editar()]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.Index() POST]] la usa como tipo · `references` EXTRACTED

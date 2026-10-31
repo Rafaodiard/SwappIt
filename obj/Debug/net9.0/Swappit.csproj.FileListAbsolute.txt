@@ -519,9 +519,6 @@ C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\bundle\Swappit.styles.css
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\scopedcss\projectbundle\Swappit.bundle.scp.css
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\cueivfcjbs-61n19gt1b8.gz
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\4ch4uxh4d7-4q3ty3w99i.gz
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\m5q5qmvx59-biblc9qxl4.gz
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\gfu3jbnw32-zsf0lrdvdc.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\rj4im6dxes-t1cqhe9u97.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\dw2kmedts8-c2jlpeoesf.gz
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\yb555zw6fm-sejl45xvog.gz
@@ -590,12 +587,7 @@ C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\staticwebassets.build.endpoint
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\Swappit.csproj.Up2Date
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\Swappit.genruntimeconfig.cache
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\ref\Swappit.dll
-C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\.graphify_labels.json
-C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\cost.json
-C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\graph.json
-C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\graphify-out\manifest.json
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\bgok2kicae-6hqfbjiyre.gz
-C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-2wilmvgft5.gz
 C:\Users\50416809\Desktop\SwappIt\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\50416809\Desktop\SwappIt\bin\Debug\net9.0\appsettings.json
 C:\Users\50416809\Desktop\SwappIt\bin\Debug\net9.0\graphify-out\.graphify_labels.json
@@ -947,3 +939,14 @@ C:\Users\49758734\AppData\Local\Temp\claude\C--Users-49758734-Desktop-swappit\4f
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\26qer9o0kt-vyfky7gjmy.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\vnh0ekjncn-m30ugodwrw.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-yqz1goxv43.gz
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\Vault-local\Grafo\graph.json
+C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\Vault\Grafo\graph.json
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\26qer9o0kt-vyfky7gjmy.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\qk3zvwg1xn-co848rknyr.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\smaad7afoy-sis3452g3z.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\vnh0ekjncn-m30ugodwrw.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\4ch4uxh4d7-mt1d3nc9p7.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\q7dg00387n-43tpqessqk.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\m5q5qmvx59-eer3espfkx.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-wzqvhiv5zg.gz
+C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\1xws7mzh39-rgr0xqsg43.gz

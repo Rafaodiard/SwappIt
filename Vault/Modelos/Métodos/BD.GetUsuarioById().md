@@ -23,6 +23,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 **Desde otras notas:**
 - [[AccountController.CambiarContrasena() POST]] la llama · `calls` EXTRACTED
 - [[ArticulosController.Detalle()]] la llama · `calls` EXTRACTED
+- [[HomeController.Inicio()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Editar()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Index()]] la llama · `calls` EXTRACTED
 - [[PerfilController.Publico()]] la llama · `calls` EXTRACTED

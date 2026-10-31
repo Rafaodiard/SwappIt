@@ -11,7 +11,7 @@ tags:
 ---
 # Vista: Home / Index (landing)
 
-`Views/Home/Index.cshtml` · [[HomeController]].Index. Secciones: hero ("Explorar productos" → Buscar), banda Intercambiá/Conectá/Reutilizá, "¿Qué es Swappit?", "Una segunda vida para cada objeto", "¿Cómo funciona?" (4 pasos, `id="como-funciona"`), "Todo lo que necesitás", **objetos destacados** (`ViewBag.destacados`, 4 cards [[Vista _CardObjeto]]) y CTA "Registrate ahora". Imágenes `foto1.png` a `foto4.jpg` de `wwwroot/img`.
+`Views/Home/Index.cshtml` · [[HomeController]].Index, **solo para visitantes** (con sesión se ve [[Vista Home-Inicio]]). Secciones: hero ("Explorar productos" → Buscar), banda Intercambiá/Conectá/Reutilizá, "¿Qué es Swappit?", "Una segunda vida para cada objeto", "¿Cómo funciona?" (4 pasos, `id="como-funciona"`), "Todo lo que necesitás", **objetos destacados** (`ViewBag.destacados`, 4 cards [[Vista _CardObjeto]]) y CTA "Registrate ahora". Imágenes `foto1.png` a `foto4.jpg` de `wwwroot/img`.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

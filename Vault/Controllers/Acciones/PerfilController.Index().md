@@ -18,6 +18,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 - llama a [[BD.GetArticulosCatalogo()]] · `calls` EXTRACTED
 - llama a [[BD.GetFotoUsuario()]] · `calls` EXTRACTED
+- llama a [[BD.GetIntercambios()]] · `calls` EXTRACTED
 - llama a [[BD.GetProvinciaById()]] · `calls` EXTRACTED
 - llama a [[BD.GetProvincias()]] · `calls` EXTRACTED
 - llama a [[BD.GetUsuarioById()]] · `calls` EXTRACTED
@@ -26,9 +27,10 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - muestra la vista [[Vista Perfil-Index]] · `renders` INFERRED
 
 **Desde otras notas:**
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Account-CambiarContrasena]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
-- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Home-Inicio]] tiene un link acá · `links_to` EXTRACTED
 - [[PerfilController]] la tiene como método · `method` EXTRACTED
 - [[PerfilController.Editar()]] redirige acá · `redirects_to` EXTRACTED
 - [[PerfilController.Publico()]] redirige acá · `redirects_to` EXTRACTED
