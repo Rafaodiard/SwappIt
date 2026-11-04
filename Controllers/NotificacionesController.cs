@@ -10,7 +10,8 @@ namespace Swappit.Controllers;
 // - GET /Notificaciones/NoLeidas: cuántas sin leer hay, para el contador de la campana.
 // - POST /Notificaciones/Ver/5: la marca como leída y lleva al intercambio (o a su chat, si es "Mensaje nuevo").
 // - POST /Notificaciones/MarcarTodasLeidas: botón "Marcar todas como leídas".
-// Las notificaciones se crean en BD.ProponerIntercambio, BD.CambiarEstadoIntercambio y BD.EnviarMensaje.
+// Las notificaciones se crean en BD.ProponerIntercambio, BD.CambiarEstadoIntercambio, BD.CancelarIntercambio y BD.EnviarMensaje,
+// y los controllers que las llaman las mandan también por mail (Services/EmailService).
 public class NotificacionesController : Controller
 {
     // Las del pop up (las más nuevas).
