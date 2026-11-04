@@ -60,6 +60,7 @@
                         <i class="bi bi-calendar3" aria-hidden="true"></i>
                         <input class="sw-input @ClaseError("FechaNacimiento")" id="FechaNacimiento" name="FechaNacimiento" value="@registro?.FechaNacimiento?.ToString("yyyy-MM-dd")" type="date" autocomplete="bday">
                     </div>
+                    <small class="sw-ayuda">Debes tener entre @Swappit.Models.ViewModels.RegistroViewModel.EdadMinima y @Swappit.Models.ViewModels.RegistroViewModel.EdadMaxima años.</small>
                     @Html.ValidationMessage("FechaNacimiento", new { @class = "sw-error" })
                 </div>
                 <div class="sw-campo">
