@@ -144,5 +144,5 @@ public class ChatController : Controller
 
     // Pendiente o Aceptado: todavía se puede escribir.
     private static bool EnCurso(string estado) =>
-        estado == EstadosIntercambios.Pendiente || estado == EstadosIntercambios.Aceptado;
+        estado == EstadosIntercambios.Aceptado;
 }

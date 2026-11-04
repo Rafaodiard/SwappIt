@@ -690,7 +690,7 @@ public static class BD
                     pIdIntercambio = idIntercambio,
                     pIdUsuario = idUsuario,
                     pTexto = texto,
-                    pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+                    pEnCurso = new[] { EstadosIntercambios.Aceptado }
                 }, transaccion);
 
                 if (idOtro.HasValue)
