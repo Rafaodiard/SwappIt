@@ -84,6 +84,13 @@ public class PublicarController : Controller
             return View();
         }
 
+        if (BD.ContarArticulosActivos(usuarioId.Value) >= 5)
+        {
+            ModelState.AddModelError(string.Empty, "Ya llegaste al máximo de 5 objetos publicados a la vez.");
+            AvisarFotosDeNuevo(fotos);
+            return View();
+        }
+
         List<string> rutasFotos = new List<string>();
         try
         {
@@ -97,7 +104,8 @@ public class PublicarController : Controller
                 IdUsuarios = usuarioId.Value,
                 IdCategorias = modelo.IdCategorias!.Value,
                 Ubicacion = modelo.Ubicacion.Trim(),
-                ACambio = string.IsNullOrWhiteSpace(modelo.ACambio) ? null : modelo.ACambio.Trim()
+                ACambio = string.IsNullOrWhiteSpace(modelo.ACambio) ? null : modelo.ACambio.Trim(),
+                FechaPublicacion = DateTime.Today
             };
             int idArticulo = BD.PublicarArticulo(articulo, rutasFotos);
 

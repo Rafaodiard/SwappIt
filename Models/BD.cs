@@ -177,14 +177,16 @@ public static class BD
     // Va todo en una transacción: si falla algo, no queda un artículo a medias. Devuelve el IdArticulos nuevo.
     public static int PublicarArticulo(Articulos a, List<string> rutasFotos)
     {
+        AsegurarFechaPublicacion();
+
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                string query = @"INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
+                string query = @"INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio, FechaPublicacion)
                     OUTPUT INSERTED.IdArticulos
-                    VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio)";
+                    VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio, @FechaPublicacion)";
                 int idArticulo = connection.QuerySingle<int>(query, a, transaccion);
 
                 // Las fotos de artículos llevan IdArticulos (las de perfil llevan IdUsuarios e IdArticulos NULL).
@@ -197,6 +199,60 @@ public static class BD
                 transaccion.Commit();
                 return idArticulo;
             }
+        }
+    }
+
+    public static int ContarArticulosActivos(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT COUNT(*)
+                FROM Articulos a
+                INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
+                WHERE a.IdUsuarios = @pIdUsuario
+                    AND NOT EXISTS (
+                        SELECT 1 FROM Intercambios i
+                        INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                        WHERE ei.Nombre IN @pComprometidos
+                            AND (i.IdArticulos1 = a.IdArticulos OR i.IdArticulos2 = a.IdArticulos)
+                    )";
+            return connection.ExecuteScalar<int>(query, new
+            {
+                pIdUsuario = idUsuario,
+                pComprometidos = EstadosComprometidos
+            });
+        }
+    }
+
+    public static int ContarIntercambiosActivos(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT COUNT(*)
+                FROM Intercambios i
+                INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+                WHERE i.IdUsuarios1 = @pIdUsuario
+                    AND e.Nombre IN @pEnCurso";
+            return connection.ExecuteScalar<int>(query, new
+            {
+                pIdUsuario = idUsuario,
+                pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado }
+            });
+        }
+    }
+
+    private static void AsegurarFechaPublicacion()
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            string query = @"IF COL_LENGTH('dbo.Articulos', 'FechaPublicacion') IS NULL
+                BEGIN
+                    ALTER TABLE dbo.Articulos ADD FechaPublicacion date NULL;
+                    UPDATE dbo.Articulos SET FechaPublicacion = CAST(GETDATE() AS date) WHERE FechaPublicacion IS NULL;
+                    ALTER TABLE dbo.Articulos ALTER COLUMN FechaPublicacion date NOT NULL;
+                END";
+            connection.Execute(query);
         }
     }
 
@@ -227,7 +283,6 @@ public static class BD
         }
     }
 
-
     // Opciones de "Estado del objeto" en Publicar, en el orden en que se cargaron (de mejor a peor).
     public static List<EstadosArticulos> GetEstadosArticulos()
     {
@@ -247,7 +302,7 @@ public static class BD
         }
     }
 
-    // excluirUsuario: no cuenta los artículos de ese usuario (igual que GetArticulosCatalogo en Explorar).
+    // excluirUsuario: no cuenta los artículos de ese usuario (igual que GetArticulosCatalogo in Explorar).
     public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null, int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -381,7 +436,7 @@ public static class BD
                             INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
                             WHERE eic.Nombre IN @pComprometidos
                                 AND (ic.IdArticulos1 IN (@pIdOfrecido, @pIdPedido) OR ic.IdArticulos2 IN (@pIdOfrecido, @pIdPedido)))";
-                int? idIntercambio = connection.QueryFirstOrDefault<int?>(query, new
+                int? idIntercambio = connection.QueryFirstOrDefault<int>(query, new
                 {
                     pIdUsuario = idUsuario,
                     pIdDueno = idDueno,

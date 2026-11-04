@@ -9,4 +9,5 @@ public class Articulos
     public int IdCategorias { get; set; }
     public string? Ubicacion { get; set; }
     public string? ACambio { get; set; }
+    public DateTime FechaPublicacion { get; set; }
 }
