@@ -149,26 +149,29 @@
                 <hr class="sw-divisor">
 
                 <!-- Quién lo publicó (Usuarios). Lleva al perfil público, o al propio si es tuyo. -->
-                <div>
-                    <h2 class="h6 fw-bold mb-2">Publicado por</h2>
-                    <a class="sw-dueno" href="@(esPropio ? Url.Action("Index", "Perfil") : Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios }))">
-                        <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesDueno">
-                            @if (fotoDueno != null)
-                            {
-                                <img src="@fotoDueno" alt="">
-                            }
-                            else
-                            {
-                                <span aria-hidden="true">@inicialesDueno</span>
-                            }
-                        </span>
-                        <span class="flex-grow-1 min-w-0">
-                            <span class="d-block fw-bold text-truncate">@dueno.Nombre @dueno.Apellido @(esPropio ? "(vos)" : "")</span>
-                            <span class="d-block text-suave small text-truncate">@@@dueno.Usuario</span>
-                        </span>
-                        <span class="text-primario small fw-semibold text-nowrap">@(esPropio ? "Mi perfil" : "Ver perfil") <i class="bi bi-chevron-right"></i></span>
-                    </a>
-                </div>
+                @if (logueado)
+                {
+                    <div>
+                        <h2 class="h6 fw-bold mb-2">Publicado por</h2>
+                        <a class="sw-dueno" href="@(esPropio ? Url.Action("Index", "Perfil") : Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios }))">
+                            <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesDueno">
+                                @if (fotoDueno != null)
+                                {
+                                    <img src="@fotoDueno" alt="">
+                                }
+                                else
+                                {
+                                    <span aria-hidden="true">@inicialesDueno</span>
+                                }
+                            </span>
+                            <span class="flex-grow-1 min-w-0">
+                                <span class="d-block fw-bold text-truncate">@dueno.Nombre @dueno.Apellido @(esPropio ? "(vos)" : "")</span>
+                                <span class="d-block text-suave small text-truncate">@@@dueno.Usuario</span>
+                            </span>
+                            <span class="text-primario small fw-semibold text-nowrap">@(esPropio ? "Mi perfil" : "Ver perfil") <i class="bi bi-chevron-right"></i></span>
+                        </a>
+                    </div>
+                }
 
                 <!-- ===== Acciones ===== -->
                 <div class="d-flex flex-column gap-2">
@@ -210,7 +213,7 @@
         </div>
 
         <!-- ===== Más artículos del mismo usuario ===== -->
-        @if (otrosArticulos.Count > 0)
+        @if (otrosArticulos.Count > 0 && logueado)
         {
             <div class="col-12">
                 <section aria-labelledby="titulo-otros-articulos">
