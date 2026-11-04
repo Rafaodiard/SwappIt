@@ -125,6 +125,10 @@ public class IntercambioController : Controller
             {
                 error = "Elegí uno de tus artículos para ofrecer a cambio.";
             }
+            else if (BD.ContarIntercambiosActivos(usuarioId.Value) >= 5)
+            {
+                error = "Tenés 5 intercambios activos. Cuando uno se resuelva, podés hacer otro.";
+            }
             else if (BD.ArticuloComprometido(pedido.IdArticulos))
             {
                 error = "Este artículo ya tiene un intercambio aceptado.";
