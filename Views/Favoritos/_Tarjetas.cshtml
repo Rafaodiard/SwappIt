@@ -1,0 +1,11 @@
+@*
+    Cards de los favoritos (FavoritosController.Tarjetas). favoritos-lista.js las pone dentro de #lista-favoritos.
+*@
+@{
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
+}
+@foreach (var articulo in articulos)
+{
+    ViewBag.articulo = articulo;
+    <partial name="_CardObjeto" />
+}

@@ -115,11 +115,13 @@
                 {
                     <!-- Misma card que el catálogo (Views/Shared/_CardObjeto.cshtml) -->
                     <div id="mis-articulos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                        @{ ViewBag.ocultarFavorito = true; /* son mis artículos: sin corazón */ }
                         @foreach (var articulo in articulos)
                         {
                             ViewBag.articulo = articulo;
                             <partial name="_CardObjeto" />
                         }
+                        @{ ViewBag.ocultarFavorito = null; }
                     </div>
                 }
                 else
