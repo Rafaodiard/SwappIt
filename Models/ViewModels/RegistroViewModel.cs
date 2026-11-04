@@ -5,8 +5,11 @@ namespace Swappit.Models.ViewModels
     // Datos del formulario de Views/Account/Registro.cshtml (llegan por POST).
     // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
     // Longitudes máximas = columnas de la tabla Usuarios (varchar(50)).
-    public class RegistroViewModel
+    public class RegistroViewModel : IValidatableObject
     {
+        public const int EdadMinima = 18;
+        public const int EdadMaxima = 100;
+
         [Required(ErrorMessage = "Ingresá tu nombre")]
         [StringLength(50, ErrorMessage = "Máximo {1} caracteres")]
         [Display(Name = "Nombre")]
@@ -38,6 +41,33 @@ namespace Swappit.Models.ViewModels
         [Phone(ErrorMessage = "Ingresá un teléfono válido")]
         [Display(Name = "Número de teléfono")]
         public string Telefono { get; set; } = string.Empty;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!FechaNacimiento.HasValue)
+            {
+                yield break;
+            }
+
+            int edad = CalcularEdad(FechaNacimiento.Value);
+
+            if (edad < EdadMinima)
+            {
+                yield return new ValidationResult($"Debes tener al menos {EdadMinima} años para registrarte.", new[] { nameof(FechaNacimiento) });
+            }
+
+            if (edad > EdadMaxima)
+            {
+                yield return new ValidationResult($"La edad máxima permitida es {EdadMaxima} años.", new[] { nameof(FechaNacimiento) });
+            }
+        }
+
+        private static int CalcularEdad(DateTime fechaNacimiento)
+        {
+            int edad = DateTime.Today.Year - fechaNacimiento.Year;
+            if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
+            return edad;
+        }
 
         // TODO (BD): la tabla Usuarios también pide Usuario, Barrio e IdProvincias,
         // que el diseño de Figma no incluye. Hay que agregarlos al formulario

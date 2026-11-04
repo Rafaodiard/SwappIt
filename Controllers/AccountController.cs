@@ -73,6 +73,20 @@ public class AccountController : Controller
             return View();
         }
 
+        int edad = CalcularEdad(r.FechaNacimiento!.Value);
+
+        if (edad < RegistroViewModel.EdadMinima)
+        {
+            ModelState.AddModelError(nameof(r.FechaNacimiento), $"Debes tener al menos {RegistroViewModel.EdadMinima} años para registrarte.");
+            return View();
+        }
+
+        if (edad > RegistroViewModel.EdadMaxima)
+        {
+            ModelState.AddModelError(nameof(r.FechaNacimiento), $"La edad máxima permitida es {RegistroViewModel.EdadMaxima} años.");
+            return View();
+        }
+
         Usuarios u = new Usuarios
         {
             Nombre = r.Nombre,
@@ -80,7 +94,7 @@ public class AccountController : Controller
             Mail = r.Mail,
             Contraseña = Contrasenas.Hashear(r.Contrasena),
             FechaNacimiento = r.FechaNacimiento!.Value,
-            Edad = CalcularEdad(r.FechaNacimiento.Value),
+            Edad = edad,
             Telefono = Telefonos.Convertir(r.Telefono),
             Usuario = r.Mail.Split('@')[0],
             Barrio = string.Empty,
