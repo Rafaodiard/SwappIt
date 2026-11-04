@@ -41,7 +41,14 @@ public class PerfilController : Controller
 
     public IActionResult Publico(int id)
     {
-        if (HttpContext.Session.GetInt32("UsuarioId") == id)
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+
+        if (usuarioId == null)
+        {
+            return RedirectToAction("Index", "Account");
+        }
+
+        if (usuarioId == id)
         {
             return RedirectToAction("Index");
         }
