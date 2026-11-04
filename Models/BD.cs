@@ -248,9 +248,11 @@ public static class BD
             connection.Open();
             string query = @"IF COL_LENGTH('dbo.Articulos', 'FechaPublicacion') IS NULL
                 BEGIN
-                    ALTER TABLE dbo.Articulos ADD FechaPublicacion date NULL;
-                    UPDATE dbo.Articulos SET FechaPublicacion = CAST(GETDATE() AS date) WHERE FechaPublicacion IS NULL;
-                    ALTER TABLE dbo.Articulos ALTER COLUMN FechaPublicacion date NOT NULL;
+                    -- Con EXEC cada sentencia se compila aparte: si no, SQL Server compila el lote entero
+                    -- antes de agregar la columna y el UPDATE falla con 'Invalid column name'.
+                    EXEC('ALTER TABLE dbo.Articulos ADD FechaPublicacion date NULL');
+                    EXEC('UPDATE dbo.Articulos SET FechaPublicacion = CAST(GETDATE() AS date) WHERE FechaPublicacion IS NULL');
+                    EXEC('ALTER TABLE dbo.Articulos ALTER COLUMN FechaPublicacion date NOT NULL');
                 END";
             connection.Execute(query);
         }
