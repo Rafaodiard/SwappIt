@@ -97,6 +97,7 @@ CREATE TABLE [dbo].[Articulos](
 	[IdCategorias] [int] NOT NULL,
 	[Ubicacion] [varchar](100) NULL,
 	[ACambio] [varchar](100) NULL,
+	[FechaPublicacion] [date] NOT NULL,
  CONSTRAINT [PK_Articulos] PRIMARY KEY CLUSTERED 
 (
 	[IdArticulos] ASC

@@ -57,6 +57,8 @@ const swappit = (() => {
             nodo.querySelector('[data-campo="nombre"]').href = `/Articulos/Detalle/${a.id}`;
             nodo.querySelector('img[data-campo="imagen"]').alt = a.nombre;
         });
+        // Las cards nuevas arrancan con el corazón vacío: marcar las que ya son favoritas
+        if (typeof swappitFavoritos !== 'undefined') swappitFavoritos.marcar(document.querySelector(selector));
         const vacio = document.getElementById('sin-resultados');
         if (vacio) vacio.classList.toggle('d-none', articulos.length > 0);
     }
