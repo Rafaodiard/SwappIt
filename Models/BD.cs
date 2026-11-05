@@ -419,7 +419,9 @@ public static class BD
     // Si el usuario ya tiene una propuesta en curso por ese artículo, o alguno de los dos artículos ya está comprometido,
     // no inserta nada y devuelve null (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
     // En la misma transacción le avisa al dueño del artículo pedido (notificación "Propuesta recibida").
-    public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido)
+    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
+    public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido,
+        List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -449,12 +451,14 @@ public static class BD
                     pComprometidos = EstadosComprometidos
                 }, transaccion);
 
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
                 if (idIntercambio.HasValue)
                 {
-                    CrearNotificacion(connection, transaccion, idDueno, idIntercambio.Value, TipoNotificaciones.PropuestaRecibida);
+                    CrearNotificacion(connection, transaccion, nuevas, idDueno, idIntercambio.Value, TipoNotificaciones.PropuestaRecibida);
                 }
 
                 transaccion.Commit();
+                creadas?.AddRange(nuevas);
                 return idIntercambio;
             }
         }
@@ -466,8 +470,9 @@ public static class BD
     // Para pasar a Aceptado, ninguno de los dos artículos puede estar ya en otro intercambio Aceptado o Realizado,
     // y en la misma transacción se rechazan las otras propuestas pendientes con esos artículos (ver RechazarPendientesDeArticulos).
     // Devuelve false si no se cambió (no existe, no es del usuario, ya no estaba en estadoActual o el artículo ya está comprometido).
+    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
     public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo,
-        bool soloQuienRecibe, string? tipoNotificacion = null)
+        bool soloQuienRecibe, string? tipoNotificacion = null, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -497,17 +502,19 @@ public static class BD
                     pComprometidos = EstadosComprometidos
                 }, transaccion);
 
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
                 if (idOtro.HasValue && tipoNotificacion != null)
                 {
-                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, tipoNotificacion);
+                    CrearNotificacion(connection, transaccion, nuevas, idOtro.Value, idIntercambio, tipoNotificacion);
                 }
 
                 if (idOtro.HasValue && estadoNuevo == EstadosIntercambios.Aceptado)
                 {
-                    RechazarPendientesDeArticulos(connection, transaccion, idIntercambio, idUsuario);
+                    RechazarPendientesDeArticulos(connection, transaccion, nuevas, idIntercambio, idUsuario);
                 }
 
                 transaccion.Commit();
+                creadas?.AddRange(nuevas);
                 return idOtro.HasValue;
             }
         }
@@ -517,7 +524,8 @@ public static class BD
     // Una propuesta Pendiente solo la cancela quien la hizo (quien la recibió la rechaza); uno Aceptado, cualquiera de los dos.
     // Devuelve false si el usuario no puede cancelarlo o si ya cambió de estado.
     // Al dejar de estar Aceptado, los dos artículos vuelven a estar disponibles (ver ArticuloDisponible).
-    public static bool CancelarIntercambio(int idIntercambio, int idUsuario)
+    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
+    public static bool CancelarIntercambio(int idIntercambio, int idUsuario, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -542,12 +550,14 @@ public static class BD
                     pAceptado = EstadosIntercambios.Aceptado
                 }, transaccion);
 
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
                 if (idOtro.HasValue)
                 {
-                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, TipoNotificaciones.IntercambioCancelado);
+                    CrearNotificacion(connection, transaccion, nuevas, idOtro.Value, idIntercambio, TipoNotificaciones.IntercambioCancelado);
                 }
 
                 transaccion.Commit();
+                creadas?.AddRange(nuevas);
                 return idOtro.HasValue;
             }
         }
@@ -574,7 +584,8 @@ public static class BD
     // Se llama al aceptar un intercambio, dentro de su transacción: pasa a Rechazado las otras propuestas pendientes
     // con esos artículos y le avisa a quien las hizo ("Propuesta rechazada"). No se avisa a quien acepta (idUsuario),
     // por ejemplo si él mismo había ofrecido ese artículo en otra propuesta.
-    private static void RechazarPendientesDeArticulos(SqlConnection connection, SqlTransaction transaccion, int idIntercambio, int idUsuario)
+    private static void RechazarPendientesDeArticulos(SqlConnection connection, SqlTransaction transaccion,
+        List<NotificacionCreada> nuevas, int idIntercambio, int idUsuario)
     {
         string query = @"UPDATE o SET o.IdEstado = rechazado.IdEstadosIntercambios
             OUTPUT INSERTED.IdIntercambios, INSERTED.IdUsuarios1
@@ -591,7 +602,7 @@ public static class BD
 
         foreach (var r in rechazadas.Where(r => r.IdUsuarios1 != idUsuario))
         {
-            CrearNotificacion(connection, transaccion, r.IdUsuarios1, r.IdIntercambios, TipoNotificaciones.PropuestaRechazada);
+            CrearNotificacion(connection, transaccion, nuevas, r.IdUsuarios1, r.IdIntercambios, TipoNotificaciones.PropuestaRechazada);
         }
     }
 
@@ -611,22 +622,45 @@ public static class BD
 
     // Se llama desde ProponerIntercambio, CambiarEstadoIntercambio, CancelarIntercambio y EnviarMensaje, dentro de su transacción.
     // siNoHayOtraSinLeer = true: no la crea si el usuario ya tiene una sin leer de ese tipo y de ese intercambio
-    // (así un chat con 10 mensajes seguidos deja una sola notificación "Mensaje nuevo").
-    private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, int idUsuario, int idIntercambio, string tipo,
-        bool siNoHayOtraSinLeer = false)
+    // (así un chat con 10 mensajes seguidos deja una sola notificación "Mensaje nuevo", y un solo mail).
+    // Si la insertó, la agrega a nuevas; quien llama las devuelve recién después del Commit.
+    private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, List<NotificacionCreada> nuevas,
+        int idUsuario, int idIntercambio, string tipo, bool siNoHayOtraSinLeer = false)
     {
         string query = @"INSERT INTO Notificaciones (IdUsuario, IdIntercambio, IdTipoNotificacion, Leida, Fecha)
             SELECT @pIdUsuario, @pIdIntercambio, t.Id, 0, GETDATE()
             FROM TipoNotificaciones t WHERE t.Nombre = @pTipo
                 AND (@pSiNoHayOtra = 0 OR NOT EXISTS (SELECT 1 FROM Notificaciones n
                     WHERE n.IdUsuario = @pIdUsuario AND n.IdIntercambio = @pIdIntercambio AND n.IdTipoNotificacion = t.Id AND n.Leida = 0))";
-        connection.Execute(query, new
+        int filas = connection.Execute(query, new
         {
             pIdUsuario = idUsuario,
             pIdIntercambio = idIntercambio,
             pTipo = tipo,
             pSiNoHayOtra = siNoHayOtraSinLeer
         }, transaccion);
+
+        if (filas > 0)
+        {
+            nuevas.Add(new NotificacionCreada(idUsuario, idIntercambio, tipo));
+        }
+    }
+
+    // Datos para el mail de una notificación: mail y nombre del destinatario, la otra persona y los dos artículos
+    // (MiArticulo es el del destinatario). null si el usuario no es parte del intercambio.
+    public static DatosMailNotificacion? GetDatosMailNotificacion(int idUsuario, int idIntercambio)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT d.Mail, d.Nombre, o.Nombre AS OtroNombre, am.Nombre AS MiArticulo, asu.Nombre AS SuArticulo
+                FROM Intercambios i
+                INNER JOIN Usuarios d ON d.IdUsuarios = @pIdUsuario
+                INNER JOIN Usuarios o ON o.IdUsuarios = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
+                INNER JOIN Articulos am ON am.IdArticulos = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos1 ELSE i.IdArticulos2 END
+                INNER JOIN Articulos asu ON asu.IdArticulos = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos2 ELSE i.IdArticulos1 END
+                WHERE i.IdIntercambios = @pIdIntercambio AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)";
+            return connection.QueryFirstOrDefault<DatosMailNotificacion>(query, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio });
+        }
     }
 
     // Notificaciones del usuario para el pop up del header, lo más nuevo primero.
@@ -723,7 +757,8 @@ public static class BD
     // Guarda un mensaje del usuario en el chat del intercambio y, en la misma transacción, le avisa a la otra persona
     // (notificación "Mensaje nuevo", una sola mientras no la lea). Solo lo guarda si el usuario es parte del intercambio
     // y el intercambio está en curso; si no, devuelve false.
-    public static bool EnviarMensaje(int idIntercambio, int idUsuario, string texto)
+    // creadas: si viene, después del Commit se le agrega la notificación si se creó (para mandarla por mail).
+    public static bool EnviarMensaje(int idIntercambio, int idUsuario, string texto, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -750,12 +785,15 @@ public static class BD
                     pEnCurso = new[] { EstadosIntercambios.Aceptado }
                 }, transaccion);
 
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
                 if (idOtro.HasValue)
                 {
-                    CrearNotificacion(connection, transaccion, idOtro.Value, idIntercambio, TipoNotificaciones.MensajeNuevo, siNoHayOtraSinLeer: true);
+                    CrearNotificacion(connection, transaccion, nuevas, idOtro.Value, idIntercambio, TipoNotificaciones.MensajeNuevo,
+                        siNoHayOtraSinLeer: true);
                 }
 
                 transaccion.Commit();
+                creadas?.AddRange(nuevas);
                 return idOtro.HasValue;
             }
         }

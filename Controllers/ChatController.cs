@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Swappit.Models;
 using Swappit.Models.ViewModels;
+using Swappit.Services;
 
 namespace Swappit.Controllers;
 
@@ -12,13 +13,16 @@ namespace Swappit.Controllers;
 //   para mostrar los mensajes nuevos de la otra persona sin recargar.
 // Se puede escribir mientras el intercambio está Pendiente o Aceptado; si se rechazó o ya se realizó, el chat queda para leer.
 // Al mandar un mensaje, la otra persona recibe la notificación "Mensaje nuevo" (ver BD.EnviarMensaje).
+// Esa notificación se manda también por mail, pero solo cuando se crea (una mientras no la lea, no una por mensaje).
 public class ChatController : Controller
 {
     private readonly ILogger<ChatController> _logger;
+    private readonly EmailService _emailService;
 
-    public ChatController(ILogger<ChatController> logger)
+    public ChatController(ILogger<ChatController> logger, EmailService emailService)
     {
         _logger = logger;
+        _emailService = emailService;
     }
 
     public IActionResult Index(int? id)
@@ -127,11 +131,13 @@ public class ChatController : Controller
 
         try
         {
-            if (!BD.EnviarMensaje(id, usuarioId.Value, texto))
+            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
+            if (!BD.EnviarMensaje(id, usuarioId.Value, texto, creadas))
             {
                 // No es parte del intercambio o el intercambio ya no está en curso.
                 TempData["ErrorChat"] = "No se pudo mandar el mensaje: este intercambio ya no está en curso.";
             }
+            _emailService.EnviarNotificaciones(creadas, Url);
         }
         catch (SqlException ex)
         {

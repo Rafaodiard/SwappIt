@@ -275,3 +275,5 @@ __pycache__/
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
 wwwroot/img/perfiles/
+# Copias .eml de los mails de notificaciones (Smtp:CarpetaPrueba)
+MailsPrueba/

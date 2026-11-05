@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Swappit.Models;
 using Swappit.Models.ViewModels;
+using Swappit.Services;
 
 namespace Swappit.Controllers;
 
@@ -13,13 +14,16 @@ namespace Swappit.Controllers;
 // - Cancelarlo: quien propuso retira su propuesta pendiente, o cualquiera de los dos cancela uno aceptado.
 // Al proponer, aceptar, rechazar o cancelar se le avisa a la otra persona con una notificación (ver NotificacionesController).
 // Marcar como realizado no avisa: no hay tipo de notificación para eso.
+// Las notificaciones creadas también se mandan por mail (EmailService), después de que la base confirmó el cambio.
 public class IntercambioController : Controller
 {
     private readonly ILogger<IntercambioController> _logger;
+    private readonly EmailService _emailService;
 
-    public IntercambioController(ILogger<IntercambioController> logger)
+    public IntercambioController(ILogger<IntercambioController> logger, EmailService emailService)
     {
         _logger = logger;
+        _emailService = emailService;
     }
 
     public IActionResult Index(string? estado)
@@ -144,12 +148,14 @@ public class IntercambioController : Controller
                 return RedirectToAction("Detalle", "Articulos", new { id = idArticuloPedido });
             }
 
-            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idArticuloOfrecido, pedido.IdUsuarios, idArticuloPedido);
+            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
+            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idArticuloOfrecido, pedido.IdUsuarios, idArticuloPedido, creadas);
             if (idIntercambio == null)
             {
                 TempData["ErrorArticulo"] = "Ya tenés una propuesta en curso por este artículo.";
                 return RedirectToAction("Detalle", "Articulos", new { id = idArticuloPedido });
             }
+            _emailService.EnviarNotificaciones(creadas, Url);
 
             TempData["MensajeIntercambio"] = "¡Listo! Enviaste tu propuesta. Cuando la respondan, la vas a ver acá.";
             return RedirectToAction("Detalle", new { id = idIntercambio });
@@ -219,8 +225,10 @@ public class IntercambioController : Controller
 
         try
         {
-            if (BD.CancelarIntercambio(id, usuarioId.Value))
+            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
+            if (BD.CancelarIntercambio(id, usuarioId.Value, creadas))
             {
+                _emailService.EnviarNotificaciones(creadas, Url);
                 TempData["MensajeIntercambio"] = "Cancelaste el intercambio. Le avisamos a la otra persona.";
             }
             else
@@ -249,8 +257,11 @@ public class IntercambioController : Controller
 
         try
         {
-            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion))
+            // Al aceptar, además de "Propuesta aceptada" puede haber varias "Propuesta rechazada" (las pendientes que se rechazan solas).
+            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
+            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion, creadas))
             {
+                _emailService.EnviarNotificaciones(creadas, Url);
                 TempData["MensajeIntercambio"] = mensaje;
             }
             else

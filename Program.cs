@@ -1,8 +1,14 @@
+using Swappit.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
+
+// Mails de notificaciones. La sección "Smtp" (con la contraseña) sale de user-secrets o de variables de entorno.
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddSingleton<EmailService>();
 
 var app = builder.Build();
 
