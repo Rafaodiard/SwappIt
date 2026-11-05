@@ -515,6 +515,20 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     overflow: hidden;
 }
 .card-objeto-ubicacion { font-size: .8rem; color: var(--sw-primario); }
+/* Motivo de la recomendación (RecomendacionesController): "Le interesa algo tuyo" o "Para descubrir" */
+.card-objeto-motivo {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .45rem;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--sw-secundario);
+    background: rgba(110, 44, 58, .08);
+}
+.card-objeto-motivo--descubrir { color: var(--sw-primario); background: var(--sw-gris-claro); }
 .card-objeto-cambio {
     border-top: 1px solid var(--sw-borde);
     margin-top: .6rem;

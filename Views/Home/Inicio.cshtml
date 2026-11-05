@@ -1,7 +1,8 @@
 ﻿@*
     Inicio del usuario logueado (HomeController.Index cuando hay sesión; sin sesión se ve la landing, Index.cshtml).
     - Saludo grande y centrado, con accesos a Publicar y a Buscar.
-    - Columna principal: artículos recomendados (por ahora, los últimos disponibles de los demás usuarios). Reusa _CardObjeto.
+    - Columna principal: "Destacados para vos" (RecomendacionesController.Destacados: según tus gustos y con
+      dueños a los que les puede interesar algo tuyo; 1 de cada 5 es para descubrir). Reusa _CardObjeto.
     - Columna lateral: resumen (propuestas por responder, mensajes sin leer y artículos publicados) e intercambios
       en curso (Pendiente o Aceptado), primero los que el usuario tiene que responder. En celulares va arriba.
     Las notificaciones no se repiten acá: ya están en la campana del header.
@@ -14,7 +15,7 @@
     int cantidadEnCurso = ViewBag.cantidadEnCurso;
     int cantidadArticulos = ViewBag.cantidadArticulos;
     int? mensajesSinLeer = ViewBag.mensajesSinLeer;
-    List<Swappit.Models.ViewModels.ArticuloCardViewModel> recomendados = ViewBag.recomendados;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> destacados = ViewBag.destacados;
     bool errorCarga = ViewBag.errorCarga;
 }
 
@@ -116,7 +117,7 @@
             </div>
         </aside>
 
-        <!-- ===== Columna principal: artículos recomendados ===== -->
+        <!-- ===== Columna principal: destacados para vos ===== -->
         <div class="col-lg-8 order-lg-1">
             <!-- Sin artículos propios no se puede proponer un intercambio (la propuesta ofrece uno de los tuyos) -->
             @if (cantidadArticulos == 0)
@@ -131,16 +132,16 @@
                 </section>
             }
 
-            <section aria-labelledby="titulo-recomendados">
+            <section aria-labelledby="titulo-destacados">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
-                    <h2 class="font-titulo h3 text-primario mb-0" id="titulo-recomendados">Artículos recomendados</h2>
-                    <a href="@Url.Action("Buscar", "Articulos")" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    <h2 class="font-titulo h3 text-primario mb-0" id="titulo-destacados">Destacados para vos</h2>
+                    <a href="@Url.Action("Buscar", "Articulos", new { orden = Swappit.Controllers.RecomendacionesController.OrdenParaVos })" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                 </div>
 
-                @if (recomendados.Count > 0)
+                @if (destacados.Count > 0)
                 {
                     <div class="row row-cols-2 row-cols-md-3 g-3">
-                        @foreach (var articulo in recomendados)
+                        @foreach (var articulo in destacados)
                         {
                             ViewBag.articulo = articulo;
                             <partial name="_CardObjeto" />

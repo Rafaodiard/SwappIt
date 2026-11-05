@@ -143,7 +143,8 @@ public static class BD
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
             // Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
             string query = $@"SELECT {top}a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
-                    (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
+                    (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
+                    a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
                 FROM Articulos a
                 INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
                 INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
@@ -167,7 +168,7 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio
+            string query = @"SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, IdCategoriaACambio
                 FROM Articulos WHERE IdArticulos = @pId";
             return connection.QueryFirstOrDefault<Articulos>(query, new { pId = id });
         }
@@ -184,9 +185,9 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                string query = @"INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio, FechaPublicacion)
+                string query = @"INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, IdCategoriaACambio, FechaPublicacion)
                     OUTPUT INSERTED.IdArticulos
-                    VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @ACambio, @FechaPublicacion)";
+                    VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @IdCategoriaACambio, @FechaPublicacion)";
                 int idArticulo = connection.QuerySingle<int>(query, a, transaccion);
 
                 // Las fotos de artículos llevan IdArticulos (las de perfil llevan IdUsuarios e IdArticulos NULL).
@@ -812,6 +813,202 @@ public static class BD
                 INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
                 WHERE n.IdUsuario = @pIdUsuario AND n.IdIntercambio = @pIdIntercambio AND t.Nombre = @pTipo AND n.Leida = 0";
             connection.Execute(query, new { pIdIntercambio = idIntercambio, pIdUsuario = idUsuario, pTipo = TipoNotificaciones.MensajeNuevo });
+        }
+    }
+
+    // ---------- Interacciones y favoritos (algoritmo de recomendaciones) ----------
+    // Todo lo que hace el usuario y sirve para recomendarle artículos va a la tabla Interacciones.
+    // El tipo se busca por nombre en TipoInteracciones (ver Models/TipoInteracciones.cs).
+    // Quien decide qué guardar y cómo usarlo es RecomendacionesController.
+
+    private const string IdTipo = "(SELECT Id FROM TipoInteracciones WHERE Nombre = @pTipo)";
+
+    // El usuario abrió el detalle de un artículo (= hizo clic en él). Devuelve el Id de la fila,
+    // para después guardarle los segundos que se quedó (GuardarSegundosVista).
+    public static int RegistrarVista(int idUsuario, int idArticulo)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"INSERT INTO Interacciones (IdUsuario, IdTipoInteraccion, IdArticulo, Segundos, Fecha)
+                OUTPUT INSERTED.Id
+                VALUES (@pIdUsuario, {IdTipo}, @pIdArticulo, 0, GETDATE())";
+            return connection.QuerySingle<int>(query, new { pIdUsuario = idUsuario, pIdArticulo = idArticulo, pTipo = TipoInteracciones.Vista });
+        }
+    }
+
+    // Guarda cuántos segundos estuvo mirando el detalle. Solo cambia la vista si es de ese usuario.
+    public static void GuardarSegundosVista(int idInteraccion, int idUsuario, int segundos)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"UPDATE Interacciones SET Segundos = @pSegundos
+                WHERE Id = @pId AND IdUsuario = @pIdUsuario AND IdTipoInteraccion = {IdTipo}";
+            connection.Execute(query, new { pId = idInteraccion, pIdUsuario = idUsuario, pSegundos = segundos, pTipo = TipoInteracciones.Vista });
+        }
+    }
+
+    // Lo que buscó en Explorar: el texto y las categorías que marcó en los filtros.
+    // Si ya registró lo mismo en los últimos minutos no se repite (recargar la página o cambiar otro filtro
+    // no tiene que contar como otra búsqueda).
+    public static void RegistrarBusqueda(int idUsuario, string? texto, IReadOnlyCollection<int> categorias, int minutosSinRepetir)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            if (!string.IsNullOrWhiteSpace(texto))
+            {
+                string query = $@"INSERT INTO Interacciones (IdUsuario, IdTipoInteraccion, Texto, Fecha)
+                    SELECT @pIdUsuario, {IdTipo}, @pTexto, GETDATE()
+                    WHERE NOT EXISTS (SELECT 1 FROM Interacciones r
+                        WHERE r.IdUsuario = @pIdUsuario AND r.IdTipoInteraccion = {IdTipo} AND r.Texto = @pTexto
+                            AND r.Fecha >= DATEADD(MINUTE, -@pMinutos, GETDATE()))";
+                connection.Execute(query, new { pIdUsuario = idUsuario, pTexto = texto, pTipo = TipoInteracciones.Busqueda, pMinutos = minutosSinRepetir });
+            }
+
+            foreach (int idCategoria in categorias)
+            {
+                string query = $@"INSERT INTO Interacciones (IdUsuario, IdTipoInteraccion, IdCategoria, Fecha)
+                    SELECT @pIdUsuario, {IdTipo}, @pIdCategoria, GETDATE()
+                    WHERE EXISTS (SELECT 1 FROM Categorias WHERE IdCategorias = @pIdCategoria)
+                        AND NOT EXISTS (SELECT 1 FROM Interacciones r
+                            WHERE r.IdUsuario = @pIdUsuario AND r.IdTipoInteraccion = {IdTipo} AND r.IdCategoria = @pIdCategoria
+                                AND r.Fecha >= DATEADD(MINUTE, -@pMinutos, GETDATE()))";
+                connection.Execute(query, new { pIdUsuario = idUsuario, pIdCategoria = idCategoria, pTipo = TipoInteracciones.FiltroCategoria, pMinutos = minutosSinRepetir });
+            }
+        }
+    }
+
+    // Favoritos: una fila de Interacciones de tipo Favorito por usuario y artículo, mientras siga siendo favorito.
+
+    public static List<int> GetIdsFavoritos(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $"SELECT IdArticulo FROM Interacciones WHERE IdUsuario = @pIdUsuario AND IdTipoInteraccion = {IdTipo}";
+            return connection.Query<int>(query, new { pIdUsuario = idUsuario, pTipo = TipoInteracciones.Favorito }).ToList();
+        }
+    }
+
+    // Los favoritos que siguen disponibles (los mismos que se ven en el catálogo), el último que marcó primero.
+    public static List<ArticuloCardViewModel> GetFavoritos(int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"SELECT a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
+                    (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
+                    a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
+                FROM Interacciones f
+                INNER JOIN Articulos a ON a.IdArticulos = f.IdArticulo
+                INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+                INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
+                WHERE f.IdUsuario = @pIdUsuario AND f.IdTipoInteraccion = {IdTipo} AND {ArticuloDisponible}
+                ORDER BY f.Fecha DESC, f.Id DESC";
+            return connection.Query<ArticuloCardViewModel>(query, new
+            {
+                pIdUsuario = idUsuario,
+                pTipo = TipoInteracciones.Favorito,
+                pComprometidos = EstadosComprometidos
+            }).ToList();
+        }
+    }
+
+    // Marca o desmarca un favorito. Devuelve true si quedó como favorito, false si se sacó
+    // y null si no se puede marcar (no existe o es un artículo propio).
+    public static bool? AlternarFavorito(int idUsuario, int idArticulo)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"IF EXISTS (SELECT 1 FROM Interacciones WHERE IdUsuario = @pIdUsuario AND IdArticulo = @pIdArticulo AND IdTipoInteraccion = {IdTipo})
+                BEGIN
+                    DELETE FROM Interacciones WHERE IdUsuario = @pIdUsuario AND IdArticulo = @pIdArticulo AND IdTipoInteraccion = {IdTipo};
+                    SELECT CAST(0 AS bit);
+                END
+                ELSE IF EXISTS (SELECT 1 FROM Articulos WHERE IdArticulos = @pIdArticulo AND IdUsuarios <> @pIdUsuario)
+                BEGIN
+                    INSERT INTO Interacciones (IdUsuario, IdTipoInteraccion, IdArticulo, Fecha) VALUES (@pIdUsuario, {IdTipo}, @pIdArticulo, GETDATE());
+                    SELECT CAST(1 AS bit);
+                END
+                ELSE
+                    SELECT CAST(NULL AS bit);";
+            return connection.QuerySingle<bool?>(query, new { pIdUsuario = idUsuario, pIdArticulo = idArticulo, pTipo = TipoInteracciones.Favorito });
+        }
+    }
+
+    // Pasa a la BD los favoritos que quedaron guardados en el navegador (antes vivían en localStorage).
+    // Agrega solo los que no estaban, existen y no son del usuario.
+    public static void ImportarFavoritos(int idUsuario, IReadOnlyCollection<int> idsArticulos)
+    {
+        if (idsArticulos.Count == 0) return;
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $@"INSERT INTO Interacciones (IdUsuario, IdTipoInteraccion, IdArticulo, Fecha)
+                SELECT @pIdUsuario, {IdTipo}, a.IdArticulos, GETDATE()
+                FROM Articulos a
+                WHERE a.IdArticulos IN @pIds AND a.IdUsuarios <> @pIdUsuario
+                    AND NOT EXISTS (SELECT 1 FROM Interacciones f
+                        WHERE f.IdUsuario = @pIdUsuario AND f.IdArticulo = a.IdArticulos AND f.IdTipoInteraccion = {IdTipo})";
+            connection.Execute(query, new { pIdUsuario = idUsuario, pIds = idsArticulos, pTipo = TipoInteracciones.Favorito });
+        }
+    }
+
+    // Datos de gustos de varios usuarios a la vez (el que mira y los dueños de los artículos), desde la fecha "desde".
+    // Junta tres fuentes en una sola lista (ver Models/SenalGusto.cs):
+    // 1. Interacciones: vistas, búsquedas, filtros y favoritos. En vistas y favoritos la categoría es la del artículo.
+    // 2. Intercambios: cada propuesta que mandó (IdUsuarios1) suma a la categoría del artículo que pidió (IdArticulos2),
+    //    sin importar cómo terminó: igual muestra lo que quería.
+    // 3. Articulos: la categoría que pide a cambio en sus artículos disponibles (sin fecha: es lo que quiere hoy).
+    public static List<SenalGusto> GetSenalesGustos(IReadOnlyCollection<int> idsUsuarios, DateTime desde)
+    {
+        if (idsUsuarios.Count == 0) return new List<SenalGusto>();
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT i.IdUsuario, t.Nombre AS Tipo, COALESCE(i.IdCategoria, ai.IdCategorias) AS IdCategoria,
+                    i.Texto, i.Segundos, i.Fecha
+                FROM Interacciones i
+                INNER JOIN TipoInteracciones t ON t.Id = i.IdTipoInteraccion
+                LEFT JOIN Articulos ai ON ai.IdArticulos = i.IdArticulo
+                WHERE i.IdUsuario IN @pIds AND i.Fecha >= @pDesde
+
+                UNION ALL
+
+                SELECT ic.IdUsuarios1, @pPropuesta, ap.IdCategorias, NULL, NULL, CAST(ic.Fecha AS datetime)
+                FROM Intercambios ic
+                INNER JOIN Articulos ap ON ap.IdArticulos = ic.IdArticulos2
+                WHERE ic.IdUsuarios1 IN @pIds AND ic.Fecha >= CAST(@pDesde AS date)
+
+                UNION ALL
+
+                SELECT a.IdUsuarios, @pPideACambio, a.IdCategoriaACambio, NULL, NULL, GETDATE()
+                FROM Articulos a
+                WHERE a.IdUsuarios IN @pIds AND a.IdCategoriaACambio IS NOT NULL AND " + ArticuloDisponible;
+            return connection.Query<SenalGusto>(query, new
+            {
+                pIds = idsUsuarios,
+                pDesde = desde,
+                pPropuesta = SenalGusto.Propuesta,
+                pPideACambio = SenalGusto.PideACambio,
+                pComprometidos = EstadosComprometidos
+            }).ToList();
+        }
+    }
+
+    // Vistas y favoritos de cada artículo desde la fecha "desde", contando a todos los usuarios.
+    public static List<PopularidadArticulo> GetPopularidad(DateTime desde)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT i.IdArticulo,
+                    SUM(CASE WHEN t.Nombre = @pVista THEN 1 ELSE 0 END) AS Vistas,
+                    SUM(CASE WHEN t.Nombre = @pFavorito THEN 1 ELSE 0 END) AS Favoritos
+                FROM Interacciones i
+                INNER JOIN TipoInteracciones t ON t.Id = i.IdTipoInteraccion
+                WHERE i.IdArticulo IS NOT NULL AND i.Fecha >= @pDesde
+                GROUP BY i.IdArticulo";
+            return connection.Query<PopularidadArticulo>(query, new
+            {
+                pDesde = desde,
+                pVista = TipoInteracciones.Vista,
+                pFavorito = TipoInteracciones.Favorito
+            }).ToList();
         }
     }
 

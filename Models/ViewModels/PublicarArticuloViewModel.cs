@@ -36,10 +36,10 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "Descripción")]
         public string Descripcion { get; set; } = string.Empty;
 
-        // Opcional: se puede dejar abierto a propuestas.
-        [StringLength(100, ErrorMessage = "Máximo {1} caracteres")]
+        // Opcional: una categoría de la tabla Categorias. Vacío = abierto a propuestas.
+        // Se guarda en Articulos.IdCategoriaACambio y la usa el algoritmo de recomendaciones.
         [Display(Name = "¿Qué te gustaría recibir a cambio?")]
-        public string? ACambio { get; set; }
+        public int? IdCategoriaACambio { get; set; }
 
         // Hasta MaxFotos imágenes JPG/PNG de máx. MaxFotoMB. La primera es la portada.
         // Se guardan en wwwroot/img/articulos y en la tabla Imagenes (con IdArticulos).

@@ -2,51 +2,34 @@
 // SWAPPIT - Botón de favorito de las cards (se carga en todas las páginas desde _Layout)
 // La card está en Views/Shared/_CardObjeto.cshtml.
 //
-// Solo con sesión iniciada: si no hay usuario (data-usuario vacío en el <body>
-// de _Layout), el corazón lleva a iniciar sesión (data-url-login).
+// Los favoritos se guardan en la base de datos (tabla Interacciones, tipo "Favorito") con FavoritosController:
+// - al cargar la página se piden los IDs (GET Favoritos/Ids) y se pintan los corazones;
+// - al tocar un corazón se manda POST Favoritos/Alternar. Se pinta enseguida y, si no se pudo guardar,
+//   vuelve como estaba.
+// Las URLs y el token antiforgery salen del form oculto [data-favoritos] de _Layout (un .js no puede usar Razor).
+// Ese form solo existe con sesión iniciada: sin sesión, el corazón lleva a iniciar sesión (data-url-login del <body>).
 //
-// Por ahora los favoritos se guardan SOLO en el navegador (localStorage),
-// sin tocar la base de datos. La clave lleva el ID del usuario, así dos
-// cuentas que usan la misma compu no comparten la lista.
+// Antes los favoritos vivían solo en el navegador (localStorage). Si quedó algo guardado ahí,
+// se pasa una vez a la BD (POST Favoritos/Importar) y se borra del navegador.
 //
-// TODO backend: cuando exista la tabla de favoritos, reemplazar leer()/guardar()
-// por llamadas al servidor (ver los TODO de abajo). El resto (marcar las cards,
-// alternar el corazón, accesibilidad) puede quedar igual.
-// La página de favoritos usa ids() y el evento 'swappit:favorito' (favoritos-lista.js).
+// La página de favoritos escucha el evento 'swappit:favorito' (favoritos-lista.js).
+// Los favoritos también los usa el algoritmo de recomendaciones (RecomendacionesController).
 // =========================================================
 
 const swappitFavoritos = (() => {
+    const form = document.querySelector('form[data-favoritos]');
     const usuario = document.body.dataset.usuario;
-    const CLAVE = usuario ? `swappit:favoritos:${usuario}` : null;
-
-    // Devuelve un Set con los IDs (números) de los artículos favoritos
-    function leer() {
-        if (!CLAVE) return new Set();
-        // TODO backend: traer la lista del servidor
-        // (ej: GET a una acción tipo Favoritos/Ids que devuelva [1, 5, 8]).
-        try {
-            const datos = JSON.parse(localStorage.getItem(CLAVE) || '[]');
-            return new Set(Array.isArray(datos) ? datos.map(Number).filter(Number.isInteger) : []);
-        } catch {
-            // localStorage bloqueado (modo privado, etc.) o JSON roto: se arranca vacío
-            return new Set();
-        }
-    }
-
-    function guardar(ids) {
-        try {
-            localStorage.setItem(CLAVE, JSON.stringify([...ids]));
-        } catch {
-            // Sin localStorage el corazón igual cambia en pantalla, solo no se recuerda
-        }
-    }
+    const CLAVE_NAVEGADOR = usuario ? `swappit:favoritos:${usuario}` : null;
+    let favoritos = new Set();
+    // Artículos con un cambio en camino al servidor (para no mandar dos a la vez)
+    const enCamino = new Set();
 
     // Pinta un botón según esté o no en favoritos
     function pintar(boton, esFavorito) {
         const nombre = boton.closest('.card-objeto')?.querySelector('.card-objeto-titulo')?.textContent.trim() || 'este artículo';
         const icono = boton.querySelector('i');
         boton.classList.toggle('activo', esFavorito);
-        if (usuario) {
+        if (form) {
             boton.setAttribute('aria-pressed', esFavorito);
             boton.setAttribute('aria-label', esFavorito ? `Quitar ${nombre} de favoritos` : `Agregar ${nombre} a favoritos`);
         } else {
@@ -58,58 +41,99 @@ const swappitFavoritos = (() => {
         icono.classList.toggle('bi-heart-fill', esFavorito);
     }
 
-    // Marca las cards que ya están en favoritos. Se llama al cargar la página,
-    // desde swappit.renderObjetos (plantillas.js) y desde favoritos-lista.js.
+    // Marca las cards que ya están en favoritos. Se llama al cargar la página
+    // y desde swappit.renderObjetos (plantillas.js).
     function marcar(contenedor = document) {
-        const ids = leer();
         contenedor.querySelectorAll('.card-objeto[data-id]').forEach(card => {
             const boton = card.querySelector('.card-objeto-fav');
-            if (boton) pintar(boton, ids.has(Number(card.dataset.id)));
+            if (boton) pintar(boton, favoritos.has(Number(card.dataset.id)));
         });
     }
 
-    // IDs favoritos en el orden en que se marcaron
-    function ids() {
-        return [...leer()];
+    // FormData con el token antiforgery del form + los datos que se pasen (un valor o una lista)
+    function datos(campos) {
+        const formData = new FormData(form);
+        Object.entries(campos).forEach(([nombre, valor]) => [].concat(valor).forEach(v => formData.append(nombre, v)));
+        return formData;
     }
 
-    document.addEventListener('click', (e) => {
+    // Favoritos que quedaron en el navegador de antes de usar la BD
+    function leerDelNavegador() {
+        try {
+            const guardados = JSON.parse(localStorage.getItem(CLAVE_NAVEGADOR) || '[]');
+            return Array.isArray(guardados) ? guardados.map(Number).filter(Number.isInteger) : [];
+        } catch {
+            return [];
+        }
+    }
+
+    async function cargar() {
+        if (!form) {
+            marcar();
+            return;
+        }
+        try {
+            const delNavegador = leerDelNavegador();
+            if (delNavegador.length > 0) {
+                const importados = await fetch(form.dataset.urlImportar, { method: 'POST', body: datos({ ids: delNavegador }) });
+                if (importados.ok) {
+                    try { localStorage.removeItem(CLAVE_NAVEGADOR); } catch { }
+                }
+            }
+            const respuesta = await fetch(form.dataset.urlIds, { cache: 'no-store' });
+            if (respuesta.ok) favoritos = new Set((await respuesta.json()).map(Number));
+        } catch {
+            // Sin conexión con el servidor los corazones quedan vacíos
+        }
+        marcar();
+    }
+
+    // Cambia el estado en pantalla (en todas las cards de ese artículo) y avisa a la página de favoritos
+    function aplicar(id, esFavorito) {
+        if (esFavorito) favoritos.add(id); else favoritos.delete(id);
+        document.querySelectorAll(`.card-objeto[data-id="${id}"] .card-objeto-fav`).forEach(b => pintar(b, esFavorito));
+        document.dispatchEvent(new CustomEvent('swappit:favorito', { detail: { id, esFavorito } }));
+    }
+
+    document.addEventListener('click', async (e) => {
         const boton = e.target.closest('.card-objeto-fav');
         if (!boton) return;
 
-        if (!usuario) {
+        if (!form) {
             location.href = document.body.dataset.urlLogin;
             return;
         }
 
         const id = Number(boton.closest('.card-objeto')?.dataset.id);
-        if (!Number.isInteger(id)) return;
+        if (!Number.isInteger(id) || enCamino.has(id)) return;
 
-        const favoritos = leer();
-        const esFavorito = !favoritos.has(id);
-        if (esFavorito) favoritos.add(id); else favoritos.delete(id);
-        guardar(favoritos);
-        // TODO backend: avisar al servidor (ej: POST Favoritos/Alternar con el id
-        // y el token antiforgery). Si falla, volver a pintar con el estado anterior.
-
-        // El mismo artículo puede aparecer más de una vez en la página
-        document.querySelectorAll(`.card-objeto[data-id="${id}"] .card-objeto-fav`)
-            .forEach(b => pintar(b, esFavorito));
-
-        if (esFavorito) {
+        const antes = favoritos.has(id);
+        aplicar(id, !antes);
+        if (!antes) {
             boton.classList.add('latido');
             boton.addEventListener('animationend', () => boton.classList.remove('latido'), { once: true });
         }
 
-        document.dispatchEvent(new CustomEvent('swappit:favorito', { detail: { id, esFavorito } }));
+        enCamino.add(id);
+        try {
+            const respuesta = await fetch(form.action, { method: 'POST', body: datos({ idArticulo: id }) });
+            if (respuesta.status === 401) {
+                // Se venció la sesión: a iniciar sesión
+                location.href = document.body.dataset.urlLogin;
+                return;
+            }
+            if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+            const resultado = await respuesta.json();
+            if (resultado.esFavorito !== !antes) aplicar(id, resultado.esFavorito);
+        } catch {
+            // No se guardó: el corazón vuelve como estaba
+            aplicar(id, antes);
+        } finally {
+            enCamino.delete(id);
+        }
     });
 
-    // Si se cambia un favorito en otra pestaña, esta se actualiza sola
-    window.addEventListener('storage', (e) => {
-        if (CLAVE && e.key === CLAVE) marcar();
-    });
+    cargar();
 
-    marcar();
-
-    return { marcar, ids };
+    return { marcar };
 })();

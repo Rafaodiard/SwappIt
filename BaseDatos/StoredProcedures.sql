@@ -1,7 +1,7 @@
 ﻿/****** 3 de 3: Stored procedures. Ejecutar después de Estructura.sql. ******/
 USE [Base_De_Datos_Swappit]
 GO
-/****** Object:  StoredProcedure [dbo].[ActualizarContrasena]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[ActualizarContrasena]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,7 +15,7 @@ BEGIN
 	WHERE IdUsuarios = @idUsuario
 END
 GO
-/****** Object:  StoredProcedure [dbo].[BorrarFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[BorrarFotoUsuario]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,7 +35,7 @@ BEGIN
 	DELETE FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetArticuloById]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetArticuloById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -55,11 +55,11 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-		SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio
+		SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, FechaPublicacion, IdCategoriaACambio
         FROM Articulos WHERE IdArticulos = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetArticulosCatalogo]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetArticulosCatalogo]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -88,7 +88,7 @@ BEGIN
 	ORDER BY a.IdArticulos DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCategoriaById]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetCategoriaById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -111,7 +111,7 @@ BEGIN
 	SELECT IdCategorias, Nombre FROM Categorias WHERE IdCategorias = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCategorias]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetCategorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -134,7 +134,7 @@ BEGIN
 	SELECT IdCategorias, Nombre FROM Categorias ORDER BY Nombre
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetEstadoArticuloById]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetEstadoArticuloById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -157,7 +157,7 @@ BEGIN
 	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos WHERE IdEstadosArticulos = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetEstadosArticulos]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetEstadosArticulos]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -180,7 +180,7 @@ BEGIN
 	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos ORDER BY IdEstadosArticulos
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetFiltroCategorias]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetFiltroCategorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -199,7 +199,7 @@ BEGIN
 	ORDER BY c.Nombre
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetFiltroEstados]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetFiltroEstados]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -218,7 +218,7 @@ BEGIN
 	ORDER BY e.IdEstadosArticulos
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetFotoUsuario]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -236,7 +236,7 @@ BEGIN
 	SELECT TOP 1 Ruta FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL ORDER BY IdImagenes DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetImagenesArticulo]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetImagenesArticulo]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -259,7 +259,7 @@ BEGIN
 	SELECT Ruta FROM Imagenes WHERE IdArticulos = @idArticulo ORDER BY IdImagenes
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetProvinciaById]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetProvinciaById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -279,7 +279,7 @@ BEGIN
 	WHERE IdProvincia = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetProvincias]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetProvincias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -296,7 +296,7 @@ BEGIN
 	SELECT IdProvincia, Nombre FROM Provincias ORDER BY Nombre
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetUsuarioById]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetUsuarioById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -311,7 +311,7 @@ BEGIN
 		 WHERE IdUsuarios = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetUsuarioByMail]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GetUsuarioByMail]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -325,7 +325,7 @@ BEGIN
 		WHERE Mail = @Mail
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GuardarFotoUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[GuardarFotoUsuario]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -346,7 +346,7 @@ BEGIN
     INSERT INTO Imagenes (Ruta, IdUsuarios) VALUES (@ruta, @idUsuario)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[PublicarArticulo]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[PublicarArticulo]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -358,20 +358,21 @@ CREATE PROCEDURE [dbo].[PublicarArticulo]
 	@idUsuario int,
 	@idCategoria int,
 	@ubicacion varchar(100),
-	@aCambio varchar(100) = NULL,
+	@idCategoriaACambio int = NULL,
 	@rutasFotos varchar(max) = NULL
 AS
 BEGIN
 	-- Guarda el artículo y sus fotos en una transacción: si falla algo, no queda un artículo a medias.
 	-- @rutasFotos: rutas separadas por '|' (no puede aparecer en un nombre de archivo); la primera es la portada.
+	-- @idCategoriaACambio: categoría que busca a cambio (NULL = abierto a propuestas). FechaPublicacion: hoy.
 	-- Devuelve el IdArticulos nuevo.
 	SET NOCOUNT ON;
 	SET XACT_ABORT ON;
 	DECLARE @idArticulo int, @ruta varchar(max), @pos int
 
 	BEGIN TRANSACTION
-	INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, ACambio)
-	VALUES (@nombre, @descripcion, @idEstado, @idUsuario, @idCategoria, @ubicacion, @aCambio)
+	INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, FechaPublicacion, IdCategoriaACambio)
+	VALUES (@nombre, @descripcion, @idEstado, @idUsuario, @idCategoria, @ubicacion, CAST(GETDATE() AS date), @idCategoriaACambio)
 	SET @idArticulo = SCOPE_IDENTITY()
 
 	-- Se recorren en orden (STRING_SPLIT no lo garantiza): la portada es la foto de menor IdImagenes.
@@ -388,7 +389,7 @@ BEGIN
 	SELECT @idArticulo AS IdArticulos
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarArticulo]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarArticulo]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -405,14 +406,15 @@ BEGIN
         BEGIN
             IF EXISTS (SELECT Nombre FROM Categorias WHERE Nombre = @categoria) AND EXISTS (SELECT Nombre FROM EstadosArticulos WHERE Nombre = @estado)
             BEGIN
-                INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias)
+                INSERT INTO Articulos (Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, FechaPublicacion)
                 VALUES(@nombre, @descripcion, (SELECT IdEstadosArticulos FROM EstadosArticulos WHERE Nombre = @estado), (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @usuario), (SELECT IdCategorias
-                FROM Categorias WHERE Nombre = @categoria))
+                FROM Categorias WHERE Nombre = @categoria), CAST(GETDATE() AS date))
             END
         END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarIntercambio]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarIntercambio]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -449,8 +451,9 @@ BEGIN
         END
     END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarMensaje]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarMensaje]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -478,8 +481,9 @@ BEGIN
         END
     END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  StoredProcedure [dbo].[RegistrarUsuario]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -505,8 +509,9 @@ BEGIN
 		END
 	END
 END
+
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateUsuario]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[UpdateUsuario]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -533,7 +538,7 @@ BEGIN
 	WHERE IdUsuarios = @idUsuario
 END
 GO
-/****** Object:  StoredProcedure [dbo].[UsuarioExiste]    Script Date: 28/10/2026 12:02:01 ******/
+/****** Object:  StoredProcedure [dbo].[UsuarioExiste]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

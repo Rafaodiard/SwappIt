@@ -9,6 +9,17 @@
     List<int> estadosSeleccionados = ViewBag.estadosSeleccionados;
     bool errorCarga = ViewBag.errorCarga;
     bool hayFiltros = ViewBag.hayFiltros;
+    // "Ordenar por": opciones y orden elegido salen de RecomendacionesController.
+    string orden = ViewBag.orden;
+    List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> opcionesOrden = ViewBag.opcionesOrden;
+    bool logueado = ViewBag.logueado;
+    string titulo = orden switch
+    {
+        Swappit.Controllers.RecomendacionesController.OrdenParaVos => "Elegidos para vos",
+        Swappit.Controllers.RecomendacionesController.OrdenRecientes => "Recién publicados",
+        Swappit.Controllers.RecomendacionesController.OrdenAZ => "Todos los artículos",
+        _ => "Los más buscados"
+    };
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -31,7 +42,7 @@
                     <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
                     @if (hayFiltros)
                     {
-                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
+                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda, orden })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
                     }
                 </div>
 
@@ -71,13 +82,16 @@
         <section class="col-lg-9">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                 <h1 class="font-titulo h2 mb-0">
-                    @if (string.IsNullOrEmpty(busqueda)) { <text>Los más buscados</text> }
+                    @if (string.IsNullOrEmpty(busqueda)) { @titulo }
                     else { <text>Resultados para “@busqueda”</text> }
                 </h1>
                 <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm" id="ordenar" aria-label="Ordenar por" style="width:auto">
-                        <option value="recientes" selected>Más recientes</option>
-                        <option value="az">A - Z</option>
+                    <!-- Va con el form de filtros (form="filtros"): al cambiarlo, buscar.js recarga Buscar con ?orden=... -->
+                    <select class="form-select form-select-sm" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por" style="width:auto">
+                        @foreach (var opcion in opcionesOrden)
+                        {
+                            <option value="@opcion.Value" selected="@(opcion.Value == orden)">@opcion.Text</option>
+                        }
                     </select>
                     <div class="btn-group btn-group-sm sw-vista-toggle" role="group" aria-label="Vista">
                         <input type="radio" class="btn-check" name="vista" id="vista-grilla" value="grilla" checked>
@@ -119,6 +133,20 @@
     </div>
 </div>
 
+@if (logueado && (!string.IsNullOrEmpty(busqueda) || categoriasSeleccionadas.Count > 0))
+{
+    @* Algoritmo de recomendaciones: recomendaciones.js guarda qué buscaste y qué categorías filtraste
+       (RecomendacionesController.Busqueda). *@
+    <form hidden data-reco-busqueda method="post" asp-antiforgery="true" action="@Url.Action("Busqueda", "Recomendaciones")">
+        <input type="hidden" name="texto" value="@busqueda">
+        @foreach (int idCategoria in categoriasSeleccionadas)
+        {
+            <input type="hidden" name="categorias" value="@idCategoria">
+        }
+    </form>
+}
+
 @section Scripts {
     <script src="~/js/buscar.js" asp-append-version="true"></script>
+    <script src="~/js/recomendaciones.js" asp-append-version="true"></script>
 }

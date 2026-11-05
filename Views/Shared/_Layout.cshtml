@@ -20,8 +20,8 @@
 
 
 </head>
-<!-- data-usuario / data-url-login: favoritos.js guarda los favoritos de cada cuenta por separado
-     y, si no hay sesión, el corazón de las cards lleva a iniciar sesión -->
+<!-- data-url-login: sin sesión, el corazón de las cards lleva a iniciar sesión (favoritos.js).
+     data-usuario: favoritos.js lo usa para pasar a la BD los favoritos que quedaron guardados en el navegador -->
 <body data-usuario="@usuarioId" data-url-login="@Url.Action("Index", "Account")">
     <a href="#contenido" class="sw-saltar">Saltar al contenido</a>
 
@@ -115,6 +115,13 @@
             </div>
         </div>
     </footer>
+
+    @if (!esVisitante)
+    {
+        @* favoritos.js: URLs de FavoritosController y token antiforgery para guardar los favoritos en la BD *@
+        <form hidden data-favoritos method="post" asp-antiforgery="true" action="@Url.Action("Alternar", "Favoritos")"
+              data-url-ids="@Url.Action("Ids", "Favoritos")" data-url-importar="@Url.Action("Importar", "Favoritos")"></form>
+    }
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JS de todas las páginas (cada archivo dice arriba qué maneja). El JS propio de una página va en su sección Scripts. -->

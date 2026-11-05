@@ -8,6 +8,7 @@ public class Articulos
     public int IdUsuarios { get; set; }
     public int IdCategorias { get; set; }
     public string? Ubicacion { get; set; }
-    public string? ACambio { get; set; }
+    // Categoría que el dueño quiere recibir a cambio (null = abierto a propuestas).
+    public int? IdCategoriaACambio { get; set; }
     public DateTime FechaPublicacion { get; set; }
 }

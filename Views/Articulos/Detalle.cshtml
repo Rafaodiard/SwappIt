@@ -31,6 +31,8 @@
 @{
     List<string> imagenes = ViewBag.imagenes;
     Swappit.Models.Categorias? categoria = ViewBag.categoria;
+    // Lo que el dueño pide a cambio (Articulos.IdCategoriaACambio); null = abierto a propuestas.
+    Swappit.Models.Categorias? categoriaACambio = ViewBag.categoriaACambio;
     Swappit.Models.EstadosArticulos? estado = ViewBag.estado;
     Swappit.Models.Usuarios dueno = ViewBag.dueno;
     string? fotoDueno = ViewBag.fotoDueno;
@@ -143,7 +145,7 @@
 
                 <div>
                     <h2 class="h6 fw-bold mb-2">Busca a cambio</h2>
-                    <p class="sw-articulo-descripcion mb-0">@(string.IsNullOrWhiteSpace(articulo.ACambio) ? "Abierto a propuestas" : articulo.ACambio)</p>
+                    <p class="sw-articulo-descripcion mb-0">@(categoriaACambio?.Nombre ?? "Abierto a propuestas")</p>
                 </div>
 
                 <hr class="sw-divisor">
@@ -304,6 +306,17 @@
     </div>
 }
 
+@if (logueado && !esPropio)
+{
+    @* Algoritmo de recomendaciones: recomendaciones.js registra que abriste este artículo (= clic)
+       y cuánto tiempo lo miraste (RecomendacionesController.Vista y .Tiempo). *@
+    <form hidden data-reco-vista method="post" asp-antiforgery="true"
+          action="@Url.Action("Vista", "Recomendaciones")" data-url-tiempo="@Url.Action("Tiempo", "Recomendaciones")">
+        <input type="hidden" name="idArticulo" value="@articulo.IdArticulos">
+    </form>
+}
+
 @section Scripts {
     <script src="~/js/articulo.js" asp-append-version="true"></script>
+    <script src="~/js/recomendaciones.js" asp-append-version="true"></script>
 }

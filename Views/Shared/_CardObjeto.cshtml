@@ -13,9 +13,11 @@
       estado   -> EstadosArticulos.Nombre (por Articulos.IdEstado)
       nombre   -> Articulos.Nombre
       barrio   -> Articulos.Ubicacion (si está vacía, Usuarios.Barrio del dueño)
+      motivo   -> por qué se recomienda ("Le interesa algo tuyo" / "Para descubrir"); solo lo completa
+                  RecomendacionesController en "Para vos" y en Destacados. Si es null no se muestra.
     Botón de favorito: se muestra siempre, salvo que la vista ponga ViewBag.ocultarFavorito = true
     (ej: "Mis artículos" en el perfil, donde no tiene sentido marcar lo propio).
-    Pendiente: "Busca a cambio" (Articulos.ACambio, por ahora solo en el detalle).
+    Pendiente: "Busca a cambio" (Articulos.IdCategoriaACambio, por ahora solo en el detalle).
 *@
 @{
     Swappit.Models.ViewModels.ArticuloCardViewModel articulo = ViewBag.articulo;
@@ -34,7 +36,7 @@
             <span class="card-objeto-estado" data-campo="estado">@articulo.Estado</span>
             @if (ViewBag.ocultarFavorito != true)
             {
-                @* Favorito: solo en el navegador por ahora (wwwroot/js/favoritos.js marca el estado al cargar) *@
+                @* Favorito: se guarda en la BD (FavoritosController); wwwroot/js/favoritos.js marca el estado al cargar *@
                 <button type="button" class="card-objeto-fav" aria-pressed="false" aria-label="Agregar @articulo.Nombre a favoritos"><i class="bi bi-heart" aria-hidden="true"></i></button>
             }
         </div>
@@ -47,6 +49,14 @@
                 <div class="card-objeto-ubicacion">
                     <i class="bi bi-geo-alt"></i>
                     <span data-campo="barrio">@articulo.Barrio</span>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(articulo.Motivo))
+            {
+                bool descubrir = articulo.Motivo == Swappit.Controllers.RecomendacionesController.MotivoDescubrir;
+                <div class="card-objeto-motivo @(descubrir ? "card-objeto-motivo--descubrir" : "")">
+                    <i class="bi @(descubrir ? "bi-compass" : "bi-arrow-left-right")" aria-hidden="true"></i>
+                    <span>@articulo.Motivo</span>
                 </div>
             }
         </div>

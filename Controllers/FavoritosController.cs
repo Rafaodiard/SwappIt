@@ -5,16 +5,17 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Favoritos del usuario logueado (/Favoritos). Solo con sesión iniciada.
-// Por ahora los IDs favoritos viven en el navegador (localStorage, ver wwwroot/js/favoritos.js):
-// - GET /Favoritos: la página, con la lista vacía.
-// - GET /Favoritos/Tarjetas?ids=3&ids=8: las cards de esos artículos (partial). La pide favoritos-lista.js.
-// TODO backend: cuando exista la tabla de favoritos, Tarjetas tiene que leer los IDs de la BD
-// (por usuario) en lugar de recibirlos por la URL, y la página puede armarse directo desde el servidor.
+// Favoritos del usuario logueado. Se guardan en la tabla Interacciones con el tipo "Favorito"
+// (una fila por artículo mientras siga siendo favorito). El algoritmo de recomendaciones también los usa
+// (RecomendacionesController): un favorito es la señal de gusto que más pesa.
+// - GET  /Favoritos: la página con las cards de los favoritos.
+// - GET  /Favoritos/Ids: los IDs de los favoritos, para que favoritos.js pinte los corazones de cualquier página.
+// - POST /Favoritos/Alternar: marca o desmarca un favorito (corazón de las cards).
+// - POST /Favoritos/Importar: pasa a la BD los favoritos que quedaron guardados en el navegador de antes (localStorage).
 public class FavoritosController : Controller
 {
-    // Tope de IDs que se aceptan en la URL.
-    private const int MaxFavoritos = 100;
+    // Tope de IDs que se aceptan al importar.
+    private const int MaxImportar = 100;
 
     private readonly ILogger<FavoritosController> _logger;
 
@@ -23,20 +24,31 @@ public class FavoritosController : Controller
         _logger = logger;
     }
 
+    // Solo los que siguen disponibles (los mismos que se ven en el catálogo); el último que marcaste primero.
     public IActionResult Index()
     {
-        if (HttpContext.Session.GetInt32("UsuarioId") == null)
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
         {
             return RedirectToAction("Index", "Account");
         }
 
+        ViewBag.articulos = new List<ArticuloCardViewModel>();
+        ViewBag.errorCarga = false;
+        try
+        {
+            ViewBag.articulos = BD.GetFavoritos(usuarioId.Value);
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron cargar los favoritos del usuario {IdUsuario}", usuarioId);
+            ViewBag.errorCarga = true;
+        }
         return View();
     }
 
-    // ids: en el orden en que se quieren mostrar (favoritos-lista.js manda primero los más nuevos).
-    // Solo devuelve los artículos que siguen disponibles (los mismos que se ven en el catálogo);
-    // los que ya se intercambiaron o se borraron no aparecen.
-    public IActionResult Tarjetas(int[]? ids)
+    [HttpGet]
+    public IActionResult Ids()
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -44,27 +56,65 @@ public class FavoritosController : Controller
             return Unauthorized();
         }
 
-        List<int> pedidos = (ids ?? []).Where(id => id > 0).Distinct().Take(MaxFavoritos).ToList();
-        List<ArticuloCardViewModel> articulos = new List<ArticuloCardViewModel>();
-
-        if (pedidos.Count > 0)
+        try
         {
-            try
-            {
-                // TODO backend: reemplazar por una consulta que traiga solo los favoritos del usuario.
-                // Mientras tanto se reusa el catálogo (sin los artículos propios) y se filtra acá.
-                Dictionary<int, ArticuloCardViewModel> disponibles = BD.GetArticulosCatalogo(excluirUsuario: usuarioId)
-                    .ToDictionary(a => a.IdArticulos);
-                articulos = pedidos.Where(disponibles.ContainsKey).Select(id => disponibles[id]).ToList();
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "No se pudieron cargar los favoritos del usuario {IdUsuario}", usuarioId);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable);
-            }
+            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron leer los favoritos del usuario {IdUsuario}", usuarioId);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+    }
+
+    // Devuelve { esFavorito } con cómo quedó. 404 si el artículo no existe o es tuyo.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Alternar(int idArticulo)
+    {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+        {
+            return Unauthorized();
         }
 
-        ViewBag.articulos = articulos;
-        return PartialView("_Tarjetas");
+        try
+        {
+            bool? esFavorito = BD.AlternarFavorito(usuarioId.Value, idArticulo);
+            if (esFavorito == null)
+            {
+                return NotFound();
+            }
+            return Json(new { esFavorito });
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudo cambiar el favorito {IdArticulo} del usuario {IdUsuario}", idArticulo, usuarioId);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
+    }
+
+    // Antes los favoritos vivían solo en el navegador: favoritos.js los manda una vez y después los borra de ahí.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Importar(int[]? ids)
+    {
+        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuarioId == null)
+        {
+            return Unauthorized();
+        }
+
+        List<int> pedidos = (ids ?? []).Where(id => id > 0).Distinct().Take(MaxImportar).ToList();
+        try
+        {
+            BD.ImportarFavoritos(usuarioId.Value, pedidos);
+            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron importar los favoritos del usuario {IdUsuario}", usuarioId);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable);
+        }
     }
 }

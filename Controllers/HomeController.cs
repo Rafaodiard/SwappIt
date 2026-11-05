@@ -24,9 +24,10 @@ public class HomeController : Controller
             return Inicio(usuarioId.Value);
         }
 
+        // Destacados de la landing: los más populares (vistas y favoritos), ver RecomendacionesController.Destacados.
         try
         {
-            ViewBag.destacados = BD.GetArticulosCatalogo(cantidad: 4);
+            ViewBag.destacados = RecomendacionesController.Destacados(null, CantidadDestacadosLanding);
         }
         catch (SqlException ex)
         {
@@ -37,7 +38,7 @@ public class HomeController : Controller
     }
 
     // Inicio del usuario logueado: sus intercambios en curso (primero los que tiene que responder),
-    // un resumen de lo que tiene pendiente y artículos recomendados de los demás.
+    // un resumen de lo que tiene pendiente y los destacados para él (algoritmo de recomendaciones).
     private IActionResult Inicio(int usuarioId)
     {
         ViewBag.nombre = null;
@@ -45,7 +46,7 @@ public class HomeController : Controller
         ViewBag.porResponder = 0;
         ViewBag.cantidadEnCurso = 0;
         ViewBag.cantidadArticulos = 0;
-        ViewBag.recomendados = new List<ArticuloCardViewModel>();
+        ViewBag.destacados = new List<ArticuloCardViewModel>();
         ViewBag.mensajesSinLeer = null;
         ViewBag.errorCarga = false;
         try
@@ -61,9 +62,8 @@ public class HomeController : Controller
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
             ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
-            // Por ahora los recomendados son los últimos artículos disponibles de los demás:
-            // no hay datos de gustos ni de búsquedas del usuario para elegirlos de otra forma.
-            ViewBag.recomendados = BD.GetArticulosCatalogo(cantidad: CantidadRecomendadosInicio, excluirUsuario: usuarioId);
+            // Lo que más le puede interesar y donde al dueño también le puede interesar algo suyo.
+            ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)
         {
@@ -85,7 +85,8 @@ public class HomeController : Controller
     }
 
     private const int CantidadIntercambiosInicio = 4;
-    private const int CantidadRecomendadosInicio = 9;
+    private const int CantidadDestacadosInicio = 9;
+    private const int CantidadDestacadosLanding = 4;
 
     // Propuesta que le llegó al usuario y que todavía tiene que aceptar o rechazar.
     private static bool PorResponder(IntercambioViewModel i)

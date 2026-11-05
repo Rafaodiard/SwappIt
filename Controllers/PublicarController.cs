@@ -65,6 +65,10 @@ public class PublicarController : Controller
         {
             ModelState.AddModelError(nameof(modelo.IdCategorias), "Elegí una categoría de la lista");
         }
+        if (modelo.IdCategoriaACambio.HasValue && !categorias.Any(c => c.Value == modelo.IdCategoriaACambio.Value.ToString()))
+        {
+            ModelState.AddModelError(nameof(modelo.IdCategoriaACambio), "Elegí una categoría de la lista o dejalo abierto a propuestas");
+        }
         List<EstadosArticulos> estados = ObtenerEstados();
         if (modelo.IdEstado.HasValue && !estados.Any(e => e.IdEstadosArticulos == modelo.IdEstado.Value))
         {
@@ -104,7 +108,7 @@ public class PublicarController : Controller
                 IdUsuarios = usuarioId.Value,
                 IdCategorias = modelo.IdCategorias!.Value,
                 Ubicacion = modelo.Ubicacion.Trim(),
-                ACambio = string.IsNullOrWhiteSpace(modelo.ACambio) ? null : modelo.ACambio.Trim(),
+                IdCategoriaACambio = modelo.IdCategoriaACambio,
                 FechaPublicacion = DateTime.Today
             };
             int idArticulo = BD.PublicarArticulo(articulo, rutasFotos);
