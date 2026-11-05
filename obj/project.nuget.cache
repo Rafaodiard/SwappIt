@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QsgcUEpJg+M=",
+  "dgSpecHash": "vDcGKvM20V0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\49758734\\swappit\\Swappit.csproj",
+  "projectFilePath": "C:\\Users\\49758734\\Desktop\\SwappIt\\Swappit.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\49758734\\.nuget\\packages\\dapper\\2.1.89\\dapper.2.1.89.nupkg.sha512",
     "C:\\Users\\49758734\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\2.3.11\\microsoft.aspnetcore.cryptography.internal.2.3.11.nupkg.sha512",

@@ -10,9 +10,13 @@ namespace Swappit.Services;
 // Manda por mail las notificaciones nuevas (Propuesta recibida/aceptada/rechazada, Mensaje nuevo, Intercambio cancelado).
 // Los controllers lo llaman DESPUÉS de que BD confirmó la transacción, con las NotificacionCreada que devolvió BD.
 // El envío corre en segundo plano: no demora la respuesta y, si falla, solo se loguea (la notificación ya está guardada).
-// Sin configuración SMTP (sección "Smtp") no manda nada y avisa una vez en el log.
+// Sin configuración SMTP (sección "Smtp") los guarda como .eml en Smtp:CarpetaPrueba (si está),
+// y si tampoco hay carpeta no hace nada y avisa una vez en el log.
 public class EmailService
 {
+    // Remitente para los mails de prueba guardados en carpeta, si no hay Smtp:From.
+    private const string FromPrueba = "notificaciones@swappit.local";
+
     // Colores de la identidad de Swappit.
     private const string AzulPetroleo = "#0d596a";
     private const string Beige = "#ece6d8";
@@ -22,12 +26,17 @@ public class EmailService
 
     private readonly SmtpSettings _smtp;
     private readonly ILogger<EmailService> _logger;
+    private readonly string? _carpetaPrueba;
     private int _avisoSinConfiguracion;
 
-    public EmailService(IOptions<SmtpSettings> smtp, ILogger<EmailService> logger)
+    public EmailService(IOptions<SmtpSettings> smtp, ILogger<EmailService> logger, IWebHostEnvironment env)
     {
         _smtp = smtp.Value;
         _logger = logger;
+        if (_smtp.GuardaEnCarpeta)
+        {
+            _carpetaPrueba = Path.GetFullPath(Path.Combine(env.ContentRootPath, _smtp.CarpetaPrueba!));
+        }
     }
 
     // url: el Url del controller; los links se arman acá, durante el request, con el esquema y host del pedido.
@@ -37,13 +46,17 @@ public class EmailService
         {
             return;
         }
-        if (!_smtp.EstaConfigurado)
+        if (!_smtp.EstaConfigurado && _carpetaPrueba == null)
         {
             if (Interlocked.Exchange(ref _avisoSinConfiguracion, 1) == 0)
             {
-                _logger.LogWarning("No se mandan mails de notificaciones: falta configurar Smtp:Host y Smtp:From (ver user-secrets).");
+                _logger.LogWarning("No se mandan mails de notificaciones: falta configurar Smtp:Host y Smtp:From (ver appsettings.Development.json).");
             }
             return;
+        }
+        if (!_smtp.EstaConfigurado && Interlocked.Exchange(ref _avisoSinConfiguracion, 1) == 0)
+        {
+            _logger.LogWarning("Sin SMTP configurado: los mails NO salen, solo se guardan como .eml en {Carpeta}", _carpetaPrueba);
         }
 
         string scheme = url.ActionContext.HttpContext.Request.Scheme;
@@ -84,26 +97,37 @@ public class EmailService
         }
     }
 
-    // Arma el mail y lo manda por SMTP. Separado de la lectura de la base para que quede más claro.
+    // Guarda la copia en la carpeta (si hay) y lo manda por SMTP (si está configurado).
+    // Separado de la lectura de la base para que quede más claro.
     private async Task EnviarAsync(NotificacionCreada notificacion, DatosMailNotificacion datos, string? link)
     {
-        (string asunto, string titulo, string texto, string boton) = Textos(notificacion.Tipo, datos);
-        string saludo = string.IsNullOrWhiteSpace(datos.Nombre) ? "Hola," : $"Hola {datos.Nombre},";
-
-        using MailMessage mail = new MailMessage
+        if (_carpetaPrueba != null)
         {
-            From = new MailAddress(_smtp.From!, _smtp.FromName),
-            Subject = asunto,
-            SubjectEncoding = Encoding.UTF8,
-            BodyEncoding = Encoding.UTF8
-        };
-        mail.To.Add(datos.Mail!);
-        // Texto plano para los clientes que no muestran HTML, y la versión HTML.
-        mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
-            TextoPlano(saludo, texto, boton, link), Encoding.UTF8, "text/plain"));
-        mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
-            Html(saludo, titulo, texto, boton, link), Encoding.UTF8, "text/html"));
+            // La copia se guarda primero: así queda aunque después falle el SMTP.
+            try
+            {
+                Directory.CreateDirectory(_carpetaPrueba);
+                using MailMessage copia = CrearMail(notificacion, datos, link);
+                using SmtpClient aCarpeta = new SmtpClient
+                {
+                    DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                    PickupDirectoryLocation = _carpetaPrueba
+                };
+                await aCarpeta.SendMailAsync(copia);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "No se pudo guardar la copia del mail en {Carpeta}", _carpetaPrueba);
+            }
+        }
 
+        if (!_smtp.EstaConfigurado)
+        {
+            return;
+        }
+
+        // Un MailMessage nuevo para el envío: el de la copia ya consumió sus vistas.
+        using MailMessage mail = CrearMail(notificacion, datos, link);
         using SmtpClient cliente = new SmtpClient(_smtp.Host, _smtp.Port)
         {
             EnableSsl = _smtp.EnableSsl,
@@ -116,6 +140,27 @@ public class EmailService
         }
 
         await cliente.SendMailAsync(mail);
+    }
+
+    private MailMessage CrearMail(NotificacionCreada notificacion, DatosMailNotificacion datos, string? link)
+    {
+        (string asunto, string titulo, string texto, string boton) = Textos(notificacion.Tipo, datos);
+        string saludo = string.IsNullOrWhiteSpace(datos.Nombre) ? "Hola," : $"Hola {datos.Nombre},";
+
+        MailMessage mail = new MailMessage
+        {
+            From = new MailAddress(string.IsNullOrWhiteSpace(_smtp.From) ? FromPrueba : _smtp.From, _smtp.FromName),
+            Subject = asunto,
+            SubjectEncoding = Encoding.UTF8,
+            BodyEncoding = Encoding.UTF8
+        };
+        mail.To.Add(datos.Mail!);
+        // Texto plano para los clientes que no muestran HTML, y la versión HTML.
+        mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+            TextoPlano(saludo, texto, boton, link), Encoding.UTF8, "text/plain"));
+        mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+            Html(saludo, titulo, texto, boton, link), Encoding.UTF8, "text/html"));
+        return mail;
     }
 
     // Textos sin escapar; Html() los escapa.

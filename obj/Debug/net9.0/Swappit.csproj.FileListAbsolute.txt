@@ -919,7 +919,6 @@ C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\vnh0ekjncn-sjd1v
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\4ch4uxh4d7-mt1d3nc9p7.gz
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\q7dg00387n-43tpqessqk.gz
 C:\Users\50416809\Downloads\SwappIt\obj\Debug\net9.0\compressed\m5q5qmvx59-eer3espfkx.gz
-C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\1xws7mzh39-l0aoequri6.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\qk3zvwg1xn-co848rknyr.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\smaad7afoy-sis3452g3z.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\4ch4uxh4d7-mt1d3nc9p7.gz
@@ -938,7 +937,6 @@ C:\Users\49758734\AppData\Local\Temp\claude\C--Users-49758734-Desktop-swappit\4f
 C:\Users\49758734\AppData\Local\Temp\claude\C--Users-49758734-Desktop-swappit\4fdb00c4-cfe6-4a53-be5d-711eaf302d46\scratchpad\out\Swappit.pdb
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\26qer9o0kt-vyfky7gjmy.gz
 C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\vnh0ekjncn-m30ugodwrw.gz
-C:\Users\49758734\Desktop\swappit\obj\Debug\net9.0\compressed\jntdcx1p0d-yqz1goxv43.gz
 C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\Vault-local\Grafo\graph.json
 C:\Users\rafae\Proyectos\swappit\bin\Debug\net9.0\Vault\Grafo\graph.json
 C:\Users\rafae\Proyectos\swappit\obj\Debug\net9.0\compressed\26qer9o0kt-vyfky7gjmy.gz
@@ -1114,3 +1112,6 @@ C:\Users\49758734\AppData\Local\Temp\claude\a1410e633af2b78f\05bcbfc7-9d7c-45b0-
 C:\Users\49758734\AppData\Local\Temp\claude\a1410e633af2b78f\05bcbfc7-9d7c-45b0-aae8-1d04d1fac080\scratchpad\build\Swappit.runtimeconfig.json
 C:\Users\49758734\AppData\Local\Temp\claude\a1410e633af2b78f\05bcbfc7-9d7c-45b0-aae8-1d04d1fac080\scratchpad\build\Swappit.dll
 C:\Users\49758734\AppData\Local\Temp\claude\a1410e633af2b78f\05bcbfc7-9d7c-45b0-aae8-1d04d1fac080\scratchpad\build\Swappit.pdb
+C:\Users\49758734\Desktop\SwappIt\bin\Debug\net9.0\Vault-local\Grafo\graph.json
+C:\Users\49758734\Desktop\SwappIt\obj\Debug\net9.0\compressed\jntdcx1p0d-wzqvhiv5zg.gz
+C:\Users\49758734\Desktop\SwappIt\obj\Debug\net9.0\compressed\1xws7mzh39-rgr0xqsg43.gz
