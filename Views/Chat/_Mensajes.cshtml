@@ -1,8 +1,3 @@
-@*
-    Mensajes del chat abierto (tabla Mensajes). Lo usan Chat/Index y ChatController.Mensajes,
-    que chat.js pide cada pocos segundos para mostrar los mensajes nuevos.
-    Clase "enviado" si lo mandó el usuario logueado, si no "recibido". Antes del primer mensaje de cada día va la fecha.
-*@
 @{
     List<Swappit.Models.Mensajes> mensajes = ViewBag.mensajes;
     int usuarioId = ViewBag.usuarioId;

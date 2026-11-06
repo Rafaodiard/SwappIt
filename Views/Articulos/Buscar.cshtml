@@ -9,7 +9,6 @@
     List<int> estadosSeleccionados = ViewBag.estadosSeleccionados;
     bool errorCarga = ViewBag.errorCarga;
     bool hayFiltros = ViewBag.hayFiltros;
-    // "Ordenar por": opciones y orden elegido salen de RecomendacionesController.
     string orden = ViewBag.orden;
     List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> opcionesOrden = ViewBag.opcionesOrden;
     bool logueado = ViewBag.logueado;
@@ -27,12 +26,10 @@
 
         <!-- ===== Filtros ===== -->
         <aside class="col-lg-3">
-            <!-- En mobile se colapsa -->
             <button class="btn btn-sw-outline w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros">
                 <i class="bi bi-funnel"></i> Filtros
             </button>
 
-            <!-- Se envía por GET a Buscar: los filtros quedan en la URL y se combinan con la búsqueda (q) -->
             <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
                 @if (!string.IsNullOrEmpty(busqueda))
                 {
@@ -46,7 +43,6 @@
                     }
                 </div>
 
-                <!-- Categoría: tabla Categorias. El número es cuántos artículos hay (respetando la búsqueda) -->
                 <h6>Categoría</h6>
                 <div id="filtro-categorias" class="mb-4">
                     @foreach (var cat in categorias)
@@ -61,7 +57,6 @@
                     }
                 </div>
 
-                <!-- Estado: filas de la tabla EstadosArticulos -->
                 <h6>Estado</h6>
                 <div>
                     @foreach (var est in estados)
@@ -73,7 +68,6 @@
                     }
                 </div>
 
-                <!-- Con JS los filtros se aplican al marcarlos; sin JS se usa este botón -->
                 <noscript><button type="submit" class="btn btn-sw-outline w-100 mt-4">Aplicar filtros</button></noscript>
             </form>
         </aside>
@@ -86,7 +80,6 @@
                     else { <text>Resultados para “@busqueda”</text> }
                 </h1>
                 <div class="d-flex align-items-center gap-2">
-                    <!-- Va con el form de filtros (form="filtros"): al cambiarlo, buscar.js recarga Buscar con ?orden=... -->
                     <select class="form-select form-select-sm" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por" style="width:auto">
                         @foreach (var opcion in opcionesOrden)
                         {
@@ -102,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- Artículos de la tabla Articulos (ArticulosController.Buscar → BD.GetArticulosCatalogo) -->
             <div id="lista-objetos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
                 @foreach (var articulo in articulos)
                 {
@@ -120,7 +112,6 @@
             }
             else
             {
-                <!-- Se muestra cuando no hay resultados -->
                 <div id="sin-resultados" class="text-center py-5 @(articulos.Count > 0 ? "d-none" : "")">
                     <i class="bi bi-inbox fs-1 text-suave"></i>
                     <p class="text-suave mt-2">
@@ -135,8 +126,6 @@
 
 @if (logueado && (!string.IsNullOrEmpty(busqueda) || categoriasSeleccionadas.Count > 0))
 {
-    @* Algoritmo de recomendaciones: recomendaciones.js guarda qué buscaste y qué categorías filtraste
-       (RecomendacionesController.Busqueda). *@
     <form hidden data-reco-busqueda method="post" asp-antiforgery="true" action="@Url.Action("Busqueda", "Recomendaciones")">
         <input type="hidden" name="texto" value="@busqueda">
         @foreach (int idCategoria in categoriasSeleccionadas)

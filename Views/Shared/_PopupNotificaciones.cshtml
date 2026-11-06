@@ -1,14 +1,6 @@
-@*
-    Pop up de notificaciones (UI Kit de Figma: "Popup / Notificaciones").
-    El botón que lo abre está en _Layout.cshtml. notificaciones.js lo abre y lo cierra, pide la lista
-    a NotificacionesController.Lista cada vez que se abre (la pone en [data-notif-contenido])
-    y maneja "Marcar todas como leídas" y el contador de la campana.
-    La lista (o el estado vacío) está en Views/Notificaciones/_Lista.cshtml.
-*@
 <section id="popup-notificaciones" class="sw-notif-popup" aria-labelledby="notif-titulo">
     <header class="sw-notif-encabezado">
         <h2 id="notif-titulo" class="sw-notif-titulo">Notificaciones</h2>
-        <!-- Se muestra solo si hay notificaciones sin leer (notificaciones.js) -->
         <form action="@Url.Action("MarcarTodasLeidas", "Notificaciones")" asp-antiforgery="true" method="post" data-notif-marcar-todas hidden>
             <button type="submit" class="sw-notif-accion">Marcar todas como leídas</button>
         </form>

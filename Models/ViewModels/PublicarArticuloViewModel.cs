@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Swappit.Models.ViewModels
 {
-    // Datos del formulario de Views/Home/Publicar.cshtml (llegan por POST).
-    // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
-    // Las opciones de categorías y estados van aparte, en ViewBag.categorias y ViewBag.estados.
     public class PublicarArticuloViewModel
     {
         public const int MaxFotos = 6;
@@ -28,7 +25,6 @@ namespace Swappit.Models.ViewModels
 
         [Required(ErrorMessage = "Elegí el estado del objeto")]
         [Display(Name = "Estado del objeto")]
-        // Un IdEstadosArticulos de la tabla EstadosArticulos. Se guarda en Articulos.IdEstado.
         public int? IdEstado { get; set; }
 
         [Required(ErrorMessage = "Contá cómo es tu objeto")]
@@ -36,15 +32,9 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "Descripción")]
         public string Descripcion { get; set; } = string.Empty;
 
-        // Opcional: una categoría de la tabla Categorias. Vacío = abierto a propuestas.
-        // Se guarda en Articulos.IdCategoriaACambio y la usa el algoritmo de recomendaciones.
         [Display(Name = "¿Qué te gustaría recibir a cambio?")]
         public int? IdCategoriaACambio { get; set; }
 
-        // Hasta MaxFotos imágenes JPG/PNG de máx. MaxFotoMB. La primera es la portada.
-        // Se guardan en wwwroot/img/articulos y en la tabla Imagenes (con IdArticulos).
         public List<IFormFile>? Fotos { get; set; }
-
-        // Titulo -> Articulos.Nombre.
     }
 }

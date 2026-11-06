@@ -1,8 +1,3 @@
-@*
-    Mis favoritos (FavoritosController.Index). Solo con sesión iniciada.
-    Las cards salen de la BD (tabla Interacciones, tipo "Favorito"), el último que marcaste primero.
-    Si se saca el corazón de una card, favoritos-lista.js la saca de la lista.
-*@
 @{
     ViewData["Title"] = "Favoritos";
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;

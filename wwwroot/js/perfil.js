@@ -1,12 +1,3 @@
-// =========================================================
-// SWAPPIT - Perfil: pop up "Editar perfil"
-// - Lo abren los botones con data-bs-toggle="modal" (Bootstrap)
-// - Vista previa de la foto elegida y botón "Quitar foto"
-// - Contador de caracteres de la descripción
-// - Si el servidor devolvió un error, se vuelve a abrir solo
-// La validación final y el guardado los hace PerfilController.Editar.
-// =========================================================
-
 (() => {
     const modalEl = document.getElementById('modal-editar-perfil');
     if (!modalEl) return;
@@ -26,7 +17,7 @@
     const botonQuitarVisible = !btnQuitar.classList.contains('d-none');
     let urlTemporal = null;
 
-    // --- Vista previa del avatar ---
+    // ---------- Vista previa del avatar ----------
     function mostrarImagen(src) {
         vistaPrevia.innerHTML = '';
         const img = document.createElement('img');
@@ -79,24 +70,21 @@
         btnQuitar.classList.add('d-none');
     });
 
-    // --- Contador de la descripción ---
+    // ---------- Contador de la descripción ----------
     const actualizarContador = () => { contador.textContent = `${descripcion.value.length}/${descripcion.maxLength}`; };
     descripcion.addEventListener('input', actualizarContador);
     actualizarContador();
 
-    // --- Abrir / cerrar ---
-    // El botón de la cámara abre directamente el selector de archivos
+    // ---------- Abrir / cerrar ----------
     document.querySelectorAll('[data-elegir-foto]').forEach(btn =>
         btn.addEventListener('click', () => inputFoto.click()));
 
-    // Botones con data-enfocar="Campo" llevan el foco a ese campo al abrir
     modalEl.addEventListener('shown.bs.modal', e => {
         const campo = e.relatedTarget?.dataset.enfocar;
         const destino = campo ? document.getElementById(campo) : document.getElementById('Nombre');
         destino?.focus();
     });
 
-    // Si se cancela, se descartan los cambios
     modalEl.addEventListener('hidden.bs.modal', () => {
         form.reset();
         liberarUrl();
@@ -107,7 +95,6 @@
         actualizarContador();
     });
 
-    // Error del servidor: se vuelve a abrir el pop up para mostrarlo
     if (modalEl.dataset.error) {
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }

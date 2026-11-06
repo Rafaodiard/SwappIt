@@ -2,15 +2,12 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Publicar objeto";
-    // Lo cargado en el formulario (vacío la primera vez; con los datos del usuario si el POST volvió con errores).
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
-    // Filas de la tabla EstadosArticulos (PublicarController.ObtenerEstados).
     List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
 }
 
 @functions {
-    // Clase que pone el input en rojo si el campo volvió del controller con error (como hacía asp-for).
     string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
 }
 
@@ -31,7 +28,6 @@
                     <span class="sw-ayuda">La primera foto va a ser la portada de tu publicación.</span>
                 </div>
 
-                <!-- Zona de carga: clic o arrastrar. El input real está oculto. -->
                 <div class="sw-zona-carga" id="zona-carga" role="button" tabindex="0" aria-labelledby="etiqueta-fotos">
                     <span class="sw-zona-carga-icono"><i class="bi bi-camera" aria-hidden="true"></i></span>
                     <p class="sw-zona-carga-titulo">Arrastrá tus fotos acá</p>
@@ -41,7 +37,6 @@
                 <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden
                        data-max-fotos="@PublicarArticuloViewModel.MaxFotos" data-max-mb="@PublicarArticuloViewModel.MaxFotoMB">
 
-                <!-- Miniaturas: 4 espacios vacíos; publicar.js las completa con las fotos elegidas -->
                 <div class="sw-miniaturas" id="miniaturas">
                     <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
                     <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
@@ -51,7 +46,6 @@
 
                 <p class="sw-nota">Hasta @PublicarArticuloViewModel.MaxFotos fotos · JPG o PNG · máx. @PublicarArticuloViewModel.MaxFotoMB MB cada una</p>
                 @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
-                <!-- Aviso de publicar.js si se eligen fotos que no se aceptan -->
                 <p class="sw-error" id="aviso-fotos" role="alert"></p>
             </div>
 
@@ -104,8 +98,6 @@
                     @Html.ValidationMessage("Descripcion", new { @class = "sw-error" })
                 </div>
 
-                <!-- Categoría que quiere recibir (Articulos.IdCategoriaACambio). La usa el algoritmo de recomendaciones
-                     para mostrarle este artículo a quien tiene algo de esa categoría. Vacío = abierto a propuestas. -->
                 <div class="sw-campo">
                     <label class="sw-label" for="IdCategoriaACambio">¿Qué te gustaría recibir a cambio?</label>
                     <span class="sw-ayuda" id="ayuda-a-cambio">Elegí una categoría o dejalo abierto a propuestas.</span>

@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Swappit.Models.ViewModels
 {
-    // Datos del formulario de Views/Account/Registro.cshtml (llegan por POST).
-    // Los nombres de las propiedades coinciden con los name de los inputs de la vista.
-    // Longitudes máximas = columnas de la tabla Usuarios (varchar(50)).
     public class RegistroViewModel : IValidatableObject
     {
         public const int EdadMinima = 18;
@@ -68,9 +65,5 @@ namespace Swappit.Models.ViewModels
             if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
             return edad;
         }
-
-        // TODO (BD): la tabla Usuarios también pide Usuario, Barrio e IdProvincias,
-        // que el diseño de Figma no incluye. Hay que agregarlos al formulario
-        // o resolverlos del lado del servidor antes de guardar.
     }
 }

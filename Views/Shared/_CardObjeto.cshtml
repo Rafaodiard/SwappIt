@@ -1,24 +1,3 @@
-@*
-    Card / Objeto  (componente "10. Card" del UI Kit)
-    ------------------------------------------------------------
-    Se renderiza desde el servidor con un ArticuloCardViewModel en ViewBag.articulo:
-    ViewBag.articulo = articulo;
-    <partial name="_CardObjeto" />
-
-    Mantiene data-template / data-campo para que swappit.renderObjetos (plantillas.js)
-    pueda seguir usándola como molde si más adelante se carga por JS.
-
-    Campos:
-      imagen   -> primera fila de Imagenes del artículo (si no hay, se ve el placeholder de .sw-img)
-      estado   -> EstadosArticulos.Nombre (por Articulos.IdEstado)
-      nombre   -> Articulos.Nombre
-      barrio   -> Articulos.Ubicacion (si está vacía, Usuarios.Barrio del dueño)
-      motivo   -> por qué se recomienda ("Le interesa algo tuyo" / "Para descubrir"); solo lo completa
-                  RecomendacionesController en "Para vos" y en Destacados. Si es null no se muestra.
-    Botón de favorito: se muestra siempre, salvo que la vista ponga ViewBag.ocultarFavorito = true
-    (ej: "Mis artículos" en el perfil, donde no tiene sentido marcar lo propio).
-    Pendiente: "Busca a cambio" (Articulos.IdCategoriaACambio, por ahora solo en el detalle).
-*@
 @{
     Swappit.Models.ViewModels.ArticuloCardViewModel articulo = ViewBag.articulo;
 }
@@ -36,7 +15,6 @@
             <span class="card-objeto-estado" data-campo="estado">@articulo.Estado</span>
             @if (ViewBag.ocultarFavorito != true)
             {
-                @* Favorito: se guarda en la BD (FavoritosController); wwwroot/js/favoritos.js marca el estado al cargar *@
                 <button type="button" class="card-objeto-fav" aria-pressed="false" aria-label="Agregar @articulo.Nombre a favoritos"><i class="bi bi-heart" aria-hidden="true"></i></button>
             }
         </div>

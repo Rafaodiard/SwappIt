@@ -20,17 +20,10 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[BorrarFotoUsuario]
 	@idUsuario int
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	DELETE FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL
 END
@@ -40,21 +33,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetArticuloById]
-	-- Add the parameters for the stored procedure here
 	@id int
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 		SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, FechaPublicacion, IdCategoriaACambio
         FROM Articulos WHERE IdArticulos = @id
 END
@@ -72,9 +56,6 @@ CREATE PROCEDURE [dbo].[GetArticulosCatalogo]
 	@idUsuario int = NULL
 AS
 BEGIN
-	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda), por eso entra hasta el triple de Articulos.Nombre.
-	-- @categorias y @estados: Ids separados por coma ('1,4'); NULL o vacío no filtra.
-	-- Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
 	SET NOCOUNT ON;
 	SELECT TOP (ISNULL(@cantidad, 2147483647)) a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
 		(SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen
@@ -88,26 +69,30 @@ BEGIN
 	ORDER BY a.IdArticulos DESC
 END
 GO
+/****** Object:  StoredProcedure [dbo].[GetCantidadNotificacionesNoLeidas]    Script Date: 29/10/2026 13:39:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetCantidadNotificacionesNoLeidas]
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT COUNT(*) FROM Notificaciones WHERE IdUsuario = @idUsuario AND Leida = 0
+END
+GO
 /****** Object:  StoredProcedure [dbo].[GetCategoriaById]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetCategoriaById]
-	-- Add the parameters for the stored procedure here
 	@id int
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 	SELECT IdCategorias, Nombre FROM Categorias WHERE IdCategorias = @id
 END
 GO
@@ -116,21 +101,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetCategorias]
-	-- Add the parameters for the stored procedure here
 	
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 	SELECT IdCategorias, Nombre FROM Categorias ORDER BY Nombre
 END
 GO
@@ -139,21 +115,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetEstadoArticuloById]
-	-- Add the parameters for the stored procedure here
 	@id int
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos WHERE IdEstadosArticulos = @id
 END
 GO
@@ -162,22 +129,25 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetEstadosArticulos]
-	-- Add the parameters for the stored procedure here
 	
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 	SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos ORDER BY IdEstadosArticulos
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetEstadosIntercambios]    Script Date: 29/10/2026 13:39:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetEstadosIntercambios]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT IdEstadosIntercambios, Nombre FROM EstadosIntercambios ORDER BY IdEstadosIntercambios
 END
 GO
 /****** Object:  StoredProcedure [dbo].[GetFiltroCategorias]    Script Date: 29/10/2026 13:39:32 ******/
@@ -186,15 +156,21 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[GetFiltroCategorias]
-	@busqueda varchar(150) = NULL
+	@busqueda varchar(150) = NULL,
+	@excluirUsuario int = NULL,
+	@comprometidos varchar(200) = NULL
 AS
 BEGIN
-	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda).
 	SET NOCOUNT ON;
 	SELECT CAST(c.IdCategorias AS varchar(10)) AS Valor, c.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
 	FROM Categorias c
 	LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
+		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
+		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
+			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
+				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
 	GROUP BY c.IdCategorias, c.Nombre
 	ORDER BY c.Nombre
 END
@@ -205,15 +181,21 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[GetFiltroEstados]
-	@busqueda varchar(150) = NULL
+	@busqueda varchar(150) = NULL,
+	@excluirUsuario int = NULL,
+	@comprometidos varchar(200) = NULL
 AS
 BEGIN
-	-- @busqueda llega ya escapada para LIKE (BD.PatronBusqueda). Estados de mejor a peor.
 	SET NOCOUNT ON;
 	SELECT CAST(e.IdEstadosArticulos AS varchar(10)) AS Valor, e.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
 	FROM EstadosArticulos e
 	LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
+		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
+		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
+			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
+				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
 	GROUP BY e.IdEstadosArticulos, e.Nombre
 	ORDER BY e.IdEstadosArticulos
 END
@@ -223,13 +205,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetFotoUsuario]
-	-- Add the parameters for the stored procedure here
 	@idUsuario int
 	AS
 BEGIN
@@ -241,21 +217,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetImagenesArticulo]
-	-- Add the parameters for the stored procedure here
 	@idArticulo int
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-    -- Insert statements for procedure here
 	SELECT Ruta FROM Imagenes WHERE IdArticulos = @idArticulo ORDER BY IdImagenes
 END
 GO
@@ -264,13 +231,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetProvinciaById]
-	-- Add the parameters for the stored procedure here
 	@id int
 AS
 BEGIN
@@ -284,11 +245,6 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GetProvincias] 
 
 AS
@@ -330,11 +286,6 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
 CREATE PROCEDURE [dbo].[GuardarFotoUsuario]
 	@idUsuario int,
 	@ruta varchar(100)
@@ -344,6 +295,19 @@ BEGIN
 	DELETE FROM Imagenes 
 	WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL;
     INSERT INTO Imagenes (Ruta, IdUsuarios) VALUES (@ruta, @idUsuario)
+END
+GO
+/****** Object:  StoredProcedure [dbo].[MarcarNotificacionesLeidas]    Script Date: 29/10/2026 13:39:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[MarcarNotificacionesLeidas]
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE Notificaciones SET Leida = 1 WHERE IdUsuario = @idUsuario AND Leida = 0
 END
 GO
 /****** Object:  StoredProcedure [dbo].[PublicarArticulo]    Script Date: 29/10/2026 13:39:32 ******/
@@ -362,10 +326,6 @@ CREATE PROCEDURE [dbo].[PublicarArticulo]
 	@rutasFotos varchar(max) = NULL
 AS
 BEGIN
-	-- Guarda el artículo y sus fotos en una transacción: si falla algo, no queda un artículo a medias.
-	-- @rutasFotos: rutas separadas por '|' (no puede aparecer en un nombre de archivo); la primera es la portada.
-	-- @idCategoriaACambio: categoría que busca a cambio (NULL = abierto a propuestas). FechaPublicacion: hoy.
-	-- Devuelve el IdArticulos nuevo.
 	SET NOCOUNT ON;
 	SET XACT_ABORT ON;
 	DECLARE @idArticulo int, @ruta varchar(max), @pos int
@@ -375,7 +335,6 @@ BEGIN
 	VALUES (@nombre, @descripcion, @idEstado, @idUsuario, @idCategoria, @ubicacion, CAST(GETDATE() AS date), @idCategoriaACambio)
 	SET @idArticulo = SCOPE_IDENTITY()
 
-	-- Se recorren en orden (STRING_SPLIT no lo garantiza): la portada es la foto de menor IdImagenes.
 	WHILE LEN(@rutasFotos) > 0
 	BEGIN
 		SET @pos = CHARINDEX('|', @rutasFotos)

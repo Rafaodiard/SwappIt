@@ -4,8 +4,6 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Cuenta del usuario: iniciar sesión (/Account), registrarse, cambiar la contraseña y cerrar sesión.
-// Ver y editar el perfil está en PerfilController.
 public class AccountController : Controller
 {
     public IActionResult Index()

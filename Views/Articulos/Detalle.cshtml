@@ -1,11 +1,3 @@
-@*
-    Detalle de un artículo (ArticulosController.Detalle).
-    Datos: Articulos + Imagenes (fotos del artículo) + Categorias + Usuarios (dueño) + Provincias.
-    - Artículo de otra persona: botón "Proponer intercambio" (pop up para elegir qué artículo ofrecés,
-      lo guarda IntercambioController.Proponer). Si ya hay una propuesta en curso, "Propuesta enviada".
-    - Artículo propio (el dueño es el usuario logueado): aviso "Es tu artículo" y acciones del dueño.
-    - Visitante (sin sesión): "Proponer intercambio" lleva a iniciar sesión.
-*@
 @{
     Swappit.Models.Articulos? articulo = ViewBag.detalle;
     bool errorCarga = ViewBag.errorCarga;
@@ -31,7 +23,6 @@
 @{
     List<string> imagenes = ViewBag.imagenes;
     Swappit.Models.Categorias? categoria = ViewBag.categoria;
-    // Lo que el dueño pide a cambio (Articulos.IdCategoriaACambio); null = abierto a propuestas.
     Swappit.Models.Categorias? categoriaACambio = ViewBag.categoriaACambio;
     Swappit.Models.EstadosArticulos? estado = ViewBag.estado;
     Swappit.Models.Usuarios dueno = ViewBag.dueno;
@@ -45,14 +36,11 @@
     bool comprometido = ViewBag.comprometido;
 
     string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
-    // La ubicación que cargó el dueño al publicar; los artículos viejos (sin ubicación) usan su barrio y provincia.
     string ubicacion = !string.IsNullOrWhiteSpace(articulo.Ubicacion)
         ? articulo.Ubicacion
         : string.Join(", ", new[] { dueno.Barrio, provinciaDueno?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
     string? fotoPrincipal = imagenes.FirstOrDefault();
-    // Viene de PublicarController después de guardar el artículo.
     string? mensajeArticulo = TempData["MensajeArticulo"] as string;
-    // Viene de IntercambioController.Proponer si no se pudo guardar la propuesta.
     string? errorArticulo = TempData["ErrorArticulo"] as string;
 }
 
@@ -86,14 +74,13 @@
 
     <div class="row g-4 g-lg-5">
 
-        <!-- ===== Fotos (tabla Imagenes, IdArticulos = este artículo) ===== -->
+        <!-- ===== Fotos ===== -->
         <div class="col-lg-7">
             <div class="sw-img sw-articulo-foto">
                 <img id="articulo-foto-principal" src="@fotoPrincipal" alt="@(fotoPrincipal != null ? $"Foto de {articulo.Nombre}" : "")">
             </div>
             @if (imagenes.Count > 1)
             {
-                <!-- Miniaturas: al hacer clic cambian la foto principal (wwwroot/js/articulo.js) -->
                 <div class="sw-articulo-miniaturas" role="group" aria-label="Fotos del artículo">
                     @for (int i = 0; i < imagenes.Count; i++)
                     {
@@ -150,7 +137,6 @@
 
                 <hr class="sw-divisor">
 
-                <!-- Quién lo publicó (Usuarios). Lleva al perfil público, o al propio si es tuyo. -->
                 @if (logueado)
                 {
                     <div>
@@ -179,7 +165,6 @@
                 <div class="d-flex flex-column gap-2">
                     @if (esPropio)
                     {
-                        @* TODO: todavía no existe la pantalla para editar un artículo. *@
                         <button type="button" class="btn btn-sw-primario btn-lg" disabled aria-describedby="editar-pendiente">
                             <i class="bi bi-pencil-square me-1"></i> Editar artículo
                         </button>
@@ -243,9 +228,7 @@
 
 @if (logueado && !esPropio && idPropuestaEnCurso == null && !comprometido)
 {
-    <!-- ===== Pop up: Proponer intercambio =====
-         El usuario elige cuál de sus artículos ofrece a cambio. IntercambioController.Proponer lo guarda en Intercambios
-         como Pendiente: quien propone en IdUsuarios1/IdArticulos1 y el dueño de este artículo en IdUsuarios2/IdArticulos2. -->
+    <!-- ===== Pop up: Proponer intercambio ===== -->
     <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <form class="modal-content" method="post" action="@Url.Action("Proponer", "Intercambio")" asp-antiforgery="true">
@@ -308,8 +291,6 @@
 
 @if (logueado && !esPropio)
 {
-    @* Algoritmo de recomendaciones: recomendaciones.js registra que abriste este artículo (= clic)
-       y cuánto tiempo lo miraste (RecomendacionesController.Vista y .Tiempo). *@
     <form hidden data-reco-vista method="post" asp-antiforgery="true"
           action="@Url.Action("Vista", "Recomendaciones")" data-url-tiempo="@Url.Action("Tiempo", "Recomendaciones")">
         <input type="hidden" name="idArticulo" value="@articulo.IdArticulos">

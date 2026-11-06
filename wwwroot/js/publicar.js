@@ -1,28 +1,17 @@
-// =========================================================
-// SWAPPIT - Publicar objeto (solo comportamiento de interfaz)
-// - Zona de carga: clic o arrastrar para elegir fotos
-// - Miniaturas con vista previa y botón para quitar
-// - Contador de caracteres de la descripción
-// Descarta fotos que no son JPG/PNG o pesan de más para no mandarlas,
-// pero la validación que vale es la del servidor
-// (ver PublicarArticuloViewModel y PublicarController).
-// =========================================================
-
 (() => {
     const zona = document.getElementById('zona-carga');
     const inputFotos = document.getElementById('Fotos');
     const miniaturas = document.getElementById('miniaturas');
     if (!zona || !inputFotos || !miniaturas) return;
 
-    // Límites que pone la vista desde PublicarArticuloViewModel (MaxFotos / MaxFotoMB)
     const MAX_FOTOS = Number(inputFotos.dataset.maxFotos) || 6;
     const MAX_MB = Number(inputFotos.dataset.maxMb) || 10;
     const TIPOS = ['image/jpeg', 'image/png'];
-    const ESPACIOS_MIN = 4;  // espacios vacíos que muestra el diseño
+    const ESPACIOS_MIN = 4;
     const aviso = document.getElementById('aviso-fotos');
     let archivos = [];
 
-    // --- Zona de carga ---
+    // ---------- Zona de carga ----------
     const abrirSelector = () => inputFotos.click();
 
     zona.addEventListener('click', abrirSelector);
@@ -42,7 +31,7 @@
 
     inputFotos.addEventListener('change', () => agregar(inputFotos.files));
 
-    // --- Fotos ---
+    // ---------- Fotos ----------
     function agregar(lista) {
         const elegidas = Array.from(lista);
         const validas = elegidas.filter(f => TIPOS.includes(f.type) && f.size <= MAX_MB * 1024 * 1024);
@@ -67,7 +56,6 @@
         if (aviso) aviso.textContent = texto;
     }
 
-    // Mantiene el <input type="file"> sincronizado para que el formulario envíe las fotos elegidas
     function actualizar() {
         const dt = new DataTransfer();
         archivos.forEach(f => dt.items.add(f));
@@ -110,10 +98,9 @@
         }
     }
 
-    // Los "+" que vienen en el HTML también abren el selector
     miniaturas.querySelectorAll('button.sw-miniatura').forEach(b => b.addEventListener('click', abrirSelector));
 
-    // --- Contador de la descripción ---
+    // ---------- Contador de la descripción ----------
     const descripcion = document.getElementById('Descripcion');
     const contador = document.getElementById('contador-descripcion');
     if (descripcion && contador) {

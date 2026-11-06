@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <!-- ===== Información personal (tabla Usuarios) ===== -->
+        <!-- ===== Información personal ===== -->
         <div class="col-lg-6">
             <div class="sw-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
@@ -97,7 +97,7 @@
             </div>
         </div>
 
-        <!-- ===== Artículos publicados (Articulos.IdUsuarios = usuario del perfil) ===== -->
+        <!-- ===== Artículos publicados ===== -->
         <div class="col-12">
             <section class="sw-card p-4" aria-labelledby="titulo-mis-articulos">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
@@ -113,7 +113,6 @@
 
                 @if (articulos.Count > 0)
                 {
-                    <!-- Misma card que el catálogo (Views/Shared/_CardObjeto.cshtml) -->
                     <div id="mis-articulos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
                         @{ ViewBag.ocultarFavorito = true; /* son mis artículos: sin corazón */ }
                         @foreach (var articulo in articulos)
@@ -134,7 +133,7 @@
             </section>
         </div>
 
-        <!-- ===== Historial de intercambios: los últimos de la tabla Intercambios (todos en Intercambio/Index) ===== -->
+        <!-- ===== Historial de intercambios ===== -->
         <div class="col-12">
             <section class="sw-card p-4" aria-labelledby="titulo-historial">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
@@ -167,7 +166,7 @@
     </div>
 </div>
 
-<!-- ===== Pop up: Editar perfil (lo maneja wwwroot/js/perfil.js) ===== -->
+<!-- ===== Pop up: Editar perfil ===== -->
 <div class="modal fade sw-modal" id="modal-editar-perfil" tabindex="-1" aria-labelledby="titulo-editar-perfil" aria-hidden="true"
      data-error="@errorPerfil">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">

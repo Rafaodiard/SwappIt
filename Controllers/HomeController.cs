@@ -15,7 +15,6 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    // "/" muestra la landing a quien no inició sesión y el inicio (Views/Home/Inicio.cshtml) a quien sí.
     public IActionResult Index()
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
@@ -24,7 +23,6 @@ public class HomeController : Controller
             return Inicio(usuarioId.Value);
         }
 
-        // Destacados de la landing: los más populares (vistas y favoritos), ver RecomendacionesController.Destacados.
         try
         {
             ViewBag.destacados = RecomendacionesController.Destacados(null, CantidadDestacadosLanding);
@@ -37,8 +35,6 @@ public class HomeController : Controller
         return View();
     }
 
-    // Inicio del usuario logueado: sus intercambios en curso (primero los que tiene que responder),
-    // un resumen de lo que tiene pendiente y los destacados para él (algoritmo de recomendaciones).
     private IActionResult Inicio(int usuarioId)
     {
         ViewBag.nombre = null;
@@ -57,12 +53,10 @@ public class HomeController : Controller
                 .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
                 .ToList();
 
-            // GetIntercambios ya viene del más nuevo al más viejo: acá solo se suben los que esperan respuesta.
             ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
             ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
-            // Lo que más le puede interesar y donde al dueño también le puede interesar algo suyo.
             ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)
@@ -71,7 +65,6 @@ public class HomeController : Controller
             ViewBag.errorCarga = true;
         }
 
-        // Aparte: si falta correr BaseDatos/Chat.sql no se rompe todo el inicio, solo no se muestra ese número.
         try
         {
             ViewBag.mensajesSinLeer = BD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
@@ -88,7 +81,6 @@ public class HomeController : Controller
     private const int CantidadDestacadosInicio = 9;
     private const int CantidadDestacadosLanding = 4;
 
-    // Propuesta que le llegó al usuario y que todavía tiene que aceptar o rechazar.
     private static bool PorResponder(IntercambioViewModel i)
     {
         return i.EsRecibido && i.Estado == EstadosIntercambios.Pendiente;

@@ -1,5 +1,6 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Data;
 using Swappit.Models.ViewModels;
 
 namespace Swappit.Models;
@@ -9,16 +10,13 @@ public static class BD
     private static string _connectionString = @"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
     //@"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
 
-    
-    private const string SelectUsuarios = @"SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion FROM Usuarios";
-
     public static Usuarios? GetUsuarioByMail(string mail)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = SelectUsuarios + " WHERE Mail = @pMail";
-            return connection.QueryFirstOrDefault<Usuarios>(query, new { pMail = mail });
+            return connection.QueryFirstOrDefault<Usuarios>("GetUsuarioByMail",
+                new { Mail = mail },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -26,8 +24,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "UPDATE Usuarios SET Contraseña = @pContrasena WHERE IdUsuarios = @pId";
-            connection.Execute(query, new { pId = idUsuario, pContrasena = contrasenaHash });
+            connection.Execute("ActualizarContrasena",
+                new { idUsuario, contrasenaHash },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -35,8 +34,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT COUNT(*) FROM Usuarios WHERE Mail = @pMail";
-            return connection.ExecuteScalar<int>(query, new { pMail = mail }) > 0;
+            return connection.ExecuteScalar<int>("UsuarioExiste",
+                new { mail },
+                commandType: CommandType.StoredProcedure) > 0;
         }
     }
 
@@ -44,8 +44,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = SelectUsuarios + " WHERE IdUsuarios = @pId";
-            return connection.QueryFirstOrDefault<Usuarios>(query, new { pId = id });
+            return connection.QueryFirstOrDefault<Usuarios>("GetUsuarioById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -53,8 +54,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdProvincia, Nombre FROM Provincias WHERE IdProvincia = @pId";
-            return connection.QueryFirstOrDefault<Provincias>(query, new { pId = id });
+            return connection.QueryFirstOrDefault<Provincias>("GetProvinciaById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -62,8 +64,7 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdProvincia, Nombre FROM Provincias ORDER BY Nombre";
-            return connection.Query<Provincias>(query).ToList();
+            return connection.Query<Provincias>("GetProvincias", commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
@@ -81,10 +82,23 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"UPDATE Usuarios SET Nombre = @Nombre, Apellido = @Apellido, Usuario = @Usuario, Mail = @Mail,
-                Telefono = @Telefono, Contraseña = @Contraseña, Barrio = @Barrio, [Fecha nacimiento] = @FechaNacimiento,
-                Edad = @Edad, IdProvincias = @IdProvincias, Descripcion = @Descripcion WHERE IdUsuarios = @IdUsuarios";
-            connection.Execute(query, u);
+            connection.Execute("UpdateUsuario",
+                new
+                {
+                    idUsuario = u.IdUsuarios,
+                    nombre = u.Nombre,
+                    apellido = u.Apellido,
+                    usuario = u.Usuario,
+                    mail = u.Mail,
+                    telefono = u.Telefono,
+                    contraseña = u.Contraseña,
+                    barrio = u.Barrio,
+                    fechaNacimiento = u.FechaNacimiento,
+                    edad = u.Edad,
+                    idProvincia = u.IdProvincias,
+                    descripcion = u.Descripcion
+                },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -92,8 +106,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT TOP 1 Ruta FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL ORDER BY IdImagenes DESC";
-            return connection.QueryFirstOrDefault<string>(query, new { pId = idUsuario });
+            return connection.QueryFirstOrDefault<string>("GetFotoUsuario",
+                new { idUsuario },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -101,9 +116,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"DELETE FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL;
-                INSERT INTO Imagenes (Ruta, IdUsuarios) VALUES (@pRuta, @pId)";
-            connection.Execute(query, new { pId = idUsuario, pRuta = ruta });
+            connection.Execute("GuardarFotoUsuario",
+                new { idUsuario, ruta },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -111,23 +126,18 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "DELETE FROM Imagenes WHERE IdUsuarios = @pId AND IdArticulos IS NULL";
-            connection.Execute(query, new { pId = idUsuario });
+            connection.Execute("BorrarFotoUsuario",
+                new { idUsuario },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
-    // Un artículo con un intercambio Aceptado o Realizado ya está comprometido: deja de mostrarse en el inicio,
-    // el catálogo, los filtros, los perfiles y "Más artículos de...", y no se puede pedir ni ofrecer en otra propuesta.
-    // No se le cambia nada al artículo: se calcula desde Intercambios (sigue visible en Mis intercambios y en su detalle).
-    // Va con el alias "a" para Articulos y necesita el parámetro @pComprometidos (EstadosComprometidos).
     private const string ArticuloDisponible = @"NOT EXISTS (SELECT 1 FROM Intercambios ic
         INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
         WHERE eic.Nombre IN @pComprometidos AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))";
 
     private static readonly string[] EstadosComprometidos = { EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado };
 
-    // idUsuario: solo los artículos de ese usuario (perfiles). excluirUsuario: todos menos los de ese usuario
-    // (en Explorar no se muestran los artículos propios del que está logueado).
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
         IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null,
         int? excluirUsuario = null)
@@ -141,7 +151,6 @@ public static class BD
             if (excluirUsuario.HasValue) condiciones.Add("a.IdUsuarios <> @pExcluirUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
-            // Barrio: la ubicación que cargó el dueño al publicar; si no tiene, el barrio de su perfil.
             string query = $@"SELECT {top}a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
                     (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
                     a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
@@ -168,14 +177,12 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT IdArticulos, Nombre, Descripcion, IdEstado, IdUsuarios, IdCategorias, Ubicacion, IdCategoriaACambio
-                FROM Articulos WHERE IdArticulos = @pId";
-            return connection.QueryFirstOrDefault<Articulos>(query, new { pId = id });
+            return connection.QueryFirstOrDefault<Articulos>("GetArticuloById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
-    // Guarda un artículo nuevo y sus fotos (rutas ya guardadas en wwwroot, la primera es la portada).
-    // Va todo en una transacción: si falla algo, no queda un artículo a medias. Devuelve el IdArticulos nuevo.
     public static int PublicarArticulo(Articulos a, List<string> rutasFotos)
     {
         AsegurarFechaPublicacion();
@@ -190,7 +197,6 @@ public static class BD
                     VALUES (@Nombre, @Descripcion, @IdEstado, @IdUsuarios, @IdCategorias, @Ubicacion, @IdCategoriaACambio, @FechaPublicacion)";
                 int idArticulo = connection.QuerySingle<int>(query, a, transaccion);
 
-                // Las fotos de artículos llevan IdArticulos (las de perfil llevan IdUsuarios e IdArticulos NULL).
                 string queryFoto = "INSERT INTO Imagenes (Ruta, IdArticulos) VALUES (@pRuta, @pIdArticulo)";
                 foreach (string ruta in rutasFotos)
                 {
@@ -249,8 +255,6 @@ public static class BD
             connection.Open();
             string query = @"IF COL_LENGTH('dbo.Articulos', 'FechaPublicacion') IS NULL
                 BEGIN
-                    -- Con EXEC cada sentencia se compila aparte: si no, SQL Server compila el lote entero
-                    -- antes de agregar la columna y el UPDATE falla con 'Invalid column name'.
                     EXEC('ALTER TABLE dbo.Articulos ADD FechaPublicacion date NULL');
                     EXEC('UPDATE dbo.Articulos SET FechaPublicacion = CAST(GETDATE() AS date) WHERE FechaPublicacion IS NULL');
                     EXEC('ALTER TABLE dbo.Articulos ALTER COLUMN FechaPublicacion date NOT NULL');
@@ -263,8 +267,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT Ruta FROM Imagenes WHERE IdArticulos = @pId ORDER BY IdImagenes";
-            return connection.Query<string>(query, new { pId = idArticulo }).ToList();
+            return connection.Query<string>("GetImagenesArticulo",
+                new { idArticulo },
+                commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
@@ -272,8 +277,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdCategorias, Nombre FROM Categorias WHERE IdCategorias = @pId";
-            return connection.QueryFirstOrDefault<Categorias>(query, new { pId = id });
+            return connection.QueryFirstOrDefault<Categorias>("GetCategoriaById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
@@ -281,18 +287,15 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdCategorias, Nombre FROM Categorias ORDER BY Nombre";
-            return connection.Query<Categorias>(query).ToList();
+            return connection.Query<Categorias>("GetCategorias", commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
-    // Opciones de "Estado del objeto" en Publicar, en el orden en que se cargaron (de mejor a peor).
     public static List<EstadosArticulos> GetEstadosArticulos()
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos ORDER BY IdEstadosArticulos";
-            return connection.Query<EstadosArticulos>(query).ToList();
+            return connection.Query<EstadosArticulos>("GetEstadosArticulos", commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
@@ -300,52 +303,44 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdEstadosArticulos, Nombre FROM EstadosArticulos WHERE IdEstadosArticulos = @pId";
-            return connection.QueryFirstOrDefault<EstadosArticulos>(query, new { pId = id });
+            return connection.QueryFirstOrDefault<EstadosArticulos>("GetEstadoArticuloById",
+                new { id },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
-    // excluirUsuario: no cuenta los artículos de ese usuario (igual que GetArticulosCatalogo in Explorar).
     public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null, int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT CAST(c.IdCategorias AS varchar(10)) AS Valor, c.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
-                FROM Categorias c
-                LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
-                    AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
-                    AND (@pExcluirUsuario IS NULL OR a.IdUsuarios <> @pExcluirUsuario)
-                    AND " + ArticuloDisponible + @"
-                GROUP BY c.IdCategorias, c.Nombre
-                ORDER BY c.Nombre";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pExcluirUsuario = excluirUsuario, pComprometidos = EstadosComprometidos }).ToList();
+            return connection.Query<OpcionFiltroViewModel>("GetFiltroCategorias",
+                new
+                {
+                    busqueda = PatronBusqueda(busqueda),
+                    excluirUsuario,
+                    comprometidos = string.Join(",", EstadosComprometidos)
+                },
+                commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
-    // Estados para el filtro de Buscar: todos los de EstadosArticulos (como las categorías), de mejor a peor.
     public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null, int? excluirUsuario = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT CAST(e.IdEstadosArticulos AS varchar(10)) AS Valor, e.Nombre AS Texto, COUNT(a.IdArticulos) AS Cantidad
-                FROM EstadosArticulos e
-                LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
-                    AND (@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')
-                    AND (@pExcluirUsuario IS NULL OR a.IdUsuarios <> @pExcluirUsuario)
-                    AND " + ArticuloDisponible + @"
-                GROUP BY e.IdEstadosArticulos, e.Nombre
-                ORDER BY e.IdEstadosArticulos";
-            return connection.Query<OpcionFiltroViewModel>(query, new { pBusqueda = PatronBusqueda(busqueda), pExcluirUsuario = excluirUsuario, pComprometidos = EstadosComprometidos }).ToList();
+            return connection.Query<OpcionFiltroViewModel>("GetFiltroEstados",
+                new
+                {
+                    busqueda = PatronBusqueda(busqueda),
+                    excluirUsuario,
+                    comprometidos = string.Join(",", EstadosComprometidos)
+                },
+                commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
     // ---------- Intercambios ----------
-    // Quien propone queda en IdUsuarios1/IdArticulos1 (el artículo que ofrece) y el dueño del artículo pedido
-    // en IdUsuarios2/IdArticulos2. Los estados se buscan por nombre (ver EstadosIntercambios).
 
-    // Lista de intercambios del usuario (enviados y recibidos), lo más nuevo primero.
-    // "Mi..." es siempre lo del usuario logueado y "Su..."/"Otro..." lo de la otra persona.
-    // Va sin el SELECT para poder agregarle TOP (ver GetIntercambios).
     private const string ConsultaIntercambios = @"i.IdIntercambios, i.Fecha, e.Nombre AS Estado,
             CAST(CASE WHEN i.IdUsuarios2 = @pIdUsuario THEN 1 ELSE 0 END AS bit) AS EsRecibido,
             am.IdArticulos AS MiArticuloId, am.Nombre AS MiArticuloNombre, eam.Nombre AS MiArticuloEstado,
@@ -378,7 +373,6 @@ public static class BD
         }
     }
 
-    // Un intercambio, solo si el usuario es una de las dos partes (si no, null).
     public static IntercambioViewModel? GetIntercambio(int idIntercambio, int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -388,7 +382,6 @@ public static class BD
         }
     }
 
-    // Propuesta en curso (Pendiente o Aceptado) que el usuario ya hizo por ese artículo, para no repetirla.
     public static int? GetIdPropuestaEnCurso(int idUsuario, int idArticuloPedido)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -406,7 +399,6 @@ public static class BD
         }
     }
 
-    // true si el artículo ya está en un intercambio Aceptado o Realizado (ver ArticuloDisponible).
     public static bool ArticuloComprometido(int idArticulo)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -416,11 +408,6 @@ public static class BD
         }
     }
 
-    // Guarda una propuesta nueva en estado Pendiente con la fecha de hoy y devuelve su IdIntercambios.
-    // Si el usuario ya tiene una propuesta en curso por ese artículo, o alguno de los dos artículos ya está comprometido,
-    // no inserta nada y devuelve null (el chequeo va en el mismo INSERT para que dos clics seguidos no creen dos propuestas).
-    // En la misma transacción le avisa al dueño del artículo pedido (notificación "Propuesta recibida").
-    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
     public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido,
         List<NotificacionCreada>? creadas = null)
     {
@@ -465,13 +452,6 @@ public static class BD
         }
     }
 
-    // Pasa un intercambio de estadoActual a estadoNuevo. Solo lo cambia si el usuario puede hacerlo:
-    // soloQuienRecibe = true -> solo el dueño del artículo pedido (aceptar o rechazar); si no, cualquiera de los dos.
-    // Si se cambió y viene tipoNotificacion, en la misma transacción le avisa a la otra persona del intercambio.
-    // Para pasar a Aceptado, ninguno de los dos artículos puede estar ya en otro intercambio Aceptado o Realizado,
-    // y en la misma transacción se rechazan las otras propuestas pendientes con esos artículos (ver RechazarPendientesDeArticulos).
-    // Devuelve false si no se cambió (no existe, no es del usuario, ya no estaba en estadoActual o el artículo ya está comprometido).
-    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
     public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo,
         bool soloQuienRecibe, string? tipoNotificacion = null, List<NotificacionCreada>? creadas = null)
     {
@@ -480,7 +460,6 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                // Devuelve el id de la otra persona, o nada si no se actualizó ninguna fila.
                 string query = @"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
                     OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
                     FROM Intercambios i
@@ -521,11 +500,6 @@ public static class BD
         }
     }
 
-    // Pasa el intercambio a Cancelado y le avisa a la otra persona ("Intercambio cancelado"), en una transacción.
-    // Una propuesta Pendiente solo la cancela quien la hizo (quien la recibió la rechaza); uno Aceptado, cualquiera de los dos.
-    // Devuelve false si el usuario no puede cancelarlo o si ya cambió de estado.
-    // Al dejar de estar Aceptado, los dos artículos vuelven a estar disponibles (ver ArticuloDisponible).
-    // creadas: si viene, después del Commit se le agregan las notificaciones creadas (para mandarlas por mail).
     public static bool CancelarIntercambio(int idIntercambio, int idUsuario, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -533,7 +507,6 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                // Devuelve el id de la otra persona, o nada si no se actualizó ninguna fila.
                 string query = @"UPDATE i SET i.IdEstado = cancelado.IdEstadosIntercambios
                     OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
                     FROM Intercambios i
@@ -564,13 +537,10 @@ public static class BD
         }
     }
 
-    // Otras propuestas Pendientes que usan alguno de los dos artículos del intercambio (como pedido o como ofrecido).
-    // Son las que se rechazan solas si se acepta este intercambio.
     private const string CondicionPendientesDeArticulos = @"o.IdIntercambios <> @pId
         AND EXISTS (SELECT 1 FROM Intercambios acep WHERE acep.IdIntercambios = @pId
             AND (o.IdArticulos1 IN (acep.IdArticulos1, acep.IdArticulos2) OR o.IdArticulos2 IN (acep.IdArticulos1, acep.IdArticulos2)))";
 
-    // Cuántas propuestas se rechazarían solas al aceptar este intercambio (para avisarle antes a quien acepta).
     public static int ContarPendientesDeArticulos(int idIntercambio)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -582,9 +552,6 @@ public static class BD
         }
     }
 
-    // Se llama al aceptar un intercambio, dentro de su transacción: pasa a Rechazado las otras propuestas pendientes
-    // con esos artículos y le avisa a quien las hizo ("Propuesta rechazada"). No se avisa a quien acepta (idUsuario),
-    // por ejemplo si él mismo había ofrecido ese artículo en otra propuesta.
     private static void RechazarPendientesDeArticulos(SqlConnection connection, SqlTransaction transaccion,
         List<NotificacionCreada> nuevas, int idIntercambio, int idUsuario)
     {
@@ -607,24 +574,16 @@ public static class BD
         }
     }
 
-    // Estados para los filtros de Mis intercambios, en el orden de la tabla.
     public static List<EstadosIntercambios> GetEstadosIntercambios()
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT IdEstadosIntercambios, Nombre FROM EstadosIntercambios ORDER BY IdEstadosIntercambios";
-            return connection.Query<EstadosIntercambios>(query).ToList();
+            return connection.Query<EstadosIntercambios>("GetEstadosIntercambios", commandType: CommandType.StoredProcedure).ToList();
         }
     }
 
     // ---------- Notificaciones ----------
-    // Cada notificación es para un usuario (IdUsuario) sobre un intercambio. El tipo se busca por nombre
-    // (ver TipoNotificaciones): si ese tipo no está cargado en la tabla, no se inserta nada.
 
-    // Se llama desde ProponerIntercambio, CambiarEstadoIntercambio, CancelarIntercambio y EnviarMensaje, dentro de su transacción.
-    // siNoHayOtraSinLeer = true: no la crea si el usuario ya tiene una sin leer de ese tipo y de ese intercambio
-    // (así un chat con 10 mensajes seguidos deja una sola notificación "Mensaje nuevo", y un solo mail).
-    // Si la insertó, la agrega a nuevas; quien llama las devuelve recién después del Commit.
     private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, List<NotificacionCreada> nuevas,
         int idUsuario, int idIntercambio, string tipo, bool siNoHayOtraSinLeer = false)
     {
@@ -647,8 +606,6 @@ public static class BD
         }
     }
 
-    // Datos para el mail de una notificación: mail y nombre del destinatario, la otra persona y los dos artículos
-    // (MiArticulo es el del destinatario). null si el usuario no es parte del intercambio.
     public static DatosMailNotificacion? GetDatosMailNotificacion(int idUsuario, int idIntercambio)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -664,8 +621,6 @@ public static class BD
         }
     }
 
-    // Notificaciones del usuario para el pop up del header, lo más nuevo primero.
-    // "Otro" es la otra persona del intercambio y el artículo es el pedido (IdArticulos2).
     public static List<NotificacionViewModel> GetNotificaciones(int idUsuario, int cantidad)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -687,13 +642,12 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "SELECT COUNT(*) FROM Notificaciones WHERE IdUsuario = @pIdUsuario AND Leida = 0";
-            return connection.ExecuteScalar<int>(query, new { pIdUsuario = idUsuario });
+            return connection.ExecuteScalar<int>("GetCantidadNotificacionesNoLeidas",
+                new { idUsuario },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
-    // Marca como leída una notificación del usuario y la devuelve con su IdIntercambio y su Tipo, para saber a dónde llevarlo
-    // (null si no es suya o no existe).
     public static NotificacionViewModel? MarcarNotificacionLeida(int idNotificacion, int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -711,21 +665,17 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = "UPDATE Notificaciones SET Leida = 1 WHERE IdUsuario = @pIdUsuario AND Leida = 0";
-            connection.Execute(query, new { pIdUsuario = idUsuario });
+            connection.Execute("MarcarNotificacionesLeidas",
+                new { idUsuario },
+                commandType: CommandType.StoredProcedure);
         }
     }
 
     // ---------- Chat ----------
-    // Hay un chat por intercambio: Mensajes.IdIntercambio. Solo lo usan las dos partes del intercambio
-    // (todas las consultas lo chequean con ParteDelIntercambio). Se puede escribir mientras el intercambio
-    // está en curso (Pendiente o Aceptado); cuando se rechaza o se realiza, el chat queda para leer.
 
-    // Condición "el usuario @pIdUsuario es una de las dos partes del intercambio @pIdIntercambio".
     private const string ParteDelIntercambio = @"EXISTS (SELECT 1 FROM Intercambios ip
         WHERE ip.IdIntercambios = @pIdIntercambio AND (ip.IdUsuarios1 = @pIdUsuario OR ip.IdUsuarios2 = @pIdUsuario))";
 
-    // Último mensaje y cantidad sin ver de cada intercambio del usuario que ya tiene mensajes.
     public static List<ConversacionViewModel> GetResumenesChat(int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -742,7 +692,6 @@ public static class BD
         }
     }
 
-    // Mensajes del chat de un intercambio, del más viejo al más nuevo (vacío si el usuario no es parte del intercambio).
     public static List<Mensajes> GetMensajes(int idIntercambio, int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -755,10 +704,6 @@ public static class BD
         }
     }
 
-    // Guarda un mensaje del usuario en el chat del intercambio y, en la misma transacción, le avisa a la otra persona
-    // (notificación "Mensaje nuevo", una sola mientras no la lea). Solo lo guarda si el usuario es parte del intercambio
-    // y el intercambio está en curso; si no, devuelve false.
-    // creadas: si viene, después del Commit se le agrega la notificación si se creó (para mandarla por mail).
     public static bool EnviarMensaje(int idIntercambio, int idUsuario, string texto, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -766,8 +711,6 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                // Busca a la otra persona solo si el usuario es parte y el intercambio está en curso; si la encontró, inserta.
-                // Devuelve el id de la otra persona, o NULL si no se insertó.
                 string query = @"DECLARE @idOtro int;
                     SELECT @idOtro = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
                     FROM Intercambios i
@@ -800,8 +743,6 @@ public static class BD
         }
     }
 
-    // El usuario abrió el chat: marca como vistos los mensajes que le mandó la otra persona (con la fecha en FechaRecibido)
-    // y como leídas sus notificaciones "Mensaje nuevo" de ese intercambio.
     public static void MarcarMensajesVistos(int idIntercambio, int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -816,15 +757,10 @@ public static class BD
         }
     }
 
-    // ---------- Interacciones y favoritos (algoritmo de recomendaciones) ----------
-    // Todo lo que hace el usuario y sirve para recomendarle artículos va a la tabla Interacciones.
-    // El tipo se busca por nombre en TipoInteracciones (ver Models/TipoInteracciones.cs).
-    // Quien decide qué guardar y cómo usarlo es RecomendacionesController.
+    // ---------- Interacciones y favoritos ----------
 
     private const string IdTipo = "(SELECT Id FROM TipoInteracciones WHERE Nombre = @pTipo)";
 
-    // El usuario abrió el detalle de un artículo (= hizo clic en él). Devuelve el Id de la fila,
-    // para después guardarle los segundos que se quedó (GuardarSegundosVista).
     public static int RegistrarVista(int idUsuario, int idArticulo)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -836,7 +772,6 @@ public static class BD
         }
     }
 
-    // Guarda cuántos segundos estuvo mirando el detalle. Solo cambia la vista si es de ese usuario.
     public static void GuardarSegundosVista(int idInteraccion, int idUsuario, int segundos)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -847,9 +782,6 @@ public static class BD
         }
     }
 
-    // Lo que buscó en Explorar: el texto y las categorías que marcó en los filtros.
-    // Si ya registró lo mismo en los últimos minutos no se repite (recargar la página o cambiar otro filtro
-    // no tiene que contar como otra búsqueda).
     public static void RegistrarBusqueda(int idUsuario, string? texto, IReadOnlyCollection<int> categorias, int minutosSinRepetir)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -877,8 +809,6 @@ public static class BD
         }
     }
 
-    // Favoritos: una fila de Interacciones de tipo Favorito por usuario y artículo, mientras siga siendo favorito.
-
     public static List<int> GetIdsFavoritos(int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -888,7 +818,6 @@ public static class BD
         }
     }
 
-    // Los favoritos que siguen disponibles (los mismos que se ven en el catálogo), el último que marcó primero.
     public static List<ArticuloCardViewModel> GetFavoritos(int idUsuario)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -911,8 +840,6 @@ public static class BD
         }
     }
 
-    // Marca o desmarca un favorito. Devuelve true si quedó como favorito, false si se sacó
-    // y null si no se puede marcar (no existe o es un artículo propio).
     public static bool? AlternarFavorito(int idUsuario, int idArticulo)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -933,8 +860,6 @@ public static class BD
         }
     }
 
-    // Pasa a la BD los favoritos que quedaron guardados en el navegador (antes vivían en localStorage).
-    // Agrega solo los que no estaban, existen y no son del usuario.
     public static void ImportarFavoritos(int idUsuario, IReadOnlyCollection<int> idsArticulos)
     {
         if (idsArticulos.Count == 0) return;
@@ -950,12 +875,6 @@ public static class BD
         }
     }
 
-    // Datos de gustos de varios usuarios a la vez (el que mira y los dueños de los artículos), desde la fecha "desde".
-    // Junta tres fuentes en una sola lista (ver Models/SenalGusto.cs):
-    // 1. Interacciones: vistas, búsquedas, filtros y favoritos. En vistas y favoritos la categoría es la del artículo.
-    // 2. Intercambios: cada propuesta que mandó (IdUsuarios1) suma a la categoría del artículo que pidió (IdArticulos2),
-    //    sin importar cómo terminó: igual muestra lo que quería.
-    // 3. Articulos: la categoría que pide a cambio en sus artículos disponibles (sin fecha: es lo que quiere hoy).
     public static List<SenalGusto> GetSenalesGustos(IReadOnlyCollection<int> idsUsuarios, DateTime desde)
     {
         if (idsUsuarios.Count == 0) return new List<SenalGusto>();
@@ -991,7 +910,6 @@ public static class BD
         }
     }
 
-    // Vistas y favoritos de cada artículo desde la fecha "desde", contando a todos los usuarios.
     public static List<PopularidadArticulo> GetPopularidad(DateTime desde)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -1015,7 +933,6 @@ public static class BD
     private static string? PatronBusqueda(string? busqueda) =>
         string.IsNullOrWhiteSpace(busqueda) ? null : EscaparLike(busqueda.Trim());
 
-    // Evita que %, _ o [ escritos por el usuario funcionen como comodines del LIKE.
     private static string EscaparLike(string texto) =>
         texto.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
 }
