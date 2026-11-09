@@ -4,8 +4,6 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Perfiles de usuario: mi perfil (/Perfil), editarlo con el pop up "Editar perfil" (POST /Perfil/Editar)
-// y el perfil público de otro usuario (/Perfil/Publico/5).
 public class PerfilController : Controller
 {
     private readonly IWebHostEnvironment _env;
@@ -34,7 +32,6 @@ public class PerfilController : Controller
         ViewBag.provincias = BD.GetProvincias();
         ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
-        // Historial: los 3 intercambios más nuevos (enviados y recibidos).
         ViewBag.intercambios = BD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
         return View();
     }
@@ -140,8 +137,6 @@ public class PerfilController : Controller
         return RedirectToAction("Index");
     }
 
-    // Las fotos de perfil se guardan en wwwroot/img/perfiles y la ruta va a Imagenes.Ruta,
-    // que es varchar(50): por eso el nombre es corto (id + ticks en hexa, ~36 caracteres en total).
     private string GuardarFoto(IFormFile foto, int idUsuario, string extension)
     {
         string carpeta = Path.Combine(_env.WebRootPath, "img", "perfiles");

@@ -1,11 +1,3 @@
-@*
-    Ver un intercambio (IntercambioController.Detalle). Solo lo ven las dos partes.
-    - Propuesta recibida y Pendiente: "Recibiste una propuesta" con Aceptar / Rechazar.
-    - El resto: "Intercambio con @usuario", con el avance (Pendiente -> Aceptado -> Realizado, o Rechazado / Cancelado),
-      lo que das y lo que recibís, y los próximos pasos (marcar como realizado cuando está aceptado).
-    - Cancelar (con un pop up de confirmación): quien propuso, mientras está Pendiente; cualquiera de los dos, si está Aceptado.
-    - Mientras está Pendiente o Aceptado, links al chat del intercambio (Chat/Index/id).
-*@
 @using Swappit.Models
 @{
     Swappit.Models.ViewModels.IntercambioViewModel? intercambio = ViewBag.intercambio;
@@ -33,7 +25,6 @@
     string? fotoOtro = ViewBag.fotoOtro;
     bool articuloComprometido = ViewBag.articuloComprometido;
     int pendientesQueSeRechazan = ViewBag.pendientesQueSeRechazan;
-    // Si al aceptar se rechazan otras propuestas, antes de aceptar se pide confirmación en un pop up.
     bool confirmarAceptar = !articuloComprometido && pendientesQueSeRechazan > 0;
     string avisoRechazos = pendientesQueSeRechazan == 1
         ? "Hay otra propuesta pendiente que incluye estos artículos: si aceptás, se va a rechazar automáticamente."
@@ -46,7 +37,6 @@
     string? mensaje = TempData["MensajeIntercambio"] as string;
     string? error = TempData["ErrorIntercambio"] as string;
 
-    // Tarjeta de uno de los dos artículos ("Te ofrece" / "Por tu" o "Vos das" / "Recibís").
     void PanelArticulo(string etiqueta, int idArticulo, string nombre, string estadoArticulo, string? imagen, string deQuien)
     {
         <a href="@Url.Action("Detalle", "Articulos", new { id = idArticulo })" class="sw-intercambio-panel">
@@ -171,7 +161,6 @@
         <!-- ===== Seguimiento del intercambio ===== -->
         bool rechazado = estado == EstadosIntercambios.Rechazado;
         bool cancelado = estado == EstadosIntercambios.Cancelado;
-        // En este bloque, una Pendiente siempre es una propuesta que hizo el usuario (las recibidas van arriba).
         bool puedeCancelar = estado == EstadosIntercambios.Pendiente || estado == EstadosIntercambios.Aceptado;
         bool aceptadoOMas = estado == EstadosIntercambios.Aceptado || estado == EstadosIntercambios.Realizado;
         bool realizado = estado == EstadosIntercambios.Realizado;
@@ -187,7 +176,6 @@
         <div class="row g-4">
             <div class="col-lg-8">
                 <section class="sw-card p-4 h-100" aria-label="Detalle del intercambio">
-                    <!-- Avance: solo se guarda la fecha de la propuesta (Intercambios.Fecha) -->
                     <ol class="sw-avance pb-4 mb-4 border-bottom">
                         <li class="sw-avance-paso hecho">
                             <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-check-lg"></i></span>

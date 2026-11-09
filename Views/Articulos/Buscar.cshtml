@@ -9,6 +9,16 @@
     List<int> estadosSeleccionados = ViewBag.estadosSeleccionados;
     bool errorCarga = ViewBag.errorCarga;
     bool hayFiltros = ViewBag.hayFiltros;
+    string orden = ViewBag.orden;
+    List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> opcionesOrden = ViewBag.opcionesOrden;
+    bool logueado = ViewBag.logueado;
+    string titulo = orden switch
+    {
+        Swappit.Controllers.RecomendacionesController.OrdenParaVos => "Elegidos para vos",
+        Swappit.Controllers.RecomendacionesController.OrdenRecientes => "Recién publicados",
+        Swappit.Controllers.RecomendacionesController.OrdenAZ => "Todos los artículos",
+        _ => "Los más buscados"
+    };
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -16,12 +26,10 @@
 
         <!-- ===== Filtros ===== -->
         <aside class="col-lg-3">
-            <!-- En mobile se colapsa -->
             <button class="btn btn-sw-outline w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros">
                 <i class="bi bi-funnel"></i> Filtros
             </button>
 
-            <!-- Se envía por GET a Buscar: los filtros quedan en la URL y se combinan con la búsqueda (q) -->
             <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
                 @if (!string.IsNullOrEmpty(busqueda))
                 {
@@ -31,11 +39,10 @@
                     <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
                     @if (hayFiltros)
                     {
-                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
+                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda, orden })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
                     }
                 </div>
 
-                <!-- Categoría: tabla Categorias. El número es cuántos artículos hay (respetando la búsqueda) -->
                 <h6>Categoría</h6>
                 <div id="filtro-categorias" class="mb-4">
                     @foreach (var cat in categorias)
@@ -50,7 +57,6 @@
                     }
                 </div>
 
-                <!-- Estado: filas de la tabla EstadosArticulos -->
                 <h6>Estado</h6>
                 <div>
                     @foreach (var est in estados)
@@ -62,7 +68,6 @@
                     }
                 </div>
 
-                <!-- Con JS los filtros se aplican al marcarlos; sin JS se usa este botón -->
                 <noscript><button type="submit" class="btn btn-sw-outline w-100 mt-4">Aplicar filtros</button></noscript>
             </form>
         </aside>
@@ -71,13 +76,15 @@
         <section class="col-lg-9">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                 <h1 class="font-titulo h2 mb-0">
-                    @if (string.IsNullOrEmpty(busqueda)) { <text>Los más buscados</text> }
+                    @if (string.IsNullOrEmpty(busqueda)) { @titulo }
                     else { <text>Resultados para “@busqueda”</text> }
                 </h1>
                 <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm" id="ordenar" aria-label="Ordenar por" style="width:auto">
-                        <option value="recientes" selected>Más recientes</option>
-                        <option value="az">A - Z</option>
+                    <select class="form-select form-select-sm" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por" style="width:auto">
+                        @foreach (var opcion in opcionesOrden)
+                        {
+                            <option value="@opcion.Value" selected="@(opcion.Value == orden)">@opcion.Text</option>
+                        }
                     </select>
                     <div class="btn-group btn-group-sm sw-vista-toggle" role="group" aria-label="Vista">
                         <input type="radio" class="btn-check" name="vista" id="vista-grilla" value="grilla" checked>
@@ -88,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- Artículos de la tabla Articulos (ArticulosController.Buscar → BD.GetArticulosCatalogo) -->
             <div id="lista-objetos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
                 @foreach (var articulo in articulos)
                 {
@@ -106,7 +112,6 @@
             }
             else
             {
-                <!-- Se muestra cuando no hay resultados -->
                 <div id="sin-resultados" class="text-center py-5 @(articulos.Count > 0 ? "d-none" : "")">
                     <i class="bi bi-inbox fs-1 text-suave"></i>
                     <p class="text-suave mt-2">
@@ -119,6 +124,18 @@
     </div>
 </div>
 
+@if (logueado && (!string.IsNullOrEmpty(busqueda) || categoriasSeleccionadas.Count > 0))
+{
+    <form hidden data-reco-busqueda method="post" asp-antiforgery="true" action="@Url.Action("Busqueda", "Recomendaciones")">
+        <input type="hidden" name="texto" value="@busqueda">
+        @foreach (int idCategoria in categoriasSeleccionadas)
+        {
+            <input type="hidden" name="categorias" value="@idCategoria">
+        }
+    </form>
+}
+
 @section Scripts {
     <script src="~/js/buscar.js" asp-append-version="true"></script>
+    <script src="~/js/recomendaciones.js" asp-append-version="true"></script>
 }

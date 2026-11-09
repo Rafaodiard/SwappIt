@@ -6,11 +6,8 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Publicar un artículo nuevo (/Publicar): formulario, validación, guardado de fotos en wwwroot/img/articulos
-// y alta en la base. Hay que estar logueado: el artículo se guarda con IdUsuarios = UsuarioId de la sesión.
 public class PublicarController : Controller
 {
-    // 6 fotos de 10 MB superan el límite por defecto de Kestrel por pedido (~28 MB): se amplía solo acá.
     private const long LimitePedidoPublicar = (PublicarArticuloViewModel.MaxFotos * PublicarArticuloViewModel.MaxFotoMB + 1) * 1024L * 1024L;
 
     private readonly ILogger<PublicarController> _logger;
@@ -31,7 +28,6 @@ public class PublicarController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        // La ubicación arranca con el barrio del perfil; el usuario la puede cambiar.
         PublicarArticuloViewModel publicar = new PublicarArticuloViewModel();
         try
         {
@@ -65,6 +61,10 @@ public class PublicarController : Controller
         {
             ModelState.AddModelError(nameof(modelo.IdCategorias), "Elegí una categoría de la lista");
         }
+        if (modelo.IdCategoriaACambio.HasValue && !categorias.Any(c => c.Value == modelo.IdCategoriaACambio.Value.ToString()))
+        {
+            ModelState.AddModelError(nameof(modelo.IdCategoriaACambio), "Elegí una categoría de la lista o dejalo abierto a propuestas");
+        }
         List<EstadosArticulos> estados = ObtenerEstados();
         if (modelo.IdEstado.HasValue && !estados.Any(e => e.IdEstadosArticulos == modelo.IdEstado.Value))
         {
@@ -74,7 +74,6 @@ public class PublicarController : Controller
         List<IFormFile> fotos = (modelo.Fotos ?? []).Where(f => f.Length > 0).ToList();
         ValidarFotos(fotos);
 
-        // Si hay errores, la vista vuelve a mostrar lo que el usuario cargó.
         ViewBag.publicar = modelo;
         ViewBag.categorias = categorias;
         ViewBag.estados = estados;
@@ -104,7 +103,7 @@ public class PublicarController : Controller
                 IdUsuarios = usuarioId.Value,
                 IdCategorias = modelo.IdCategorias!.Value,
                 Ubicacion = modelo.Ubicacion.Trim(),
-                ACambio = string.IsNullOrWhiteSpace(modelo.ACambio) ? null : modelo.ACambio.Trim(),
+                IdCategoriaACambio = modelo.IdCategoriaACambio,
                 FechaPublicacion = DateTime.Today
             };
             int idArticulo = BD.PublicarArticulo(articulo, rutasFotos);
@@ -114,7 +113,6 @@ public class PublicarController : Controller
         }
         catch (Exception ex) when (ex is SqlException or IOException or UnauthorizedAccessException)
         {
-            // No quedan fotos sueltas en wwwroot de un artículo que no se guardó.
             _logger.LogError(ex, "No se pudo publicar el artículo del usuario {IdUsuario}", usuarioId);
             BorrarFotosArticulo(rutasFotos);
             ModelState.AddModelError(string.Empty, "No pudimos publicar tu artículo. Probá de nuevo en un rato.");
@@ -123,7 +121,6 @@ public class PublicarController : Controller
         }
     }
 
-    // Mismas reglas que las fotos de perfil (PerfilController.Editar): extensión JPG/PNG y tamaño máximo.
     private void ValidarFotos(List<IFormFile> fotos)
     {
         if (fotos.Count > PublicarArticuloViewModel.MaxFotos)
@@ -140,7 +137,6 @@ public class PublicarController : Controller
         }
     }
 
-    // El navegador no vuelve a cargar un <input type="file"> cuando la página vuelve con errores.
     private void AvisarFotosDeNuevo(List<IFormFile> fotos)
     {
         if (fotos.Count > 0 && ModelState["Fotos"]?.Errors.Count is null or 0)
@@ -149,9 +145,6 @@ public class PublicarController : Controller
         }
     }
 
-    // Las fotos van a wwwroot/img/articulos y la ruta a Imagenes.Ruta, que es varchar(50):
-    // nombre corto con id del usuario + ticks en hexa + número de foto (~48 caracteres como máximo).
-    // Agrega cada ruta a rutasFotos antes de escribirla, para poder borrarlas si algo falla después.
     private void GuardarFotosArticulo(List<IFormFile> fotos, int idUsuario, List<string> rutasFotos)
     {
         string carpeta = Path.Combine(_env.WebRootPath, "img", "articulos");
@@ -183,8 +176,6 @@ public class PublicarController : Controller
         }
     }
 
-    // Opciones del <select> de categorías, desde la tabla Categorias.
-    // Si la BD falla, el select queda vacío y el POST no valida (no se puede publicar sin categoría).
     private List<SelectListItem> ObtenerCategorias()
     {
         try
@@ -198,8 +189,6 @@ public class PublicarController : Controller
         }
     }
 
-    // Opciones de "Estado del objeto", desde la tabla EstadosArticulos.
-    // Si la BD falla, no hay opciones y el POST no valida (no se puede publicar sin estado).
     private List<EstadosArticulos> ObtenerEstados()
     {
         try

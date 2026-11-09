@@ -1,10 +1,3 @@
-/* =========================================================
-   SWAPPIT - Estilos globales (basado en UI Kit de Figma)
-   Paleta: Azul petróleo #0D596A | Bordó #6E2C3A
-           Celeste grisáceo #A5BABE | Beige claro #ECE6D8
-   Tipografías: Century Gothic (texto) / Forum (títulos)
-   ========================================================= */
-
 :root {
     --sw-primario: #0d596a;
     --sw-primario-hover: #0a4654;
@@ -15,7 +8,6 @@
     --sw-crema: #ece6d8;
     --sw-fondo: #f6f7f7;
     --sw-texto: #1f2a2c;
-    /* Gris de texto secundario: llega a 4.5:1 de contraste (WCAG AA) también sobre beige y gris claro */
     --sw-texto-suave: #55666a;
     --sw-borde: #dfe5e6;
     --sw-radio: 16px;
@@ -50,7 +42,6 @@ body {
 
 main { flex: 1 0 auto; }
 
-/* Foco visible y consistente para teclado en links y botones propios */
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
@@ -60,7 +51,6 @@ button:focus-visible,
     outline-offset: 2px;
 }
 
-/* Link "Saltar al contenido": invisible hasta que se navega con Tab */
 .sw-saltar {
     position: absolute;
     left: 1rem;
@@ -85,7 +75,6 @@ main:focus { outline: 0; }
 }
 
 .font-titulo { font-family: var(--sw-font-titulo); font-weight: 400; }
-/* Títulos: reparte las líneas para que no quede una palabra sola abajo */
 h1, h2, h3, .font-titulo { text-wrap: balance; }
 .text-primario { color: var(--sw-primario) !important; }
 .text-secundario { color: var(--sw-secundario) !important; }
@@ -113,7 +102,6 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
 .btn-sw-secundario:disabled,
 .btn-sw-outline:disabled,
 .btn-sw-outline-secundario:disabled { opacity: .5; }
-/* El CTA principal es bordó; el borde y el hover quedan en el mismo tono (antes el borde era azul y el hover saltaba a azul) */
 .btn-sw-primario { background: var(--sw-secundario); color: #fff; border: 1.5px solid var(--sw-secundario); }
 .btn-sw-primario:hover,
 .btn-sw-primario:active { background: var(--sw-secundario-hover); border-color: var(--sw-secundario-hover); color: #fff; }
@@ -136,7 +124,6 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
     position: sticky;
     top: 0;
     z-index: 1030;
-    /* Línea sutil para separar el header del contenido que pasa por debajo al scrollear */
     box-shadow: 0 1px 0 rgba(13, 89, 106, .12);
 }
 
@@ -152,7 +139,6 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
 }
 .sw-logo:hover { color: var(--sw-texto); }
 .sw-logo { flex-shrink: 0; }
-/* El logo se ajusta a la altura indicada y el ancho sale solo, sea cual sea el tamaño del archivo */
 .sw-logo-img {
     display: block;
     height: 44px;
@@ -175,9 +161,8 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
     transition: box-shadow var(--sw-transicion);
 }
 .sw-buscador:focus-within { box-shadow: 0 0 0 3px var(--sw-anillo-foco); }
-/* Buscador de mobile: segunda fila del header */
 .sw-buscador--mobile { margin-top: .6rem; }
-.sw-buscador--mobile input { font-size: 16px; } /* 16px evita el zoom automático de iOS */
+.sw-buscador--mobile input { font-size: 16px; }
 .sw-buscador input {
     border: 0;
     outline: 0;
@@ -210,7 +195,6 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
 }
 .sw-btn-icono:hover { background: var(--sw-secundario-hover); }
 
-/* Íconos del header: área táctil de 40px aunque el ícono se vea chico */
 .sw-header-accion {
     color: var(--sw-texto);
     font-size: 1.2rem;
@@ -257,12 +241,11 @@ h1, h2, h3, .font-titulo { text-wrap: balance; }
 .sw-avatar:hover { color: #fff; }
 a.sw-avatar:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, .7); }
 
-/* ---------- Pop up de notificaciones (UI Kit: "Popup / Notificaciones") ---------- */
+/* ---------- Pop up de notificaciones ---------- */
 button.sw-header-accion { border: 0; padding: 0; background: transparent; }
 .sw-header-accion[aria-expanded="true"] { color: var(--sw-primario); background: rgba(255, 255, 255, .6); }
 
 .sw-notif { position: relative; }
-/* Contador de no leídas sobre la campana (notificaciones.js) */
 .sw-notif-contador {
     position: absolute;
     top: 3px;
@@ -295,7 +278,6 @@ button.sw-header-accion { border: 0; padding: 0; background: transparent; }
     border-radius: 20px;
     box-shadow: 0 16px 40px rgba(13, 38, 51, .16);
     overflow: hidden;
-    /* Cerrado: invisible y fuera del orden de Tab. Se abre con la clase .abierto (site.js) */
     visibility: hidden;
     opacity: 0;
     transform: translateY(-6px);
@@ -318,7 +300,6 @@ button.sw-header-accion { border: 0; padding: 0; background: transparent; }
 }
 .sw-notif-titulo { margin: 0; font-family: var(--sw-font-titulo); font-size: 24px; color: var(--sw-primario); }
 
-/* Lo que carga notificaciones.js (Views/Notificaciones/_Lista.cshtml): la lista crece y scrollea adentro */
 .sw-notif-cuerpo { display: flex; flex-direction: column; min-height: 0; }
 .sw-notif-cargando { margin: 0; padding: 28px 24px; text-align: center; font-size: 14px; color: var(--sw-texto-suave); }
 
@@ -383,12 +364,9 @@ a.sw-notif-accion:hover, button.sw-notif-accion:hover { color: var(--sw-primario
 .sw-notif-accion--bordo { color: var(--sw-secundario); }
 button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 
-/* Puntito de "sin leer" a la derecha de la fila */
 .sw-notif-punto { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--sw-primario); flex-shrink: 0; }
 .sw-notif-item:not(.sw-notif-item--sin-leer) .sw-notif-punto { display: none; }
 
-/* En celulares y tablets chicas el pop up ocupa el ancho de la pantalla, debajo del header
-   (.sw-header es sticky y lo contiene). Con 440px fijos se saldría por la izquierda. */
 @media (max-width: 767.98px) {
     .sw-notif { position: static; }
     .sw-notif-popup { top: calc(100% + 8px); left: 16px; right: 16px; width: auto; max-width: 440px; margin-left: auto; max-height: calc(100vh - 140px); }
@@ -418,9 +396,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     box-shadow: var(--sw-sombra);
 }
 
-/* Contenedor de imagen: el contenedor define el tamaño (aspect-ratio / width / height)
-   y la <img> lo llena recortándose, sin importar el tamaño original de la foto.
-   Mientras la imagen esté vacía (src="") o no cargue, se ve el ícono de fondo. */
 .sw-img {
     position: relative;
     overflow: hidden;
@@ -445,7 +420,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     overflow: hidden;
     height: 100%;
     position: relative;
-    /* Color propio: si la card está dentro de una sección oscura (ej: .sw-cta) no hereda texto blanco */
     color: var(--sw-texto);
     transition: transform var(--sw-transicion), box-shadow var(--sw-transicion), border-color var(--sw-transicion);
 }
@@ -454,7 +428,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     border-color: transparent;
     box-shadow: var(--sw-sombra-hover);
 }
-/* El link del título cubre la card (stretched-link): el foco se marca en toda la card */
 .card-objeto:focus-within { outline: 3px solid var(--sw-anillo-foco); outline-offset: 2px; }
 .card-objeto .stretched-link:focus-visible { outline: 0; }
 .card-objeto-img {
@@ -475,7 +448,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     color: var(--sw-texto);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
 }
-/* Favorito: z-index 2 para quedar arriba del stretched-link del título */
 .card-objeto-fav {
     font-size: 1rem;
     z-index: 2;
@@ -497,13 +469,11 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .card-objeto-fav:hover,
 .card-objeto-fav.activo { color: var(--sw-secundario); }
 .card-objeto-fav:active { transform: scale(.9); }
-/* Latido solo al hacer click (favoritos.js agrega .latido), no al cargar la página */
 .card-objeto-fav.latido i { animation: sw-fav-latido .3s cubic-bezier(.2, .8, .2, 1); }
 @keyframes sw-fav-latido {
     50% { transform: scale(1.25); }
 }
 .card-objeto-body { padding: .8rem .9rem .9rem; }
-/* Títulos largos: máximo 2 líneas para que todas las cards tengan la misma altura visual */
 .card-objeto-titulo {
     font-weight: 700;
     font-size: 1rem;
@@ -515,6 +485,19 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     overflow: hidden;
 }
 .card-objeto-ubicacion { font-size: .8rem; color: var(--sw-primario); }
+.card-objeto-motivo {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .45rem;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--sw-secundario);
+    background: rgba(110, 44, 58, .08);
+}
+.card-objeto-motivo--descubrir { color: var(--sw-primario); background: var(--sw-gris-claro); }
 .card-objeto-cambio {
     border-top: 1px solid var(--sw-borde);
     margin-top: .6rem;
@@ -656,7 +639,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     flex-shrink: 0;
 }
 
-/* Foto de perfil dentro de los avatares (perfil y header) */
 .sw-perfil-avatar > img,
 .sw-avatar > img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .sw-avatar { overflow: hidden; }
@@ -715,23 +697,17 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-chat-input .btn-link:hover,
 .sw-chat-header .btn-link:hover { background: var(--sw-fondo); }
 .sw-chat-input .sw-btn-icono { width: 40px; height: 40px; }
-/* Fecha antes del primer mensaje de cada día */
 .sw-chat-dia { text-align: center; margin: .25rem 0 1rem; }
 .sw-chat-dia span {
     display: inline-block; padding: .2rem .75rem; border-radius: 999px;
     background: var(--sw-gris-claro); color: var(--sw-primario); font-size: .72rem; font-weight: 600;
 }
-/* Chat sin mensajes o conversación que no existe */
 .sw-chat-vacio {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem;
     height: 100%; padding: 2rem; text-align: center; color: var(--sw-texto-suave);
 }
 
-/* =========================================================
-   UI KIT - Formularios (Login / Registro / Publicar objeto)
-   Valores tomados del UI Kit de Figma:
-   inputs (04), botones (05), chips de estado y tokens de color.
-   ========================================================= */
+/* ===== UI KIT - Formularios ===== */
 
 :root {
     --sw-ui-primario: #0d596a;
@@ -762,7 +738,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-ayuda { font-size: 14px; line-height: 19px; color: var(--sw-ui-gray-4); }
 .sw-nota { margin: 0; font-size: 13px; line-height: 17px; color: var(--sw-ui-gray-4); }
 
-/* Text input (estados del UI Kit: default / hover / focus / error / disabled) */
 .sw-input {
     display: block;
     width: 100%;
@@ -783,13 +758,11 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-input:focus,
 .sw-input:focus-visible { outline: 0; border-color: var(--sw-ui-primario); background-color: #fff; box-shadow: 0 0 0 3px rgba(13, 89, 106, .2); }
 .sw-input:disabled { color: var(--sw-ui-gray-5); background-color: #fff; border-color: var(--sw-ui-gray-5); cursor: not-allowed; }
-/* Las clases input-validation-error / field-validation-error las pone ASP.NET (jquery-validation-unobtrusive) */
 .sw-input.input-validation-error,
 .sw-input.input-validation-error:hover,
 .sw-input.input-validation-error:focus { border-color: var(--sw-ui-error); }
 .sw-input.input-validation-error:focus { box-shadow: 0 0 0 3px rgba(186, 0, 0, .15); }
 
-/* Mensaje de error (UI Kit: texto rojo + ícono de alerta). Vacío = oculto */
 .sw-error {
     display: flex;
     align-items: center;
@@ -807,7 +780,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-error-resumen li { display: flex; align-items: center; gap: 6px; }
 .sw-error-resumen li::before { font-family: "bootstrap-icons"; content: "\f33a"; font-size: 16px; line-height: 1; }
 
-/* Input con ícono a la izquierda (fecha) */
 .sw-input-icono { position: relative; }
 .sw-input-icono > i {
     position: absolute;
@@ -820,7 +792,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
     pointer-events: none;
 }
 .sw-input-icono > .sw-input { padding-left: 52px; }
-/* El selector nativo de fecha ocupa todo el campo: se abre con clic en cualquier parte */
 .sw-input-icono > .sw-input::-webkit-calendar-picker-indicator {
     position: absolute;
     inset: 0;
@@ -845,7 +816,7 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-textarea { height: 140px; padding: 12px 12px 12px 16px; resize: vertical; }
 .sw-contador { text-align: right; font-size: 13px; line-height: 17px; color: var(--sw-ui-gray-4); }
 
-/* ---------- Botones (UI Kit 05) ---------- */
+/* ---------- Botones ---------- */
 .sw-btn {
     display: inline-flex;
     align-items: center;
@@ -883,7 +854,7 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-link-chico { font-size: 14px; line-height: 19px; }
 .sw-campo-extra { align-self: flex-end; }
 
-/* ---------- Chips de estado (Estado del objeto) ---------- */
+/* ---------- Chips de estado ---------- */
 .sw-estados { position: relative; display: flex; flex-wrap: wrap; gap: 10px; }
 .sw-campo-estado { gap: 10px; }
 .sw-estado-radio { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
@@ -907,7 +878,7 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-estado-radio:checked + .sw-estado { background: var(--sw-ui-primario); color: #fff; }
 .sw-estado-radio:focus-visible + .sw-estado { outline: 3px solid rgba(13, 89, 106, .35); outline-offset: 2px; }
 
-/* ---------- Auth (Login / Registro) ---------- */
+/* ---------- Auth ---------- */
 .sw-auth { background: var(--sw-ui-crema); padding: 85px 16px 150px; }
 .sw-auth-card {
     width: 100%;
@@ -1070,7 +1041,7 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 }
 .min-w-0 { min-width: 0; }
 
-/* ---------- Detalle de artículo (Home/Articulo) ---------- */
+/* ---------- Detalle de artículo ---------- */
 .sw-articulo-foto { aspect-ratio: 4 / 3; border-radius: var(--sw-radio); border: 1px solid var(--sw-borde); }
 .sw-articulo-miniaturas { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .75rem; }
 .sw-articulo-miniatura {
@@ -1091,7 +1062,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-perfil-descripcion { white-space: pre-line; overflow-wrap: anywhere; }
 .sw-articulo-propio { background: var(--sw-crema); color: var(--sw-primario); border-radius: 12px; padding: .75rem 1rem; font-size: .9rem; }
 
-/* Tarjeta "Publicado por": lleva al perfil del dueño */
 .sw-dueno {
     display: flex; align-items: center; gap: 1rem;
     padding: .85rem 1rem; border-radius: 14px;
@@ -1102,7 +1072,6 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-dueno:focus-visible { outline: 3px solid rgba(13, 89, 106, .35); outline-offset: 2px; }
 .sw-perfil-avatar--mini { width: 52px; height: 52px; font-size: 1.15rem; }
 
-/* Pop up "Proponer intercambio": cada artículo propio es un radio con forma de tarjeta */
 .sw-opcion-articulo { position: relative; display: block; cursor: pointer; }
 .sw-opcion-articulo-cuerpo {
     display: flex; align-items: center; gap: .85rem;
@@ -1125,13 +1094,11 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 }
 .sw-error-pagina code { color: var(--sw-texto-suave); overflow-wrap: anywhere; }
 
-/* ---------- Intercambios (Views/Intercambio, _FilaIntercambio) ---------- */
-/* Filtros de Mis intercambios: son links, el elegido se pinta como .btn-check:checked + .sw-chip */
+/* ---------- Intercambios ---------- */
 a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
 .sw-chip.activo { background: var(--sw-primario); border-color: var(--sw-primario); color: #fff; }
 .sw-chip-cantidad { font-weight: 400; opacity: .75; margin-left: .25rem; }
 
-/* Estado del intercambio (EstadosIntercambios.Nombre en minúscula) */
 .sw-estado-intercambio {
     display: inline-block; padding: .25rem .75rem; border-radius: 999px;
     font-size: .75rem; font-weight: 600; white-space: nowrap;
@@ -1148,14 +1115,11 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
 }
 .sw-volver:hover { color: var(--sw-primario-hover); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Botón contorno bordó (Rechazar) */
 .btn-sw-outline-secundario { background: transparent; color: var(--sw-secundario); border: 1.5px solid var(--sw-secundario); }
 .btn-sw-outline-secundario:hover,
 .btn-sw-outline-secundario:active { background: var(--sw-secundario); border-color: var(--sw-secundario); color: #fff; }
 
-/* Los dos artículos del intercambio, con las flechas en el medio */
 .sw-intercambio-propuesta { max-width: 920px; }
-/* Aviso antes de aceptar: las otras propuestas pendientes con esos artículos se rechazan solas */
 .sw-aviso-rechazos { background: #f6e9ec; color: var(--sw-secundario); border-radius: 12px; padding: .75rem 1rem; font-size: .9rem; }
 .sw-intercambio-articulos {
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.25rem;
@@ -1182,12 +1146,9 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
     .sw-intercambio-flechas { justify-self: center; transform: rotate(90deg); }
 }
 
-/* Avance del intercambio: Propuesta enviada -> Aceptada -> Realizado (o Rechazada).
-   No usa .sw-paso: esa clase es de "Cómo funciona" en el inicio. */
 .sw-avance { display: flex; align-items: center; gap: .75rem; list-style: none; padding-left: 0; margin-top: 0; }
 .sw-avance-paso { display: flex; align-items: center; gap: .65rem; flex: 1 1 auto; color: var(--sw-texto-suave); }
 .sw-avance-paso:last-child { flex: 0 0 auto; }
-/* Línea que une cada paso con el siguiente */
 .sw-avance-paso:not(:last-child)::after {
     content: ""; flex: 1 1 auto; min-width: 1.5rem; height: 2px; margin-left: .35rem;
     background: var(--sw-borde); border-radius: 2px;
@@ -1209,20 +1170,16 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
     .sw-avance-paso:not(:last-child)::after { display: none; }
 }
 
-/* ===== Inicio del usuario logueado (Views/Home/Inicio.cshtml) ===== */
-/* Saludo: grande y centrado, con los botones abajo */
+/* ===== Inicio del usuario logueado ===== */
 .sw-inicio-saludo { background: #fff; padding: 4.5rem 0 3.5rem; border-bottom: 1px solid var(--sw-borde); }
 .sw-inicio-saludo h1 {
     font-family: var(--sw-font-titulo); font-weight: 400;
     font-size: clamp(3rem, 8vw, 5.5rem); line-height: 1; color: var(--sw-primario);
     overflow-wrap: anywhere;
 }
-/* Columna lateral: queda a la vista al bajar por los recomendados (solo si entra en la pantalla).
-   El top deja lugar al header, que también es sticky. */
 @media (min-width: 992px) and (min-height: 800px) {
     .sw-inicio-lateral { position: sticky; top: 6rem; }
 }
-/* Filas del resumen: ícono + texto + número a la derecha; cada una lleva a su pantalla */
 .sw-resumen {
     display: flex; align-items: center; gap: .85rem;
     padding: .7rem .9rem; border-radius: 12px;
@@ -1238,11 +1195,9 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
 }
 .sw-resumen-texto { flex: 1 1 auto; min-width: 0; font-size: .9rem; line-height: 1.3; color: var(--sw-texto-suave); }
 .sw-resumen-numero { font-family: var(--sw-font-titulo); font-size: 1.9rem; line-height: 1; color: var(--sw-primario); }
-/* Hay algo que espera al usuario: bordó, como el contador de la campana */
 .sw-resumen--alerta .sw-resumen-icono { background: #f3e9eb; color: var(--sw-secundario); }
 .sw-resumen--alerta .sw-resumen-texto { color: var(--sw-texto); font-weight: 600; }
 .sw-resumen--alerta .sw-resumen-numero { color: var(--sw-secundario); }
-/* Intercambios en curso: filas compactas, cada una lleva a Ver intercambio */
 .sw-inicio-intercambio {
     display: flex; align-items: center; gap: .8rem;
     padding: .6rem; margin: 0 -.6rem; border-radius: 12px;
@@ -1254,9 +1209,7 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
 .sw-inicio-intercambio-nombre { display: block; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sw-inicio-intercambio-detalle { display: block; font-size: .8rem; color: var(--sw-texto-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sw-inicio-intercambio .sw-estado-intercambio { flex-shrink: 0; }
-/* Propuesta que le llegó y tiene que aceptar o rechazar */
 .sw-inicio-responder { background: var(--sw-secundario); color: #fff; }
-/* Aviso "Publicá tu primer artículo" */
 .sw-inicio-aviso {
     display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
     padding: 1.1rem 1.25rem; border-radius: var(--sw-radio); background: var(--sw-crema);

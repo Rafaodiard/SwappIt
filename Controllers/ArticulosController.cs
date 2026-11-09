@@ -5,12 +5,8 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Ver artículos: el catálogo con buscador y filtros (/Articulos/Buscar)
-// y el detalle de cada uno (/Articulos/Detalle/5).
-// Publicar un artículo nuevo está en PublicarController.
 public class ArticulosController : Controller
 {
-    // Límite de opciones por filtro que se aceptan en la URL (hoy hay 6 categorías y pocos estados).
     private const int MaxOpcionesFiltro = 20;
 
     private readonly ILogger<ArticulosController> _logger;
@@ -20,11 +16,10 @@ public class ArticulosController : Controller
         _logger = logger;
     }
 
-    // q: texto del buscador del header. categoria / estado: checkboxes del panel de filtros (se pueden marcar varios).
-    // Si hay alguien logueado, no ve sus propios artículos (están en su perfil); los contadores de los filtros tampoco los cuentan.
-    public IActionResult Buscar(string? q, int[]? categoria, int[]? estado)
+    public IActionResult Buscar(string? q, int[]? categoria, int[]? estado, string? orden)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+        string ordenElegido = RecomendacionesController.OrdenValido(orden, usuarioId != null);
         string? busqueda = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
         List<int> categoriasSeleccionadas = (categoria ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
         List<int> estadosSeleccionados = (estado ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
@@ -32,12 +27,12 @@ public class ArticulosController : Controller
         List<ArticuloCardViewModel> articulos = new List<ArticuloCardViewModel>();
         List<OpcionFiltroViewModel> categorias = new List<OpcionFiltroViewModel>();
         List<OpcionFiltroViewModel> estados = new List<OpcionFiltroViewModel>();
-        // true si no se pudo leer la BD (para distinguir "error" de "sin resultados").
         bool errorCarga = false;
 
         try
         {
             articulos = BD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
+            articulos = RecomendacionesController.Ordenar(articulos, ordenElegido, usuarioId);
             categorias = BD.GetFiltroCategorias(busqueda, usuarioId);
             estados = BD.GetFiltroEstados(busqueda, usuarioId);
         }
@@ -55,12 +50,12 @@ public class ArticulosController : Controller
         ViewBag.estadosSeleccionados = estadosSeleccionados;
         ViewBag.errorCarga = errorCarga;
         ViewBag.hayFiltros = categoriasSeleccionadas.Count > 0 || estadosSeleccionados.Count > 0;
+        ViewBag.orden = ordenElegido;
+        ViewBag.opcionesOrden = RecomendacionesController.OpcionesOrden(usuarioId != null);
+        ViewBag.logueado = usuarioId != null;
         return View();
     }
 
-    // Detalle de un artículo. Lo puede ver cualquiera (logueado o no).
-    // Si el que mira es el dueño (Articulos.IdUsuarios = UsuarioId de la sesión) se muestran sus acciones
-    // en lugar de "Proponer intercambio".
     public IActionResult Detalle(int id)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
@@ -76,13 +71,13 @@ public class ArticulosController : Controller
                 return View();
             }
 
-            // Articulos.IdUsuarios es NOT NULL con clave foránea a Usuarios: el dueño siempre existe.
             Usuarios dueno = BD.GetUsuarioById(articulo.IdUsuarios)!;
             bool esPropio = usuarioId == articulo.IdUsuarios;
 
             ViewBag.detalle = articulo;
             ViewBag.imagenes = BD.GetImagenesArticulo(articulo.IdArticulos);
             ViewBag.categoria = BD.GetCategoriaById(articulo.IdCategorias);
+            ViewBag.categoriaACambio = articulo.IdCategoriaACambio.HasValue ? BD.GetCategoriaById(articulo.IdCategoriaACambio.Value) : null;
             ViewBag.estado = BD.GetEstadoArticuloById(articulo.IdEstado);
             ViewBag.dueno = dueno;
             ViewBag.fotoDueno = BD.GetFotoUsuario(dueno.IdUsuarios);
@@ -90,14 +85,11 @@ public class ArticulosController : Controller
             ViewBag.otrosArticulos = BD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
                 .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
             ViewBag.esPropio = esPropio;
-            // Con un intercambio Aceptado o Realizado ya no se muestra en el catálogo ni se puede pedir.
             ViewBag.comprometido = BD.ArticuloComprometido(articulo.IdArticulos);
             ViewBag.logueado = usuarioId != null;
-            // Pop up "Proponer intercambio": artículos del usuario logueado que puede ofrecer a cambio.
             ViewBag.misArticulos = usuarioId != null && !esPropio
                 ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
                 : new List<ArticuloCardViewModel>();
-            // Si ya propuso un intercambio por este artículo (Pendiente o Aceptado), se muestra "Propuesta enviada".
             ViewBag.idPropuestaEnCurso = usuarioId != null && !esPropio
                 ? BD.GetIdPropuestaEnCurso(usuarioId.Value, articulo.IdArticulos)
                 : null;

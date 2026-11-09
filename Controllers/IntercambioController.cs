@@ -6,15 +6,6 @@ using Swappit.Services;
 
 namespace Swappit.Controllers;
 
-// Intercambios entre usuarios:
-// - Proponer uno desde el detalle de un artículo (POST /Intercambio/Proponer).
-// - Mis intercambios, enviados y recibidos, con filtro por estado (/Intercambio?estado=Pendiente).
-// - Ver un intercambio (/Intercambio/Detalle/5): quien lo recibe lo acepta o lo rechaza, y cuando está
-//   aceptado cualquiera de los dos lo marca como realizado.
-// - Cancelarlo: quien propuso retira su propuesta pendiente, o cualquiera de los dos cancela uno aceptado.
-// Al proponer, aceptar, rechazar o cancelar se le avisa a la otra persona con una notificación (ver NotificacionesController).
-// Marcar como realizado no avisa: no hay tipo de notificación para eso.
-// Las notificaciones creadas también se mandan por mail (EmailService), después de que la base confirmó el cambio.
 public class IntercambioController : Controller
 {
     private readonly ILogger<IntercambioController> _logger;
@@ -48,7 +39,6 @@ public class IntercambioController : Controller
             errorCarga = true;
         }
 
-        // Solo se filtra por un estado que exista en la tabla; cualquier otro valor muestra todos.
         string? estadoElegido = estados.Any(e => e.Nombre == estado) ? estado : null;
 
         ViewBag.intercambios = estadoElegido == null ? intercambios : intercambios.Where(i => i.Estado == estadoElegido).ToList();
@@ -71,7 +61,6 @@ public class IntercambioController : Controller
         ViewBag.errorCarga = false;
         try
         {
-            // Si el intercambio no existe o el usuario no es parte de él, se muestra "no encontrado".
             IntercambioViewModel? intercambio = BD.GetIntercambio(id, usuarioId.Value);
             if (intercambio == null)
             {
@@ -80,10 +69,8 @@ public class IntercambioController : Controller
             else
             {
                 ViewBag.fotoOtro = BD.GetFotoUsuario(intercambio.OtroIdUsuario);
-                // Una propuesta pendiente no se puede aceptar si alguno de los dos artículos ya se comprometió en otro intercambio.
                 ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
                     && (BD.ArticuloComprometido(intercambio.MiArticuloId) || BD.ArticuloComprometido(intercambio.SuArticuloId));
-                // Si quien la recibió la acepta, estas otras propuestas pendientes con los mismos artículos se rechazan solas.
                 ViewBag.pendientesQueSeRechazan = intercambio.EsRecibido && intercambio.Estado == EstadosIntercambios.Pendiente
                     ? BD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
                     : 0;
@@ -99,8 +86,6 @@ public class IntercambioController : Controller
         return View();
     }
 
-    // Lo manda el pop up "Proponer intercambio" de Articulos/Detalle.
-    // idArticuloPedido: el artículo que se está mirando. idArticuloOfrecido: uno de los artículos del usuario logueado.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Proponer(int idArticuloPedido, int idArticuloOfrecido)
@@ -168,8 +153,6 @@ public class IntercambioController : Controller
         }
     }
 
-    // Solo quien recibió la propuesta (dueño del artículo pedido) y mientras esté Pendiente.
-    // Las otras propuestas pendientes con esos artículos se rechazan solas (BD.CambiarEstadoIntercambio).
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Aceptar(int id)
@@ -187,7 +170,6 @@ public class IntercambioController : Controller
         }
         catch (SqlException ex)
         {
-            // Solo es para el mensaje: si falla, CambiarEstado igual intenta aceptar y maneja el error.
             _logger.LogError(ex, "No se pudieron contar las propuestas pendientes del intercambio {IdIntercambio}", id);
         }
         return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado, soloQuienRecibe: true,
@@ -202,7 +184,6 @@ public class IntercambioController : Controller
             TipoNotificaciones.PropuestaRechazada, "Rechazaste la propuesta.");
     }
 
-    // Cualquiera de los dos, una vez aceptado.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult MarcarRealizado(int id)
@@ -211,8 +192,6 @@ public class IntercambioController : Controller
             tipoNotificacion: null, "¡Intercambio realizado!");
     }
 
-    // Quien propuso, mientras está Pendiente, o cualquiera de los dos, una vez aceptado.
-    // A la otra persona le llega "Intercambio cancelado" (BD.CancelarIntercambio).
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Cancelar(int id)
@@ -233,7 +212,6 @@ public class IntercambioController : Controller
             }
             else
             {
-                // No es parte del intercambio, no le toca a él o el estado ya cambió (por ejemplo, la otra persona ya respondió).
                 TempData["ErrorIntercambio"] = "No se pudo cancelar el intercambio. Puede que ya haya cambiado de estado.";
             }
         }
@@ -245,7 +223,6 @@ public class IntercambioController : Controller
         return RedirectToAction("Detalle", new { id });
     }
 
-    // tipoNotificacion: la que le llega a la otra persona si el cambio se hizo (null = no se avisa).
     private IActionResult CambiarEstado(int id, string estadoActual, string estadoNuevo, bool soloQuienRecibe,
         string? tipoNotificacion, string mensaje)
     {
@@ -257,7 +234,6 @@ public class IntercambioController : Controller
 
         try
         {
-            // Al aceptar, además de "Propuesta aceptada" puede haber varias "Propuesta rechazada" (las pendientes que se rechazan solas).
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
             if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion, creadas))
             {
@@ -266,7 +242,6 @@ public class IntercambioController : Controller
             }
             else
             {
-                // No es parte del intercambio, no le toca a él o el estado ya cambió (por ejemplo, la otra persona ya respondió).
                 TempData["ErrorIntercambio"] = "No se pudo actualizar el intercambio. Puede que ya haya cambiado de estado.";
             }
         }

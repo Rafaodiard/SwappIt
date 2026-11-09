@@ -8,6 +8,6 @@ public class Articulos
     public int IdUsuarios { get; set; }
     public int IdCategorias { get; set; }
     public string? Ubicacion { get; set; }
-    public string? ACambio { get; set; }
+    public int? IdCategoriaACambio { get; set; }
     public DateTime FechaPublicacion { get; set; }
 }

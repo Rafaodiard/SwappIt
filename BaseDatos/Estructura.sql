@@ -1,7 +1,7 @@
 ﻿USE [master]
 GO
-/****** Object:  Database [Base_De_Datos_Swappit]    Script Date: 23/10/2026 09:04:02 ******/
-/****** 1 de 3: Estructura (base, usuario, tablas y claves foráneas). Ejecutar primero. ******/
+/****** Object:  Database [Base_De_Datos_Swappit]    Script Date: 29/10/2026 13:39:32 ******/
+/****** 1 de 3: Estructura (base, usuario, tablas, índice y claves foráneas). Ejecutar primero. ******/
 CREATE DATABASE [Base_De_Datos_Swappit]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -80,10 +80,10 @@ ALTER DATABASE [Base_De_Datos_Swappit] SET QUERY_STORE = OFF
 GO
 USE [Base_De_Datos_Swappit]
 GO
-/****** Object:  User [alumno]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  User [alumno]    Script Date: 29/10/2026 13:39:32 ******/
 CREATE USER [alumno] FOR LOGIN [alumno] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  Table [dbo].[Articulos]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Articulos]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -96,15 +96,15 @@ CREATE TABLE [dbo].[Articulos](
 	[IdUsuarios] [int] NOT NULL,
 	[IdCategorias] [int] NOT NULL,
 	[Ubicacion] [varchar](100) NULL,
-	[ACambio] [varchar](100) NULL,
 	[FechaPublicacion] [date] NOT NULL,
+	[IdCategoriaACambio] [int] NULL,
  CONSTRAINT [PK_Articulos] PRIMARY KEY CLUSTERED 
 (
 	[IdArticulos] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Categorias]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Categorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -118,7 +118,7 @@ CREATE TABLE [dbo].[Categorias](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosArticulos]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -132,7 +132,7 @@ CREATE TABLE [dbo].[EstadosArticulos](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 27/10/2026 08:51:27 ******/
+/****** Object:  Table [dbo].[EstadosIntercambios]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -146,7 +146,7 @@ CREATE TABLE [dbo].[EstadosIntercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Imagenes]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Imagenes]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -162,7 +162,36 @@ CREATE TABLE [dbo].[Imagenes](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Intercambios]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Interacciones]    Script Date: 05/11/2026 10:02:21 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Interacciones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdUsuario] [int] NOT NULL,
+	[IdTipoInteraccion] [int] NOT NULL,
+	[IdArticulo] [int] NULL,
+	[IdCategoria] [int] NULL,
+	[Texto] [varchar](100) NULL,
+	[Segundos] [int] NULL,
+	[Fecha] [datetime] NOT NULL,
+ CONSTRAINT [PK_Interacciones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [IX_Interacciones_Usuario_Fecha]    Script Date: 05/11/2026 10:02:21 ******/
+CREATE NONCLUSTERED INDEX [IX_Interacciones_Usuario_Fecha] ON [dbo].[Interacciones]
+(
+	[IdUsuario] ASC,
+	[Fecha] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Intercambios]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -182,7 +211,7 @@ CREATE TABLE [dbo].[Intercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Mensajes]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Mensajes]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -219,7 +248,7 @@ CREATE TABLE [dbo].[Notificaciones](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Provincias]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Provincias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -230,6 +259,20 @@ CREATE TABLE [dbo].[Provincias](
  CONSTRAINT [PK_Provincias] PRIMARY KEY CLUSTERED 
 (
 	[IdProvincia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TipoInteracciones]    Script Date: 05/11/2026 10:02:21 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TipoInteracciones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_TipoInteracciones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -247,7 +290,7 @@ CREATE TABLE [dbo].[TipoNotificaciones](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Usuarios]    Script Date: 23/10/2026 09:04:02 ******/
+/****** Object:  Table [dbo].[Usuarios]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -276,6 +319,11 @@ REFERENCES [dbo].[Categorias] ([IdCategorias])
 GO
 ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_Categorias]
 GO
+ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_CategoriasACambio] FOREIGN KEY([IdCategoriaACambio])
+REFERENCES [dbo].[Categorias] ([IdCategorias])
+GO
+ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_CategoriasACambio]
+GO
 ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_EstadosArticulos] FOREIGN KEY([IdEstado])
 REFERENCES [dbo].[EstadosArticulos] ([IdEstadosArticulos])
 GO
@@ -295,6 +343,26 @@ ALTER TABLE [dbo].[Imagenes]  WITH CHECK ADD  CONSTRAINT [FK_Imagenes_Usuarios] 
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Imagenes] CHECK CONSTRAINT [FK_Imagenes_Usuarios]
+GO
+ALTER TABLE [dbo].[Interacciones]  WITH CHECK ADD  CONSTRAINT [FK_Interacciones_Articulos] FOREIGN KEY([IdArticulo])
+REFERENCES [dbo].[Articulos] ([IdArticulos])
+GO
+ALTER TABLE [dbo].[Interacciones] CHECK CONSTRAINT [FK_Interacciones_Articulos]
+GO
+ALTER TABLE [dbo].[Interacciones]  WITH CHECK ADD  CONSTRAINT [FK_Interacciones_Categorias] FOREIGN KEY([IdCategoria])
+REFERENCES [dbo].[Categorias] ([IdCategorias])
+GO
+ALTER TABLE [dbo].[Interacciones] CHECK CONSTRAINT [FK_Interacciones_Categorias]
+GO
+ALTER TABLE [dbo].[Interacciones]  WITH CHECK ADD  CONSTRAINT [FK_Interacciones_TipoInteracciones] FOREIGN KEY([IdTipoInteraccion])
+REFERENCES [dbo].[TipoInteracciones] ([Id])
+GO
+ALTER TABLE [dbo].[Interacciones] CHECK CONSTRAINT [FK_Interacciones_TipoInteracciones]
+GO
+ALTER TABLE [dbo].[Interacciones]  WITH CHECK ADD  CONSTRAINT [FK_Interacciones_Usuarios] FOREIGN KEY([IdUsuario])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[Interacciones] CHECK CONSTRAINT [FK_Interacciones_Usuarios]
 GO
 ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Articulos] FOREIGN KEY([IdArticulos1])
 REFERENCES [dbo].[Articulos] ([IdArticulos])

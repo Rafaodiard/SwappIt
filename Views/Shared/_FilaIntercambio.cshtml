@@ -1,11 +1,3 @@
-@*
-    Fila de un intercambio (Mis intercambios y el historial de Mi perfil).
-    Se renderiza con un IntercambioViewModel en ViewBag.fila:
-    ViewBag.fila = intercambio;
-    <partial name="_FilaIntercambio" />
-
-    Arriba va lo que recibe el usuario logueado y abajo (con las flechas) lo que da.
-*@
 @{
     Swappit.Models.ViewModels.IntercambioViewModel fila = ViewBag.fila;
     bool porResponder = fila.EsRecibido && fila.Estado == Swappit.Models.EstadosIntercambios.Pendiente;

@@ -6,14 +6,6 @@ using Swappit.Services;
 
 namespace Swappit.Controllers;
 
-// Chat para coordinar los intercambios. Hay una conversación por intercambio, entre sus dos partes.
-// - GET /Chat: lista de conversaciones y la primera abierta. GET /Chat/Index/5: el chat del intercambio 5.
-// - POST /Chat/Enviar/5: manda un mensaje (form normal: guarda y vuelve a cargar la página).
-// - GET /Chat/Mensajes/5: solo los mensajes (partial _Mensajes). chat.js lo pide cada pocos segundos
-//   para mostrar los mensajes nuevos de la otra persona sin recargar.
-// Se puede escribir mientras el intercambio está Pendiente o Aceptado; si se rechazó o ya se realizó, el chat queda para leer.
-// Al mandar un mensaje, la otra persona recibe la notificación "Mensaje nuevo" (ver BD.EnviarMensaje).
-// Esa notificación se manda también por mail, pero solo cuando se crea (una mientras no la lea, no una por mensaje).
 public class ChatController : Controller
 {
     private readonly ILogger<ChatController> _logger;
@@ -43,13 +35,11 @@ public class ChatController : Controller
             List<IntercambioViewModel> intercambios = BD.GetIntercambios(usuarioId.Value);
             resumenes = BD.GetResumenesChat(usuarioId.Value).ToDictionary(r => r.IdIntercambio);
 
-            // En la lista van los intercambios en curso y los que ya tienen mensajes; primero los que tienen el mensaje más nuevo.
             conversaciones = intercambios
                 .Where(i => EnCurso(i.Estado) || resumenes.ContainsKey(i.IdIntercambios))
                 .OrderByDescending(i => resumenes.TryGetValue(i.IdIntercambios, out ConversacionViewModel? r) ? r.UltimaFecha : i.Fecha)
                 .ToList();
 
-            // Sin id se abre la primera. Con id, cualquiera de sus intercambios (aunque no esté en la lista).
             abierta = id == null ? conversaciones.FirstOrDefault() : intercambios.FirstOrDefault(i => i.IdIntercambios == id);
             if (abierta != null)
             {
@@ -63,7 +53,6 @@ public class ChatController : Controller
             }
             else if (id != null)
             {
-                // El intercambio no existe o el usuario no es parte de él.
                 Response.StatusCode = StatusCodes.Status404NotFound;
             }
         }
@@ -84,7 +73,6 @@ public class ChatController : Controller
         return View();
     }
 
-    // Para chat.js: los mensajes del chat abierto (y los marca como vistos, porque el usuario lo está mirando).
     public IActionResult Mensajes(int id)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
@@ -134,7 +122,6 @@ public class ChatController : Controller
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
             if (!BD.EnviarMensaje(id, usuarioId.Value, texto, creadas))
             {
-                // No es parte del intercambio o el intercambio ya no está en curso.
                 TempData["ErrorChat"] = "No se pudo mandar el mensaje: este intercambio ya no está en curso.";
             }
             _emailService.EnviarNotificaciones(creadas, Url);
@@ -148,7 +135,6 @@ public class ChatController : Controller
         return RedirectToAction("Index", new { id });
     }
 
-    // Pendiente o Aceptado: todavía se puede escribir.
     private static bool EnCurso(string estado) =>
         estado == EstadosIntercambios.Aceptado;
 }

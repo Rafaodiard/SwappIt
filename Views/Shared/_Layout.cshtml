@@ -20,8 +20,6 @@
 
 
 </head>
-<!-- data-usuario / data-url-login: favoritos.js guarda los favoritos de cada cuenta por separado
-     y, si no hay sesión, el corazón de las cards lleva a iniciar sesión -->
 <body data-usuario="@usuarioId" data-url-login="@Url.Action("Index", "Account")">
     <a href="#contenido" class="sw-saltar">Saltar al contenido</a>
 
@@ -32,7 +30,6 @@
                 <img src="~/img/logo.png" class="sw-logo-img" alt="Swappit">
             </a>
 
-            <!-- Buscador (va a Home/Buscar con ?q=) -->
             <form action="@Url.Action("Buscar", "Articulos")" method="get" class="sw-buscador flex-grow-1 d-none d-md-flex" role="search">
                 <i class="bi bi-search text-suave" aria-hidden="true"></i>
                 <input type="search" name="q" placeholder="Buscá sillones, heladeras, lámparas..." aria-label="Buscar objetos">
@@ -52,21 +49,18 @@
                 <nav class="d-flex align-items-center gap-1 gap-sm-2 ms-auto" aria-label="Mi cuenta">
                     <a href="@Url.Action("Index", "Favoritos")" class="sw-header-accion" title="Favoritos" aria-label="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
                     <a href="@Url.Action("Index", "Chat")" class="sw-header-accion" title="Mensajes" aria-label="Mensajes"><i class="bi bi-chat-dots" aria-hidden="true"></i><span class="sw-punto"></span></a>
-                    <!-- Notificaciones: el pop up va justo después del botón para que el Tab entre en él -->
                     <div class="sw-notif" data-notif data-url-no-leidas="@Url.Action("NoLeidas", "Notificaciones")" data-url-lista="@Url.Action("Lista", "Notificaciones")">
                         <button type="button" class="sw-header-accion" title="Notificaciones" aria-label="Notificaciones" aria-expanded="false" aria-controls="popup-notificaciones" data-notif-boton><i class="bi bi-bell" aria-hidden="true"></i><span class="sw-notif-contador" data-notif-contador aria-hidden="true" hidden></span></button>
                         <partial name="_PopupNotificaciones" />
                     </div>
                     <a href="@Url.Action("Index", "Perfil")" class="sw-avatar mx-1" data-iniciales="@iniciales" title="Mi perfil" aria-label="Mi perfil">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</a>
                     <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-secundario btn-sm d-none d-sm-inline-flex align-items-center gap-1"><i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar</a>
-                    <!-- En celulares el botón Publicar queda como ícono para que entre en el header -->
                     <a href="@Url.Action("Index", "Publicar")" class="sw-header-accion sw-header-accion--publicar d-sm-none" title="Publicar" aria-label="Publicar"><i class="bi bi-plus-lg" aria-hidden="true"></i></a>
                     <a href="@Url.Action("Logout", "Account")" class="sw-header-accion" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></a>
                 </nav>
             }
         </div>
 
-        <!-- Buscador en celulares (en pantallas medianas en adelante está en la fila de arriba) -->
         <div class="container-xl d-md-none">
             <form action="@Url.Action("Buscar", "Articulos")" method="get" class="sw-buscador sw-buscador--mobile" role="search">
                 <i class="bi bi-search text-suave" aria-hidden="true"></i>
@@ -116,8 +110,13 @@
         </div>
     </footer>
 
+    @if (!esVisitante)
+    {
+        <form hidden data-favoritos method="post" asp-antiforgery="true" action="@Url.Action("Alternar", "Favoritos")"
+              data-url-ids="@Url.Action("Ids", "Favoritos")" data-url-importar="@Url.Action("Importar", "Favoritos")"></form>
+    }
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS de todas las páginas (cada archivo dice arriba qué maneja). El JS propio de una página va en su sección Scripts. -->
     <script src="~/js/plantillas.js" asp-append-version="true"></script>
     <script src="~/js/imagenes.js" asp-append-version="true"></script>
     <script src="~/js/favoritos.js" asp-append-version="true"></script>

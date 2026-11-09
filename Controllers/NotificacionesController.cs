@@ -5,16 +5,8 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-// Notificaciones del pop up del header (campana de _Layout). Las usa notificaciones.js:
-// - GET /Notificaciones/Lista: la lista del pop up (partial), se pide cada vez que se abre.
-// - GET /Notificaciones/NoLeidas: cuántas sin leer hay, para el contador de la campana.
-// - POST /Notificaciones/Ver/5: la marca como leída y lleva al intercambio (o a su chat, si es "Mensaje nuevo").
-// - POST /Notificaciones/MarcarTodasLeidas: botón "Marcar todas como leídas".
-// Las notificaciones se crean en BD.ProponerIntercambio, BD.CambiarEstadoIntercambio, BD.CancelarIntercambio y BD.EnviarMensaje,
-// y los controllers que las llaman las mandan también por mail (Services/EmailService).
 public class NotificacionesController : Controller
 {
-    // Las del pop up (las más nuevas).
     private const int CantidadEnPopup = 20;
 
     private readonly ILogger<NotificacionesController> _logger;
@@ -85,17 +77,14 @@ public class NotificacionesController : Controller
         }
         catch (SqlException ex)
         {
-            // Sin el intercambio de la notificación, se va a Mis intercambios (que avisa si la base no responde).
             _logger.LogError(ex, "No se pudo marcar como leída la notificación {IdNotificacion}", id);
             return RedirectToAction("Index", "Intercambio");
         }
 
-        // No es del usuario o no existe.
         if (notificacion == null)
         {
             return NotFound();
         }
-        // "Mensaje nuevo" lleva al chat del intercambio; las demás, al intercambio.
         if (notificacion.Tipo == TipoNotificaciones.MensajeNuevo)
         {
             return RedirectToAction("Index", "Chat", new { id = notificacion.IdIntercambio });
@@ -103,7 +92,6 @@ public class NotificacionesController : Controller
         return RedirectToAction("Detalle", "Intercambio", new { id = notificacion.IdIntercambio });
     }
 
-    // Lo llama notificaciones.js con fetch; después vuelve a pedir la lista y el contador.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult MarcarTodasLeidas()

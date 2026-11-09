@@ -1,16 +1,6 @@
-// =========================================================
-// SWAPPIT - Pop up de notificaciones del header (se carga en todas las páginas desde _Layout)
-// - La campana (_Layout.cshtml) lo abre y lo cierra, y muestra cuántas hay sin leer (NotificacionesController.NoLeidas).
-// - Al abrirlo se pide la lista a NotificacionesController.Lista (Views/Notificaciones/_Lista.cshtml).
-// - "Marcar todas como leídas" va por fetch a NotificacionesController.MarcarTodasLeidas y vuelve a cargar todo.
-// - Las URLs no se escriben acá: _Layout las genera con @Url.Action y las pasa en data-url-no-leidas / data-url-lista
-//   (la de "Marcar todas" es el action del form). Un .js no puede usar Razor.
-// - Se cierra con Esc (el foco vuelve a la campana), con clic afuera o al salir con Tab.
-// =========================================================
-
 (() => {
     const contenedor = document.querySelector('[data-notif]');
-    if (!contenedor) return; // visitante: no hay campana
+    if (!contenedor) return;
     const boton = contenedor.querySelector('[data-notif-boton]');
     const popup = contenedor.querySelector('.sw-notif-popup');
     const contenido = popup.querySelector('[data-notif-contenido]');
@@ -61,7 +51,6 @@
             const respuesta = await fetch(marcarTodas.action, { method: 'POST', body: new FormData(marcarTodas) });
             if (respuesta.ok) mostrarCantidad(0);
         } catch {
-            // Si falla, la lista que se vuelve a cargar sigue mostrando las sin leer.
         }
         cargarLista();
         boton.focus();

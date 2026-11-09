@@ -15,7 +15,6 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    // "/" muestra la landing a quien no inició sesión y el inicio (Views/Home/Inicio.cshtml) a quien sí.
     public IActionResult Index()
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
@@ -26,7 +25,7 @@ public class HomeController : Controller
 
         try
         {
-            ViewBag.destacados = BD.GetArticulosCatalogo(cantidad: 4);
+            ViewBag.destacados = RecomendacionesController.Destacados(null, CantidadDestacadosLanding);
         }
         catch (SqlException ex)
         {
@@ -36,8 +35,6 @@ public class HomeController : Controller
         return View();
     }
 
-    // Inicio del usuario logueado: sus intercambios en curso (primero los que tiene que responder),
-    // un resumen de lo que tiene pendiente y artículos recomendados de los demás.
     private IActionResult Inicio(int usuarioId)
     {
         ViewBag.nombre = null;
@@ -45,7 +42,7 @@ public class HomeController : Controller
         ViewBag.porResponder = 0;
         ViewBag.cantidadEnCurso = 0;
         ViewBag.cantidadArticulos = 0;
-        ViewBag.recomendados = new List<ArticuloCardViewModel>();
+        ViewBag.destacados = new List<ArticuloCardViewModel>();
         ViewBag.mensajesSinLeer = null;
         ViewBag.errorCarga = false;
         try
@@ -56,14 +53,11 @@ public class HomeController : Controller
                 .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
                 .ToList();
 
-            // GetIntercambios ya viene del más nuevo al más viejo: acá solo se suben los que esperan respuesta.
             ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
             ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
-            // Por ahora los recomendados son los últimos artículos disponibles de los demás:
-            // no hay datos de gustos ni de búsquedas del usuario para elegirlos de otra forma.
-            ViewBag.recomendados = BD.GetArticulosCatalogo(cantidad: CantidadRecomendadosInicio, excluirUsuario: usuarioId);
+            ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)
         {
@@ -71,7 +65,6 @@ public class HomeController : Controller
             ViewBag.errorCarga = true;
         }
 
-        // Aparte: si falta correr BaseDatos/Chat.sql no se rompe todo el inicio, solo no se muestra ese número.
         try
         {
             ViewBag.mensajesSinLeer = BD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
@@ -85,9 +78,9 @@ public class HomeController : Controller
     }
 
     private const int CantidadIntercambiosInicio = 4;
-    private const int CantidadRecomendadosInicio = 9;
+    private const int CantidadDestacadosInicio = 9;
+    private const int CantidadDestacadosLanding = 4;
 
-    // Propuesta que le llegó al usuario y que todavía tiene que aceptar o rechazar.
     private static bool PorResponder(IntercambioViewModel i)
     {
         return i.EsRecibido && i.Estado == EstadosIntercambios.Pendiente;

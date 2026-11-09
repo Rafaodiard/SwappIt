@@ -1,11 +1,9 @@
 @{
     ViewData["Title"] = "Registrarse";
-    // Lo que se cargó en el formulario, si el controller lo devolvió (POST con error). La contraseña no se vuelve a mostrar.
     Swappit.Models.ViewModels.RegistroViewModel? registro = ViewBag.registro;
 }
 
 @functions {
-    // Clase que pone el input en rojo si el campo volvió del controller con error (como hacía asp-for).
     string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
 }
 

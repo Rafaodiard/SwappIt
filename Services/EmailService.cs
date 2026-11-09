@@ -7,17 +7,10 @@ using Swappit.Models;
 
 namespace Swappit.Services;
 
-// Manda por mail las notificaciones nuevas (Propuesta recibida/aceptada/rechazada, Mensaje nuevo, Intercambio cancelado).
-// Los controllers lo llaman DESPUÉS de que BD confirmó la transacción, con las NotificacionCreada que devolvió BD.
-// El envío corre en segundo plano: no demora la respuesta y, si falla, solo se loguea (la notificación ya está guardada).
-// Sin configuración SMTP (sección "Smtp") los guarda como .eml en Smtp:CarpetaPrueba (si está),
-// y si tampoco hay carpeta no hace nada y avisa una vez en el log.
 public class EmailService
 {
-    // Remitente para los mails de prueba guardados en carpeta, si no hay Smtp:From.
     private const string FromPrueba = "notificaciones@swappit.local";
 
-    // Colores de la identidad de Swappit.
     private const string AzulPetroleo = "#0d596a";
     private const string Beige = "#ece6d8";
     private const string Bordo = "#6e2c3a";
@@ -39,7 +32,6 @@ public class EmailService
         }
     }
 
-    // url: el Url del controller; los links se arman acá, durante el request, con el esquema y host del pedido.
     public void EnviarNotificaciones(IReadOnlyCollection<NotificacionCreada> creadas, IUrlHelper url)
     {
         if (creadas.Count == 0)
@@ -60,12 +52,10 @@ public class EmailService
         }
 
         string scheme = url.ActionContext.HttpContext.Request.Scheme;
-        // "Mensaje nuevo" lleva al chat; las demás, al intercambio (igual que NotificacionesController.Ver).
         var conLink = creadas.Select(n => (Notificacion: n, Link: n.Tipo == TipoNotificaciones.MensajeNuevo
             ? url.Action("Index", "Chat", new { id = n.IdIntercambio }, scheme)
             : url.Action("Detalle", "Intercambio", new { id = n.IdIntercambio }, scheme))).ToList();
 
-        // En segundo plano: el request no espera al servidor SMTP. Cada error se loguea adentro.
         _ = Task.Run(async () =>
         {
             foreach (var (notificacion, link) in conLink)
@@ -91,19 +81,15 @@ public class EmailService
         }
         catch (Exception ex)
         {
-            // Un mail caído no rompe nada: la notificación ya se ve en la campana.
             _logger.LogError(ex, "No se pudo mandar el mail de \"{Tipo}\" al usuario {IdUsuario} (intercambio {IdIntercambio})",
                 notificacion.Tipo, notificacion.IdUsuario, notificacion.IdIntercambio);
         }
     }
 
-    // Guarda la copia en la carpeta (si hay) y lo manda por SMTP (si está configurado).
-    // Separado de la lectura de la base para que quede más claro.
     private async Task EnviarAsync(NotificacionCreada notificacion, DatosMailNotificacion datos, string? link)
     {
         if (_carpetaPrueba != null)
         {
-            // La copia se guarda primero: así queda aunque después falle el SMTP.
             try
             {
                 Directory.CreateDirectory(_carpetaPrueba);
@@ -126,7 +112,6 @@ public class EmailService
             return;
         }
 
-        // Un MailMessage nuevo para el envío: el de la copia ya consumió sus vistas.
         using MailMessage mail = CrearMail(notificacion, datos, link);
         using SmtpClient cliente = new SmtpClient(_smtp.Host, _smtp.Port)
         {
@@ -155,7 +140,6 @@ public class EmailService
             BodyEncoding = Encoding.UTF8
         };
         mail.To.Add(datos.Mail!);
-        // Texto plano para los clientes que no muestran HTML, y la versión HTML.
         mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
             TextoPlano(saludo, texto, boton, link), Encoding.UTF8, "text/plain"));
         mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
@@ -163,7 +147,6 @@ public class EmailService
         return mail;
     }
 
-    // Textos sin escapar; Html() los escapa.
     private static (string Asunto, string Titulo, string Texto, string Boton) Textos(string tipo, DatosMailNotificacion d)
     {
         string otro = string.IsNullOrWhiteSpace(d.OtroNombre) ? "Alguien" : d.OtroNombre;
@@ -211,7 +194,6 @@ public class EmailService
         return $"{saludo}\r\n\r\n{texto}{enlace}\r\n\r\n—\r\nSwappit · Intercambiá. Conectá. Reutilizá.";
     }
 
-    // HTML simple con tablas y estilos en línea (lo que mejor soportan los clientes de mail).
     private static string Html(string saludo, string titulo, string texto, string boton, string? link)
     {
         string e(string s) => WebUtility.HtmlEncode(s);
