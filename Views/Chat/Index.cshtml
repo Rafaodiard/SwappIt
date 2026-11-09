@@ -104,7 +104,7 @@
             {
                 string iniciales = Iniciales(abierta);
                 <header class="sw-chat-header d-flex align-items-center gap-3">
-                    <span class="sw-avatar" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @iniciales }</span>
+                    <span class="sw-avatar" data-iniciales="@iniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @iniciales }</span>
                     <div class="flex-grow-1 min-w-0">
                         <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
                         <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloNombre ⇄ @abierta.SuArticuloNombre</div>
@@ -134,7 +134,14 @@
                 else
                 {
                     <p class="sw-chat-input small text-suave text-center mb-0">
-                        Este intercambio está @abierta.Estado.ToLowerInvariant(): ya no se pueden mandar mensajes.
+                        @if (abierta.Estado == EstadosIntercambios.Pendiente)
+                        {
+                            @:Cuando @abierta.OtroNombre te escriba, vas a poder responderle. Si acepta tu propuesta, también vas a poder escribirle vos.
+                        }
+                        else
+                        {
+                            @:Este intercambio está @abierta.Estado.ToLowerInvariant(): ya no se pueden mandar mensajes.
+                        }
                     </p>
                 }
             }

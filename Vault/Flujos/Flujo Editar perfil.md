@@ -13,6 +13,7 @@ tags:
 4. `POST /Perfil/Editar` con [[EditarPerfilViewModel]] → [[PerfilController]].Editar:
    - valida; el error va por `TempData["ErrorPerfil"]`;
    - foto nueva (JPG/PNG, 5 MB): borra la anterior del disco, la guarda en `wwwroot/img/perfiles/` y [[BD]].GuardarFotoUsuario; o "Quitar foto" → [[BD]].BorrarFotoUsuario;
+   - si el teléfono no está vacío y no tiene entre 8 y 15 dígitos ([[Telefonos]]), vuelve con el error y no guarda nada (ni la foto);
    - actualiza nombre, apellido, usuario (sin `@`), teléfono, barrio, provincia y descripción con [[BD]].UpdateUsuario;
    - refresca el avatar del header ([[SesionUsuario]]) y vuelve con "Perfil actualizado.".
 

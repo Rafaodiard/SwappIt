@@ -31,7 +31,7 @@ Comunidad 0 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene
 - [[chat.js]]
 - [[chat.js actualizar()]]
 - [[ChatController]]
-- [[ChatController.EnCurso()]]
+- [[ChatController.PuedeEscribir()]]
 - [[ChatController.Enviar()]]
 - [[ChatController.Index()]]
 - [[ChatController.Mensajes()]]

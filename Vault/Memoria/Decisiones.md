@@ -27,4 +27,8 @@ tags:
 | 05/11 | Favoritos en la BD en vez del navegador | Lo que quedó en localStorage se pasa una vez a la BD (Favoritos/Importar) |
 | 05/11 | `Articulos.ACambio` (texto) pasa a `IdCategoriaACambio` (FK a Categorias; NULL = "Abierto a propuestas") | Para que el algoritmo sepa qué quiere cada dueño. Al migrar, los textos que no son una categoría se pierden |
 | 05/11 | Algoritmo en `RecomendacionesController` + `recomendaciones.js`. Explorar ordena por "Para vos" con sesión y "Más populares" sin sesión; 1 de cada 5 recomendados es "para descubrir" | "Más recientes" y "A - Z" siguen como opciones del orden |
+| 08/11 | Chat con la propuesta Pendiente: solo lo empieza quien la recibió; quien propuso responde cuando le escribieron. Aceptado: escriben los dos | Pedido de Rafael después del feedback de prueba. Reemplaza `5b901d0` (04/11, Sol), que lo había limitado a Aceptado |
+| 08/11 | El límite de 5 artículos cuenta todos los del usuario que no estén en un intercambio Realizado (también los de intercambios pendientes o aceptados) | Pedido del feedback: antes se podía llegar a 10 |
+| 08/11 | El registro pide provincia (lista) y barrio (texto, igual que en Editar perfil) | Figma no los tiene; los pidió el feedback. Barrio de una lista queda para decidir (necesita tabla nueva) |
+| 08/11 | Header en celular: logo chico (`LogoSimple.png`) y "Cerrar sesión" en Mi perfil | Con el ícono de Mis intercambios no entraba en 320–375 px |
 | 05/11 | `SQLSwappit.sql` es el script base; los demás se generan iguales a él. Se agregó `Articulos.FechaPublicacion` (faltaba en SQLSwappit.sql) | Pedido de Rafael |

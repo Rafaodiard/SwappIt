@@ -7,8 +7,8 @@ namespace Swappit.Models;
 
 public static class BD
 {
-    private static string _connectionString = @"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
-    //@"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
+    private static string _connectionString = //@"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
+    @"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
 
     public static Usuarios? GetUsuarioByMail(string mail)
     {
@@ -215,18 +215,17 @@ public static class BD
         {
             string query = @"SELECT COUNT(*)
                 FROM Articulos a
-                INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
                 WHERE a.IdUsuarios = @pIdUsuario
                     AND NOT EXISTS (
                         SELECT 1 FROM Intercambios i
                         INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
-                        WHERE ei.Nombre IN @pComprometidos
+                        WHERE ei.Nombre = @pRealizado
                             AND (i.IdArticulos1 = a.IdArticulos OR i.IdArticulos2 = a.IdArticulos)
                     )";
             return connection.ExecuteScalar<int>(query, new
             {
                 pIdUsuario = idUsuario,
-                pComprometidos = EstadosComprometidos
+                pRealizado = EstadosIntercambios.Realizado
             });
         }
     }
@@ -716,7 +715,9 @@ public static class BD
                     FROM Intercambios i
                     INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
                     WHERE i.IdIntercambios = @pIdIntercambio AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)
-                        AND e.Nombre IN @pEnCurso;
+                        AND (e.Nombre = @pAceptado
+                            OR (e.Nombre = @pPendiente AND (i.IdUsuarios2 = @pIdUsuario
+                                OR EXISTS (SELECT 1 FROM Mensajes mr WHERE mr.IdIntercambio = i.IdIntercambios AND mr.IdUsuariosManda = i.IdUsuarios2))));
                     IF @idOtro IS NOT NULL
                         INSERT INTO Mensajes (Texto, fueVisto, FechaEnviado, FechaRecibido, IdUsuariosManda, IdIntercambio)
                         VALUES (@pTexto, 0, GETDATE(), NULL, @pIdUsuario, @pIdIntercambio);
@@ -726,7 +727,8 @@ public static class BD
                     pIdIntercambio = idIntercambio,
                     pIdUsuario = idUsuario,
                     pTexto = texto,
-                    pEnCurso = new[] { EstadosIntercambios.Aceptado }
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pAceptado = EstadosIntercambios.Aceptado
                 }, transaccion);
 
                 List<NotificacionCreada> nuevas = new List<NotificacionCreada>();

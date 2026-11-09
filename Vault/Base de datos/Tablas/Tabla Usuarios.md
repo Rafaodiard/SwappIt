@@ -20,7 +20,7 @@ tags:
 |---|---|---|
 | IdUsuarios | int identity, PK | |
 | Nombre, Apellido, Usuario, Mail | varchar(50) NOT NULL | Usuario = @alias |
-| Telefono | **int** NOT NULL | un celular completo no entra ([[Telefonos]]) |
+| Telefono | varchar(20) NOT NULL | solo dígitos, de 8 a 15; vacío si no tiene ([[Telefonos]]). Era `int` hasta el 08/11 |
 | Contraseña | varchar(100) NOT NULL | hash de [[Contrasenas]] (84 caracteres) |
 | Barrio | varchar(50) NOT NULL | vacío al registrarse |
 | Fecha nacimiento | date NOT NULL | con espacio en el nombre: [[BD]] la renombra `FechaNacimiento` |

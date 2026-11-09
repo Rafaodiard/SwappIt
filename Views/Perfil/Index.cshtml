@@ -54,6 +54,7 @@
                             </p>
                         }
                         <button type="button" class="btn btn-sw-primario btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1"></i> Editar perfil</button>
+                        <a href="@Url.Action("Logout", "Account")" class="btn btn-sw-outline btn-sm d-sm-none ms-1"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión</a>
                     </div>
                 </div>
             </div>
@@ -81,7 +82,7 @@
                     <li class="d-flex align-items-center gap-3">
                         <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-telephone-fill"></i></span>
                         <span class="fw-semibold sw-info-etiqueta">Teléfono</span>
-                        <span class="text-suave sw-info-valor" data-campo="telefono">@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "—")</span>
+                        <span class="text-suave sw-info-valor" data-campo="telefono">@(string.IsNullOrEmpty(usuario.Telefono) ? "—" : usuario.Telefono)</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
                         <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
@@ -225,7 +226,7 @@
                     </div>
                     <div class="sw-campo">
                         <label class="sw-label" for="Telefono">Teléfono</label>
-                        <input class="sw-input" id="Telefono" name="Telefono" type="tel" value="@(usuario.Telefono != 0 ? usuario.Telefono.ToString() : "")"
+                        <input class="sw-input" id="Telefono" name="Telefono" type="tel" value="@usuario.Telefono"
                                placeholder="11 0000 0000" autocomplete="tel">
                     </div>
                 </div>

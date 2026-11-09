@@ -13,8 +13,8 @@ tags:
 
 `Views/Perfil/Index.cshtml` · [[PerfilController]].Index ([[Flujo Editar perfil]]).
 
-- Tarjeta con avatar (botón de cámara), nombre, @usuario, descripción o "Agregá una descripción", "Editar perfil".
-- Información personal: usuario, email, teléfono (— si es 0), barrio + provincia, edad.
+- Tarjeta con avatar (botón de cámara), nombre, @usuario, descripción o "Agregá una descripción", "Editar perfil" y, solo en celular, "Cerrar sesión".
+- Información personal: usuario, email, teléfono (— si está vacío), barrio + provincia, edad.
 - "Mis artículos publicados" con [[Vista _CardObjeto]] y botón Publicar.
 - "Historial de intercambios": los intercambios del usuario, cada uno con [[Vista _FilaIntercambio]], y link a Mis intercambios.
 - Pop up "Editar perfil" (form POST a [[PerfilController]].Editar, con foto) manejado por [[perfil.js]]. El email aparece deshabilitado.

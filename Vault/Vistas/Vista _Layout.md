@@ -15,8 +15,8 @@ tags:
 
 - **Header:** logo, buscador (GET a `/Articulos/Buscar?q=`), botón de ubicación con texto fijo "Palermo, CABA".
   - Visitante (sin `UsuarioId` en sesión): "Iniciar sesión" y "Registrarse".
-  - Logueado: mensajes ([[ChatController]]), campana con [[Vista _PopupNotificaciones]] y contador de no leídas (las URLs de `NoLeidas` y `Lista` de [[NotificacionesController]] van en `data-url-*` para [[notificaciones.js]]), avatar con foto o iniciales (de la sesión, ver [[SesionUsuario]]) → [[PerfilController]], "Publicar" ([[PublicarController]]), cerrar sesión.
-  - En celulares el buscador pasa a una segunda fila y "Publicar" queda como ícono "+".
+  - Logueado: favoritos, Mis intercambios (ícono ⇄, [[IntercambioController]], desde el 08/11), mensajes ([[ChatController]]), campana con [[Vista _PopupNotificaciones]] y contador de no leídas (las URLs de `NoLeidas` y `Lista` de [[NotificacionesController]] van en `data-url-*` para [[notificaciones.js]]), avatar con foto o iniciales (de la sesión, ver [[SesionUsuario]]) → [[PerfilController]], "Publicar" ([[PublicarController]]), cerrar sesión.
+  - En celulares el buscador pasa a una segunda fila y "Publicar" queda como ícono "+". Logueado y en celular (menos de 576 px) se usa el logo chico (`LogoSimple.png`) y "Cerrar sesión" sale del header y queda en [[Vista Perfil-Index]]: si no, no entraba en 320–375 px.
 - **Footer:** eslogan, links (Cómo funciona → `#como-funciona` de [[Vista Home-Index]], Términos y privacidad → [[Vista Home-Privacy]]); el resto apunta a `#`.
 - **Recursos:** Google Fonts (Forum y Questrial), Bootstrap local, Bootstrap Icons 1.11.3 por CDN, [[site.css]]; scripts comunes [[plantillas.js]], [[imagenes.js]], [[notificaciones.js]] y la sección `Scripts` de cada página. Ya no carga [[favoritos.js]].
 - Accesibilidad: link "Saltar al contenido", `aria-label` en los íconos, `main` con `tabindex="-1"`.

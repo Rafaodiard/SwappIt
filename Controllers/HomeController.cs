@@ -56,7 +56,7 @@ public class HomeController : Controller
             ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
-            ViewBag.cantidadArticulos = BD.GetArticulosCatalogo(idUsuario: usuarioId).Count;
+            ViewBag.cantidadArticulos = BD.ContarArticulosActivos(usuarioId);
             ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)

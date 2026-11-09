@@ -16,7 +16,7 @@ tags:
 
 | Método | Qué hace |
 |---|---|
-| `Index()` GET | Form vacío con la ubicación = barrio del perfil |
+| `Index()` GET | Form vacío con la ubicación = barrio del perfil; `ViewBag.limiteAlcanzado` si ya tiene 5 artículos sin intercambiar |
 | `Index(PublicarArticuloViewModel)` POST | `[ValidateAntiForgeryToken]`, `[RequestSizeLimit]` de 61 MB. Valida, guarda fotos y llama a [[BD]].PublicarArticulo |
 | `ValidarFotos` | Máx. 6, JPG/PNG, 10 MB cada una (mismas reglas que [[PerfilController]]) |
 | `AvisarFotosDeNuevo` | El navegador no recuerda las fotos si la página vuelve con errores |

@@ -24,7 +24,7 @@ tags:
 ---
 # Usuarios (modelo)
 
-`Models/Usuarios.cs` · Una fila de [[Tabla Usuarios]]. `FechaNacimiento` viene de la columna `[Fecha nacimiento]` (alias en [[BD]]). `Telefono` es `int` (ver [[Telefonos]]). `Contraseña` guarda el hash ([[Contrasenas]]). `Descripcion` es opcional (hasta 500).
+`Models/Usuarios.cs` · Una fila de [[Tabla Usuarios]]. `FechaNacimiento` viene de la columna `[Fecha nacimiento]` (alias en [[BD]]). `Telefono` es `string` (solo dígitos, ver [[Telefonos]]). `Contraseña` guarda el hash ([[Contrasenas]]). `Descripcion` es opcional (hasta 500).
 
 Comunidad del grafo: [[Comunidad - Usuarios, contraseñas y sesión]]
 

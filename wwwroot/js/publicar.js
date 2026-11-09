@@ -100,6 +100,37 @@
 
     miniaturas.querySelectorAll('button.sw-miniatura').forEach(b => b.addEventListener('click', abrirSelector));
 
+    // ---------- Campos obligatorios ----------
+    const form = zona.closest('form');
+    const requeridos = Array.from(form.querySelectorAll('[data-requerido]'));
+    const nombreDe = campo => campo.name || campo.dataset.nombre;
+    const completo = campo => {
+        const el = form.elements[nombreDe(campo)];
+        const valor = el?.type === 'radio' && !el.checked ? '' : el?.value;
+        return (valor ?? '').trim() !== '';
+    };
+
+    function marcar(campo, mensaje) {
+        const span = form.querySelector(`[data-valmsg-for="${nombreDe(campo)}"]`);
+        if (span) span.textContent = mensaje;
+        campo.classList.toggle('input-validation-error', mensaje !== '');
+    }
+
+    form.addEventListener('submit', e => {
+        const faltan = requeridos.filter(campo => !completo(campo));
+        requeridos.forEach(campo => marcar(campo, faltan.includes(campo) ? campo.dataset.requerido : ''));
+        if (faltan.length === 0) return;
+
+        e.preventDefault();
+        const primero = faltan[0].matches('input, select, textarea') ? faltan[0] : faltan[0].querySelector('input');
+        primero?.focus();
+    });
+
+    ['input', 'change'].forEach(tipo => form.addEventListener(tipo, e => {
+        const campo = requeridos.find(c => nombreDe(c) === e.target.name);
+        if (campo && completo(campo)) marcar(campo, '');
+    }));
+
     // ---------- Contador de la descripción ----------
     const descripcion = document.getElementById('Descripcion');
     const contador = document.getElementById('contador-descripcion');

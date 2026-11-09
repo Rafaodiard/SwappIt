@@ -11,7 +11,7 @@ tags:
 ---
 # Telefonos.Convertir()
 
-Método de [[Telefonos]] · `Models/Telefonos.cs` línea 8. Parámetros: `string`.
+Método de [[Telefonos]] · `Models/Telefonos.cs` línea 8. Parámetros: `string?`. Devuelve `string` (solo los dígitos).
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

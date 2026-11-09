@@ -11,7 +11,7 @@ tags:
 ---
 # Vista: Publicar / Index
 
-`Views/Publicar/Index.cshtml` · Form `multipart/form-data` POST a [[PublicarController]].Index. Columna izquierda: zona de carga de fotos (clic o arrastrar), 4 miniaturas, aviso de límites. Columna derecha: Título, Categoría (select), Ubicación, Estado del objeto (radios con forma de chip, de [[Tabla EstadosArticulos]]), Descripción con contador, "¿Qué te gustaría recibir a cambio?". Botones Cancelar / Publicar objeto. Scripts: jQuery, [[Vista _ValidationScriptsPartial]], [[publicar.js]]. Modelo: [[PublicarArticuloViewModel]].
+`Views/Publicar/Index.cshtml` · Form `multipart/form-data` POST a [[PublicarController]].Index. Columna izquierda: zona de carga de fotos (clic o arrastrar), 4 miniaturas, aviso de límites. Columna derecha: Título, Categoría (select), Ubicación, Estado del objeto (radios con forma de chip, de [[Tabla EstadosArticulos]]), Descripción con contador, "¿Qué te gustaría recibir a cambio?". Botones Cancelar / Publicar objeto. Los campos obligatorios llevan `data-requerido` con el mensaje del `[Required]` de [[PublicarArticuloViewModel]] (helper `Requerido`) para [[publicar.js]]. Con `ViewBag.limiteAlcanzado` muestra el aviso del máximo de 5 con link a Mis intercambios y deshabilita el botón. Scripts: jQuery, [[Vista _ValidationScriptsPartial]], [[publicar.js]]. Modelo: [[PublicarArticuloViewModel]].
 
 Comunidad del grafo: [[Comunidad - Publicar artículo]]
 

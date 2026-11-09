@@ -6,7 +6,7 @@ public class Usuarios
     public string? Apellido { get; set; }
     public string? Usuario { get; set; }
     public string? Mail { get; set; }
-    public int Telefono { get; set; }
+    public string Telefono { get; set; } = string.Empty;
     public string? Contraseña { get; set; }
     public string? Barrio { get; set; }
     public DateTime FechaNacimiento { get; set; }

@@ -14,7 +14,7 @@ tags:
 `Views/Intercambio/Detalle.cshtml` · [[IntercambioController]].Detalle. Solo lo ven las dos partes:
 - Propuesta recibida y Pendiente: "Recibiste una propuesta" con Aceptar (con pop up que avisa cuántas propuestas se rechazan solas) / Rechazar.
 - El resto: "Intercambio con @usuario", con el avance (Pendiente → Aceptado → Realizado, o Rechazado / Cancelado), lo que das y lo que recibís, y marcar como realizado cuando está aceptado.
-- Cancelar con pop up de confirmación. Mientras está en curso, links al chat del intercambio.
+- Cancelar con pop up de confirmación. Mientras está en curso, links al chat del intercambio: "Preguntarle algo" (propuesta recibida) e "Ir al chat" (Aceptado). Quien propuso no tiene link al chat mientras está Pendiente: le llega la notificación si el otro le escribe.
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

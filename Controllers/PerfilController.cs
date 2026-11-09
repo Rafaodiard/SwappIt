@@ -96,6 +96,14 @@ public class PerfilController : Controller
             return RedirectToAction("Index");
         }
 
+        string telefono = Telefonos.Convertir(e.Telefono);
+
+        if (telefono.Length > 0 && !Telefonos.EsValido(telefono))
+        {
+            TempData["ErrorPerfil"] = $"El teléfono tiene que tener entre {Telefonos.MinDigitos} y {Telefonos.MaxDigitos} dígitos.";
+            return RedirectToAction("Index");
+        }
+
         if (e.Foto != null)
         {
             string extension = Path.GetExtension(e.Foto.FileName).ToLower();
@@ -124,7 +132,7 @@ public class PerfilController : Controller
         usuario.Nombre = e.Nombre.Trim();
         usuario.Apellido = e.Apellido.Trim();
         usuario.Usuario = e.Usuario.Trim().TrimStart('@');
-        usuario.Telefono = Telefonos.Convertir(e.Telefono ?? string.Empty);
+        usuario.Telefono = telefono;
         usuario.Barrio = e.Barrio?.Trim() ?? string.Empty;
         usuario.IdProvincias = e.IdProvincias;
         usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();

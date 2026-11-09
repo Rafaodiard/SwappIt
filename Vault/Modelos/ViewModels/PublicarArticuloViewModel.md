@@ -19,7 +19,7 @@ tags:
 ---
 # PublicarArticuloViewModel
 
-`Models/ViewModels/PublicarArticuloViewModel.cs` · Form de [[Vista Publicar-Index]]. Constantes `MaxFotos = 6`, `MaxFotoMB = 10`, `MaxDescripcion = 500`. Campos: Titulo (→ `Articulos.Nombre`, 50), IdCategorias, Ubicacion (100), IdEstado, Descripcion (500), ACambio (opcional, 100), Fotos. La vista y [[publicar.js]] leen los límites de acá. Lo usa [[PublicarController]].
+`Models/ViewModels/PublicarArticuloViewModel.cs` · Form de [[Vista Publicar-Index]]. Constantes `MaxPublicados = 5`, `MaxFotos = 6`, `MaxFotoMB = 10`, `MaxDescripcion = 500`. Campos: Titulo (→ `Articulos.Nombre`, 50), IdCategorias, Ubicacion (100), IdEstado, Descripcion (500), ACambio (opcional, 100), Fotos. La vista y [[publicar.js]] leen los límites de acá. Lo usa [[PublicarController]].
 
 Comunidad del grafo: [[Comunidad - Publicar artículo]]
 

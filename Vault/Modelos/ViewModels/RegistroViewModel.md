@@ -18,7 +18,7 @@ tags:
 ---
 # RegistroViewModel
 
-`Models/ViewModels/RegistroViewModel.cs` · Form de [[Vista Account-Registro]]: Nombre, Apellido, Mail (50), Contrasena (8 a 50), FechaNacimiento, Telefono. Tiene un TODO: la tabla también pide Usuario, Barrio e IdProvincias, que el diseño de Figma no incluye ([[AccountController]] los completa solo).
+`Models/ViewModels/RegistroViewModel.cs` · Form de [[Vista Account-Registro]]: Nombre, Apellido, Mail (50), Contrasena (8 a 50), FechaNacimiento, Telefono, IdProvincias (obligatoria) y Barrio (obligatorio, 50). Provincia y barrio se agregaron el 08/11 aunque Figma no los tiene. `Usuario` lo completa [[AccountController]] con la parte del mail antes de la `@`.
 
 Comunidad del grafo: [[Comunidad - Registro]]
 

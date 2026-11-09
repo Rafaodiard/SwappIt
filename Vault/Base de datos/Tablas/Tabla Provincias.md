@@ -16,7 +16,7 @@ tags:
 ---
 # Tabla Provincias
 
-`IdProvincia` (identity, PK, ojo: en singular) y `Nombre` varchar(50). 48 filas en los datos: las 25 a 48 repiten las 1 a 24 (las agrega [[Script Provincias.sql]]). Modelo: [[Provincias]].
+`IdProvincia` (identity, PK, ojo: en singular) y `Nombre` varchar(50). 24 filas en los scripts de creación desde el 08/11 (antes 48: las 25 a 48 repetían las 1 a 24 y se veían dos veces en Editar perfil). Una base que ya existe se limpia con [[Script ProvinciasDuplicadas.sql]]. Modelo: [[Provincias]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

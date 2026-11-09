@@ -1,3 +1,5 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @using Swappit.Models.ViewModels
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
@@ -5,10 +7,12 @@
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
     List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
+    bool limiteAlcanzado = ViewBag.limiteAlcanzado;
 }
 
 @functions {
     string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
+    string Requerido(string campo) => typeof(PublicarArticuloViewModel).GetProperty(campo)?.GetCustomAttribute<RequiredAttribute>()?.ErrorMessage ?? "";
 }
 
 <section class="sw-publicar">
@@ -52,17 +56,26 @@
             <!-- ===== Columna derecha: datos ===== -->
             <div class="sw-publicar-datos">
                 @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
+                @if (limiteAlcanzado)
+                {
+                    <p class="sw-aviso-rechazos mb-0" role="alert">
+                        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+                        Ya tenés @PublicarArticuloViewModel.MaxPublicados objetos publicados, contando los que están en un intercambio pendiente o aceptado.
+                        Cuando un intercambio se complete, vas a poder publicar otro.
+                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-reset">Ver mis intercambios</a>
+                    </p>
+                }
 
                 <div class="sw-campo">
                     <label class="sw-label" for="Titulo">Título</label>
-                    <input class="sw-input @ClaseError("Titulo")" id="Titulo" name="Titulo" value="@publicar.Titulo" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
+                    <input class="sw-input @ClaseError("Titulo")" id="Titulo" name="Titulo" value="@publicar.Titulo" data-requerido="@Requerido("Titulo")" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
                     @Html.ValidationMessage("Titulo", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-fila">
                     <div class="sw-campo">
                         <label class="sw-label" for="IdCategorias">Categoría</label>
-                        <select class="sw-input sw-select @ClaseError("IdCategorias")" id="IdCategorias" name="IdCategorias" required>
+                        <select class="sw-input sw-select @ClaseError("IdCategorias")" id="IdCategorias" name="IdCategorias" required data-requerido="@Requerido("IdCategorias")">
                             <option value="" disabled selected="@(publicar.IdCategorias == null)">Elegí una categoría</option>
                             @foreach (var c in categorias)
                             {
@@ -73,14 +86,14 @@
                     </div>
                     <div class="sw-campo">
                         <label class="sw-label" for="Ubicacion">Ubicación</label>
-                        <input class="sw-input @ClaseError("Ubicacion")" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" placeholder="Palermo, CABA" maxlength="100">
+                        <input class="sw-input @ClaseError("Ubicacion")" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" data-requerido="@Requerido("Ubicacion")" placeholder="Palermo, CABA" maxlength="100">
                         @Html.ValidationMessage("Ubicacion", new { @class = "sw-error" })
                     </div>
                 </div>
 
                 <div class="sw-campo sw-campo-estado">
                     <span class="sw-label" id="etiqueta-estado">Estado del objeto</span>
-                    <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado">
+                    <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado" data-nombre="IdEstado" data-requerido="@Requerido("IdEstado")">
                         @foreach (var estado in estados)
                         {
                             var idEstado = "Estado_" + estado.IdEstadosArticulos;
@@ -93,7 +106,7 @@
 
                 <div class="sw-campo">
                     <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea @ClaseError("Descripcion")" id="Descripcion" name="Descripcion" rows="5" maxlength="@PublicarArticuloViewModel.MaxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
+                    <textarea class="sw-input sw-textarea @ClaseError("Descripcion")" id="Descripcion" name="Descripcion" rows="5" data-requerido="@Requerido("Descripcion")" maxlength="@PublicarArticuloViewModel.MaxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
                     <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@PublicarArticuloViewModel.MaxDescripcion</span>
                     @Html.ValidationMessage("Descripcion", new { @class = "sw-error" })
                 </div>
@@ -115,7 +128,7 @@
 
                 <div class="sw-publicar-acciones">
                     <a href="@Url.Action("Index", "Home")" class="sw-btn sw-btn-contorno">Cancelar</a>
-                    <button type="submit" class="sw-btn sw-btn-solido">Publicar objeto</button>
+                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@limiteAlcanzado">Publicar objeto</button>
                 </div>
             </div>
         </form>

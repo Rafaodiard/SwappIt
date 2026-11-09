@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Swappit.Models;
 using Swappit.Models.ViewModels;
 
@@ -13,6 +14,7 @@ public class AccountController : Controller
 
     public IActionResult Registro()
     {
+        ViewBag.provincias = BD.GetProvincias();
         return View();
     }
 
@@ -56,7 +58,18 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
+        List<Provincias> provincias = BD.GetProvincias();
+        if (r.IdProvincias.HasValue && !provincias.Any(p => p.IdProvincia == r.IdProvincias.Value))
+        {
+            ModelState.AddModelError(nameof(r.IdProvincias), "Elegí una provincia de la lista");
+        }
+
+        bool contrasenaValida = ModelState.GetFieldValidationState(nameof(r.Contrasena)) == ModelValidationState.Valid
+            && r.Contrasena == password2;
+
         ViewBag.registro = r;
+        ViewBag.provincias = provincias;
+        ViewBag.contrasena = contrasenaValida ? r.Contrasena : null;
         if (!ModelState.IsValid) return View();
 
         if (BD.UsuarioExiste(r.Mail))
@@ -85,6 +98,14 @@ public class AccountController : Controller
             return View();
         }
 
+        string telefono = Telefonos.Convertir(r.Telefono);
+
+        if (!Telefonos.EsValido(telefono))
+        {
+            ModelState.AddModelError(nameof(r.Telefono), $"El teléfono tiene que tener entre {Telefonos.MinDigitos} y {Telefonos.MaxDigitos} dígitos.");
+            return View();
+        }
+
         Usuarios u = new Usuarios
         {
             Nombre = r.Nombre,
@@ -93,10 +114,10 @@ public class AccountController : Controller
             Contraseña = Contrasenas.Hashear(r.Contrasena),
             FechaNacimiento = r.FechaNacimiento!.Value,
             Edad = edad,
-            Telefono = Telefonos.Convertir(r.Telefono),
+            Telefono = telefono,
             Usuario = r.Mail.Split('@')[0],
-            Barrio = string.Empty,
-            IdProvincias = 1
+            Barrio = r.Barrio.Trim(),
+            IdProvincias = r.IdProvincias!.Value
         };
 
         BD.Register(u);

@@ -36,7 +36,7 @@ public class ChatController : Controller
             resumenes = BD.GetResumenesChat(usuarioId.Value).ToDictionary(r => r.IdIntercambio);
 
             conversaciones = intercambios
-                .Where(i => EnCurso(i.Estado) || resumenes.ContainsKey(i.IdIntercambios))
+                .Where(i => PuedeEscribir(i, false) || resumenes.ContainsKey(i.IdIntercambios))
                 .OrderByDescending(i => resumenes.TryGetValue(i.IdIntercambios, out ConversacionViewModel? r) ? r.UltimaFecha : i.Fecha)
                 .ToList();
 
@@ -66,7 +66,7 @@ public class ChatController : Controller
         ViewBag.resumenes = resumenes;
         ViewBag.abierta = abierta;
         ViewBag.mensajes = mensajes;
-        ViewBag.puedeEscribir = abierta != null && EnCurso(abierta.Estado);
+        ViewBag.puedeEscribir = abierta != null && PuedeEscribir(abierta, mensajes.Any(m => m.IdUsuariosManda == abierta.OtroIdUsuario));
         ViewBag.usuarioId = usuarioId.Value;
         ViewBag.idPedido = id;
         ViewBag.errorCarga = errorCarga;
@@ -135,6 +135,7 @@ public class ChatController : Controller
         return RedirectToAction("Index", new { id });
     }
 
-    private static bool EnCurso(string estado) =>
-        estado == EstadosIntercambios.Aceptado;
+    private static bool PuedeEscribir(IntercambioViewModel intercambio, bool elOtroYaEscribio) =>
+        intercambio.Estado == EstadosIntercambios.Aceptado
+        || (intercambio.Estado == EstadosIntercambios.Pendiente && (intercambio.EsRecibido || elOtroYaEscribio));
 }

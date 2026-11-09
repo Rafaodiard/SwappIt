@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "de6425bc6195b68b",
+        "id": "66c8409b364d4506",
         "type": "tabs",
         "children": [
           {
-            "id": "ca1f8ab62a5e35b2",
+            "id": "2c9fbd90a5d89c0a",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -181,15 +181,15 @@
       "bases:Create new base": false
     }
   },
-  "active": "ca1f8ab62a5e35b2",
+  "active": "2c9fbd90a5d89c0a",
   "lastOpenFiles": [
+    "Vistas/Vista Home-Inicio.md",
     "Grafo/Comunidades/Comunidad - Favoritos (sin usar).md",
     "Frontend/chat.js.md",
     "Vistas/Vista _FilaIntercambio.md",
     "Vistas/Vista Notificaciones-_Lista.md",
     "Vistas/Vista Intercambio-Index.md",
     "Vistas/Vista Intercambio-Detalle.md",
-    "Vistas/Vista Home-Inicio.md",
     "Vistas/Vista Chat-_Mensajes.md",
     "Base de datos/Scripts/Script Notificaciones.sql.md",
     "Base de datos/Scripts/Script Chat.sql.md",

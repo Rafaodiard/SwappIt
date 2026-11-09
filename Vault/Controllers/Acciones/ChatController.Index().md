@@ -21,7 +21,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - llama a [[BD.GetMensajes()]] · `calls` EXTRACTED
 - llama a [[BD.GetResumenesChat()]] · `calls` EXTRACTED
 - llama a [[BD.MarcarMensajesVistos()]] · `calls` EXTRACTED
-- llama a [[ChatController.EnCurso()]] · `calls` EXTRACTED
+- llama a [[ChatController.PuedeEscribir()]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - muestra la vista [[Vista Chat-Index]] · `renders` INFERRED

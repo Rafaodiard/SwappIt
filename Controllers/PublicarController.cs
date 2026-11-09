@@ -29,16 +29,19 @@ public class PublicarController : Controller
         }
 
         PublicarArticuloViewModel publicar = new PublicarArticuloViewModel();
+        bool limiteAlcanzado = false;
         try
         {
             publicar.Ubicacion = BD.GetUsuarioById(usuarioId.Value)?.Barrio ?? string.Empty;
+            limiteAlcanzado = BD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados;
         }
         catch (SqlException ex)
         {
-            _logger.LogError(ex, "No se pudo leer el barrio del usuario {IdUsuario}", usuarioId);
+            _logger.LogError(ex, "No se pudieron leer los datos del usuario {IdUsuario}", usuarioId);
         }
 
         ViewBag.publicar = publicar;
+        ViewBag.limiteAlcanzado = limiteAlcanzado;
         ViewBag.categorias = ObtenerCategorias();
         ViewBag.estados = ObtenerEstados();
         return View();
@@ -77,16 +80,16 @@ public class PublicarController : Controller
         ViewBag.publicar = modelo;
         ViewBag.categorias = categorias;
         ViewBag.estados = estados;
+        ViewBag.limiteAlcanzado = false;
         if (!ModelState.IsValid)
         {
             AvisarFotosDeNuevo(fotos);
             return View();
         }
 
-        if (BD.ContarArticulosActivos(usuarioId.Value) >= 5)
+        if (BD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados)
         {
-            ModelState.AddModelError(string.Empty, "Ya llegaste al máximo de 5 objetos publicados a la vez.");
-            AvisarFotosDeNuevo(fotos);
+            ViewBag.limiteAlcanzado = true;
             return View();
         }
 

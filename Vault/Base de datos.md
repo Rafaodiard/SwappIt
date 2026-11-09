@@ -46,4 +46,5 @@ erDiagram
 | [[Script Notificaciones.sql]] | Para bases ya creadas: tablas TipoNotificaciones y Notificaciones |
 | [[Script Chat.sql]] | Para bases ya creadas: Mensajes.Texto a 500 caracteres y fechas con hora |
 | [[Script Cancelado.sql]] | Para bases ya creadas: estado Cancelado y su tipo de notificación |
-| [[Script Provincias.sql]] | Inserta las 24 provincias (vuelve a insertarlas si ya están) |
+| [[Script Provincias.sql]] | Ya no está: insertaba las 24 provincias otra vez |
+| [[Script ProvinciasDuplicadas.sql]] | Para bases ya creadas: deja una fila por provincia (08/11) |

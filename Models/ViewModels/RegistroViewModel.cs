@@ -39,6 +39,15 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "Número de teléfono")]
         public string Telefono { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Elegí tu provincia")]
+        [Display(Name = "Provincia")]
+        public int? IdProvincias { get; set; }
+
+        [Required(ErrorMessage = "Ingresá tu barrio")]
+        [StringLength(50, ErrorMessage = "Máximo {1} caracteres")]
+        [Display(Name = "Barrio")]
+        public string Barrio { get; set; } = string.Empty;
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!FechaNacimiento.HasValue)

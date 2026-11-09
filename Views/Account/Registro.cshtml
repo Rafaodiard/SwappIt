@@ -1,6 +1,8 @@
 @{
     ViewData["Title"] = "Registrarse";
     Swappit.Models.ViewModels.RegistroViewModel? registro = ViewBag.registro;
+    List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
+    string? contrasena = ViewBag.contrasena;
 }
 
 @functions {
@@ -42,13 +44,13 @@
 
             <div class="sw-campo">
                 <label class="sw-label" for="Contrasena">Contraseña</label>
-                <input class="sw-input @ClaseError("Contrasena")" id="Contrasena" name="Contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
+                <input class="sw-input @ClaseError("Contrasena")" id="Contrasena" name="Contrasena" value="@contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
                 @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
             </div>
 
             <div class="sw-campo">
                 <label class="sw-label" for="password2">Repetir contraseña</label>
-                <input class="sw-input" id="password2" name="password2" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password" maxlength="50">
+                <input class="sw-input" id="password2" name="password2" value="@contrasena" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password" maxlength="50">
             </div>
 
             <div class="sw-fila">
@@ -65,6 +67,25 @@
                     <label class="sw-label" for="Telefono">Número de teléfono</label>
                     <input class="sw-input @ClaseError("Telefono")" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
                     @Html.ValidationMessage("Telefono", new { @class = "sw-error" })
+                </div>
+            </div>
+
+            <div class="sw-fila">
+                <div class="sw-campo">
+                    <label class="sw-label" for="IdProvincias">Provincia</label>
+                    <select class="sw-input sw-select @ClaseError("IdProvincias")" id="IdProvincias" name="IdProvincias" autocomplete="address-level1">
+                        <option value="" disabled selected="@(registro?.IdProvincias == null)">Elegí tu provincia</option>
+                        @foreach (var p in provincias)
+                        {
+                            <option value="@p.IdProvincia" selected="@(p.IdProvincia == registro?.IdProvincias)">@p.Nombre</option>
+                        }
+                    </select>
+                    @Html.ValidationMessage("IdProvincias", new { @class = "sw-error" })
+                </div>
+                <div class="sw-campo">
+                    <label class="sw-label" for="Barrio">Barrio</label>
+                    <input class="sw-input @ClaseError("Barrio")" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
+                    @Html.ValidationMessage("Barrio", new { @class = "sw-error" })
                 </div>
             </div>
 
