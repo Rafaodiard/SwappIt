@@ -48,6 +48,9 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "Barrio")]
         public string Barrio { get; set; } = string.Empty;
 
+        [Display(Name = "Tipo de suscripción")]
+        public string PlanSuscripcion { get; set; } = "Gratis";
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!FechaNacimiento.HasValue)

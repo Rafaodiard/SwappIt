@@ -7,6 +7,7 @@
 
 @functions {
     string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
+    string CheckedSi(bool condicion) => condicion ? "checked" : null;
 }
 
 <section class="sw-auth">
@@ -86,6 +87,24 @@
                     <label class="sw-label" for="Barrio">Barrio</label>
                     <input class="sw-input @ClaseError("Barrio")" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
                     @Html.ValidationMessage("Barrio", new { @class = "sw-error" })
+                </div>
+            </div>
+
+            <div class="sw-campo">
+                <label class="sw-label">Suscripción</label>
+                <div class="sw-plan-selector" role="radiogroup" aria-label="Elegí tu tipo de suscripción">
+                    <label class="sw-plan-option">
+                        <input type="radio" name="PlanSuscripcion" value="Gratis" @CheckedSi(registro?.PlanSuscripcion == "Gratis" || string.IsNullOrWhiteSpace(registro?.PlanSuscripcion)) />
+                        <span>Gratis</span>
+                    </label>
+                    <label class="sw-plan-option">
+                        <input type="radio" name="PlanSuscripcion" value="Plus" @CheckedSi(registro?.PlanSuscripcion == "Plus") />
+                        <span>Plus</span>
+                    </label>
+                    <label class="sw-plan-option">
+                        <input type="radio" name="PlanSuscripcion" value="Pro" @CheckedSi(registro?.PlanSuscripcion == "Pro") />
+                        <span>Pro</span>
+                    </label>
                 </div>
             </div>
 
