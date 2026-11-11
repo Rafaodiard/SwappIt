@@ -7,8 +7,8 @@ namespace Swappit.Models;
 
 public static class BD
 {
-    private static string _connectionString = //@"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
-    @"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
+    private static string _connectionString = @"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
+    //@"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
 
     public static Usuarios? GetUsuarioByMail(string mail)
     {
@@ -132,28 +132,39 @@ public static class BD
         }
     }
 
-    private const string ArticuloDisponible = @"NOT EXISTS (SELECT 1 FROM Intercambios ic
+    private const string ArticuloDisponible = @"NOT EXISTS (SELECT 1 FROM ArticulosIntercambios aic
+        INNER JOIN Intercambios ic ON ic.IdIntercambios = aic.IdIntercambio
         INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
-        WHERE eic.Nombre IN @pComprometidos AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))";
+        WHERE eic.Nombre IN @pComprometidos AND aic.IdArticulo = a.IdArticulos)";
+
+    private const string ArticuloNoIntercambiado = @"NOT EXISTS (SELECT 1 FROM ArticulosIntercambios air
+        INNER JOIN Intercambios ir ON ir.IdIntercambios = air.IdIntercambio
+        INNER JOIN EstadosIntercambios eir ON eir.IdEstadosIntercambios = ir.IdEstado
+        WHERE eir.Nombre = @pRealizado AND air.IdArticulo = a.IdArticulos)";
 
     private static readonly string[] EstadosComprometidos = { EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado };
 
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
         IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null,
-        int? excluirUsuario = null)
+        int? excluirUsuario = null, bool incluirEnIntercambio = false)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            var condiciones = new List<string> { "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')", ArticuloDisponible };
+            var condiciones = new List<string>
+            {
+                "(@pBusqueda IS NULL OR a.Nombre LIKE '%' + @pBusqueda + '%')",
+                incluirEnIntercambio ? ArticuloNoIntercambiado : ArticuloDisponible
+            };
             if (categorias is { Count: > 0 }) condiciones.Add("a.IdCategorias IN @pCategorias");
             if (estados is { Count: > 0 }) condiciones.Add("a.IdEstado IN @pEstados");
             if (idUsuario.HasValue) condiciones.Add("a.IdUsuarios = @pIdUsuario");
             if (excluirUsuario.HasValue) condiciones.Add("a.IdUsuarios <> @pExcluirUsuario");
 
             string top = cantidad.HasValue ? "TOP (@pCantidad) " : "";
+            string enIntercambio = incluirEnIntercambio ? $", CAST(CASE WHEN {ArticuloDisponible} THEN 0 ELSE 1 END AS bit) AS EnIntercambio" : "";
             string query = $@"SELECT {top}a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
                     (SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
-                    a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
+                    a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio{enIntercambio}
                 FROM Articulos a
                 INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
                 INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
@@ -168,7 +179,8 @@ public static class BD
                 pEstados = estados,
                 pIdUsuario = idUsuario,
                 pExcluirUsuario = excluirUsuario,
-                pComprometidos = EstadosComprometidos
+                pComprometidos = EstadosComprometidos,
+                pRealizado = EstadosIntercambios.Realizado
             }).ToList();
         }
     }
@@ -213,15 +225,9 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT COUNT(*)
+            string query = $@"SELECT COUNT(*)
                 FROM Articulos a
-                WHERE a.IdUsuarios = @pIdUsuario
-                    AND NOT EXISTS (
-                        SELECT 1 FROM Intercambios i
-                        INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
-                        WHERE ei.Nombre = @pRealizado
-                            AND (i.IdArticulos1 = a.IdArticulos OR i.IdArticulos2 = a.IdArticulos)
-                    )";
+                WHERE a.IdUsuarios = @pIdUsuario AND {ArticuloNoIntercambiado}";
             return connection.ExecuteScalar<int>(query, new
             {
                 pIdUsuario = idUsuario,
@@ -344,19 +350,24 @@ public static class BD
             CAST(CASE WHEN i.IdUsuarios2 = @pIdUsuario THEN 1 ELSE 0 END AS bit) AS EsRecibido,
             am.IdArticulos AS MiArticuloId, am.Nombre AS MiArticuloNombre, eam.Nombre AS MiArticuloEstado,
             (SELECT TOP 1 im.Ruta FROM Imagenes im WHERE im.IdArticulos = am.IdArticulos ORDER BY im.IdImagenes) AS MiArticuloImagen,
+            mios.Cantidad AS CantidadMios,
             asu.IdArticulos AS SuArticuloId, asu.Nombre AS SuArticuloNombre, easu.Nombre AS SuArticuloEstado,
             (SELECT TOP 1 isu.Ruta FROM Imagenes isu WHERE isu.IdArticulos = asu.IdArticulos ORDER BY isu.IdImagenes) AS SuArticuloImagen,
+            suyos.Cantidad AS CantidadSuyos,
             u.IdUsuarios AS OtroIdUsuario, u.Nombre AS OtroNombre, u.Apellido AS OtroApellido, u.Usuario AS OtroUsuario,
             u.Barrio AS OtroBarrio, p.Nombre AS OtroProvincia
         FROM Intercambios i
         INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
-        CROSS APPLY (SELECT
-            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos1 ELSE i.IdArticulos2 END AS IdMiArticulo,
-            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos2 ELSE i.IdArticulos1 END AS IdSuArticulo,
-            CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END AS IdOtro) lado
-        INNER JOIN Articulos am ON am.IdArticulos = lado.IdMiArticulo
+        CROSS APPLY (SELECT CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END AS IdOtro) lado
+        CROSS APPLY (SELECT TOP 1 aim.IdArticulo, COUNT(*) OVER () AS Cantidad FROM ArticulosIntercambios aim
+            INNER JOIN Articulos xm ON xm.IdArticulos = aim.IdArticulo
+            WHERE aim.IdIntercambio = i.IdIntercambios AND xm.IdUsuarios = @pIdUsuario ORDER BY aim.Id) mios
+        CROSS APPLY (SELECT TOP 1 ais.IdArticulo, COUNT(*) OVER () AS Cantidad FROM ArticulosIntercambios ais
+            INNER JOIN Articulos xs ON xs.IdArticulos = ais.IdArticulo
+            WHERE ais.IdIntercambio = i.IdIntercambios AND xs.IdUsuarios = lado.IdOtro ORDER BY ais.Id) suyos
+        INNER JOIN Articulos am ON am.IdArticulos = mios.IdArticulo
         INNER JOIN EstadosArticulos eam ON eam.IdEstadosArticulos = am.IdEstado
-        INNER JOIN Articulos asu ON asu.IdArticulos = lado.IdSuArticulo
+        INNER JOIN Articulos asu ON asu.IdArticulos = suyos.IdArticulo
         INNER JOIN EstadosArticulos easu ON easu.IdEstadosArticulos = asu.IdEstado
         INNER JOIN Usuarios u ON u.IdUsuarios = lado.IdOtro
         LEFT JOIN Provincias p ON p.IdProvincia = u.IdProvincias
@@ -387,7 +398,8 @@ public static class BD
         {
             string query = @"SELECT TOP 1 i.IdIntercambios FROM Intercambios i
                 INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
-                WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdArticulo AND e.Nombre IN @pEnCurso
+                INNER JOIN ArticulosIntercambios ai ON ai.IdIntercambio = i.IdIntercambios
+                WHERE i.IdUsuarios1 = @pIdUsuario AND ai.IdArticulo = @pIdArticulo AND e.Nombre IN @pEnCurso
                 ORDER BY i.IdIntercambios DESC";
             return connection.QueryFirstOrDefault<int?>(query, new
             {
@@ -407,7 +419,39 @@ public static class BD
         }
     }
 
-    public static int? ProponerIntercambio(int idUsuario, int idArticuloOfrecido, int idDueno, int idArticuloPedido,
+    private const string ArticuloComprometidoEnOtro = @"EXISTS (SELECT 1 FROM ArticulosIntercambios mio
+        INNER JOIN ArticulosIntercambios otro ON otro.IdArticulo = mio.IdArticulo AND otro.IdIntercambio <> mio.IdIntercambio
+        INNER JOIN Intercambios io ON io.IdIntercambios = otro.IdIntercambio
+        INNER JOIN EstadosIntercambios eio ON eio.IdEstadosIntercambios = io.IdEstado
+        WHERE mio.IdIntercambio = @pId AND eio.Nombre IN @pComprometidos)";
+
+    public static bool IntercambioConArticuloComprometido(int idIntercambio)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = $"SELECT CAST(CASE WHEN {ArticuloComprometidoEnOtro} THEN 1 ELSE 0 END AS bit)";
+            return connection.QuerySingle<bool>(query, new { pId = idIntercambio, pComprometidos = EstadosComprometidos });
+        }
+    }
+
+    public static List<ArticuloCardViewModel> GetArticulosDeIntercambio(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT a.IdArticulos, a.Nombre, e.Nombre AS Estado,
+                    (SELECT TOP 1 im.Ruta FROM Imagenes im WHERE im.IdArticulos = a.IdArticulos ORDER BY im.IdImagenes) AS Imagen,
+                    a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
+                FROM ArticulosIntercambios ai
+                INNER JOIN Intercambios i ON i.IdIntercambios = ai.IdIntercambio
+                INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+                INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
+                WHERE ai.IdIntercambio = @pId AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)
+                ORDER BY ai.Id";
+            return connection.Query<ArticuloCardViewModel>(query, new { pId = idIntercambio, pIdUsuario = idUsuario }).ToList();
+        }
+    }
+
+    public static int? ProponerIntercambio(int idUsuario, IReadOnlyCollection<int> idsOfrecidos, int idDueno, int idArticuloPedido,
         List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -415,24 +459,25 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                string query = @"INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                string query = @"INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2)
                     OUTPUT INSERTED.IdIntercambios
-                    SELECT CAST(GETDATE() AS date), e.IdEstadosIntercambios, @pIdUsuario, @pIdDueno, @pIdOfrecido, @pIdPedido
+                    SELECT CAST(GETDATE() AS date), e.IdEstadosIntercambios, @pIdUsuario, @pIdDueno
                     FROM EstadosIntercambios e
                     WHERE e.Nombre = @pPendiente
                         AND NOT EXISTS (SELECT 1 FROM Intercambios i
                             INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
-                            WHERE i.IdUsuarios1 = @pIdUsuario AND i.IdArticulos2 = @pIdPedido AND ei.Nombre IN @pEnCurso)
-                        AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+                            INNER JOIN ArticulosIntercambios ai ON ai.IdIntercambio = i.IdIntercambios
+                            WHERE i.IdUsuarios1 = @pIdUsuario AND ai.IdArticulo = @pIdPedido AND ei.Nombre IN @pEnCurso)
+                        AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios aic
+                            INNER JOIN Intercambios ic ON ic.IdIntercambios = aic.IdIntercambio
                             INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
-                            WHERE eic.Nombre IN @pComprometidos
-                                AND (ic.IdArticulos1 IN (@pIdOfrecido, @pIdPedido) OR ic.IdArticulos2 IN (@pIdOfrecido, @pIdPedido)))";
-                int? idIntercambio = connection.QueryFirstOrDefault<int>(query, new
+                            WHERE eic.Nombre IN @pComprometidos AND aic.IdArticulo IN @pIdsArticulos)";
+                int? idIntercambio = connection.QueryFirstOrDefault<int?>(query, new
                 {
                     pIdUsuario = idUsuario,
                     pIdDueno = idDueno,
-                    pIdOfrecido = idArticuloOfrecido,
                     pIdPedido = idArticuloPedido,
+                    pIdsArticulos = idsOfrecidos.Append(idArticuloPedido).ToList(),
                     pPendiente = EstadosIntercambios.Pendiente,
                     pEnCurso = new[] { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado },
                     pComprometidos = EstadosComprometidos
@@ -441,6 +486,19 @@ public static class BD
                 List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
                 if (idIntercambio.HasValue)
                 {
+                    string queryArticulos = @"INSERT INTO ArticulosIntercambios (IdArticulo, IdIntercambio)
+                        SELECT a.IdArticulos, @pIdIntercambio FROM Articulos a
+                        WHERE (a.IdArticulos IN @pIdsOfrecidos AND a.IdUsuarios = @pIdUsuario)
+                            OR (a.IdArticulos = @pIdPedido AND a.IdUsuarios = @pIdDueno)
+                        ORDER BY CASE WHEN a.IdUsuarios = @pIdUsuario THEN 0 ELSE 1 END, a.IdArticulos";
+                    connection.Execute(queryArticulos, new
+                    {
+                        pIdIntercambio = idIntercambio.Value,
+                        pIdsOfrecidos = idsOfrecidos,
+                        pIdUsuario = idUsuario,
+                        pIdPedido = idArticuloPedido,
+                        pIdDueno = idDueno
+                    }, transaccion);
                     CrearNotificacion(connection, transaccion, nuevas, idDueno, idIntercambio.Value, TipoNotificaciones.PropuestaRecibida);
                 }
 
@@ -459,17 +517,14 @@ public static class BD
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
-                string query = @"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
+                string query = $@"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
                     OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
                     FROM Intercambios i
                     INNER JOIN EstadosIntercambios actual ON actual.IdEstadosIntercambios = i.IdEstado
                     INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
                     WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
                         AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))
-                        AND (@pNuevo <> @pAceptado OR NOT EXISTS (SELECT 1 FROM Intercambios ic
-                            INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
-                            WHERE eic.Nombre IN @pComprometidos AND ic.IdIntercambios <> i.IdIntercambios
-                                AND (ic.IdArticulos1 IN (i.IdArticulos1, i.IdArticulos2) OR ic.IdArticulos2 IN (i.IdArticulos1, i.IdArticulos2))))";
+                        AND (@pNuevo <> @pAceptado OR NOT {ArticuloComprometidoEnOtro})";
                 int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
                 {
                     pId = idIntercambio,
@@ -537,8 +592,9 @@ public static class BD
     }
 
     private const string CondicionPendientesDeArticulos = @"o.IdIntercambios <> @pId
-        AND EXISTS (SELECT 1 FROM Intercambios acep WHERE acep.IdIntercambios = @pId
-            AND (o.IdArticulos1 IN (acep.IdArticulos1, acep.IdArticulos2) OR o.IdArticulos2 IN (acep.IdArticulos1, acep.IdArticulos2)))";
+        AND EXISTS (SELECT 1 FROM ArticulosIntercambios acep
+            INNER JOIN ArticulosIntercambios otro ON otro.IdArticulo = acep.IdArticulo
+            WHERE acep.IdIntercambio = @pId AND otro.IdIntercambio = o.IdIntercambios)";
 
     public static int ContarPendientesDeArticulos(int idIntercambio)
     {
@@ -609,14 +665,26 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT d.Mail, d.Nombre, o.Nombre AS OtroNombre, am.Nombre AS MiArticulo, asu.Nombre AS SuArticulo
+            string query = @"SELECT d.Mail, d.Nombre, o.Nombre AS OtroNombre
                 FROM Intercambios i
                 INNER JOIN Usuarios d ON d.IdUsuarios = @pIdUsuario
                 INNER JOIN Usuarios o ON o.IdUsuarios = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
-                INNER JOIN Articulos am ON am.IdArticulos = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos1 ELSE i.IdArticulos2 END
-                INNER JOIN Articulos asu ON asu.IdArticulos = CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdArticulos2 ELSE i.IdArticulos1 END
                 WHERE i.IdIntercambios = @pIdIntercambio AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)";
-            return connection.QueryFirstOrDefault<DatosMailNotificacion>(query, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio });
+            DatosMailNotificacion? datos = connection.QueryFirstOrDefault<DatosMailNotificacion>(query, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio });
+            if (datos == null)
+            {
+                return null;
+            }
+
+            string queryArticulos = @"SELECT a.Nombre, CAST(CASE WHEN a.IdUsuarios = @pIdUsuario THEN 1 ELSE 0 END AS bit) AS EsMio
+                FROM ArticulosIntercambios ai
+                INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+                WHERE ai.IdIntercambio = @pIdIntercambio
+                ORDER BY ai.Id";
+            var articulos = connection.Query<(string Nombre, bool EsMio)>(queryArticulos, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio }).ToList();
+            datos.MisArticulos = articulos.Where(a => a.EsMio).Select(a => a.Nombre).ToList();
+            datos.SusArticulos = articulos.Where(a => !a.EsMio).Select(a => a.Nombre).ToList();
+            return datos;
         }
     }
 
@@ -630,7 +698,10 @@ public static class BD
                 INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
                 INNER JOIN Intercambios i ON i.IdIntercambios = n.IdIntercambio
                 INNER JOIN Usuarios u ON u.IdUsuarios = CASE WHEN i.IdUsuarios1 = n.IdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
-                INNER JOIN Articulos a ON a.IdArticulos = i.IdArticulos2
+                CROSS APPLY (SELECT TOP 1 ap.Nombre FROM ArticulosIntercambios ai
+                    INNER JOIN Articulos ap ON ap.IdArticulos = ai.IdArticulo
+                    WHERE ai.IdIntercambio = i.IdIntercambios AND ap.IdUsuarios = i.IdUsuarios2
+                    ORDER BY ai.Id) a
                 WHERE n.IdUsuario = @pIdUsuario
                 ORDER BY n.Fecha DESC, n.Id DESC";
             return connection.Query<NotificacionViewModel>(query, new { pIdUsuario = idUsuario, pCantidad = cantidad }).ToList();
@@ -893,7 +964,8 @@ public static class BD
 
                 SELECT ic.IdUsuarios1, @pPropuesta, ap.IdCategorias, NULL, NULL, CAST(ic.Fecha AS datetime)
                 FROM Intercambios ic
-                INNER JOIN Articulos ap ON ap.IdArticulos = ic.IdArticulos2
+                INNER JOIN ArticulosIntercambios aip ON aip.IdIntercambio = ic.IdIntercambios
+                INNER JOIN Articulos ap ON ap.IdArticulos = aip.IdArticulo AND ap.IdUsuarios = ic.IdUsuarios2
                 WHERE ic.IdUsuarios1 IN @pIds AND ic.Fecha >= CAST(@pDesde AS date)
 
                 UNION ALL

@@ -123,6 +123,26 @@ CREATE TABLE [dbo].[Articulos](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[ArticulosIntercambios]    Script Date: 11/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ArticulosIntercambios](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdArticulo] [int] NOT NULL,
+	[IdIntercambio] [int] NOT NULL,
+ CONSTRAINT [PK_ArticulosIntercambios] PRIMARY KEY CLUSTERED
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UQ_ArticulosIntercambios] UNIQUE NONCLUSTERED
+(
+	[IdIntercambio] ASC,
+	[IdArticulo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Categorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -221,8 +241,6 @@ CREATE TABLE [dbo].[Intercambios](
 	[IdEstado] [int] NOT NULL,
 	[IdUsuarios1] [int] NOT NULL,
 	[IdUsuarios2] [int] NOT NULL,
-	[IdArticulos1] [int] NOT NULL,
-	[IdArticulos2] [int] NOT NULL,
 	[Ubicacion] [varchar](50) NULL,
  CONSTRAINT [PK_Intercambios] PRIMARY KEY CLUSTERED 
 (
@@ -1147,33 +1165,89 @@ SET IDENTITY_INSERT [dbo].[Interacciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Intercambios] ON 
 
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (1, CAST(N'2026-10-29' AS Date), 2, 2, 12, 21, 20, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (2, CAST(DATEADD(DAY, -39, GETDATE()) AS Date), 1, 9, 4, 13, 3, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (3, CAST(DATEADD(DAY, -22, GETDATE()) AS Date), 3, 39, 26, 67, 72, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (4, CAST(DATEADD(DAY, -21, GETDATE()) AS Date), 3, 32, 29, 43, 65, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (5, CAST(DATEADD(DAY, -21, GETDATE()) AS Date), 3, 3, 12, 2, 19, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (6, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 1, 40, 18, 48, 26, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (7, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 1, 12, 20, 19, 60, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (8, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 3, 17, 25, 56, 62, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (9, CAST(DATEADD(DAY, -18, GETDATE()) AS Date), 1, 17, 30, 77, 22, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (10, CAST(DATEADD(DAY, -15, GETDATE()) AS Date), 1, 4, 12, 3, 19, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (11, CAST(DATEADD(DAY, -14, GETDATE()) AS Date), 3, 41, 40, 41, 48, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (12, CAST(DATEADD(DAY, -12, GETDATE()) AS Date), 1, 18, 40, 26, 48, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (13, CAST(DATEADD(DAY, -11, GETDATE()) AS Date), 1, 5, 8, 6, 11, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (14, CAST(DATEADD(DAY, -9, GETDATE()) AS Date), 1, 29, 33, 78, 73, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (15, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 31, 7, 51, 9, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (16, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 30, 5, 40, 5, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (17, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 9, 31, 13, 66, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (18, CAST(DATEADD(DAY, -6, GETDATE()) AS Date), 1, 15, 24, 98, 34, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (19, CAST(DATEADD(DAY, -4, GETDATE()) AS Date), 3, 25, 19, 104, 42, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (20, CAST(DATEADD(DAY, -4, GETDATE()) AS Date), 1, 26, 37, 72, 29, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (21, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 1, 41, 42, 41, 68, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (22, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 3, 18, 28, 26, 70, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (23, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 1, 22, 27, 87, 64, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (24, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 1, 39, 29, 67, 28, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (25, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 1, 15, 16, 38, 59, NULL)
-INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [IdArticulos1], [IdArticulos2], [Ubicacion]) VALUES (26, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 3, 17, 23, 55, 106, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (1, CAST(N'2026-10-29' AS Date), 2, 2, 12, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (2, CAST(DATEADD(DAY, -39, GETDATE()) AS Date), 1, 9, 4, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (3, CAST(DATEADD(DAY, -22, GETDATE()) AS Date), 3, 39, 26, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (4, CAST(DATEADD(DAY, -21, GETDATE()) AS Date), 3, 32, 29, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (5, CAST(DATEADD(DAY, -21, GETDATE()) AS Date), 3, 3, 12, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (6, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 1, 40, 18, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (7, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 1, 12, 20, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (8, CAST(DATEADD(DAY, -20, GETDATE()) AS Date), 3, 17, 25, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (9, CAST(DATEADD(DAY, -18, GETDATE()) AS Date), 1, 17, 30, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (10, CAST(DATEADD(DAY, -15, GETDATE()) AS Date), 1, 4, 12, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (11, CAST(DATEADD(DAY, -14, GETDATE()) AS Date), 3, 41, 40, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (12, CAST(DATEADD(DAY, -12, GETDATE()) AS Date), 1, 18, 40, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (13, CAST(DATEADD(DAY, -11, GETDATE()) AS Date), 1, 5, 8, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (14, CAST(DATEADD(DAY, -9, GETDATE()) AS Date), 1, 29, 33, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (15, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 31, 7, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (16, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 30, 5, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (17, CAST(DATEADD(DAY, -7, GETDATE()) AS Date), 1, 9, 31, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (18, CAST(DATEADD(DAY, -6, GETDATE()) AS Date), 1, 15, 24, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (19, CAST(DATEADD(DAY, -4, GETDATE()) AS Date), 3, 25, 19, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (20, CAST(DATEADD(DAY, -4, GETDATE()) AS Date), 1, 26, 37, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (21, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 1, 41, 42, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (22, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 3, 18, 28, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (23, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 1, 22, 27, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (24, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 1, 39, 29, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (25, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 1, 15, 16, NULL)
+INSERT [dbo].[Intercambios] ([IdIntercambios], [Fecha], [IdEstado], [IdUsuarios1], [IdUsuarios2], [Ubicacion]) VALUES (26, CAST(DATEADD(DAY, -0, GETDATE()) AS Date), 3, 17, 23, NULL)
 SET IDENTITY_INSERT [dbo].[Intercambios] OFF
+GO
+SET IDENTITY_INSERT [dbo].[ArticulosIntercambios] ON 
+
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (1, 21, 1)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (2, 20, 1)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (3, 13, 2)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (4, 3, 2)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (5, 67, 3)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (6, 72, 3)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (7, 43, 4)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (8, 65, 4)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (9, 2, 5)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (10, 19, 5)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (11, 48, 6)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (12, 26, 6)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (13, 19, 7)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (14, 60, 7)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (15, 56, 8)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (16, 62, 8)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (17, 77, 9)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (18, 22, 9)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (19, 3, 10)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (20, 19, 10)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (21, 41, 11)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (22, 48, 11)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (23, 26, 12)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (24, 48, 12)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (25, 6, 13)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (26, 11, 13)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (27, 78, 14)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (28, 73, 14)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (29, 51, 15)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (30, 9, 15)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (31, 40, 16)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (32, 5, 16)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (33, 13, 17)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (34, 66, 17)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (35, 98, 18)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (36, 34, 18)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (37, 104, 19)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (38, 42, 19)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (39, 72, 20)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (40, 29, 20)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (41, 41, 21)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (42, 68, 21)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (43, 26, 22)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (44, 70, 22)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (45, 87, 23)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (46, 64, 23)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (47, 67, 24)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (48, 28, 24)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (49, 38, 25)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (50, 59, 25)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (51, 55, 26)
+INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (52, 106, 26)
+SET IDENTITY_INSERT [dbo].[ArticulosIntercambios] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Provincias] ON 
 
@@ -1286,6 +1360,16 @@ REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Articulos] CHECK CONSTRAINT [FK_Articulos_Usuarios]
 GO
+ALTER TABLE [dbo].[ArticulosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_ArticulosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
+REFERENCES [dbo].[Articulos] ([IdArticulos])
+GO
+ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Articulos]
+GO
+ALTER TABLE [dbo].[ArticulosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_ArticulosIntercambios_Intercambios] FOREIGN KEY([IdIntercambio])
+REFERENCES [dbo].[Intercambios] ([IdIntercambios])
+GO
+ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Intercambios]
+GO
 ALTER TABLE [dbo].[Imagenes]  WITH CHECK ADD  CONSTRAINT [FK_Imagenes_Articulos] FOREIGN KEY([IdArticulos])
 REFERENCES [dbo].[Articulos] ([IdArticulos])
 GO
@@ -1315,16 +1399,6 @@ ALTER TABLE [dbo].[Interacciones]  WITH CHECK ADD  CONSTRAINT [FK_Interacciones_
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Interacciones] CHECK CONSTRAINT [FK_Interacciones_Usuarios]
-GO
-ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Articulos] FOREIGN KEY([IdArticulos1])
-REFERENCES [dbo].[Articulos] ([IdArticulos])
-GO
-ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_Articulos]
-GO
-ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_Articulos1] FOREIGN KEY([IdArticulos2])
-REFERENCES [dbo].[Articulos] ([IdArticulos])
-GO
-ALTER TABLE [dbo].[Intercambios] CHECK CONSTRAINT [FK_Intercambios_Articulos1]
 GO
 ALTER TABLE [dbo].[Intercambios]  WITH CHECK ADD  CONSTRAINT [FK_Intercambios_EstadosIntercambios] FOREIGN KEY([IdEstado])
 REFERENCES [dbo].[EstadosIntercambios] ([IdEstadosIntercambios])
@@ -1501,14 +1575,12 @@ BEGIN
     END
 
     DECLARE @IdUsuarioRecibe INT, @EstadoIntercambio INT;
-    DECLARE @CategoriaArt1 INT, @Prioridad VARCHAR(20) = 'Prioridad Normal';
+    DECLARE @Prioridad VARCHAR(20) = 'Prioridad Normal';
 
     SELECT 
         @IdUsuarioRecibe = IdUsuarios2,
-        @EstadoIntercambio = Intercambios.IdEstado,
-        @CategoriaArt1 = a1.IdCategorias
+        @EstadoIntercambio = Intercambios.IdEstado
     FROM Intercambios 
-    INNER JOIN Articulos a1 ON Intercambios.IdArticulos1 = a1.IdArticulos
     WHERE Intercambios.IdIntercambios = @IdIntercambio;
 
     IF @EstadoIntercambio <> 1
@@ -1518,8 +1590,10 @@ BEGIN
     END
 
     IF EXISTS (
-        SELECT 1 FROM dbo.Articulos 
-        WHERE IdUsuarios = @IdUsuarioRecibe AND IdCategorias = @CategoriaArt1
+        SELECT 1 FROM dbo.ArticulosIntercambios ai
+        INNER JOIN dbo.Articulos ofrecido ON ofrecido.IdArticulos = ai.IdArticulo AND ofrecido.IdUsuarios <> @IdUsuarioRecibe
+        INNER JOIN dbo.Articulos a ON a.IdUsuarios = @IdUsuarioRecibe AND a.IdCategorias = ofrecido.IdCategorias
+        WHERE ai.IdIntercambio = @IdIntercambio
     )
     BEGIN
         SET @Prioridad = 'Alta Prioridad';
@@ -1689,6 +1763,7 @@ BEGIN
         u1.Usuario AS Usuario1,
         u2.Usuario AS Usuario2,
         a1.Nombre AS Articulo1,
+        a1.Cantidad AS CantidadOfrecidos,
         a2.Nombre AS Articulo2,
         DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) AS DiasTranscurridos,
         COUNT(m.IdMensajes) AS MensajesTotales,
@@ -1701,12 +1776,20 @@ BEGIN
     FROM dbo.Intercambios 
     INNER JOIN Usuarios u1 ON Intercambios.IdUsuarios1 = u1.IdUsuarios
     INNER JOIN Usuarios u2 ON Intercambios.IdUsuarios2 = u2.IdUsuarios
-    INNER JOIN Articulos a1 ON Intercambios.IdArticulos1 = a1.IdArticulos
-    INNER JOIN Articulos a2 ON Intercambios.IdArticulos2 = a2.IdArticulos
+    CROSS APPLY (SELECT TOP 1 a.Nombre, COUNT(*) OVER () AS Cantidad
+        FROM ArticulosIntercambios ai
+        INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+        WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios1
+        ORDER BY ai.Id) a1
+    CROSS APPLY (SELECT TOP 1 a.Nombre
+        FROM ArticulosIntercambios ai
+        INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+        WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios2
+        ORDER BY ai.Id) a2
     LEFT JOIN Mensajes m ON Intercambios.IdIntercambios = m.IdIntercambio
     WHERE Intercambios.IdEstado = 1 -- Estado 1 = Pendiente
       AND DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) >= @AntiguedadMinimaDias
-    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a2.Nombre
+    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a1.Cantidad, a2.Nombre
     ORDER BY DiasTranscurridos DESC;
 
     IF @@ROWCOUNT = 0
@@ -1854,10 +1937,11 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
-		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
+			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
-				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
+				AND ai.IdArticulo = a.IdArticulos)
 	GROUP BY c.IdCategorias, c.Nombre
 	ORDER BY c.Nombre
 END
@@ -1879,10 +1963,11 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
-		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
+			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
-				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
+				AND ai.IdArticulo = a.IdArticulos)
 	GROUP BY e.IdEstadosArticulos, e.Nombre
 	ORDER BY e.IdEstadosArticulos
 END
@@ -2084,13 +2169,19 @@ BEGIN
                 BEGIN
                     IF @fecha < GETDATE() AND EXISTS (SELECT Nombre FROM EstadosIntercambios WHERE Nombre = @estado)
                     BEGIN
-                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                        SET XACT_ABORT ON
+                        BEGIN TRANSACTION
+                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2)
                         VALUES
                             (@fecha, (SELECT IdEstadosIntercambios FROM EstadosIntercambios WHERE Nombre = @estado),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario1),
-                             (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2),
-                             (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1),
-                             (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2))
+                             (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2))
+                        DECLARE @idIntercambio int = SCOPE_IDENTITY()
+                        INSERT INTO ArticulosIntercambios (IdArticulo, IdIntercambio)
+                        VALUES
+                            ((SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1), @idIntercambio),
+                            ((SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2), @idIntercambio)
+                        COMMIT TRANSACTION
                     END
                 END
             END

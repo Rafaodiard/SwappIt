@@ -11,7 +11,9 @@ tags:
 ---
 # BD.GetArticulosCatalogo()
 
-Método de [[BD]] · `Models/BD.cs` línea 131. Parámetros: `string?,int?,IReadOnlyCollection&lt;int&gt;?,IReadOnlyCollection&lt;int&gt;?,int?,int?`.
+Método de [[BD]] · `Models/BD.cs` línea 131. Parámetros: `string?,int?,IReadOnlyCollection&lt;int&gt;?,IReadOnlyCollection&lt;int&gt;?,int?,int?,bool`.
+
+Por defecto trae solo los artículos disponibles (sin intercambio aceptado ni realizado). Con `incluirEnIntercambio: true` (11/11, solo lo usa [[PerfilController]].Index) trae todos los que no se intercambiaron, igual que el límite de 5 de BD.ContarArticulosActivos, y marca `EnIntercambio` en los que están en un intercambio aceptado.
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

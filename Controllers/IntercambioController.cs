@@ -68,9 +68,12 @@ public class IntercambioController : Controller
             }
             else
             {
+                List<ArticuloCardViewModel> articulos = BD.GetArticulosDeIntercambio(id, usuarioId.Value);
+                ViewBag.misArticulos = articulos.Where(a => a.IdUsuarios == usuarioId).ToList();
+                ViewBag.susArticulos = articulos.Where(a => a.IdUsuarios != usuarioId).ToList();
                 ViewBag.fotoOtro = BD.GetFotoUsuario(intercambio.OtroIdUsuario);
                 ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
-                    && (BD.ArticuloComprometido(intercambio.MiArticuloId) || BD.ArticuloComprometido(intercambio.SuArticuloId));
+                    && BD.IntercambioConArticuloComprometido(intercambio.IdIntercambios);
                 ViewBag.pendientesQueSeRechazan = intercambio.EsRecibido && intercambio.Estado == EstadosIntercambios.Pendiente
                     ? BD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
                     : 0;
@@ -88,7 +91,7 @@ public class IntercambioController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Proponer(int idArticuloPedido, int idArticuloOfrecido)
+    public IActionResult Proponer(int idArticuloPedido, int[]? idsArticulosOfrecidos)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -104,15 +107,23 @@ public class IntercambioController : Controller
                 return NotFound();
             }
 
+            List<int> idsOfrecidos = (idsArticulosOfrecidos ?? Array.Empty<int>()).Where(id => id > 0).Distinct().ToList();
             string? error = null;
-            Articulos? ofrecido = idArticuloOfrecido > 0 ? BD.GetArticuloById(idArticuloOfrecido) : null;
             if (pedido.IdUsuarios == usuarioId)
             {
                 error = "No podés proponer un intercambio por un artículo tuyo.";
             }
-            else if (ofrecido == null || ofrecido.IdUsuarios != usuarioId)
+            else if (idsOfrecidos.Count == 0)
             {
-                error = "Elegí uno de tus artículos para ofrecer a cambio.";
+                error = "Elegí al menos uno de tus artículos para ofrecer a cambio.";
+            }
+            else if (idsOfrecidos.Count > Intercambios.MaxArticulosOfrecidos)
+            {
+                error = $"Podés ofrecer hasta {Intercambios.MaxArticulosOfrecidos} artículos en una propuesta.";
+            }
+            else if (idsOfrecidos.Any(id => BD.GetArticuloById(id)?.IdUsuarios != usuarioId))
+            {
+                error = "Solo podés ofrecer artículos tuyos.";
             }
             else if (BD.ContarIntercambiosActivos(usuarioId.Value) >= 5)
             {
@@ -122,9 +133,11 @@ public class IntercambioController : Controller
             {
                 error = "Este artículo ya tiene un intercambio aceptado.";
             }
-            else if (BD.ArticuloComprometido(ofrecido.IdArticulos))
+            else if (idsOfrecidos.Any(BD.ArticuloComprometido))
             {
-                error = "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro.";
+                error = idsOfrecidos.Count == 1
+                    ? "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro."
+                    : "Uno de los artículos que elegiste ya tiene un intercambio aceptado. Sacalo y probá de nuevo.";
             }
 
             if (error != null)
@@ -134,7 +147,7 @@ public class IntercambioController : Controller
             }
 
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idArticuloOfrecido, pedido.IdUsuarios, idArticuloPedido, creadas);
+            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idsOfrecidos, pedido.IdUsuarios, idArticuloPedido, creadas);
             if (idIntercambio == null)
             {
                 TempData["ErrorArticulo"] = "Ya tenés una propuesta en curso por este artículo.";

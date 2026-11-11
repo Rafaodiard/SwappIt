@@ -22,6 +22,8 @@
 }
 
 @{
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> misArticulos = ViewBag.misArticulos;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> susArticulos = ViewBag.susArticulos;
     string? fotoOtro = ViewBag.fotoOtro;
     bool articuloComprometido = ViewBag.articuloComprometido;
     int pendientesQueSeRechazan = ViewBag.pendientesQueSeRechazan;
@@ -37,17 +39,50 @@
     string? mensaje = TempData["MensajeIntercambio"] as string;
     string? error = TempData["ErrorIntercambio"] as string;
 
-    void PanelArticulo(string etiqueta, int idArticulo, string nombre, string estadoArticulo, string? imagen, string deQuien)
+    string Nombres(List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos) =>
+        articulos.Count <= 1
+            ? articulos.FirstOrDefault()?.Nombre ?? ""
+            : $"{string.Join(", ", articulos.Take(articulos.Count - 1).Select(a => a.Nombre))} y {articulos[^1].Nombre}";
+    string tuMios = misArticulos.Count > 1 ? "tus" : "tu";
+
+    void PanelArticulos(string etiqueta, List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos, string deQuien)
     {
-        <a href="@Url.Action("Detalle", "Articulos", new { id = idArticulo })" class="sw-intercambio-panel">
-            <span class="sw-intercambio-etiqueta">@etiqueta</span>
-            <span class="sw-img sw-intercambio-foto"><img src="@imagen" alt=""></span>
-            <span class="d-block h5 fw-bold mt-3 mb-2">@nombre</span>
-            <span class="d-flex flex-wrap align-items-center gap-2 small">
-                <span class="sw-articulo-estado">@estadoArticulo</span>
-                <span class="text-suave">@deQuien</span>
-            </span>
-        </a>
+        if (articulos.Count == 1)
+        {
+            var articulo = articulos[0];
+            <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="sw-intercambio-panel">
+                <span class="sw-intercambio-etiqueta">@etiqueta</span>
+                <span class="sw-img sw-intercambio-foto"><img src="@articulo.Imagen" alt=""></span>
+                <span class="d-block h5 fw-bold mt-3 mb-2">@articulo.Nombre</span>
+                <span class="d-flex flex-wrap align-items-center gap-2 small">
+                    <span class="sw-articulo-estado">@articulo.Estado</span>
+                    <span class="text-suave">@deQuien</span>
+                </span>
+            </a>
+        }
+        else
+        {
+            <div class="sw-intercambio-panel sw-intercambio-panel--varios">
+                <span class="sw-intercambio-etiqueta">@etiqueta · @articulos.Count artículos</span>
+                <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                    @foreach (var articulo in articulos)
+                    {
+                        <li>
+                            <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="sw-intercambio-item">
+                                <span class="sw-img sw-intercambio-item-img"><img src="@articulo.Imagen" alt=""></span>
+                                <span class="min-w-0">
+                                    <span class="d-block fw-bold text-truncate">@articulo.Nombre</span>
+                                    <span class="d-flex flex-wrap align-items-center gap-2 small mt-1">
+                                        <span class="sw-articulo-estado">@articulo.Estado</span>
+                                        <span class="text-suave">@deQuien</span>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     }
 }
 
@@ -74,7 +109,7 @@
         <!-- ===== Propuesta recibida: Aceptar / Rechazar ===== -->
         <header class="text-center mb-4">
             <h1 class="font-titulo display-5 text-primario mb-2">Recibiste una propuesta</h1>
-            <p class="text-suave mb-0">@intercambio.OtroNombre quiere intercambiar su @intercambio.SuArticuloNombre por tu @intercambio.MiArticuloNombre.</p>
+            <p class="text-suave mb-0">@intercambio.OtroNombre te ofrece @Nombres(susArticulos) por @tuMios @Nombres(misArticulos).</p>
         </header>
 
         <section class="sw-card p-4 p-lg-5 mx-auto sw-intercambio-propuesta" aria-label="Propuesta de intercambio">
@@ -92,14 +127,14 @@
             </div>
 
             <div class="sw-intercambio-articulos">
-                @{ PanelArticulo("Te ofrece", intercambio.SuArticuloId, intercambio.SuArticuloNombre, intercambio.SuArticuloEstado, intercambio.SuArticuloImagen, $"de @{intercambio.OtroUsuario}"); }
+                @{ PanelArticulos("Te ofrece", susArticulos, $"de @{intercambio.OtroUsuario}"); }
                 <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
-                @{ PanelArticulo("Por tu", intercambio.MiArticuloId, intercambio.MiArticuloNombre, intercambio.MiArticuloEstado, intercambio.MiArticuloImagen, "tuyo"); }
+                @{ PanelArticulos(misArticulos.Count > 1 ? "Por tus" : "Por tu", misArticulos, "tuyo"); }
             </div>
 
             @if (articuloComprometido)
             {
-                <p class="sw-articulo-propio mt-4 mb-0" role="status"><i class="bi bi-exclamation-circle me-1"></i> Uno de los dos artículos ya tiene otro intercambio aceptado, así que esta propuesta no se puede aceptar.</p>
+                <p class="sw-articulo-propio mt-4 mb-0" role="status"><i class="bi bi-exclamation-circle me-1"></i> Uno de los artículos ya tiene otro intercambio aceptado, así que esta propuesta no se puede aceptar.</p>
             }
             else
             {
@@ -144,7 +179,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body d-flex flex-column gap-3">
-                            <p class="mb-0">Vas a cambiar tu <strong>@intercambio.MiArticuloNombre</strong> por <strong>@intercambio.SuArticuloNombre</strong> de @@@intercambio.OtroUsuario.</p>
+                            <p class="mb-0">Vas a cambiar @tuMios <strong>@Nombres(misArticulos)</strong> por <strong>@Nombres(susArticulos)</strong> de @@@intercambio.OtroUsuario.</p>
                             <p class="sw-aviso-rechazos mb-0"><i class="bi bi-exclamation-triangle me-1"></i> @avisoRechazos @(pendientesQueSeRechazan == 1 ? "A quien la hizo le va a llegar una notificación." : "A quienes las hicieron les va a llegar una notificación.")</p>
                         </div>
                         <div class="modal-footer">
@@ -202,9 +237,9 @@
                     </ol>
 
                     <div class="sw-intercambio-articulos">
-                        @{ PanelArticulo("Vos das", intercambio.MiArticuloId, intercambio.MiArticuloNombre, intercambio.MiArticuloEstado, intercambio.MiArticuloImagen, "tuyo"); }
+                        @{ PanelArticulos("Vos das", misArticulos, "tuyo"); }
                         <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
-                        @{ PanelArticulo("Recibís", intercambio.SuArticuloId, intercambio.SuArticuloNombre, intercambio.SuArticuloEstado, intercambio.SuArticuloImagen, $"de @{intercambio.OtroUsuario}"); }
+                        @{ PanelArticulos("Recibís", susArticulos, $"de @{intercambio.OtroUsuario}"); }
                     </div>
                 </section>
             </div>
@@ -274,8 +309,8 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body d-flex flex-column gap-3">
-                            <p class="mb-0">Ya no vas a cambiar tu <strong>@intercambio.MiArticuloNombre</strong> por <strong>@intercambio.SuArticuloNombre</strong> de @@@intercambio.OtroUsuario.</p>
-                            <p class="sw-aviso-rechazos mb-0"><i class="bi bi-exclamation-triangle me-1"></i> No se puede deshacer. A @intercambio.OtroNombre le va a llegar una notificación@(esPropuesta ? "" : " y los dos artículos vuelven a aparecer en el catálogo").</p>
+                            <p class="mb-0">Ya no vas a cambiar @tuMios <strong>@Nombres(misArticulos)</strong> por <strong>@Nombres(susArticulos)</strong> de @@@intercambio.OtroUsuario.</p>
+                            <p class="sw-aviso-rechazos mb-0"><i class="bi bi-exclamation-triangle me-1"></i> No se puede deshacer. A @intercambio.OtroNombre le va a llegar una notificación@(esPropuesta ? "" : " y los artículos vuelven a aparecer en el catálogo").</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-sw-outline" data-bs-dismiss="modal">Volver</button>

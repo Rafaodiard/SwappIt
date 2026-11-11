@@ -29,6 +29,13 @@
                     <span data-campo="barrio">@articulo.Barrio</span>
                 </div>
             }
+            @if (articulo.EnIntercambio)
+            {
+                <div class="card-objeto-motivo">
+                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                    <span>En intercambio</span>
+                </div>
+            }
             @if (!string.IsNullOrEmpty(articulo.Motivo))
             {
                 bool descubrir = articulo.Motivo == Swappit.Controllers.RecomendacionesController.MotivoDescubrir;

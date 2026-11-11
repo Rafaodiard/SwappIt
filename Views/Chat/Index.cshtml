@@ -60,7 +60,7 @@
                     resumenes.TryGetValue(c.IdIntercambios, out ConversacionViewModel? resumen);
                     bool activa = c.IdIntercambios == abierta?.IdIntercambios;
                     <a href="@Url.Action("Index", "Chat", new { id = c.IdIntercambios })" class="sw-chat-contacto @(activa ? "activo" : "")"
-                       aria-current="@(activa ? "page" : null)" data-chat-contacto="@($"{c.OtroNombre} {c.OtroApellido} {c.OtroUsuario} {c.MiArticuloNombre} {c.SuArticuloNombre}")">
+                       aria-current="@(activa ? "page" : null)" data-chat-contacto="@($"{c.OtroNombre} {c.OtroApellido} {c.OtroUsuario} {c.MiArticuloResumen} {c.SuArticuloResumen}")">
                         <span class="sw-avatar" aria-hidden="true">@Iniciales(c)</span>
                         <div class="flex-grow-1 min-w-0">
                             <div class="d-flex justify-content-between gap-2">
@@ -77,7 +77,7 @@
                                 }
                                 else
                                 {
-                                    @:@c.MiArticuloNombre ⇄ @c.SuArticuloNombre
+                                    @:@c.MiArticuloResumen ⇄ @c.SuArticuloResumen
                                 }
                             </div>
                         </div>
@@ -107,7 +107,7 @@
                     <span class="sw-avatar" data-iniciales="@iniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @iniciales }</span>
                     <div class="flex-grow-1 min-w-0">
                         <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
-                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloNombre ⇄ @abierta.SuArticuloNombre</div>
+                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloResumen ⇄ @abierta.SuArticuloResumen</div>
                     </div>
                     <span class="sw-estado-intercambio sw-estado-intercambio--@abierta.Estado.ToLowerInvariant() d-none d-sm-inline-block">@abierta.Estado</span>
                     <a href="@Url.Action("Detalle", "Intercambio", new { id = abierta.IdIntercambios })" class="btn btn-sw-outline btn-sm flex-shrink-0">Ver intercambio</a>

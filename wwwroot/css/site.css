@@ -1082,7 +1082,18 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-opcion-articulo:hover .sw-opcion-articulo-cuerpo { border-color: var(--sw-gris); }
 .sw-estado-radio:checked + .sw-opcion-articulo-cuerpo { border-color: var(--sw-primario); background: var(--sw-gris-claro); }
 .sw-estado-radio:focus-visible + .sw-opcion-articulo-cuerpo { outline: 3px solid rgba(13, 89, 106, .35); outline-offset: 2px; }
+.sw-estado-radio:disabled + .sw-opcion-articulo-cuerpo { opacity: .5; cursor: not-allowed; }
+.sw-opcion-articulo:has(.sw-estado-radio:disabled) { cursor: not-allowed; }
 .sw-opcion-articulo-img { width: 56px; height: 56px; border-radius: 8px; flex-shrink: 0; }
+.sw-opcion-articulo-marca {
+    margin-left: auto; padding-left: .5rem; font-size: 1.15rem; color: var(--sw-primario);
+    opacity: 0; transform: scale(.6); transition: opacity .15s ease, transform .15s ease;
+}
+.sw-estado-radio:checked + .sw-opcion-articulo-cuerpo .sw-opcion-articulo-marca { opacity: 1; transform: scale(1); }
+.sw-proponer-leyenda { float: none; width: auto; margin-bottom: .25rem; font-size: .9rem; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+    .sw-opcion-articulo-marca { transition: none; }
+}
 
 /* ---------- Página de error ---------- */
 .sw-error-pagina { max-width: 560px; }
@@ -1136,6 +1147,15 @@ a.sw-chip { color: var(--sw-texto); text-decoration: none; font-weight: 600; }
     font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--sw-secundario);
 }
 .sw-intercambio-foto { display: block; aspect-ratio: 16 / 10; border-radius: 12px; }
+.sw-intercambio-panel--varios:hover { background: var(--sw-fondo); }
+.sw-intercambio-item {
+    display: flex; align-items: center; gap: .85rem; min-width: 0;
+    padding: .5rem; border-radius: 12px; background: #fff; color: inherit; text-decoration: none;
+    transition: background var(--sw-transicion);
+}
+.sw-intercambio-item:hover { background: var(--sw-gris-claro); color: inherit; }
+.sw-intercambio-item:focus-visible { outline: 3px solid rgba(13, 89, 106, .35); outline-offset: 2px; }
+.sw-intercambio-item-img { width: 64px; height: 64px; border-radius: 10px; flex-shrink: 0; }
 .sw-intercambio-flechas {
     width: 52px; height: 52px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;

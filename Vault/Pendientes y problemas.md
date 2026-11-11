@@ -30,7 +30,7 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 - [[SP RegistrarArticulo]] recibe `@descripcion varchar(50)` (la columna es 500) y no carga `Ubicacion` ni `ACambio`.
 
 ## Base de datos y datos
-- `Usuarios.Telefono` pasó de `int` a `varchar(20)` el 08/11 (sin commit). En una base que ya existe hay que correr `ALTER TABLE Usuarios ALTER COLUMN Telefono varchar(20) NOT NULL` y volver a crear [[SP UpdateUsuario]] y [[SP RegistrarUsuario]] ([[Telefonos]]).
+- `Usuarios.Telefono` pasó de `int` a `varchar(20)` el 08/11. En una base que ya existe hay que correr [[Script TelefonoTexto.sql]] (11/11): cambia la columna, deja vacíos los teléfonos que habían quedado en 0 y vuelve a crear [[SP UpdateUsuario]] y [[SP RegistrarUsuario]] ([[Telefonos]]).
 - En una base creada antes del 29/10 hay que correr [[Script Notificaciones.sql]], [[Script Chat.sql]] y [[Script Cancelado.sql]] (tablas de notificaciones, mensajes de 500 caracteres con hora y el estado Cancelado).
 - Provincias repetidas (08/11): los scripts de creación ya traen 24. En una base que ya existe hay que correr [[Script ProvinciasDuplicadas.sql]] (pasa a los usuarios a la primera fila de su provincia y borra las repetidas).
 - Desde el 08/11 el registro pide provincia y barrio (Figma no los tiene). Los usuarios que ya se registraron quedaron en Buenos Aires con el barrio vacío: lo corrigen en Editar perfil.
@@ -38,9 +38,7 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 - El comentario de [[PublicarController]] y [[PerfilController]] dice que `Imagenes.Ruta` es `varchar(50)`, pero ya es `varchar(100)`.
 
 ## Código
-- "Mis artículos publicados" (Mi perfil) no muestra los artículos de intercambios aceptados, pero sí cuentan para el límite de 5 (08/11). Convendría mostrarlos con una marca "En intercambio".
-- Para decidir (08/11): elegir el barrio de una lista (tabla Barrios) y proponer varios artículos en un intercambio (tabla nueva para los ofrecidos).
-- La connection string está fija en [[BD]] (`Server=localhost`, autenticación de Windows); en otra compu hay que cambiarla a mano (hay una alternativa `.\SQLEXPRESS` comentada).
+- Para decidir (08/11): elegir el barrio de una lista (tabla Barrios). Proponer varios artículos ya está hecho (11/11, [[Tabla ArticulosIntercambios]]).- La connection string está fija en [[BD]] (`Server=localhost`, autenticación de Windows); en otra compu hay que cambiarla a mano (hay una alternativa `.\SQLEXPRESS` comentada).
 - [[Intercambios]] (modelo) no tiene la columna `Ubicacion` que sí tiene la tabla.
 - [[Usuarios]] ([[BD]].UpdateUsuario) actualiza también `Mail`, `Contraseña` y fecha de nacimiento con lo que traía el objeto: funciona porque [[PerfilController]] primero lee el usuario completo.
 - `bin/` y `obj/` están en git aunque el `.gitignore` los excluye (152 archivos): conviene `git rm -r --cached bin obj`.

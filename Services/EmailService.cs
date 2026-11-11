@@ -150,35 +150,36 @@ public class EmailService
     private static (string Asunto, string Titulo, string Texto, string Boton) Textos(string tipo, DatosMailNotificacion d)
     {
         string otro = string.IsNullOrWhiteSpace(d.OtroNombre) ? "Alguien" : d.OtroNombre;
-        string mio = d.MiArticulo ?? "tu artículo";
-        string suyo = d.SuArticulo ?? "su artículo";
+        string mio = Lista(d.MisArticulos);
+        string suyo = Lista(d.SusArticulos);
+        string tu = d.MisArticulos.Count > 1 ? "tus" : "tu";
 
         return tipo switch
         {
             TipoNotificaciones.PropuestaRecibida => (
                 $"{otro} te propuso un intercambio",
                 "Tenés una propuesta nueva",
-                $"{otro} quiere tu «{mio}» y te ofrece «{suyo}» a cambio. Mirá la propuesta y decidí si la aceptás.",
+                $"{otro} quiere {tu} {mio} y te ofrece {suyo} a cambio. Mirá la propuesta y decidí si la aceptás.",
                 "Ver propuesta"),
             TipoNotificaciones.PropuestaAceptada => (
                 $"{otro} aceptó tu propuesta",
                 "¡Aceptaron tu propuesta!",
-                $"{otro} aceptó cambiar «{suyo}» por tu «{mio}». Ahora coordinen por el chat dónde y cuándo hacer el intercambio.",
+                $"{otro} aceptó cambiar {suyo} por {tu} {mio}. Ahora coordinen por el chat dónde y cuándo hacer el intercambio.",
                 "Ver intercambio"),
             TipoNotificaciones.PropuestaRechazada => (
                 "Tu propuesta no fue aceptada",
                 "Tu propuesta no fue aceptada",
-                $"La propuesta de cambiar tu «{mio}» por «{suyo}» de {otro} fue rechazada. Podés seguir buscando otros artículos en Swappit.",
+                $"La propuesta de cambiar {tu} {mio} por {suyo} de {otro} fue rechazada. Podés seguir buscando otros artículos en Swappit.",
                 "Ver intercambio"),
             TipoNotificaciones.MensajeNuevo => (
                 $"{otro} te escribió en Swappit",
                 "Tenés mensajes nuevos",
-                $"{otro} te escribió sobre el intercambio de tu «{mio}» por «{suyo}».",
+                $"{otro} te escribió sobre el intercambio de {tu} {mio} por {suyo}.",
                 "Abrir chat"),
             TipoNotificaciones.IntercambioCancelado => (
                 $"{otro} canceló el intercambio",
                 "Se canceló un intercambio",
-                $"{otro} canceló el intercambio de tu «{mio}» por «{suyo}».",
+                $"{otro} canceló el intercambio de {tu} {mio} por {suyo}.",
                 "Ver intercambio"),
             _ => (
                 "Tenés una notificación nueva en Swappit",
@@ -186,6 +187,12 @@ public class EmailService
                 "Hay novedades en uno de tus intercambios.",
                 "Ver intercambio")
         };
+    }
+
+    private static string Lista(List<string> nombres)
+    {
+        List<string> citados = (nombres.Count > 0 ? nombres : new List<string> { "artículo" }).Select(n => $"«{n}»").ToList();
+        return citados.Count == 1 ? citados[0] : $"{string.Join(", ", citados.Take(citados.Count - 1))} y {citados[^1]}";
     }
 
     private static string TextoPlano(string saludo, string texto, string boton, string? link)

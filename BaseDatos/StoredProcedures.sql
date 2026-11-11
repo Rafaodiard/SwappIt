@@ -131,14 +131,12 @@ BEGIN
     END
 
     DECLARE @IdUsuarioRecibe INT, @EstadoIntercambio INT;
-    DECLARE @CategoriaArt1 INT, @Prioridad VARCHAR(20) = 'Prioridad Normal';
+    DECLARE @Prioridad VARCHAR(20) = 'Prioridad Normal';
 
     SELECT 
         @IdUsuarioRecibe = IdUsuarios2,
-        @EstadoIntercambio = Intercambios.IdEstado,
-        @CategoriaArt1 = a1.IdCategorias
+        @EstadoIntercambio = Intercambios.IdEstado
     FROM Intercambios 
-    INNER JOIN Articulos a1 ON Intercambios.IdArticulos1 = a1.IdArticulos
     WHERE Intercambios.IdIntercambios = @IdIntercambio;
 
     IF @EstadoIntercambio <> 1
@@ -148,8 +146,10 @@ BEGIN
     END
 
     IF EXISTS (
-        SELECT 1 FROM dbo.Articulos 
-        WHERE IdUsuarios = @IdUsuarioRecibe AND IdCategorias = @CategoriaArt1
+        SELECT 1 FROM dbo.ArticulosIntercambios ai
+        INNER JOIN dbo.Articulos ofrecido ON ofrecido.IdArticulos = ai.IdArticulo AND ofrecido.IdUsuarios <> @IdUsuarioRecibe
+        INNER JOIN dbo.Articulos a ON a.IdUsuarios = @IdUsuarioRecibe AND a.IdCategorias = ofrecido.IdCategorias
+        WHERE ai.IdIntercambio = @IdIntercambio
     )
     BEGIN
         SET @Prioridad = 'Alta Prioridad';
@@ -319,6 +319,7 @@ BEGIN
         u1.Usuario AS Usuario1,
         u2.Usuario AS Usuario2,
         a1.Nombre AS Articulo1,
+        a1.Cantidad AS CantidadOfrecidos,
         a2.Nombre AS Articulo2,
         DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) AS DiasTranscurridos,
         COUNT(m.IdMensajes) AS MensajesTotales,
@@ -331,12 +332,20 @@ BEGIN
     FROM dbo.Intercambios 
     INNER JOIN Usuarios u1 ON Intercambios.IdUsuarios1 = u1.IdUsuarios
     INNER JOIN Usuarios u2 ON Intercambios.IdUsuarios2 = u2.IdUsuarios
-    INNER JOIN Articulos a1 ON Intercambios.IdArticulos1 = a1.IdArticulos
-    INNER JOIN Articulos a2 ON Intercambios.IdArticulos2 = a2.IdArticulos
+    CROSS APPLY (SELECT TOP 1 a.Nombre, COUNT(*) OVER () AS Cantidad
+        FROM ArticulosIntercambios ai
+        INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+        WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios1
+        ORDER BY ai.Id) a1
+    CROSS APPLY (SELECT TOP 1 a.Nombre
+        FROM ArticulosIntercambios ai
+        INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
+        WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios2
+        ORDER BY ai.Id) a2
     LEFT JOIN Mensajes m ON Intercambios.IdIntercambios = m.IdIntercambio
     WHERE Intercambios.IdEstado = 1 -- Estado 1 = Pendiente
       AND DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) >= @AntiguedadMinimaDias
-    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a2.Nombre
+    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a1.Cantidad, a2.Nombre
     ORDER BY DiasTranscurridos DESC;
 
     IF @@ROWCOUNT = 0
@@ -484,10 +493,11 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
-		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
+			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
-				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
+				AND ai.IdArticulo = a.IdArticulos)
 	GROUP BY c.IdCategorias, c.Nombre
 	ORDER BY c.Nombre
 END
@@ -509,10 +519,11 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
-		AND NOT EXISTS (SELECT 1 FROM Intercambios ic
+		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
+			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN (SELECT value FROM STRING_SPLIT(@comprometidos, ','))
-				AND (ic.IdArticulos1 = a.IdArticulos OR ic.IdArticulos2 = a.IdArticulos))
+				AND ai.IdArticulo = a.IdArticulos)
 	GROUP BY e.IdEstadosArticulos, e.Nombre
 	ORDER BY e.IdEstadosArticulos
 END
@@ -714,13 +725,19 @@ BEGIN
                 BEGIN
                     IF @fecha < GETDATE() AND EXISTS (SELECT Nombre FROM EstadosIntercambios WHERE Nombre = @estado)
                     BEGIN
-                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2, IdArticulos1, IdArticulos2)
+                        SET XACT_ABORT ON
+                        BEGIN TRANSACTION
+                        INSERT INTO Intercambios (Fecha, IdEstado, IdUsuarios1, IdUsuarios2)
                         VALUES
                             (@fecha, (SELECT IdEstadosIntercambios FROM EstadosIntercambios WHERE Nombre = @estado),
                              (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario1),
-                             (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2),
-                             (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1),
-                             (SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2))
+                             (SELECT IdUsuarios FROM Usuarios WHERE Usuario = @Usuario2))
+                        DECLARE @idIntercambio int = SCOPE_IDENTITY()
+                        INSERT INTO ArticulosIntercambios (IdArticulo, IdIntercambio)
+                        VALUES
+                            ((SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo1), @idIntercambio),
+                            ((SELECT IdArticulos FROM Articulos WHERE Nombre = @Articulo2), @idIntercambio)
+                        COMMIT TRANSACTION
                     END
                 END
             END

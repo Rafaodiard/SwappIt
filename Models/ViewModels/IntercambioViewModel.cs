@@ -11,11 +11,15 @@ public class IntercambioViewModel
     public string MiArticuloNombre { get; set; } = "";
     public string MiArticuloEstado { get; set; } = "";
     public string? MiArticuloImagen { get; set; }
+    public int CantidadMios { get; set; }
+    public string MiArticuloResumen => Resumen(MiArticuloNombre, CantidadMios);
 
     public int SuArticuloId { get; set; }
     public string SuArticuloNombre { get; set; } = "";
     public string SuArticuloEstado { get; set; } = "";
     public string? SuArticuloImagen { get; set; }
+    public int CantidadSuyos { get; set; }
+    public string SuArticuloResumen => Resumen(SuArticuloNombre, CantidadSuyos);
 
     public int OtroIdUsuario { get; set; }
     public string? OtroNombre { get; set; }
@@ -23,4 +27,7 @@ public class IntercambioViewModel
     public string? OtroUsuario { get; set; }
     public string? OtroBarrio { get; set; }
     public string? OtroProvincia { get; set; }
+
+    private static string Resumen(string nombre, int cantidad) =>
+        cantidad > 1 ? $"{nombre} y {cantidad - 1} más" : nombre;
 }
