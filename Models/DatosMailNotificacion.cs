@@ -9,4 +9,7 @@ public class DatosMailNotificacion
 
     public List<string> MisArticulos { get; set; } = new List<string>();
     public List<string> SusArticulos { get; set; } = new List<string>();
+
+    public string? CambioTipo { get; set; }
+    public string? CambioArticulos { get; set; }
 }

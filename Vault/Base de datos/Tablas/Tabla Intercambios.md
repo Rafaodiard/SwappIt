@@ -24,7 +24,7 @@ tags:
 | IdUsuarios1, IdUsuarios2 | int NOT NULL, FK → [[Tabla Usuarios]] |
 | Ubicacion | varchar(50) NULL (punto de encuentro) |
 
-Quien propone queda en `IdUsuarios1` y el dueño del artículo pedido en `IdUsuarios2` ([[Flujo Proponer intercambio]]). Desde el 11/11 los artículos están en [[Tabla ArticulosIntercambios]] (antes eran `IdArticulos1` e `IdArticulos2`); [[Script ArticulosIntercambios.sql]] pasa una base vieja. Modelo: [[Intercambios]] (le falta `Ubicacion`, que no se usa). Para la pantalla se lee con [[BD.GetIntercambios()]] como [[IntercambioViewModel]].
+Quien propone queda en `IdUsuarios1` y el dueño del artículo pedido en `IdUsuarios2` ([[Flujo Proponer intercambio]]). Desde el 11/11 los artículos están en [[Tabla ArticulosIntercambios]] (antes eran `IdArticulos1` e `IdArticulos2`). Modelo: [[Intercambios]] (le falta `Ubicacion`, que no se usa). Para la pantalla se lee con [[BD.GetIntercambios()]] como [[IntercambioViewModel]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

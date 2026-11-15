@@ -32,3 +32,4 @@ tags:
 | 08/11 | El registro pide provincia (lista) y barrio (texto, igual que en Editar perfil) | Figma no los tiene; los pidió el feedback. Barrio de una lista queda para decidir (necesita tabla nueva) |
 | 08/11 | Header en celular: logo chico (`LogoSimple.png`) y "Cerrar sesión" en Mi perfil | Con el ícono de Mis intercambios no entraba en 320–375 px |
 | 05/11 | `SQLSwappit.sql` es el script base; los demás se generan iguales a él. Se agregó `Articulos.FechaPublicacion` (faltaba en SQLSwappit.sql) | Pedido de Rafael |
+| 14/11 | Sin scripts de migración: `BaseDatos/` tiene solo Estructura, Datos y StoredProcedures; se sacaron ArticulosIntercambios.sql, TelefonoTexto.sql y ProvinciasDuplicadas.sql | Pedido de Rafael: cada cambio va en los dos scripts principales y en esos tres; él actualiza su base por su cuenta |

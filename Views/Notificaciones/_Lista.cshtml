@@ -20,7 +20,9 @@
 
     void Item(NotificacionViewModel n)
     {
-        bool rechazo = n.Tipo == TipoNotificaciones.PropuestaRechazada || n.Tipo == TipoNotificaciones.IntercambioCancelado;
+        bool rechazo = n.Tipo == TipoNotificaciones.PropuestaRechazada || n.Tipo == TipoNotificaciones.IntercambioCancelado
+            || n.Tipo == TipoNotificaciones.CambioRechazado;
+        bool esSacar = n.CambioTipo == TipoCambios.Sacar;
         string icono = n.Tipo switch
         {
             TipoNotificaciones.PropuestaRecibida => "bi-arrow-left-right",
@@ -28,6 +30,11 @@
             TipoNotificaciones.PropuestaRechazada => "bi-x-lg",
             TipoNotificaciones.MensajeNuevo => "bi-chat-dots",
             TipoNotificaciones.IntercambioCancelado => "bi-x-circle",
+            TipoNotificaciones.ArticuloAgregado => "bi-plus-circle",
+            TipoNotificaciones.PedidoArticulo => "bi-question-circle",
+            TipoNotificaciones.PedidoSacar => "bi-dash-circle",
+            TipoNotificaciones.CambioAceptado => "bi-check-lg",
+            TipoNotificaciones.CambioRechazado => "bi-x-lg",
             _ => "bi-bell"
         };
         string accion = n.Tipo switch
@@ -35,6 +42,8 @@
             TipoNotificaciones.PropuestaAceptada => "Ver intercambio",
             TipoNotificaciones.MensajeNuevo => "Ver chat",
             TipoNotificaciones.IntercambioCancelado => "Ver intercambio",
+            TipoNotificaciones.PedidoArticulo or TipoNotificaciones.PedidoSacar => "Responder",
+            TipoNotificaciones.ArticuloAgregado or TipoNotificaciones.CambioAceptado or TipoNotificaciones.CambioRechazado => "Ver intercambio",
             _ => "Ver propuesta"
         };
 
@@ -58,6 +67,21 @@
                             break;
                         case TipoNotificaciones.IntercambioCancelado:
                             @:<strong>@n.OtroNombre</strong> canceló el intercambio de <strong>@n.ArticuloNombre</strong>.
+                            break;
+                        case TipoNotificaciones.ArticuloAgregado:
+                            @:<strong>@n.OtroNombre</strong> agregó <strong>@n.CambioArticulos</strong> al intercambio.
+                            break;
+                        case TipoNotificaciones.PedidoArticulo:
+                            @:<strong>@n.OtroNombre</strong> te pidió tu <strong>@n.CambioArticulos</strong>.
+                            break;
+                        case TipoNotificaciones.PedidoSacar:
+                            @:<strong>@n.OtroNombre</strong> quiere sacar su <strong>@n.CambioArticulos</strong> del intercambio.
+                            break;
+                        case TipoNotificaciones.CambioAceptado:
+                            @:<strong>@n.OtroNombre</strong> aceptó @(esSacar ? "que saques" : "sumar") <strong>@n.CambioArticulos</strong>.
+                            break;
+                        case TipoNotificaciones.CambioRechazado:
+                            @:<strong>@n.OtroNombre</strong> no aceptó @(esSacar ? "que saques" : "sumar") <strong>@n.CambioArticulos</strong>.
                             break;
                         default:
                             @:@n.Tipo

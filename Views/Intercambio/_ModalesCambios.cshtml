@@ -1,0 +1,87 @@
+@using Swappit.Models.ViewModels
+@{
+    IntercambioViewModel intercambio = ViewBag.intercambio;
+    bool puedeCambiar = ViewBag.puedeCambiar;
+    int lugarMio = ViewBag.lugarMio;
+    int lugarSuyo = ViewBag.lugarSuyo;
+    List<ArticuloCardViewModel> paraAgregar = ViewBag.paraAgregar;
+    List<ArticuloCardViewModel> paraPedir = ViewBag.paraPedir;
+
+    void Opcion(ArticuloCardViewModel articulo, string tipo, string nombre)
+    {
+        <label class="sw-opcion-articulo">
+            <input type="@tipo" class="sw-estado-radio" name="@nombre" value="@articulo.IdArticulos" required="@(tipo == "radio")">
+            <span class="sw-opcion-articulo-cuerpo">
+                <span class="sw-img sw-opcion-articulo-img">
+                    @if (!string.IsNullOrEmpty(articulo.Imagen))
+                    {
+                        <img src="@articulo.Imagen" alt="">
+                    }
+                </span>
+                <span class="min-w-0">
+                    <span class="d-block fw-semibold text-truncate">@articulo.Nombre</span>
+                    <span class="d-block text-suave small">@articulo.Estado</span>
+                </span>
+                <i class="bi bi-check-circle-fill sw-opcion-articulo-marca" aria-hidden="true"></i>
+            </span>
+        </label>
+    }
+}
+@if (puedeCambiar && lugarMio > 0 && paraAgregar.Count > 0)
+{
+    <!-- ===== Pop up: agregar artículos propios ===== -->
+    <div class="modal fade sw-modal" id="modal-agregar" tabindex="-1" aria-labelledby="titulo-agregar" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form class="modal-content" method="post" action="@Url.Action("AgregarArticulos", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true"
+                  data-proponer data-max-ofrecidos="@lugarMio">
+                <div class="modal-header">
+                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-agregar">Agregar de tus artículos</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-flex flex-column gap-3">
+                    <p class="sw-articulo-propio mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> Se suman enseguida. A @intercambio.OtroNombre le llega un aviso.</p>
+                    <fieldset class="d-flex flex-column gap-2" aria-describedby="agregar-contador">
+                        <legend class="sw-proponer-leyenda">@(lugarMio == 1 ? "Podés sumar 1 más" : $"Podés sumar hasta {lugarMio} más")</legend>
+                        @foreach (var articulo in paraAgregar)
+                        {
+                            Opcion(articulo, "checkbox", "idsArticulos");
+                        }
+                    </fieldset>
+                    <p class="sw-nota mb-0" id="agregar-contador" data-proponer-contador aria-live="polite">Elegí qué querés sumar.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="sw-btn sw-btn-solido">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+@if (puedeCambiar && lugarSuyo > 0 && paraPedir.Count > 0)
+{
+    <!-- ===== Pop up: pedirle un artículo al otro ===== -->
+    <div class="modal fade sw-modal" id="modal-pedir" tabindex="-1" aria-labelledby="titulo-pedir" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form class="modal-content" method="post" action="@Url.Action("PedirArticulo", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                <div class="modal-header">
+                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-pedir">Pedirle un artículo a @intercambio.OtroNombre</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-flex flex-column gap-3">
+                    <p class="sw-articulo-propio mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> @intercambio.OtroNombre tiene que aceptarlo para que se sume.</p>
+                    <fieldset class="d-flex flex-column gap-2">
+                        <legend class="sw-proponer-leyenda">Elegí un artículo</legend>
+                        @foreach (var articulo in paraPedir)
+                        {
+                            Opcion(articulo, "radio", "idArticulo");
+                        }
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="sw-btn sw-btn-solido">Pedir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

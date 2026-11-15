@@ -124,6 +124,33 @@ CREATE TABLE [dbo].[ArticulosIntercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[CambiosIntercambios]    Script Date: 14/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CambiosIntercambios](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdIntercambio] [int] NOT NULL,
+	[IdArticulo] [int] NOT NULL,
+	[IdUsuario] [int] NOT NULL,
+	[IdTipoCambio] [int] NOT NULL,
+	[IdEstado] [int] NOT NULL,
+	[Fecha] [datetime] NOT NULL,
+	[FechaRespuesta] [datetime] NULL,
+ CONSTRAINT [PK_CambiosIntercambios] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_CambiosIntercambios_IdIntercambio]    Script Date: 14/11/2026 12:00:00 ******/
+CREATE NONCLUSTERED INDEX [IX_CambiosIntercambios_IdIntercambio] ON [dbo].[CambiosIntercambios]
+(
+	[IdIntercambio] ASC,
+	[IdEstado] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Categorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -260,6 +287,7 @@ CREATE TABLE [dbo].[Notificaciones](
 	[IdTipoNotificacion] [int] NOT NULL,
 	[Leida] [bit] NOT NULL,
 	[Fecha] [datetime] NOT NULL,
+	[IdCambio] [int] NULL,
  CONSTRAINT [PK_Notificaciones] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -277,6 +305,20 @@ CREATE TABLE [dbo].[Provincias](
  CONSTRAINT [PK_Provincias] PRIMARY KEY CLUSTERED 
 (
 	[IdProvincia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TipoCambios]    Script Date: 14/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TipoCambios](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_TipoCambios] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -362,6 +404,31 @@ REFERENCES [dbo].[Intercambios] ([IdIntercambios])
 GO
 ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Intercambios]
 GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
+REFERENCES [dbo].[Articulos] ([IdArticulos])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Articulos]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_EstadosIntercambios] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosIntercambios] ([IdEstadosIntercambios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_EstadosIntercambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Intercambios] FOREIGN KEY([IdIntercambio])
+REFERENCES [dbo].[Intercambios] ([IdIntercambios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Intercambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_TipoCambios] FOREIGN KEY([IdTipoCambio])
+REFERENCES [dbo].[TipoCambios] ([Id])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_TipoCambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Usuarios] FOREIGN KEY([IdUsuario])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Usuarios]
+GO
 ALTER TABLE [dbo].[Imagenes]  WITH CHECK ADD  CONSTRAINT [FK_Imagenes_Articulos] FOREIGN KEY([IdArticulos])
 REFERENCES [dbo].[Articulos] ([IdArticulos])
 GO
@@ -416,6 +483,11 @@ ALTER TABLE [dbo].[Mensajes]  WITH CHECK ADD  CONSTRAINT [FK_Mensajes_Usuarios2]
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Mensajes] CHECK CONSTRAINT [FK_Mensajes_Usuarios2]
+GO
+ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_CambiosIntercambios] FOREIGN KEY([IdCambio])
+REFERENCES [dbo].[CambiosIntercambios] ([Id])
+GO
+ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_CambiosIntercambios]
 GO
 ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_Intercambios] FOREIGN KEY([IdIntercambio])
 REFERENCES [dbo].[Intercambios] ([IdIntercambios])

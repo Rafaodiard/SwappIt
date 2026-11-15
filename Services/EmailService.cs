@@ -69,7 +69,7 @@ public class EmailService
     {
         try
         {
-            DatosMailNotificacion? datos = BD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio);
+            DatosMailNotificacion? datos = BD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio, notificacion.IdCambio);
             if (datos == null || string.IsNullOrWhiteSpace(datos.Mail))
             {
                 _logger.LogWarning("El usuario {IdUsuario} no tiene mail: no se avisa la notificación del intercambio {IdIntercambio}",
@@ -153,6 +153,8 @@ public class EmailService
         string mio = Lista(d.MisArticulos);
         string suyo = Lista(d.SusArticulos);
         string tu = d.MisArticulos.Count > 1 ? "tus" : "tu";
+        string cambio = string.IsNullOrWhiteSpace(d.CambioArticulos) ? "un artículo" : d.CambioArticulos;
+        bool esSacar = d.CambioTipo == TipoCambios.Sacar;
 
         return tipo switch
         {
@@ -180,6 +182,31 @@ public class EmailService
                 $"{otro} canceló el intercambio",
                 "Se canceló un intercambio",
                 $"{otro} canceló el intercambio de {tu} {mio} por {suyo}.",
+                "Ver intercambio"),
+            TipoNotificaciones.ArticuloAgregado => (
+                $"{otro} agregó artículos a tu intercambio",
+                "Cambió un intercambio",
+                $"{otro} sumó {cambio} al intercambio. Ahora recibís {suyo} por {tu} {mio}.",
+                "Ver intercambio"),
+            TipoNotificaciones.PedidoArticulo => (
+                $"{otro} te pidió un artículo",
+                "Te pidieron un artículo",
+                $"{otro} te pidió tu {cambio} para sumarlo al intercambio. Entrá para aceptarlo o rechazarlo.",
+                "Responder"),
+            TipoNotificaciones.PedidoSacar => (
+                $"{otro} quiere sacar un artículo",
+                "Te piden sacar un artículo",
+                $"{otro} quiere sacar su {cambio} del intercambio. Entrá para aceptarlo o rechazarlo.",
+                "Responder"),
+            TipoNotificaciones.CambioAceptado => (
+                $"{otro} aceptó tu pedido",
+                "Aceptaron tu pedido",
+                esSacar ? $"{otro} aceptó que saques {cambio} del intercambio." : $"{otro} aceptó sumar {cambio} al intercambio.",
+                "Ver intercambio"),
+            TipoNotificaciones.CambioRechazado => (
+                $"{otro} no aceptó tu pedido",
+                "No aceptaron tu pedido",
+                esSacar ? $"{otro} no aceptó que saques {cambio} del intercambio." : $"{otro} no aceptó sumar {cambio} al intercambio.",
                 "Ver intercambio"),
             _ => (
                 "Tenés una notificación nueva en Swappit",

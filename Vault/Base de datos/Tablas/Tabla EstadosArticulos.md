@@ -18,7 +18,7 @@ tags:
 ---
 # Tabla EstadosArticulos
 
-`IdEstadosArticulos` (PK) y `Nombre`. Datos: 1 Como nuevo, 2 Muy buen estado, 3 Buen estado, 4 Usado (de mejor a peor; se ordena por id). Antes se llamaba `Estados` y `Articulos.Estado` era texto: [[Script Estados.sql]] migra bases viejas. Modelo: [[EstadosArticulos]].
+`IdEstadosArticulos` (PK) y `Nombre`. Datos: 1 Como nuevo, 2 Muy buen estado, 3 Buen estado, 4 Usado (de mejor a peor; se ordena por id). Antes se llamaba `Estados` y `Articulos.Estado` era texto. Modelo: [[EstadosArticulos]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

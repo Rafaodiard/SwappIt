@@ -1,3 +1,3 @@
 namespace Swappit.Models;
 
-public record NotificacionCreada(int IdUsuario, int IdIntercambio, string Tipo);
+public record NotificacionCreada(int IdUsuario, int IdIntercambio, string Tipo, int? IdCambio = null);

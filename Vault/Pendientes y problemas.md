@@ -30,9 +30,8 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 - [[SP RegistrarArticulo]] recibe `@descripcion varchar(50)` (la columna es 500) y no carga `Ubicacion` ni `ACambio`.
 
 ## Base de datos y datos
-- `Usuarios.Telefono` pasó de `int` a `varchar(20)` el 08/11. En una base que ya existe hay que correr [[Script TelefonoTexto.sql]] (11/11): cambia la columna, deja vacíos los teléfonos que habían quedado en 0 y vuelve a crear [[SP UpdateUsuario]] y [[SP RegistrarUsuario]] ([[Telefonos]]).
-- En una base creada antes del 29/10 hay que correr [[Script Notificaciones.sql]], [[Script Chat.sql]] y [[Script Cancelado.sql]] (tablas de notificaciones, mensajes de 500 caracteres con hora y el estado Cancelado).
-- Provincias repetidas (08/11): los scripts de creación ya traen 24. En una base que ya existe hay que correr [[Script ProvinciasDuplicadas.sql]] (pasa a los usuarios a la primera fila de su provincia y borra las repetidas).
+- Rafael actualiza su base por su cuenta con los scripts de creación (14/11, sin scripts de migración). Una base creada antes del 14/11 puede no tener: `Usuarios.Telefono` como `varchar(20)` (08/11, [[Telefonos]]), las 24 provincias sin repetir (08/11) y [[Tabla ArticulosIntercambios]] en lugar de `Intercambios.IdArticulos1` e `IdArticulos2` (11/11). Desde el 14/11 también hacen falta [[Tabla CambiosIntercambios]], [[Tabla TipoCambios]], `Notificaciones.IdCambio` y los tipos de notificación 6 a 10. La base de cada compu es aparte.
+- Cambiar un intercambio (14/11) compila y la pantalla se probó en una página aparte, pero todavía no se probó contra una base de verdad: falta la lista de prueba de `docs/superpowers/specs/2026-11-14-editar-intercambio-design.md`.
 - Desde el 08/11 el registro pide provincia y barrio (Figma no los tiene). Los usuarios que ya se registraron quedaron en Buenos Aires con el barrio vacío: lo corrigen en Editar perfil.
 - `wwwroot/img/perfiles/` está en `.gitignore`, pero las filas de [[Tabla Imagenes]] con la foto de perfil viajan en los scripts: en otra compu la foto no existe y se ven las iniciales (ej. usuario 2).
 - El comentario de [[PublicarController]] y [[PerfilController]] dice que `Imagenes.Ruta` es `varchar(50)`, pero ya es `varchar(100)`.

@@ -4,7 +4,6 @@ archivos:
   - "BaseDatos/Estructura.sql"
   - "SQLSwappit.sql"
   - "SQLSwappit_CualquierCompu.sql"
-  - "BaseDatos/ArticulosIntercambios.sql"
 tags:
   - tipo/tabla
 ---
@@ -22,4 +21,4 @@ Guarda todos los artículos de un intercambio, de los dos lados (11/11, pedido d
 
 Lo usan casi todas las consultas de intercambios de [[BD]]: la disponibilidad en el catálogo (`ArticuloDisponible`, `ArticuloNoIntercambiado`), [[BD.GetIntercambios()]] (primer artículo de cada lado + cantidad), [[BD.ProponerIntercambio()]], el control al aceptar y el rechazo automático de las otras propuestas ([[BD.CambiarEstadoIntercambio()]]), los mails y las notificaciones. También [[SP GetFiltroCategorias]], [[SP GetFiltroEstados]], [[SP RegistrarIntercambio]] y dos SP Complejos.
 
-Datos de prueba: los 26 intercambios son 52 filas (ofrecido y pedido, en ese orden). Para una base que ya existe: [[Script ArticulosIntercambios.sql]].
+Datos de prueba: los 26 intercambios son 52 filas (ofrecido y pedido, en ese orden).

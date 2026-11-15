@@ -1,5 +1,5 @@
 ﻿/****** 2 de 3: Datos insertados. Ejecutar después de Estructura.sql. ******/
-/****** Datos de prueba: los usuarios 3 a 12 y 14 a 43 (mails @example.com) con sus artículos, intercambios e interacciones. Sus contraseñas están en texto plano y se re-hashean en el primer login. Las fechas son relativas a GETDATE() para que siempre sean recientes. Los usuarios 2 y 13 son cuentas reales. ******/
+/****** Datos de prueba: los usuarios 3 a 12 y 14 a 45 (mails @example.com) con sus artículos, intercambios e interacciones. Los usuarios 44 (prueba.uno, contraseña SwappitPrueba1!) y 45 (prueba.dos, contraseña SwappitPrueba2!) tienen 4 artículos cada uno y ningún intercambio, para probar. Sus contraseñas están en texto plano y se re-hashean en el primer login. Las fechas son relativas a GETDATE() para que siempre sean recientes. Los usuarios 2 y 13 son cuentas reales. ******/
 USE [Base_De_Datos_Swappit]
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -64,6 +64,13 @@ INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (23, N'Tierra del Fue
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (24, N'Tucumán')
 SET IDENTITY_INSERT [dbo].[Provincias] OFF
 GO
+SET IDENTITY_INSERT [dbo].[TipoCambios] ON 
+
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (1, N'Agregar')
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (2, N'Sacar')
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (3, N'Pedir')
+SET IDENTITY_INSERT [dbo].[TipoCambios] OFF
+GO
 SET IDENTITY_INSERT [dbo].[TipoInteracciones] ON 
 
 INSERT [dbo].[TipoInteracciones] ([Id], [Nombre]) VALUES (1, N'Vista')
@@ -79,6 +86,11 @@ INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (2, N'Propuesta acepta
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (3, N'Propuesta rechazada')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (4, N'Mensaje nuevo')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (5, N'Intercambio cancelado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (6, N'Artículo agregado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (7, N'Pedido de artículo')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (8, N'Pedido para sacar')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (9, N'Cambio aceptado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (10, N'Cambio rechazado')
 SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 
@@ -125,6 +137,8 @@ INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], 
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (41, N'Brenda', N'Villalba', N'brenda.villalba', N'brenda.villalba@example.com', N'110000038', N'SwappitDemo38!', N'Corrientes', CAST(N'2003-05-20' AS Date), 23, 7, N'Estudio odontología en Corrientes. Me interesan la ropa y la música; cambio libros que ya leí.')
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (42, N'Maximiliano', N'Ledesma', N'maximiliano.ledesma', N'maximiliano.ledesma@example.com', N'110000039', N'SwappitDemo39!', N'Formosa', CAST(N'1999-01-09' AS Date), 27, 9, N'Trabajo en un estudio contable. Busco cosas para la casa y algún libro para leer en el colectivo.')
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (43, N'Celeste', N'Moreno', N'celeste.moreno', N'celeste.moreno@example.com', N'110000040', N'SwappitDemo40!', N'Ushuaia', CAST(N'2001-09-27' AS Date), 25, 23, N'En Ushuaia hace frío casi todo el año: busco ropa abrigada y cosas para la casa.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (44, N'Prueba', N'Uno', N'prueba.uno', N'prueba.uno@example.com', N'110000041', N'SwappitPrueba1!', N'Palermo', CAST(N'2000-05-10' AS Date), 26, 1, N'Usuario de prueba para probar intercambios.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (45, N'Prueba', N'Dos', N'prueba.dos', N'prueba.dos@example.com', N'110000042', N'SwappitPrueba2!', N'Caballito', CAST(N'2001-08-22' AS Date), 25, 1, N'Usuario de prueba para probar intercambios.')
 SET IDENTITY_INSERT [dbo].[Usuarios] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
@@ -240,6 +254,14 @@ INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [I
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (109, N'Jean recto talle 40', N'Azul clásico. Lo cambio porque ya no me entra.', 3, 30, 3, NULL, CAST(DATEADD(DAY, -3, GETDATE()) AS Date), 8)
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (110, N'Pack de remeras básicas talle M', N'Tres remeras lisas de algodón: blanca, negra y gris.', 2, 22, 3, NULL, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 5)
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (111, N'Notebook para estudiar', N'Core i3 y 8 GB de RAM. Anda bien para Office y navegar; la batería dura poco.', 4, 38, 1, NULL, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (112, N'Lámpara de escritorio', N'Lámpara de prueba. Brazo articulado, luz cálida.', 2, 44, 4, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (113, N'Libro de cocina', N'Libro de prueba con recetas fáciles.', 3, 44, 2, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 7)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (114, N'Auriculares con cable', N'Auriculares de prueba. Andan bien.', 4, 44, 11, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 3)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (115, N'Maceta grande', N'Maceta de prueba, de cerámica.', 1, 44, 13, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 9)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (116, N'Mochila', N'Mochila de prueba, con varios bolsillos.', 2, 45, 12, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (117, N'Juego de tazas', N'Juego de prueba de 4 tazas.', 3, 45, 7, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (118, N'Pelota de fútbol', N'Pelota de prueba, número 5.', 4, 45, 5, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 3)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (119, N'Cuadro decorativo', N'Cuadro de prueba, 40 x 50 cm.', 2, 45, 9, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 8)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Imagenes] ON 

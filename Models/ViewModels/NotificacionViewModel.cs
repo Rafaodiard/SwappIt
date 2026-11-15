@@ -10,4 +10,7 @@ public class NotificacionViewModel
 
     public string? OtroNombre { get; set; }
     public string? ArticuloNombre { get; set; }
+
+    public string? CambioTipo { get; set; }
+    public string? CambioArticulos { get; set; }
 }

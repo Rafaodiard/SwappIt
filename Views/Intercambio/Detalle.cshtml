@@ -1,4 +1,4 @@
-@using Swappit.Models
+﻿@using Swappit.Models
 @{
     Swappit.Models.ViewModels.IntercambioViewModel? intercambio = ViewBag.intercambio;
     bool errorCarga = ViewBag.errorCarga;
@@ -45,9 +45,76 @@
             : $"{string.Join(", ", articulos.Take(articulos.Count - 1).Select(a => a.Nombre))} y {articulos[^1].Nombre}";
     string tuMios = misArticulos.Count > 1 ? "tus" : "tu";
 
-    void PanelArticulos(string etiqueta, List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos, string deQuien)
+    List<Swappit.Models.ViewModels.CambioIntercambioViewModel> cambios = ViewBag.cambios;
+    bool puedeCambiar = ViewBag.puedeCambiar;
+    int ultimoCambio = ViewBag.ultimoCambio;
+    int lugarMio = ViewBag.lugarMio;
+    int lugarSuyo = ViewBag.lugarSuyo;
+    bool tengoPorResponder = ViewBag.tengoPorResponder;
+    bool hayPendientes = ViewBag.hayPendientes;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> paraAgregar = ViewBag.paraAgregar;
+    List<Swappit.Models.ViewModels.ArticuloCardViewModel> paraPedir = ViewBag.paraPedir;
+    List<Swappit.Models.ViewModels.CambioIntercambioViewModel> pendientes = cambios.Where(c => c.EsPendiente).ToList();
+    int otroId = intercambio.OtroIdUsuario;
+    string otroNombre = intercambio.OtroNombre ?? intercambio.OtroUsuario ?? "";
+    bool puedoSacar = misArticulos.Count - pendientes.Count(c => c.Tipo == TipoCambios.Sacar && c.IdDuenoArticulo != otroId) >= 2;
+
+    void Etiquetas(int idArticulo)
     {
-        if (articulos.Count == 1)
+        var pendiente = pendientes.FirstOrDefault(c => c.IdArticulo == idArticulo);
+        if (pendiente != null)
+        {
+            bool loHiceYo = pendiente.IdUsuario != otroId;
+            string que = pendiente.Tipo == TipoCambios.Pedir
+                ? (loHiceYo ? "Lo pediste" : $"{otroNombre} te lo pidió")
+                : (loHiceYo ? "Pediste sacarlo" : $"{otroNombre} quiere sacarlo");
+            <span class="d-block text-suave small mt-1">@que</span>
+            <span class="sw-cambio-etiqueta @(loHiceYo ? "sw-cambio-etiqueta--espera" : "sw-cambio-etiqueta--responder")">@(loHiceYo ? $"Esperando a {otroNombre}" : "Te toca responder")</span>
+            return;
+        }
+        var sumado = cambios.FirstOrDefault(c => c.IdArticulo == idArticulo && c.Estado == EstadosIntercambios.Aceptado
+            && (c.Tipo == TipoCambios.Agregar || c.Tipo == TipoCambios.Pedir));
+        if (sumado != null)
+        {
+            bool loHiceYo = sumado.IdUsuario != otroId;
+            string quien = sumado.Tipo == TipoCambios.Agregar
+                ? (loHiceYo ? "Lo agregaste vos" : $"Lo agregó {otroNombre}")
+                : (loHiceYo ? "Lo pediste vos" : $"Lo pidió {otroNombre}");
+            <span class="sw-cambio-etiqueta sw-cambio-etiqueta--info">@quien · @((sumado.FechaRespuesta ?? sumado.Fecha).ToString("dd/MM"))</span>
+        }
+    }
+
+    void AccionArticulo(int idArticulo, bool esMio)
+    {
+        if (!puedeCambiar)
+        {
+            return;
+        }
+        var pendiente = pendientes.FirstOrDefault(c => c.IdArticulo == idArticulo);
+        if (pendiente != null && pendiente.IdUsuario != otroId)
+        {
+            <!form method="post" action="@Url.Action("CancelarCambio", "Intercambio", new { id = intercambio.IdIntercambios })">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="idCambio" value="@pendiente.Id">
+                <button type="submit" class="sw-cambio-accion">@(pendiente.Tipo == TipoCambios.Sacar ? "Deshacer" : "Cancelar pedido")</button>
+            </!form>
+        }
+        else if (pendiente == null && esMio && puedoSacar)
+        {
+            <!form method="post" action="@Url.Action("SacarArticulo", "Intercambio", new { id = intercambio.IdIntercambios })">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="idArticulo" value="@idArticulo">
+                <button type="submit" class="sw-cambio-accion">Sacar</button>
+            </!form>
+        }
+    }
+
+    void PanelArticulos(string etiqueta, List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos, string deQuien, bool esMio)
+    {
+        var pedidos = pendientes.Where(c => c.Tipo == TipoCambios.Pedir && (c.IdDuenoArticulo != otroId) == esMio).ToList();
+        bool botonAgregar = puedeCambiar && (esMio ? lugarMio > 0 && paraAgregar.Count > 0 : lugarSuyo > 0 && paraPedir.Count > 0);
+        bool conCambios = puedeCambiar || pedidos.Count > 0 || cambios.Any(c => articulos.Any(a => a.IdArticulos == c.IdArticulo));
+        if (articulos.Count == 1 && !conCambios)
         {
             var articulo = articulos[0];
             <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="sw-intercambio-panel">
@@ -63,11 +130,12 @@
         else
         {
             <div class="sw-intercambio-panel sw-intercambio-panel--varios">
-                <span class="sw-intercambio-etiqueta">@etiqueta · @articulos.Count artículos</span>
+                <span class="sw-intercambio-etiqueta">@etiqueta · @(articulos.Count == 1 ? "1 artículo" : $"{articulos.Count} artículos")</span>
                 <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                     @foreach (var articulo in articulos)
                     {
-                        <li>
+                        bool conPendiente = pendientes.Any(c => c.IdArticulo == articulo.IdArticulos);
+                        <li class="sw-intercambio-fila @(conPendiente ? "sw-cambio-pendiente" : "")">
                             <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="sw-intercambio-item">
                                 <span class="sw-img sw-intercambio-item-img"><img src="@articulo.Imagen" alt=""></span>
                                 <span class="min-w-0">
@@ -76,11 +144,41 @@
                                         <span class="sw-articulo-estado">@articulo.Estado</span>
                                         <span class="text-suave">@deQuien</span>
                                     </span>
+                                    @{ Etiquetas(articulo.IdArticulos); }
                                 </span>
                             </a>
+                            @{ AccionArticulo(articulo.IdArticulos, esMio); }
+                        </li>
+                    }
+                    @foreach (var pedido in pedidos)
+                    {
+                        <li class="sw-intercambio-fila sw-cambio-pendiente">
+                            <a href="@Url.Action("Detalle", "Articulos", new { id = pedido.IdArticulo })" class="sw-intercambio-item">
+                                <span class="sw-img sw-intercambio-item-img">
+                                    @if (!string.IsNullOrEmpty(pedido.ArticuloImagen))
+                                    {
+                                        <img src="@pedido.ArticuloImagen" alt="">
+                                    }
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="d-block fw-bold text-truncate">@pedido.ArticuloNombre</span>
+                                    <span class="d-flex flex-wrap align-items-center gap-2 small mt-1">
+                                        <span class="sw-articulo-estado">@pedido.ArticuloEstado</span>
+                                        <span class="text-suave">@deQuien</span>
+                                    </span>
+                                    @{ Etiquetas(pedido.IdArticulo); }
+                                </span>
+                            </a>
+                            @{ AccionArticulo(pedido.IdArticulo, esMio); }
                         </li>
                     }
                 </ul>
+                @if (botonAgregar)
+                {
+                    <button type="button" class="sw-agregar-articulo mt-2" data-bs-toggle="modal" data-bs-target="@(esMio ? "#modal-agregar" : "#modal-pedir")">
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> @(esMio ? "Agregar de tus artículos" : $"Pedirle un artículo a {otroNombre}")
+                    </button>
+                }
             </div>
         }
     }
@@ -112,6 +210,8 @@
             <p class="text-suave mb-0">@intercambio.OtroNombre te ofrece @Nombres(susArticulos) por @tuMios @Nombres(misArticulos).</p>
         </header>
 
+        <div class="mx-auto sw-intercambio-propuesta"><partial name="_CajaCambios" /></div>
+
         <section class="sw-card p-4 p-lg-5 mx-auto sw-intercambio-propuesta" aria-label="Propuesta de intercambio">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-4 mb-4 border-bottom">
                 <div class="d-flex align-items-center gap-3 min-w-0">
@@ -126,10 +226,10 @@
                 <span class="text-suave small">Recibida el @fecha</span>
             </div>
 
-            <div class="sw-intercambio-articulos">
-                @{ PanelArticulos("Te ofrece", susArticulos, $"de @{intercambio.OtroUsuario}"); }
+            <div class="sw-intercambio-articulos @(puedeCambiar || cambios.Count > 0 ? "sw-intercambio-articulos--cambios" : "")">
+                @{ PanelArticulos("Te ofrece", susArticulos, $"de @{intercambio.OtroUsuario}", false); }
                 <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
-                @{ PanelArticulos(misArticulos.Count > 1 ? "Por tus" : "Por tu", misArticulos, "tuyo"); }
+                @{ PanelArticulos(misArticulos.Count > 1 ? "Por tus" : "Por tu", misArticulos, "tuyo", true); }
             </div>
 
             @if (articuloComprometido)
@@ -150,23 +250,34 @@
                     <a href="@Url.Action("Publico", "Perfil", new { id = intercambio.OtroIdUsuario })" class="fw-semibold text-decoration-none text-primario">Ver perfil de @intercambio.OtroNombre <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                     <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="fw-semibold text-decoration-none text-primario"><i class="bi bi-chat-dots" aria-hidden="true"></i> Preguntarle algo</a>
                 </div>
-                <div class="d-flex gap-2">
-                    <form method="post" action="@Url.Action("Rechazar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
-                        <button type="submit" class="btn btn-sw-outline-secundario w-100">Rechazar</button>
-                    </form>
-                    @if (confirmarAceptar)
-                    {
-                        <button type="button" class="btn btn-sw-primario flex-fill" data-bs-toggle="modal" data-bs-target="#modal-confirmar-aceptar">Aceptar intercambio</button>
-                    }
-                    else
-                    {
-                        <form method="post" action="@Url.Action("Aceptar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
-                            <button type="submit" class="btn btn-sw-primario w-100" disabled="@articuloComprometido">Aceptar intercambio</button>
+                <div class="d-flex flex-column align-items-sm-end gap-2">
+                    <div class="d-flex gap-2 w-100">
+                        <form method="post" action="@Url.Action("Rechazar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
+                            <button type="submit" class="btn btn-sw-outline-secundario w-100">Rechazar</button>
                         </form>
+                        @if (confirmarAceptar)
+                        {
+                            <button type="button" class="btn btn-sw-primario flex-fill" data-bs-toggle="modal" data-bs-target="#modal-confirmar-aceptar"
+                                    disabled="@tengoPorResponder" aria-describedby="@(tengoPorResponder ? "aceptar-bloqueado" : null)">Aceptar intercambio</button>
+                        }
+                        else
+                        {
+                            <form method="post" action="@Url.Action("Aceptar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true" class="flex-fill">
+                                <input type="hidden" name="ultimoCambio" value="@ultimoCambio">
+                                <button type="submit" class="btn btn-sw-primario w-100" disabled="@(articuloComprometido || tengoPorResponder)"
+                                        aria-describedby="@(tengoPorResponder ? "aceptar-bloqueado" : null)">Aceptar intercambio</button>
+                            </form>
+                        }
+                    </div>
+                    @if (tengoPorResponder)
+                    {
+                        <span class="text-suave small" id="aceptar-bloqueado">Respondé los cambios de @otroNombre antes de aceptar.</span>
                     }
                 </div>
             </div>
         </section>
+
+        <div class="mx-auto sw-intercambio-propuesta mt-4"><partial name="_HistorialCambios" /></div>
 
         @if (confirmarAceptar)
         {
@@ -174,6 +285,7 @@
             <div class="modal fade sw-modal" id="modal-confirmar-aceptar" tabindex="-1" aria-labelledby="titulo-confirmar-aceptar" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <form class="modal-content" method="post" action="@Url.Action("Aceptar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                        <input type="hidden" name="ultimoCambio" value="@ultimoCambio">
                         <div class="modal-header">
                             <h2 class="modal-title font-titulo h3 mb-0" id="titulo-confirmar-aceptar">¿Aceptar este intercambio?</h2>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -209,8 +321,9 @@
         </header>
 
         <div class="row g-4">
-            <div class="col-lg-8">
-                <section class="sw-card p-4 h-100" aria-label="Detalle del intercambio">
+            <div class="col-lg-8 d-flex flex-column">
+                <partial name="_CajaCambios" />
+                <section class="sw-card p-4 flex-grow-1" aria-label="Detalle del intercambio">
                     <ol class="sw-avance pb-4 mb-4 border-bottom">
                         <li class="sw-avance-paso hecho">
                             <span class="sw-avance-icono" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
@@ -236,10 +349,10 @@
                         }
                     </ol>
 
-                    <div class="sw-intercambio-articulos">
-                        @{ PanelArticulos("Vos das", misArticulos, "tuyo"); }
+                    <div class="sw-intercambio-articulos @(puedeCambiar || cambios.Count > 0 ? "sw-intercambio-articulos--cambios" : "")">
+                        @{ PanelArticulos("Vos das", misArticulos, "tuyo", true); }
                         <span class="sw-intercambio-flechas" aria-hidden="true"><i class="bi bi-arrow-left-right"></i></span>
-                        @{ PanelArticulos("Recibís", susArticulos, $"de @{intercambio.OtroUsuario}"); }
+                        @{ PanelArticulos("Recibís", susArticulos, $"de @{intercambio.OtroUsuario}", false); }
                     </div>
                 </section>
             </div>
@@ -259,6 +372,8 @@
                     <a href="@Url.Action("Publico", "Perfil", new { id = intercambio.OtroIdUsuario })" class="fw-semibold text-decoration-none text-primario small">Ver perfil <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                 </section>
 
+                <partial name="_HistorialCambios" />
+
                 <section class="sw-card p-4" aria-labelledby="titulo-proximos-pasos">
                     <h2 class="h6 fw-bold mb-3" id="titulo-proximos-pasos">Próximos pasos</h2>
                     @if (estado == EstadosIntercambios.Pendiente)
@@ -274,8 +389,13 @@
                         <div class="d-flex flex-column gap-2">
                             <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn btn-sw-primario"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
                             <form method="post" action="@Url.Action("MarcarRealizado", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
-                                <button type="submit" class="btn btn-sw-outline w-100">Marcar como realizado</button>
+                                <button type="submit" class="btn btn-sw-outline w-100" disabled="@hayPendientes"
+                                        aria-describedby="@(hayPendientes ? "realizado-bloqueado" : null)">Marcar como realizado</button>
                             </form>
+                            @if (hayPendientes)
+                            {
+                                <span class="text-suave small" id="realizado-bloqueado">Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.</span>
+                            }
                             <button type="button" class="btn btn-sw-outline-secundario" data-bs-toggle="modal" data-bs-target="#modal-cancelar">Cancelar intercambio</button>
                         </div>
                     }
@@ -321,4 +441,10 @@
             </div>
         }
     }
+
+    <partial name="_ModalesCambios" />
 </div>
+
+@section Scripts {
+    <script src="~/js/articulo.js" asp-append-version="true"></script>
+}

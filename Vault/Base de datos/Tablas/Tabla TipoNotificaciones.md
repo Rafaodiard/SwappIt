@@ -17,7 +17,7 @@ tags:
 ---
 # Tabla TipoNotificaciones
 
-`Id` (PK), `Nombre` varchar(50). Cinco tipos: Propuesta recibida, Propuesta aceptada, Propuesta rechazada, Mensaje nuevo e Intercambio cancelado (el último lo agrega [[Script Cancelado.sql]] en bases viejas). Modelo: [[TipoNotificaciones]].
+`Id` (PK), `Nombre` varchar(50). Diez tipos: Propuesta recibida, Propuesta aceptada, Propuesta rechazada, Mensaje nuevo, Intercambio cancelado y, desde el 14/11, Artículo agregado, Pedido de artículo, Pedido para sacar, Cambio aceptado y Cambio rechazado ([[Tabla CambiosIntercambios]]). Modelo: [[TipoNotificaciones]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

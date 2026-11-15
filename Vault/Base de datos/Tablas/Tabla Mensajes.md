@@ -16,7 +16,7 @@ tags:
 ---
 # Tabla Mensajes
 
-`IdMensajes` (PK), `Texto` varchar(**500**), `fueVisto` bit, `FechaEnviado` datetime, `FechaRecibido` datetime NULL, `IdUsuariosManda` (FK → [[Tabla Usuarios]]), `IdIntercambio` (FK → [[Tabla Intercambios]]). Cada chat es de un intercambio ([[Flujo Chat]]). En bases creadas antes del chat hay que correr [[Script Chat.sql]] (de 50 a 500 caracteres y de date a datetime). Modelo: [[Mensajes]].
+`IdMensajes` (PK), `Texto` varchar(**500**), `fueVisto` bit, `FechaEnviado` datetime, `FechaRecibido` datetime NULL, `IdUsuariosManda` (FK → [[Tabla Usuarios]]), `IdIntercambio` (FK → [[Tabla Intercambios]]). Cada chat es de un intercambio ([[Flujo Chat]]). Modelo: [[Mensajes]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

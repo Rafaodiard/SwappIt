@@ -143,6 +143,33 @@ CREATE TABLE [dbo].[ArticulosIntercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[CambiosIntercambios]    Script Date: 14/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CambiosIntercambios](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdIntercambio] [int] NOT NULL,
+	[IdArticulo] [int] NOT NULL,
+	[IdUsuario] [int] NOT NULL,
+	[IdTipoCambio] [int] NOT NULL,
+	[IdEstado] [int] NOT NULL,
+	[Fecha] [datetime] NOT NULL,
+	[FechaRespuesta] [datetime] NULL,
+ CONSTRAINT [PK_CambiosIntercambios] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_CambiosIntercambios_IdIntercambio]    Script Date: 14/11/2026 12:00:00 ******/
+CREATE NONCLUSTERED INDEX [IX_CambiosIntercambios_IdIntercambio] ON [dbo].[CambiosIntercambios]
+(
+	[IdIntercambio] ASC,
+	[IdEstado] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Categorias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -279,6 +306,7 @@ CREATE TABLE [dbo].[Notificaciones](
 	[IdTipoNotificacion] [int] NOT NULL,
 	[Leida] [bit] NOT NULL,
 	[Fecha] [datetime] NOT NULL,
+	[IdCambio] [int] NULL,
  CONSTRAINT [PK_Notificaciones] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -296,6 +324,20 @@ CREATE TABLE [dbo].[Provincias](
  CONSTRAINT [PK_Provincias] PRIMARY KEY CLUSTERED 
 (
 	[IdProvincia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TipoCambios]    Script Date: 14/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TipoCambios](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_TipoCambios] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -351,7 +393,7 @@ CREATE TABLE [dbo].[Usuarios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Datos de prueba: los usuarios 3 a 12 y 14 a 43 (mails @example.com) con sus artículos, intercambios e interacciones. Sus contraseñas están en texto plano y se re-hashean en el primer login. Las fechas son relativas a GETDATE() para que siempre sean recientes. Los usuarios 2 y 13 son cuentas reales. ******/
+/****** Datos de prueba: los usuarios 3 a 12 y 14 a 45 (mails @example.com) con sus artículos, intercambios e interacciones. Los usuarios 44 (prueba.uno, contraseña SwappitPrueba1!) y 45 (prueba.dos, contraseña SwappitPrueba2!) tienen 4 artículos cada uno y ningún intercambio, para probar. Sus contraseñas están en texto plano y se re-hashean en el primer login. Las fechas son relativas a GETDATE() para que siempre sean recientes. Los usuarios 2 y 13 son cuentas reales. ******/
 SET IDENTITY_INSERT [dbo].[Articulos] ON 
 
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (1, N'Microondas 20 L', N'Funciona perfecto, poco uso', 2, 3, 10, NULL, CAST(DATEADD(DAY, -68, GETDATE()) AS Date), 7)
@@ -465,6 +507,14 @@ INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [I
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (109, N'Jean recto talle 40', N'Azul clásico. Lo cambio porque ya no me entra.', 3, 30, 3, NULL, CAST(DATEADD(DAY, -3, GETDATE()) AS Date), 8)
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (110, N'Pack de remeras básicas talle M', N'Tres remeras lisas de algodón: blanca, negra y gris.', 2, 22, 3, NULL, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 5)
 INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (111, N'Notebook para estudiar', N'Core i3 y 8 GB de RAM. Anda bien para Office y navegar; la batería dura poco.', 4, 38, 1, NULL, CAST(DATEADD(DAY, -2, GETDATE()) AS Date), 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (112, N'Lámpara de escritorio', N'Lámpara de prueba. Brazo articulado, luz cálida.', 2, 44, 4, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 1)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (113, N'Libro de cocina', N'Libro de prueba con recetas fáciles.', 3, 44, 2, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 7)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (114, N'Auriculares con cable', N'Auriculares de prueba. Andan bien.', 4, 44, 11, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 3)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (115, N'Maceta grande', N'Maceta de prueba, de cerámica.', 1, 44, 13, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 9)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (116, N'Mochila', N'Mochila de prueba, con varios bolsillos.', 2, 45, 12, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 5)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (117, N'Juego de tazas', N'Juego de prueba de 4 tazas.', 3, 45, 7, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 4)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (118, N'Pelota de fútbol', N'Pelota de prueba, número 5.', 4, 45, 5, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 3)
+INSERT [dbo].[Articulos] ([IdArticulos], [Nombre], [Descripcion], [IdEstado], [IdUsuarios], [IdCategorias], [Ubicacion], [FechaPublicacion], [IdCategoriaACambio]) VALUES (119, N'Cuadro decorativo', N'Cuadro de prueba, 40 x 50 cm.', 2, 45, 9, NULL, CAST(DATEADD(DAY, -1, GETDATE()) AS Date), 8)
 SET IDENTITY_INSERT [dbo].[Articulos] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Categorias] ON 
@@ -1277,6 +1327,13 @@ INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (23, N'Tierra del Fue
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (24, N'Tucumán')
 SET IDENTITY_INSERT [dbo].[Provincias] OFF
 GO
+SET IDENTITY_INSERT [dbo].[TipoCambios] ON 
+
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (1, N'Agregar')
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (2, N'Sacar')
+INSERT [dbo].[TipoCambios] ([Id], [Nombre]) VALUES (3, N'Pedir')
+SET IDENTITY_INSERT [dbo].[TipoCambios] OFF
+GO
 SET IDENTITY_INSERT [dbo].[TipoInteracciones] ON 
 
 INSERT [dbo].[TipoInteracciones] ([Id], [Nombre]) VALUES (1, N'Vista')
@@ -1292,6 +1349,11 @@ INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (2, N'Propuesta acepta
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (3, N'Propuesta rechazada')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (4, N'Mensaje nuevo')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (5, N'Intercambio cancelado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (6, N'Artículo agregado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (7, N'Pedido de artículo')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (8, N'Pedido para sacar')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (9, N'Cambio aceptado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (10, N'Cambio rechazado')
 SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 
@@ -1338,6 +1400,8 @@ INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], 
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (41, N'Brenda', N'Villalba', N'brenda.villalba', N'brenda.villalba@example.com', N'110000038', N'SwappitDemo38!', N'Corrientes', CAST(N'2003-05-20' AS Date), 23, 7, N'Estudio odontología en Corrientes. Me interesan la ropa y la música; cambio libros que ya leí.')
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (42, N'Maximiliano', N'Ledesma', N'maximiliano.ledesma', N'maximiliano.ledesma@example.com', N'110000039', N'SwappitDemo39!', N'Formosa', CAST(N'1999-01-09' AS Date), 27, 9, N'Trabajo en un estudio contable. Busco cosas para la casa y algún libro para leer en el colectivo.')
 INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (43, N'Celeste', N'Moreno', N'celeste.moreno', N'celeste.moreno@example.com', N'110000040', N'SwappitDemo40!', N'Ushuaia', CAST(N'2001-09-27' AS Date), 25, 23, N'En Ushuaia hace frío casi todo el año: busco ropa abrigada y cosas para la casa.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (44, N'Prueba', N'Uno', N'prueba.uno', N'prueba.uno@example.com', N'110000041', N'SwappitPrueba1!', N'Palermo', CAST(N'2000-05-10' AS Date), 26, 1, N'Usuario de prueba para probar intercambios.')
+INSERT [dbo].[Usuarios] ([IdUsuarios], [Nombre], [Apellido], [Usuario], [Mail], [Telefono], [Contraseña], [Barrio], [Fecha nacimiento], [Edad], [IdProvincias], [Descripcion]) VALUES (45, N'Prueba', N'Dos', N'prueba.dos', N'prueba.dos@example.com', N'110000042', N'SwappitPrueba2!', N'Caballito', CAST(N'2001-08-22' AS Date), 25, 1, N'Usuario de prueba para probar intercambios.')
 SET IDENTITY_INSERT [dbo].[Usuarios] OFF
 GO
 ALTER TABLE [dbo].[Articulos]  WITH CHECK ADD  CONSTRAINT [FK_Articulos_Categorias] FOREIGN KEY([IdCategorias])
@@ -1369,6 +1433,31 @@ ALTER TABLE [dbo].[ArticulosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_Articu
 REFERENCES [dbo].[Intercambios] ([IdIntercambios])
 GO
 ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Intercambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
+REFERENCES [dbo].[Articulos] ([IdArticulos])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Articulos]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_EstadosIntercambios] FOREIGN KEY([IdEstado])
+REFERENCES [dbo].[EstadosIntercambios] ([IdEstadosIntercambios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_EstadosIntercambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Intercambios] FOREIGN KEY([IdIntercambio])
+REFERENCES [dbo].[Intercambios] ([IdIntercambios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Intercambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_TipoCambios] FOREIGN KEY([IdTipoCambio])
+REFERENCES [dbo].[TipoCambios] ([Id])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_TipoCambios]
+GO
+ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Usuarios] FOREIGN KEY([IdUsuario])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[CambiosIntercambios] CHECK CONSTRAINT [FK_CambiosIntercambios_Usuarios]
 GO
 ALTER TABLE [dbo].[Imagenes]  WITH CHECK ADD  CONSTRAINT [FK_Imagenes_Articulos] FOREIGN KEY([IdArticulos])
 REFERENCES [dbo].[Articulos] ([IdArticulos])
@@ -1424,6 +1513,11 @@ ALTER TABLE [dbo].[Mensajes]  WITH CHECK ADD  CONSTRAINT [FK_Mensajes_Usuarios2]
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Mensajes] CHECK CONSTRAINT [FK_Mensajes_Usuarios2]
+GO
+ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_CambiosIntercambios] FOREIGN KEY([IdCambio])
+REFERENCES [dbo].[CambiosIntercambios] ([Id])
+GO
+ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_CambiosIntercambios]
 GO
 ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificaciones_Intercambios] FOREIGN KEY([IdIntercambio])
 REFERENCES [dbo].[Intercambios] ([IdIntercambios])

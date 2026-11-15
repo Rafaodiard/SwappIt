@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Swappit.Models.ViewModels;
@@ -7,8 +7,8 @@ namespace Swappit.Models;
 
 public static class BD
 {
-    private static string _connectionString = @"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
-    //@"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
+    private static string _connectionString = //@"Server=localhost; DataBase=Base_De_Datos_Swappit; Integrated Security=True; TrustServerCertificate=True;";
+    @"Server=.\SQLEXPRESS;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;";
 
     public static Usuarios? GetUsuarioByMail(string mail)
     {
@@ -510,13 +510,16 @@ public static class BD
     }
 
     public static bool CambiarEstadoIntercambio(int idIntercambio, int idUsuario, string estadoActual, string estadoNuevo,
-        bool soloQuienRecibe, string? tipoNotificacion = null, List<NotificacionCreada>? creadas = null)
+        bool soloQuienRecibe, string? tipoNotificacion = null, List<NotificacionCreada>? creadas = null, int? ultimoCambioVisto = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             using (SqlTransaction transaccion = connection.BeginTransaction())
             {
+                connection.Execute("SELECT 1 FROM Intercambios WITH (UPDLOCK, HOLDLOCK) WHERE IdIntercambios = @pId",
+                    new { pId = idIntercambio }, transaccion);
+
                 string query = $@"UPDATE i SET i.IdEstado = nuevo.IdEstadosIntercambios
                     OUTPUT CASE WHEN INSERTED.IdUsuarios1 = @pIdUsuario THEN INSERTED.IdUsuarios2 ELSE INSERTED.IdUsuarios1 END
                     FROM Intercambios i
@@ -524,7 +527,15 @@ public static class BD
                     INNER JOIN EstadosIntercambios nuevo ON nuevo.Nombre = @pNuevo
                     WHERE i.IdIntercambios = @pId AND actual.Nombre = @pActual
                         AND (i.IdUsuarios2 = @pIdUsuario OR (@pSoloQuienRecibe = 0 AND i.IdUsuarios1 = @pIdUsuario))
-                        AND (@pNuevo <> @pAceptado OR NOT {ArticuloComprometidoEnOtro})";
+                        AND (@pNuevo <> @pAceptado OR NOT {ArticuloComprometidoEnOtro})
+                        AND (@pNuevo <> @pRealizado OR NOT EXISTS (SELECT 1 FROM CambiosIntercambios cr
+                            INNER JOIN EstadosIntercambios er ON er.IdEstadosIntercambios = cr.IdEstado
+                            WHERE cr.IdIntercambio = i.IdIntercambios AND er.Nombre = @pPendiente))
+                        AND (@pNuevo <> @pAceptado OR (NOT EXISTS (SELECT 1 FROM CambiosIntercambios cr
+                                INNER JOIN EstadosIntercambios er ON er.IdEstadosIntercambios = cr.IdEstado
+                                WHERE cr.IdIntercambio = i.IdIntercambios AND er.Nombre = @pPendiente AND cr.IdUsuario <> @pIdUsuario)
+                            AND NOT EXISTS (SELECT 1 FROM CambiosIntercambios cu
+                                WHERE cu.IdIntercambio = i.IdIntercambios AND cu.Id > ISNULL(@pUltimoCambio, 0))))";
                 int? idOtro = connection.QueryFirstOrDefault<int?>(query, new
                 {
                     pId = idIntercambio,
@@ -533,6 +544,9 @@ public static class BD
                     pNuevo = estadoNuevo,
                     pSoloQuienRecibe = soloQuienRecibe,
                     pAceptado = EstadosIntercambios.Aceptado,
+                    pRealizado = EstadosIntercambios.Realizado,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pUltimoCambio = ultimoCambioVisto,
                     pComprometidos = EstadosComprometidos
                 }, transaccion);
 
@@ -629,6 +643,314 @@ public static class BD
         }
     }
 
+    // ---------- Cambios de un intercambio ----------
+
+    private static readonly string[] EstadosVigentes = { EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado };
+
+    private const string SinCambioPendiente = @"NOT EXISTS (SELECT 1 FROM CambiosIntercambios cx
+        INNER JOIN EstadosIntercambios ex ON ex.IdEstadosIntercambios = cx.IdEstado
+        WHERE cx.IdIntercambio = @pId AND cx.IdArticulo = a.IdArticulos AND ex.Nombre = @pPendiente)";
+
+    private const string EnElIntercambio = "EXISTS (SELECT 1 FROM ArticulosIntercambios ae WHERE ae.IdIntercambio = @pId AND ae.IdArticulo = a.IdArticulos)";
+
+    private static string ConfirmadosDe(string dueno) => $@"(SELECT COUNT(*) FROM ArticulosIntercambios ac
+        INNER JOIN Articulos xa ON xa.IdArticulos = ac.IdArticulo
+        WHERE ac.IdIntercambio = @pId AND xa.IdUsuarios = {dueno})";
+
+    private static string PendientesDe(string dueno, string tipo) => $@"(SELECT COUNT(*) FROM CambiosIntercambios cp
+        INNER JOIN Articulos xp ON xp.IdArticulos = cp.IdArticulo
+        INNER JOIN TipoCambios tp ON tp.Id = cp.IdTipoCambio
+        INNER JOIN EstadosIntercambios ep ON ep.IdEstadosIntercambios = cp.IdEstado
+        WHERE cp.IdIntercambio = @pId AND xp.IdUsuarios = {dueno} AND tp.Nombre = {tipo} AND ep.Nombre = @pPendiente)";
+
+    private const string InsertarCambio = @"INSERT INTO CambiosIntercambios (IdIntercambio, IdArticulo, IdUsuario, IdTipoCambio, IdEstado, Fecha)
+        OUTPUT INSERTED.Id, INSERTED.IdArticulo
+        SELECT @pId, a.IdArticulos, @pIdUsuario,
+            (SELECT t.Id FROM TipoCambios t WHERE t.Nombre = @pTipo),
+            (SELECT e.IdEstadosIntercambios FROM EstadosIntercambios e WHERE e.Nombre = @pEstadoCambio),
+            @pAhora
+        FROM Articulos a";
+
+    private static (int IdOtro, string Estado)? GetIntercambioVigente(SqlConnection connection, SqlTransaction transaccion, int idIntercambio, int idUsuario)
+    {
+        string query = @"SELECT CASE WHEN i.IdUsuarios1 = @pIdUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END AS IdOtro, e.Nombre AS Estado
+            FROM Intercambios i WITH (UPDLOCK, HOLDLOCK)
+            INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+            WHERE i.IdIntercambios = @pId AND e.Nombre IN @pVigentes AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)";
+        var filas = connection.Query<(int IdOtro, string Estado)>(query,
+            new { pId = idIntercambio, pIdUsuario = idUsuario, pVigentes = EstadosVigentes }, transaccion).ToList();
+        return filas.Count == 0 ? null : filas[0];
+    }
+
+    public static List<CambioIntercambioViewModel> GetCambiosIntercambio(int idIntercambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"SELECT c.Id, c.IdArticulo, a.Nombre AS ArticuloNombre,
+                    (SELECT TOP 1 im.Ruta FROM Imagenes im WHERE im.IdArticulos = a.IdArticulos ORDER BY im.IdImagenes) AS ArticuloImagen,
+                    ea.Nombre AS ArticuloEstado, a.IdUsuarios AS IdDuenoArticulo, c.IdUsuario, u.Nombre AS UsuarioNombre,
+                    tc.Nombre AS Tipo, ec.Nombre AS Estado, c.Fecha, c.FechaRespuesta,
+                    CAST(CASE WHEN ei.Nombre IN @pVigentes THEN 1 ELSE 0 END AS bit) AS Vigente
+                FROM CambiosIntercambios c
+                INNER JOIN Intercambios i ON i.IdIntercambios = c.IdIntercambio
+                INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                INNER JOIN Articulos a ON a.IdArticulos = c.IdArticulo
+                INNER JOIN EstadosArticulos ea ON ea.IdEstadosArticulos = a.IdEstado
+                INNER JOIN Usuarios u ON u.IdUsuarios = c.IdUsuario
+                INNER JOIN TipoCambios tc ON tc.Id = c.IdTipoCambio
+                INNER JOIN EstadosIntercambios ec ON ec.IdEstadosIntercambios = c.IdEstado
+                WHERE c.IdIntercambio = @pId AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)
+                ORDER BY c.Fecha DESC, c.Id DESC";
+            return connection.Query<CambioIntercambioViewModel>(query,
+                new { pId = idIntercambio, pIdUsuario = idUsuario, pVigentes = EstadosVigentes }).ToList();
+        }
+    }
+
+    public static int GetUltimoCambio(int idIntercambio)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            return connection.ExecuteScalar<int>("SELECT ISNULL(MAX(Id), 0) FROM CambiosIntercambios WHERE IdIntercambio = @pId",
+                new { pId = idIntercambio });
+        }
+    }
+
+    public static int AgregarArticulos(int idIntercambio, int idUsuario, IReadOnlyCollection<int> idsArticulos,
+        List<NotificacionCreada>? creadas = null)
+    {
+        List<int> ids = idsArticulos.Distinct().ToList();
+        if (ids.Count == 0)
+        {
+            return 0;
+        }
+
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                var intercambio = GetIntercambioVigente(connection, transaccion, idIntercambio, idUsuario);
+                if (intercambio == null)
+                {
+                    return 0;
+                }
+
+                string queryArticulos = $@"INSERT INTO ArticulosIntercambios (IdArticulo, IdIntercambio)
+                    OUTPUT INSERTED.IdArticulo
+                    SELECT a.IdArticulos, @pId FROM Articulos a
+                    WHERE a.IdArticulos IN @pIds AND a.IdUsuarios = @pIdUsuario
+                        AND NOT {EnElIntercambio} AND {SinCambioPendiente} AND {ArticuloDisponible}
+                        AND {ConfirmadosDe("@pIdUsuario")} + {PendientesDe("@pIdUsuario", "@pPedir")} + @pCantidad <= @pMax";
+                List<int> agregados = connection.Query<int>(queryArticulos, new
+                {
+                    pId = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pIds = ids,
+                    pCantidad = ids.Count,
+                    pMax = Intercambios.MaxArticulosOfrecidos,
+                    pPedir = TipoCambios.Pedir,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pComprometidos = EstadosComprometidos
+                }, transaccion).ToList();
+                if (agregados.Count != ids.Count)
+                {
+                    return 0;
+                }
+
+                var cambios = connection.Query<(int Id, int IdArticulo)>(InsertarCambio + " WHERE a.IdArticulos IN @pAgregados ORDER BY a.IdArticulos", new
+                {
+                    pId = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pTipo = TipoCambios.Agregar,
+                    pEstadoCambio = EstadosIntercambios.Aceptado,
+                    pAhora = DateTime.Now,
+                    pAgregados = agregados
+                }, transaccion).ToList();
+
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
+                CrearNotificacion(connection, transaccion, nuevas, intercambio.Value.IdOtro, idIntercambio,
+                    TipoNotificaciones.ArticuloAgregado, idCambio: cambios.Min(c => c.Id));
+                if (intercambio.Value.Estado == EstadosIntercambios.Aceptado)
+                {
+                    RechazarPendientesDeArticulos(connection, transaccion, nuevas, idIntercambio, idUsuario);
+                }
+
+                transaccion.Commit();
+                creadas?.AddRange(nuevas);
+                return agregados.Count;
+            }
+        }
+    }
+
+    public static bool PedirArticulo(int idIntercambio, int idUsuario, int idArticulo, List<NotificacionCreada>? creadas = null)
+    {
+        return CrearPedido(idIntercambio, idUsuario, idArticulo, TipoCambios.Pedir, creadas);
+    }
+
+    public static bool PedirSacarArticulo(int idIntercambio, int idUsuario, int idArticulo, List<NotificacionCreada>? creadas = null)
+    {
+        return CrearPedido(idIntercambio, idUsuario, idArticulo, TipoCambios.Sacar, creadas);
+    }
+
+    private static bool CrearPedido(int idIntercambio, int idUsuario, int idArticulo, string tipo, List<NotificacionCreada>? creadas)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                var intercambio = GetIntercambioVigente(connection, transaccion, idIntercambio, idUsuario);
+                if (intercambio == null)
+                {
+                    return false;
+                }
+
+                string condicion = tipo == TipoCambios.Pedir
+                    ? $@"a.IdUsuarios = @pIdOtro AND NOT {EnElIntercambio} AND {ArticuloDisponible}
+                        AND {ConfirmadosDe("@pIdOtro")} + {PendientesDe("@pIdOtro", "@pPedir")} < @pMax"
+                    : $@"a.IdUsuarios = @pIdUsuario AND {EnElIntercambio}
+                        AND {ConfirmadosDe("@pIdUsuario")} - {PendientesDe("@pIdUsuario", "@pSacar")} >= 2";
+                string query = $"{InsertarCambio} WHERE a.IdArticulos = @pIdArticulo AND {SinCambioPendiente} AND {condicion}";
+                var cambios = connection.Query<(int Id, int IdArticulo)>(query, new
+                {
+                    pId = idIntercambio,
+                    pIdUsuario = idUsuario,
+                    pIdOtro = intercambio.Value.IdOtro,
+                    pIdArticulo = idArticulo,
+                    pTipo = tipo,
+                    pEstadoCambio = EstadosIntercambios.Pendiente,
+                    pAhora = DateTime.Now,
+                    pMax = Intercambios.MaxArticulosOfrecidos,
+                    pPedir = TipoCambios.Pedir,
+                    pSacar = TipoCambios.Sacar,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pComprometidos = EstadosComprometidos
+                }, transaccion).ToList();
+                if (cambios.Count == 0)
+                {
+                    return false;
+                }
+
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
+                CrearNotificacion(connection, transaccion, nuevas, intercambio.Value.IdOtro, idIntercambio,
+                    tipo == TipoCambios.Pedir ? TipoNotificaciones.PedidoArticulo : TipoNotificaciones.PedidoSacar,
+                    idCambio: cambios[0].Id);
+
+                transaccion.Commit();
+                creadas?.AddRange(nuevas);
+                return true;
+            }
+        }
+    }
+
+    public static bool ResponderCambio(int idCambio, int idUsuario, bool aceptar, List<NotificacionCreada>? creadas = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            using (SqlTransaction transaccion = connection.BeginTransaction())
+            {
+                List<int> delCambio = connection.Query<int>("SELECT IdIntercambio FROM CambiosIntercambios WHERE Id = @pIdCambio",
+                    new { pIdCambio = idCambio }, transaccion).ToList();
+                if (delCambio.Count == 0)
+                {
+                    return false;
+                }
+                connection.Execute("SELECT 1 FROM Intercambios WITH (UPDLOCK, HOLDLOCK) WHERE IdIntercambios = @pId",
+                    new { pId = delCambio[0] }, transaccion);
+
+                string query = @"UPDATE c SET c.IdEstado = (SELECT e.IdEstadosIntercambios FROM EstadosIntercambios e WHERE e.Nombre = @pNuevo),
+                        c.FechaRespuesta = GETDATE()
+                    OUTPUT INSERTED.IdIntercambio, INSERTED.IdArticulo, INSERTED.IdUsuario, tc.Nombre, a.IdUsuarios, ei.Nombre
+                    FROM CambiosIntercambios c
+                    INNER JOIN EstadosIntercambios ec ON ec.IdEstadosIntercambios = c.IdEstado
+                    INNER JOIN TipoCambios tc ON tc.Id = c.IdTipoCambio
+                    INNER JOIN Articulos a ON a.IdArticulos = c.IdArticulo
+                    INNER JOIN Intercambios i ON i.IdIntercambios = c.IdIntercambio
+                    INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                    WHERE c.Id = @pIdCambio AND ec.Nombre = @pPendiente AND ei.Nombre IN @pVigentes
+                        AND c.IdUsuario <> @pIdUsuario AND (i.IdUsuarios1 = @pIdUsuario OR i.IdUsuarios2 = @pIdUsuario)";
+                var filas = connection.Query<(int IdIntercambio, int IdArticulo, int IdAutor, string Tipo, int IdDueno, string EstadoIntercambio)>(query, new
+                {
+                    pIdCambio = idCambio,
+                    pIdUsuario = idUsuario,
+                    pNuevo = aceptar ? EstadosIntercambios.Aceptado : EstadosIntercambios.Rechazado,
+                    pPendiente = EstadosIntercambios.Pendiente,
+                    pVigentes = EstadosVigentes
+                }, transaccion).ToList();
+                if (filas.Count == 0)
+                {
+                    return false;
+                }
+
+                var c = filas[0];
+                List<NotificacionCreada> nuevas = new List<NotificacionCreada>();
+                if (aceptar)
+                {
+                    var parametros = new
+                    {
+                        pId = c.IdIntercambio,
+                        pIdArticulo = c.IdArticulo,
+                        pIdDueno = c.IdDueno,
+                        pMax = Intercambios.MaxArticulosOfrecidos,
+                        pComprometidos = EstadosComprometidos
+                    };
+                    string queryEfecto = c.Tipo == TipoCambios.Pedir
+                        ? $@"INSERT INTO ArticulosIntercambios (IdArticulo, IdIntercambio)
+                            SELECT a.IdArticulos, @pId FROM Articulos a
+                            WHERE a.IdArticulos = @pIdArticulo AND a.IdUsuarios = @pIdDueno
+                                AND NOT {EnElIntercambio} AND {ArticuloDisponible} AND {ConfirmadosDe("@pIdDueno")} < @pMax"
+                        : $@"DELETE ai FROM ArticulosIntercambios ai
+                            WHERE ai.IdIntercambio = @pId AND ai.IdArticulo = @pIdArticulo AND {ConfirmadosDe("@pIdDueno")} >= 2";
+                    if (connection.Execute(queryEfecto, parametros, transaccion) == 0)
+                    {
+                        transaccion.Rollback();
+                        return false;
+                    }
+                    if (c.Tipo == TipoCambios.Pedir && c.EstadoIntercambio == EstadosIntercambios.Aceptado)
+                    {
+                        RechazarPendientesDeArticulos(connection, transaccion, nuevas, c.IdIntercambio, idUsuario);
+                    }
+                }
+
+                CrearNotificacion(connection, transaccion, nuevas, c.IdAutor, c.IdIntercambio,
+                    aceptar ? TipoNotificaciones.CambioAceptado : TipoNotificaciones.CambioRechazado, idCambio: idCambio);
+
+                transaccion.Commit();
+                creadas?.AddRange(nuevas);
+                return true;
+            }
+        }
+    }
+
+    public static bool CancelarCambio(int idCambio, int idUsuario)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = @"UPDATE c SET c.IdEstado = (SELECT e.IdEstadosIntercambios FROM EstadosIntercambios e WHERE e.Nombre = @pCancelado),
+                    c.FechaRespuesta = GETDATE()
+                FROM CambiosIntercambios c
+                INNER JOIN EstadosIntercambios ec ON ec.IdEstadosIntercambios = c.IdEstado
+                INNER JOIN Intercambios i ON i.IdIntercambios = c.IdIntercambio
+                INNER JOIN EstadosIntercambios ei ON ei.IdEstadosIntercambios = i.IdEstado
+                WHERE c.Id = @pIdCambio AND c.IdUsuario = @pIdUsuario AND ec.Nombre = @pPendiente AND ei.Nombre IN @pVigentes";
+            return connection.Execute(query, new
+            {
+                pIdCambio = idCambio,
+                pIdUsuario = idUsuario,
+                pCancelado = EstadosIntercambios.Cancelado,
+                pPendiente = EstadosIntercambios.Pendiente,
+                pVigentes = EstadosVigentes
+            }) > 0;
+        }
+    }
+
+    private const string ArticulosDelCambio = @"OUTER APPLY (SELECT STRING_AGG(ag.Nombre, ', ') WITHIN GROUP (ORDER BY cg.Id) AS Nombres
+            FROM CambiosIntercambios cg
+            INNER JOIN Articulos ag ON ag.IdArticulos = cg.IdArticulo
+            WHERE cg.Id = cn.Id OR (tcn.Nombre = @pAgregar AND cg.IdIntercambio = cn.IdIntercambio AND cg.IdUsuario = cn.IdUsuario
+                AND cg.IdTipoCambio = cn.IdTipoCambio AND cg.Fecha = cn.Fecha)) artcambio";
+
     public static List<EstadosIntercambios> GetEstadosIntercambios()
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -640,10 +962,10 @@ public static class BD
     // ---------- Notificaciones ----------
 
     private static void CrearNotificacion(SqlConnection connection, SqlTransaction transaccion, List<NotificacionCreada> nuevas,
-        int idUsuario, int idIntercambio, string tipo, bool siNoHayOtraSinLeer = false)
+        int idUsuario, int idIntercambio, string tipo, bool siNoHayOtraSinLeer = false, int? idCambio = null)
     {
-        string query = @"INSERT INTO Notificaciones (IdUsuario, IdIntercambio, IdTipoNotificacion, Leida, Fecha)
-            SELECT @pIdUsuario, @pIdIntercambio, t.Id, 0, GETDATE()
+        string query = @"INSERT INTO Notificaciones (IdUsuario, IdIntercambio, IdTipoNotificacion, Leida, Fecha, IdCambio)
+            SELECT @pIdUsuario, @pIdIntercambio, t.Id, 0, GETDATE(), @pIdCambio
             FROM TipoNotificaciones t WHERE t.Nombre = @pTipo
                 AND (@pSiNoHayOtra = 0 OR NOT EXISTS (SELECT 1 FROM Notificaciones n
                     WHERE n.IdUsuario = @pIdUsuario AND n.IdIntercambio = @pIdIntercambio AND n.IdTipoNotificacion = t.Id AND n.Leida = 0))";
@@ -652,16 +974,17 @@ public static class BD
             pIdUsuario = idUsuario,
             pIdIntercambio = idIntercambio,
             pTipo = tipo,
-            pSiNoHayOtra = siNoHayOtraSinLeer
+            pSiNoHayOtra = siNoHayOtraSinLeer,
+            pIdCambio = idCambio
         }, transaccion);
 
         if (filas > 0)
         {
-            nuevas.Add(new NotificacionCreada(idUsuario, idIntercambio, tipo));
+            nuevas.Add(new NotificacionCreada(idUsuario, idIntercambio, tipo, idCambio));
         }
     }
 
-    public static DatosMailNotificacion? GetDatosMailNotificacion(int idUsuario, int idIntercambio)
+    public static DatosMailNotificacion? GetDatosMailNotificacion(int idUsuario, int idIntercambio, int? idCambio = null)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -684,6 +1007,22 @@ public static class BD
             var articulos = connection.Query<(string Nombre, bool EsMio)>(queryArticulos, new { pIdUsuario = idUsuario, pIdIntercambio = idIntercambio }).ToList();
             datos.MisArticulos = articulos.Where(a => a.EsMio).Select(a => a.Nombre).ToList();
             datos.SusArticulos = articulos.Where(a => !a.EsMio).Select(a => a.Nombre).ToList();
+
+            if (idCambio.HasValue)
+            {
+                string queryCambio = $@"SELECT tcn.Nombre, artcambio.Nombres
+                    FROM CambiosIntercambios cn
+                    INNER JOIN TipoCambios tcn ON tcn.Id = cn.IdTipoCambio
+                    {ArticulosDelCambio}
+                    WHERE cn.Id = @pIdCambio AND cn.IdIntercambio = @pIdIntercambio";
+                var cambio = connection.Query<(string Tipo, string Nombres)>(queryCambio,
+                    new { pIdCambio = idCambio.Value, pIdIntercambio = idIntercambio, pAgregar = TipoCambios.Agregar }).ToList();
+                if (cambio.Count > 0)
+                {
+                    datos.CambioTipo = cambio[0].Tipo;
+                    datos.CambioArticulos = cambio[0].Nombres;
+                }
+            }
             return datos;
         }
     }
@@ -692,8 +1031,8 @@ public static class BD
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            string query = @"SELECT TOP (@pCantidad) n.Id, t.Nombre AS Tipo, n.Leida, n.Fecha, n.IdIntercambio,
-                    u.Nombre AS OtroNombre, a.Nombre AS ArticuloNombre
+            string query = $@"SELECT TOP (@pCantidad) n.Id, t.Nombre AS Tipo, n.Leida, n.Fecha, n.IdIntercambio,
+                    u.Nombre AS OtroNombre, a.Nombre AS ArticuloNombre, tcn.Nombre AS CambioTipo, artcambio.Nombres AS CambioArticulos
                 FROM Notificaciones n
                 INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
                 INNER JOIN Intercambios i ON i.IdIntercambios = n.IdIntercambio
@@ -702,9 +1041,12 @@ public static class BD
                     INNER JOIN Articulos ap ON ap.IdArticulos = ai.IdArticulo
                     WHERE ai.IdIntercambio = i.IdIntercambios AND ap.IdUsuarios = i.IdUsuarios2
                     ORDER BY ai.Id) a
+                LEFT JOIN CambiosIntercambios cn ON cn.Id = n.IdCambio
+                LEFT JOIN TipoCambios tcn ON tcn.Id = cn.IdTipoCambio
+                {ArticulosDelCambio}
                 WHERE n.IdUsuario = @pIdUsuario
                 ORDER BY n.Fecha DESC, n.Id DESC";
-            return connection.Query<NotificacionViewModel>(query, new { pIdUsuario = idUsuario, pCantidad = cantidad }).ToList();
+            return connection.Query<NotificacionViewModel>(query, new { pIdUsuario = idUsuario, pCantidad = cantidad, pAgregar = TipoCambios.Agregar }).ToList();
         }
     }
 
