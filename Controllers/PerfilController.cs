@@ -31,7 +31,7 @@ public class PerfilController : Controller
         ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
         ViewBag.provincias = BD.GetProvincias();
         ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
-        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
+        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios, incluirEnIntercambio: true);
         ViewBag.intercambios = BD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
         return View();
     }

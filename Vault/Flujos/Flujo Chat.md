@@ -5,7 +5,7 @@ tags:
 ---
 # Flujo: Chat
 
-**URL:** `/Chat` y `/Chat/Index/5` · **Estado:** funciona (necesita [[Script Chat.sql]] en bases creadas antes del 29/10).
+**URL:** `/Chat` y `/Chat/Index/5` · **Estado:** funciona.
 
 - Se entra por el ícono de mensajes del header, por los links al chat de [[Vista Intercambio-Detalle]], por la notificación "Mensaje nuevo" o por "mensajes sin leer" en [[Vista Home-Inicio]] → [[ChatController]].Index → [[Vista Chat-Index]].
 - Un chat por intercambio ([[Tabla Mensajes]].IdIntercambio → [[Tabla Intercambios]]), solo para sus dos partes. Con el intercambio **Pendiente**, el chat solo lo empieza quien recibió la propuesta; quien propuso puede responder cuando el otro ya le escribió. Con el intercambio **Aceptado** escriben los dos. Si se rechazó, se canceló o se realizó, queda para leer. La regla está en [[ChatController.PuedeEscribir()]] y en el SQL de [[BD.EnviarMensaje()]]. Historia: hasta el 04/11 escribían los dos en Pendiente; del 04/11 al 08/11 solo en Aceptado; desde el 08/11, esta regla (pedido de Rafael).

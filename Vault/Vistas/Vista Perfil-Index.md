@@ -15,7 +15,7 @@ tags:
 
 - Tarjeta con avatar (botón de cámara), nombre, @usuario, descripción o "Agregá una descripción", "Editar perfil" y, solo en celular, "Cerrar sesión".
 - Información personal: usuario, email, teléfono (— si está vacío), barrio + provincia, edad.
-- "Mis artículos publicados" con [[Vista _CardObjeto]] y botón Publicar.
+- "Mis artículos publicados" con [[Vista _CardObjeto]] y botón Publicar. Desde el 11/11 incluye los artículos de intercambios aceptados, con la marca "En intercambio", para que la cantidad coincida con el límite de 5.
 - "Historial de intercambios": los intercambios del usuario, cada uno con [[Vista _FilaIntercambio]], y link a Mis intercambios.
 - Pop up "Editar perfil" (form POST a [[PerfilController]].Editar, con foto) manejado por [[perfil.js]]. El email aparece deshabilitado.
 

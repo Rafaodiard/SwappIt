@@ -11,7 +11,7 @@ tags:
 ---
 # Vista: _CardObjeto (partial)
 
-`Views/Shared/_CardObjeto.cshtml` · Card de un artículo (componente "10. Card" del UI Kit). Recibe un [[ArticuloCardViewModel]] en `ViewBag.articulo` (antes de cada `<partial name="_CardObjeto" />`). Muestra foto (o el fondo de `.sw-img`), estado, botón de favorito ([[favoritos.js]]), nombre con link a Detalle (`stretched-link`: toda la card es clickeable) y barrio. Mantiene `data-template="card-objeto"` para `swappit.renderObjetos` de [[plantillas.js]]. Pendiente en el comentario: "Busca a cambio".
+`Views/Shared/_CardObjeto.cshtml` · Card de un artículo (componente "10. Card" del UI Kit). Recibe un [[ArticuloCardViewModel]] en `ViewBag.articulo` (antes de cada `<partial name="_CardObjeto" />`). Muestra foto (o el fondo de `.sw-img`), estado, botón de favorito ([[favoritos.js]]), nombre con link a Detalle (`stretched-link`: toda la card es clickeable), barrio y, si `EnIntercambio` (solo en Mi perfil), la marca "En intercambio" con el mismo estilo que el motivo de las recomendaciones. Mantiene `data-template="card-objeto"` para `swappit.renderObjetos` de [[plantillas.js]]. Pendiente en el comentario: "Busca a cambio".
 
 La usan [[Vista Home-Index]], [[Vista Articulos-Buscar]], [[Vista Articulos-Detalle]], [[Vista Perfil-Index]] y [[Vista Perfil-Publico]].
 

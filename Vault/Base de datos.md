@@ -24,10 +24,14 @@ erDiagram
     Usuarios ||--o{ Notificaciones : "IdUsuario"
     Intercambios ||--o{ Notificaciones : "IdIntercambio"
     TipoNotificaciones ||--o{ Notificaciones : "IdTipoNotificacion"
+    Intercambios ||--o{ CambiosIntercambios : "IdIntercambio"
+    Articulos ||--o{ CambiosIntercambios : "IdArticulo"
+    TipoCambios ||--o{ CambiosIntercambios : "IdTipoCambio"
+    CambiosIntercambios ||--o{ Notificaciones : "IdCambio"
 ```
 
 ## Tablas
-[[Tabla Usuarios]] · [[Tabla Provincias]] · [[Tabla Articulos]] · [[Tabla Categorias]] · [[Tabla EstadosArticulos]] · [[Tabla Imagenes]] · [[Tabla Intercambios]] · [[Tabla EstadosIntercambios]] · [[Tabla Mensajes]] · [[Tabla Notificaciones]] · [[Tabla TipoNotificaciones]]
+[[Tabla Usuarios]] · [[Tabla Provincias]] · [[Tabla Articulos]] · [[Tabla Categorias]] · [[Tabla EstadosArticulos]] · [[Tabla Imagenes]] · [[Tabla Intercambios]] · [[Tabla EstadosIntercambios]] · [[Tabla Mensajes]] · [[Tabla Notificaciones]] · [[Tabla TipoNotificaciones]] · [[Tabla ArticulosIntercambios]] · [[Tabla CambiosIntercambios]] · [[Tabla TipoCambios]]
 
 ## Stored procedures
 - **Originales** (en todos los scripts): [[SP RegistrarUsuario]], [[SP RegistrarArticulo]], [[SP RegistrarIntercambio]], [[SP RegistrarMensaje]].
@@ -42,9 +46,5 @@ erDiagram
 | [[Script Estructura.sql]] | 1 de 3: base, usuario `alumno`, tablas y claves foráneas |
 | [[Script Datos.sql]] | 2 de 3: datos de prueba |
 | [[Script StoredProcedures.sql]] | 3 de 3: los 24 SP |
-| [[Script Estados.sql]] | Migración para bases ya creadas: estados de texto → tablas con IdEstado |
-| [[Script Notificaciones.sql]] | Para bases ya creadas: tablas TipoNotificaciones y Notificaciones |
-| [[Script Chat.sql]] | Para bases ya creadas: Mensajes.Texto a 500 caracteres y fechas con hora |
-| [[Script Cancelado.sql]] | Para bases ya creadas: estado Cancelado y su tipo de notificación |
-| [[Script Provincias.sql]] | Ya no está: insertaba las 24 provincias otra vez |
-| [[Script ProvinciasDuplicadas.sql]] | Para bases ya creadas: deja una fila por provincia (08/11) |
+
+Desde el 14/11 no hay scripts de migración ([[Reglas de trabajo]]): cada cambio va en los dos scripts principales y en los tres de `BaseDatos/`, y Rafael actualiza su base por su cuenta. Los scripts sueltos de antes ya no están en el repo: [[Script Estados.sql]], [[Script Notificaciones.sql]], [[Script Chat.sql]], [[Script Cancelado.sql]], [[Script Provincias.sql]], [[Script ProvinciasDuplicadas.sql]], [[Script TelefonoTexto.sql]] y [[Script ArticulosIntercambios.sql]].

@@ -18,7 +18,7 @@ tags:
 ---
 # Tabla EstadosIntercambios
 
-`IdEstadosIntercambios` (PK) y `Nombre`. Datos: 1 Pendiente, 2 Aceptado, 3 Rechazado, 4 Realizado, 5 Cancelado (en bases viejas lo agrega [[Script Cancelado.sql]]). Aceptado y Realizado dejan los artículos "comprometidos" ([[BD.ArticuloComprometido()]]). Modelo: [[EstadosIntercambios]].
+`IdEstadosIntercambios` (PK) y `Nombre`. Datos: 1 Pendiente, 2 Aceptado, 3 Rechazado, 4 Realizado, 5 Cancelado. Aceptado y Realizado dejan los artículos "comprometidos" ([[BD.ArticuloComprometido()]]). Modelo: [[EstadosIntercambios]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

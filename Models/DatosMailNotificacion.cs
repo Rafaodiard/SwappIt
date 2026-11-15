@@ -7,6 +7,9 @@ public class DatosMailNotificacion
 
     public string? OtroNombre { get; set; }
 
-    public string? MiArticulo { get; set; }
-    public string? SuArticulo { get; set; }
+    public List<string> MisArticulos { get; set; } = new List<string>();
+    public List<string> SusArticulos { get; set; } = new List<string>();
+
+    public string? CambioTipo { get; set; }
+    public string? CambioArticulos { get; set; }
 }

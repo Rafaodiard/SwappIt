@@ -1,0 +1,58 @@
+@using Swappit.Models.ViewModels
+@functions {
+    private static string Cuando(DateTime fecha)
+    {
+        int dias = (DateTime.Today - fecha.Date).Days;
+        string hora = fecha.ToString("HH:mm");
+        return dias == 0 ? $"hoy {hora}" : dias == 1 ? $"ayer {hora}" : fecha.ToString("dd/MM HH:mm");
+    }
+}
+@{
+    IntercambioViewModel intercambio = ViewBag.intercambio;
+    List<CambioIntercambioViewModel> cambios = ViewBag.cambios;
+    string otro = intercambio.OtroNombre ?? intercambio.OtroUsuario ?? "La otra persona";
+    var eventos = new List<(DateTime Fecha, int Orden, bool Mio, string Texto)>();
+    foreach (var c in cambios)
+    {
+        bool autorMio = c.IdUsuario != intercambio.OtroIdUsuario;
+        string articulo = c.ArticuloNombre;
+        string creado = c.Tipo switch
+        {
+            TipoCambios.Agregar => autorMio ? $"agregaste {articulo}" : $"agregó {articulo}",
+            TipoCambios.Pedir => autorMio ? $"pediste {articulo}" : $"pidió tu {articulo}",
+            _ => autorMio ? $"pediste sacar {articulo}" : $"pidió sacar {articulo}"
+        };
+        if (c.Estado == EstadosIntercambios.Pendiente && !c.Vigente)
+        {
+            creado += " · sin respuesta";
+        }
+        eventos.Add((c.Fecha, c.Id * 2, autorMio, creado));
+
+        if (c.FechaRespuesta.HasValue && c.Tipo != TipoCambios.Agregar)
+        {
+            bool sacar = c.Tipo == TipoCambios.Sacar;
+            string respuesta = c.Estado switch
+            {
+                EstadosIntercambios.Aceptado => !autorMio ? $"aceptaste {(sacar ? "sacar" : "sumar")} {articulo}" : $"aceptó {(sacar ? "sacar" : "sumar")} {articulo}",
+                EstadosIntercambios.Rechazado => !autorMio ? $"rechazaste {(sacar ? "sacar" : "sumar")} {articulo}" : $"no aceptó {(sacar ? "sacar" : "sumar")} {articulo}",
+                _ => autorMio ? $"{(sacar ? "deshiciste el pedido para sacar" : "cancelaste el pedido de")} {articulo}"
+                              : $"{(sacar ? "deshizo el pedido para sacar" : "canceló el pedido de")} {articulo}"
+            };
+            bool respondioYo = c.Estado == EstadosIntercambios.Cancelado ? autorMio : !autorMio;
+            eventos.Add((c.FechaRespuesta.Value, c.Id * 2 + 1, respondioYo, respuesta));
+        }
+    }
+    eventos = eventos.OrderByDescending(e => e.Fecha).ThenByDescending(e => e.Orden).ToList();
+}
+@if (eventos.Count > 0)
+{
+    <section class="sw-card p-4" aria-labelledby="titulo-historial-cambios">
+        <h2 class="h6 fw-bold mb-3" id="titulo-historial-cambios">Últimos cambios</h2>
+        <ol class="list-unstyled mb-0 sw-historial-cambios">
+            @foreach (var e in eventos)
+            {
+                <li><span class="fw-semibold">@(e.Mio ? "Vos" : otro)</span> @e.Texto <span class="text-suave">· @Cuando(e.Fecha)</span></li>
+            }
+        </ol>
+    </section>
+}

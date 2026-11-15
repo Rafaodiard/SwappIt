@@ -69,7 +69,7 @@ public class EmailService
     {
         try
         {
-            DatosMailNotificacion? datos = BD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio);
+            DatosMailNotificacion? datos = BD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio, notificacion.IdCambio);
             if (datos == null || string.IsNullOrWhiteSpace(datos.Mail))
             {
                 _logger.LogWarning("El usuario {IdUsuario} no tiene mail: no se avisa la notificación del intercambio {IdIntercambio}",
@@ -150,35 +150,63 @@ public class EmailService
     private static (string Asunto, string Titulo, string Texto, string Boton) Textos(string tipo, DatosMailNotificacion d)
     {
         string otro = string.IsNullOrWhiteSpace(d.OtroNombre) ? "Alguien" : d.OtroNombre;
-        string mio = d.MiArticulo ?? "tu artículo";
-        string suyo = d.SuArticulo ?? "su artículo";
+        string mio = Lista(d.MisArticulos);
+        string suyo = Lista(d.SusArticulos);
+        string tu = d.MisArticulos.Count > 1 ? "tus" : "tu";
+        string cambio = string.IsNullOrWhiteSpace(d.CambioArticulos) ? "un artículo" : d.CambioArticulos;
+        bool esSacar = d.CambioTipo == TipoCambios.Sacar;
 
         return tipo switch
         {
             TipoNotificaciones.PropuestaRecibida => (
                 $"{otro} te propuso un intercambio",
                 "Tenés una propuesta nueva",
-                $"{otro} quiere tu «{mio}» y te ofrece «{suyo}» a cambio. Mirá la propuesta y decidí si la aceptás.",
+                $"{otro} quiere {tu} {mio} y te ofrece {suyo} a cambio. Mirá la propuesta y decidí si la aceptás.",
                 "Ver propuesta"),
             TipoNotificaciones.PropuestaAceptada => (
                 $"{otro} aceptó tu propuesta",
                 "¡Aceptaron tu propuesta!",
-                $"{otro} aceptó cambiar «{suyo}» por tu «{mio}». Ahora coordinen por el chat dónde y cuándo hacer el intercambio.",
+                $"{otro} aceptó cambiar {suyo} por {tu} {mio}. Ahora coordinen por el chat dónde y cuándo hacer el intercambio.",
                 "Ver intercambio"),
             TipoNotificaciones.PropuestaRechazada => (
                 "Tu propuesta no fue aceptada",
                 "Tu propuesta no fue aceptada",
-                $"La propuesta de cambiar tu «{mio}» por «{suyo}» de {otro} fue rechazada. Podés seguir buscando otros artículos en Swappit.",
+                $"La propuesta de cambiar {tu} {mio} por {suyo} de {otro} fue rechazada. Podés seguir buscando otros artículos en Swappit.",
                 "Ver intercambio"),
             TipoNotificaciones.MensajeNuevo => (
                 $"{otro} te escribió en Swappit",
                 "Tenés mensajes nuevos",
-                $"{otro} te escribió sobre el intercambio de tu «{mio}» por «{suyo}».",
+                $"{otro} te escribió sobre el intercambio de {tu} {mio} por {suyo}.",
                 "Abrir chat"),
             TipoNotificaciones.IntercambioCancelado => (
                 $"{otro} canceló el intercambio",
                 "Se canceló un intercambio",
-                $"{otro} canceló el intercambio de tu «{mio}» por «{suyo}».",
+                $"{otro} canceló el intercambio de {tu} {mio} por {suyo}.",
+                "Ver intercambio"),
+            TipoNotificaciones.ArticuloAgregado => (
+                $"{otro} agregó artículos a tu intercambio",
+                "Cambió un intercambio",
+                $"{otro} sumó {cambio} al intercambio. Ahora recibís {suyo} por {tu} {mio}.",
+                "Ver intercambio"),
+            TipoNotificaciones.PedidoArticulo => (
+                $"{otro} te pidió un artículo",
+                "Te pidieron un artículo",
+                $"{otro} te pidió tu {cambio} para sumarlo al intercambio. Entrá para aceptarlo o rechazarlo.",
+                "Responder"),
+            TipoNotificaciones.PedidoSacar => (
+                $"{otro} quiere sacar un artículo",
+                "Te piden sacar un artículo",
+                $"{otro} quiere sacar su {cambio} del intercambio. Entrá para aceptarlo o rechazarlo.",
+                "Responder"),
+            TipoNotificaciones.CambioAceptado => (
+                $"{otro} aceptó tu pedido",
+                "Aceptaron tu pedido",
+                esSacar ? $"{otro} aceptó que saques {cambio} del intercambio." : $"{otro} aceptó sumar {cambio} al intercambio.",
+                "Ver intercambio"),
+            TipoNotificaciones.CambioRechazado => (
+                $"{otro} no aceptó tu pedido",
+                "No aceptaron tu pedido",
+                esSacar ? $"{otro} no aceptó que saques {cambio} del intercambio." : $"{otro} no aceptó sumar {cambio} al intercambio.",
                 "Ver intercambio"),
             _ => (
                 "Tenés una notificación nueva en Swappit",
@@ -186,6 +214,12 @@ public class EmailService
                 "Hay novedades en uno de tus intercambios.",
                 "Ver intercambio")
         };
+    }
+
+    private static string Lista(List<string> nombres)
+    {
+        List<string> citados = (nombres.Count > 0 ? nombres : new List<string> { "artículo" }).Select(n => $"«{n}»").ToList();
+        return citados.Count == 1 ? citados[0] : $"{string.Join(", ", citados.Take(citados.Count - 1))} y {citados[^1]}";
     }
 
     private static string TextoPlano(string saludo, string texto, string boton, string? link)

@@ -34,6 +34,7 @@
     bool logueado = ViewBag.logueado;
     int? idPropuestaEnCurso = ViewBag.idPropuestaEnCurso;
     bool comprometido = ViewBag.comprometido;
+    int maxOfrecidos = Swappit.Models.Intercambios.MaxArticulosOfrecidos;
 
     string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
     string ubicacion = !string.IsNullOrWhiteSpace(articulo.Ubicacion)
@@ -231,7 +232,8 @@
     <!-- ===== Pop up: Proponer intercambio ===== -->
     <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <form class="modal-content" method="post" action="@Url.Action("Proponer", "Intercambio")" asp-antiforgery="true">
+            <form class="modal-content" method="post" action="@Url.Action("Proponer", "Intercambio")" asp-antiforgery="true"
+                  data-proponer data-max-ofrecidos="@maxOfrecidos">
                 <input type="hidden" name="idArticuloPedido" value="@articulo.IdArticulos">
                 <div class="modal-header">
                     <h2 class="modal-title font-titulo h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
@@ -243,12 +245,14 @@
 
                     @if (misArticulos.Count > 0)
                     {
-                        <fieldset class="d-flex flex-column gap-2">
-                            <legend class="visually-hidden">Elegí uno de tus artículos</legend>
+                        <fieldset class="d-flex flex-column gap-2" aria-describedby="@(misArticulos.Count > 1 ? "proponer-contador" : null)">
+                            <legend class="sw-proponer-leyenda">
+                                @(misArticulos.Count == 1 ? "Tu artículo" : $"Elegí hasta {Math.Min(maxOfrecidos, misArticulos.Count)} de tus artículos")
+                            </legend>
                             @foreach (var mio in misArticulos)
                             {
                                 <label class="sw-opcion-articulo">
-                                    <input type="radio" class="sw-estado-radio" name="idArticuloOfrecido" value="@mio.IdArticulos" required>
+                                    <input type="checkbox" class="sw-estado-radio" name="idsArticulosOfrecidos" value="@mio.IdArticulos" checked="@(misArticulos.Count == 1)">
                                     <span class="sw-opcion-articulo-cuerpo">
                                         <span class="sw-img sw-opcion-articulo-img">
                                             @if (!string.IsNullOrEmpty(mio.Imagen))
@@ -260,10 +264,15 @@
                                             <span class="d-block fw-semibold text-truncate">@mio.Nombre</span>
                                             <span class="d-block text-suave small">@mio.Estado</span>
                                         </span>
+                                        <i class="bi bi-check-circle-fill sw-opcion-articulo-marca" aria-hidden="true"></i>
                                     </span>
                                 </label>
                             }
                         </fieldset>
+                        @if (misArticulos.Count > 1)
+                        {
+                            <p class="sw-nota mb-0" id="proponer-contador" data-proponer-contador aria-live="polite">Podés ofrecer hasta @maxOfrecidos artículos juntos.</p>
+                        }
                     }
                     else
                     {

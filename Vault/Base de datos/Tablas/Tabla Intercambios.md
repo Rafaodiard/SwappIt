@@ -22,10 +22,9 @@ tags:
 | Fecha | date NOT NULL |
 | IdEstado | int NOT NULL, FK → [[Tabla EstadosIntercambios]] |
 | IdUsuarios1, IdUsuarios2 | int NOT NULL, FK → [[Tabla Usuarios]] |
-| IdArticulos1, IdArticulos2 | int NOT NULL, FK → [[Tabla Articulos]] |
 | Ubicacion | varchar(50) NULL (punto de encuentro) |
 
-Quien propone queda en `IdUsuarios1`/`IdArticulos1` (lo que ofrece) y el dueño del artículo pedido en `IdUsuarios2`/`IdArticulos2` ([[Flujo Proponer intercambio]]). Sin datos de prueba. Modelo: [[Intercambios]] (le falta `Ubicacion`, que no se usa). Para la pantalla se lee con [[BD.GetIntercambios()]] como [[IntercambioViewModel]].
+Quien propone queda en `IdUsuarios1` y el dueño del artículo pedido en `IdUsuarios2` ([[Flujo Proponer intercambio]]). Desde el 11/11 los artículos están en [[Tabla ArticulosIntercambios]] (antes eran `IdArticulos1` e `IdArticulos2`). Modelo: [[Intercambios]] (le falta `Ubicacion`, que no se usa). Para la pantalla se lee con [[BD.GetIntercambios()]] como [[IntercambioViewModel]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 

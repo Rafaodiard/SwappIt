@@ -13,4 +13,5 @@ public class ArticuloCardViewModel
     public int? IdCategoriaACambio { get; set; }
 
     public string? Motivo { get; set; }
+    public bool EnIntercambio { get; set; }
 }

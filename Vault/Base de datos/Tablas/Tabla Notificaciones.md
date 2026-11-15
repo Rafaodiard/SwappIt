@@ -17,7 +17,7 @@ tags:
 ---
 # Tabla Notificaciones
 
-`Id` (PK), `IdUsuario` (a quién le llega, FK → [[Tabla Usuarios]]), `IdIntercambio` (FK → [[Tabla Intercambios]]), `IdTipoNotificacion` (FK → [[Tabla TipoNotificaciones]]), `Leida` bit, `Fecha` datetime. Se crean dentro de la transacción de cada acción de intercambio o chat (`CrearNotificacion` en [[BD]]). Para bases ya creadas: [[Script Notificaciones.sql]].
+`Id` (PK), `IdUsuario` (a quién le llega, FK → [[Tabla Usuarios]]), `IdIntercambio` (FK → [[Tabla Intercambios]]), `IdTipoNotificacion` (FK → [[Tabla TipoNotificaciones]]), `Leida` bit, `Fecha` datetime, `IdCambio` int NULL (FK → [[Tabla CambiosIntercambios]], 14/11: dice qué artículo se agregó, se pidió o se sacó). Se crean dentro de la transacción de cada acción de intercambio o chat (`CrearNotificacion` en [[BD]]).
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
