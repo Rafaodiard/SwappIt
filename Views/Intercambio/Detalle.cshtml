@@ -33,16 +33,21 @@
         : $"Hay otras {pendientesQueSeRechazan} propuestas pendientes que incluyen estos artículos: si aceptás, se van a rechazar todas automáticamente.";
     string estado = intercambio.Estado;
     bool porResponder = intercambio.EsRecibido && estado == EstadosIntercambios.Pendiente;
-    string inicialesOtro = $"{intercambio.OtroNombre?.FirstOrDefault()}{intercambio.OtroApellido?.FirstOrDefault()}".ToUpper();
-    string ubicacionOtro = string.Join(", ", new[] { intercambio.OtroBarrio, intercambio.OtroProvincia }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string inicialesOtro = SesionUsuario.Iniciales(intercambio.OtroNombre, intercambio.OtroApellido);
+    string ubicacionOtro = Listas.UnirConComas(intercambio.OtroBarrio, intercambio.OtroProvincia);
     string fecha = intercambio.Fecha.ToString("dd/MM/yyyy");
     string? mensaje = TempData["MensajeIntercambio"] as string;
     string? error = TempData["ErrorIntercambio"] as string;
 
-    string Nombres(List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos) =>
-        articulos.Count <= 1
-            ? articulos.FirstOrDefault()?.Nombre ?? ""
-            : $"{string.Join(", ", articulos.Take(articulos.Count - 1).Select(a => a.Nombre))} y {articulos[^1].Nombre}";
+    string Nombres(List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos)
+    {
+        List<string> nombres = new List<string>();
+        foreach (var a in articulos)
+        {
+            nombres.Add(a.Nombre);
+        }
+        return Listas.UnirNombres(nombres);
+    }
     string tuMios = misArticulos.Count > 1 ? "tus" : "tu";
 
     List<Swappit.Models.ViewModels.CambioIntercambioViewModel> cambios = ViewBag.cambios;
@@ -54,14 +59,62 @@
     bool hayPendientes = ViewBag.hayPendientes;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> paraAgregar = ViewBag.paraAgregar;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> paraPedir = ViewBag.paraPedir;
-    List<Swappit.Models.ViewModels.CambioIntercambioViewModel> pendientes = cambios.Where(c => c.EsPendiente).ToList();
+    List<Swappit.Models.ViewModels.CambioIntercambioViewModel> pendientes = ViewBag.pendientes;
     int otroId = intercambio.OtroIdUsuario;
     string otroNombre = intercambio.OtroNombre ?? intercambio.OtroUsuario ?? "";
-    bool puedoSacar = misArticulos.Count - pendientes.Count(c => c.Tipo == TipoCambios.Sacar && c.IdDuenoArticulo != otroId) >= 2;
+    int sacarPendientes = 0;
+    foreach (var c in pendientes)
+    {
+        if (c.Tipo == TipoCambios.Sacar && c.IdDuenoArticulo != otroId)
+        {
+            sacarPendientes++;
+        }
+    }
+    bool puedoSacar = misArticulos.Count - sacarPendientes >= 2;
+
+    Swappit.Models.ViewModels.CambioIntercambioViewModel? PendienteDe(int idArticulo)
+    {
+        foreach (var c in pendientes)
+        {
+            if (c.IdArticulo == idArticulo)
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    Swappit.Models.ViewModels.CambioIntercambioViewModel? SumadoDe(int idArticulo)
+    {
+        foreach (var c in cambios)
+        {
+            if (c.IdArticulo == idArticulo && c.Estado == EstadosIntercambios.Aceptado
+                && (c.Tipo == TipoCambios.Agregar || c.Tipo == TipoCambios.Pedir))
+            {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    bool HayCambiosDe(List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos)
+    {
+        foreach (var c in cambios)
+        {
+            foreach (var a in articulos)
+            {
+                if (a.IdArticulos == c.IdArticulo)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     void Etiquetas(int idArticulo)
     {
-        var pendiente = pendientes.FirstOrDefault(c => c.IdArticulo == idArticulo);
+        var pendiente = PendienteDe(idArticulo);
         if (pendiente != null)
         {
             bool loHiceYo = pendiente.IdUsuario != otroId;
@@ -72,8 +125,7 @@
             <span class="sw-cambio-etiqueta @(loHiceYo ? "sw-cambio-etiqueta--espera" : "sw-cambio-etiqueta--responder")">@(loHiceYo ? $"Esperando a {otroNombre}" : "Te toca responder")</span>
             return;
         }
-        var sumado = cambios.FirstOrDefault(c => c.IdArticulo == idArticulo && c.Estado == EstadosIntercambios.Aceptado
-            && (c.Tipo == TipoCambios.Agregar || c.Tipo == TipoCambios.Pedir));
+        var sumado = SumadoDe(idArticulo);
         if (sumado != null)
         {
             bool loHiceYo = sumado.IdUsuario != otroId;
@@ -90,7 +142,7 @@
         {
             return;
         }
-        var pendiente = pendientes.FirstOrDefault(c => c.IdArticulo == idArticulo);
+        var pendiente = PendienteDe(idArticulo);
         if (pendiente != null && pendiente.IdUsuario != otroId)
         {
             <!form method="post" action="@Url.Action("CancelarCambio", "Intercambio", new { id = intercambio.IdIntercambios })">
@@ -111,9 +163,16 @@
 
     void PanelArticulos(string etiqueta, List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos, string deQuien, bool esMio)
     {
-        var pedidos = pendientes.Where(c => c.Tipo == TipoCambios.Pedir && (c.IdDuenoArticulo != otroId) == esMio).ToList();
+        var pedidos = new List<Swappit.Models.ViewModels.CambioIntercambioViewModel>();
+        foreach (var c in pendientes)
+        {
+            if (c.Tipo == TipoCambios.Pedir && (c.IdDuenoArticulo != otroId) == esMio)
+            {
+                pedidos.Add(c);
+            }
+        }
         bool botonAgregar = puedeCambiar && (esMio ? lugarMio > 0 && paraAgregar.Count > 0 : lugarSuyo > 0 && paraPedir.Count > 0);
-        bool conCambios = puedeCambiar || pedidos.Count > 0 || cambios.Any(c => articulos.Any(a => a.IdArticulos == c.IdArticulo));
+        bool conCambios = puedeCambiar || pedidos.Count > 0 || HayCambiosDe(articulos);
         if (articulos.Count == 1 && !conCambios)
         {
             var articulo = articulos[0];
@@ -134,7 +193,7 @@
                 <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                     @foreach (var articulo in articulos)
                     {
-                        bool conPendiente = pendientes.Any(c => c.IdArticulo == articulo.IdArticulos);
+                        bool conPendiente = PendienteDe(articulo.IdArticulos) != null;
                         <li class="sw-intercambio-fila @(conPendiente ? "sw-cambio-pendiente" : "")">
                             <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="sw-intercambio-item">
                                 <span class="sw-img sw-intercambio-item-img"><img src="@articulo.Imagen" alt=""></span>

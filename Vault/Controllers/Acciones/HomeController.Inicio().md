@@ -16,12 +16,13 @@ Método de [[HomeController]] · `Controllers/HomeController.cs` línea 41. Par�
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetArticulosCatalogo()]] · `calls` EXTRACTED
-- llama a [[BD.GetIntercambios()]] · `calls` EXTRACTED
-- llama a [[BD.GetResumenesChat()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.ContarArticulosActivos()]] · `calls` EXTRACTED
+- llama a [[ChatBD.ContarMensajesNoLeidos()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ContarIntercambiosPorEstado()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.GetIntercambios()]] · `calls` EXTRACTED
+- llama a [[RecomendacionesController]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioById()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Home-Inicio]] · `renders` EXTRACTED
 
 **Desde otras notas:**
 - [[HomeController.Index()]] la llama · `calls` EXTRACTED

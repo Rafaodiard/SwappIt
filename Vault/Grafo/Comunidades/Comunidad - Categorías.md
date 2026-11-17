@@ -12,8 +12,8 @@ Comunidad 26 que detectó graphify (agrupa nodos muy conectados entre sí). Tien
 
 ## Notas
 
-- [[BD.GetCategoriaById()]]
-- [[BD.GetCategorias()]]
+- [[ArticulosBD.GetCategoriaById()]]
+- [[ArticulosBD.GetCategorias()]]
 - [[Categorias]]
 - [[Tabla Categorias]]
 

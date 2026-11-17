@@ -26,6 +26,6 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - corresponde a la tabla [[Tabla EstadosArticulos]] · `maps_to` INFERRED
 
 **Desde otras notas:**
-- [[BD.GetEstadoArticuloById()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetEstadosArticulos()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetEstadoArticuloById()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetEstadosArticulos()]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.ObtenerEstados()]] la usa como tipo · `references` EXTRACTED

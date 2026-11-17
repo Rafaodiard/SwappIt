@@ -26,4 +26,4 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - corresponde a la tabla [[Tabla EstadosIntercambios]] · `maps_to` INFERRED
 
 **Desde otras notas:**
-- [[BD.GetEstadosIntercambios()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.GetEstadosIntercambios()]] la usa como tipo · `references` EXTRACTED

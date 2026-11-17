@@ -7,7 +7,15 @@ public static class Telefonos
 
     public static string Convertir(string? telefono)
     {
-        return new string((telefono ?? string.Empty).Where(char.IsDigit).ToArray());
+        string digitos = "";
+        foreach (char letra in telefono ?? string.Empty)
+        {
+            if (char.IsDigit(letra))
+            {
+                digitos += letra;
+            }
+        }
+        return digitos;
     }
 
     public static bool EsValido(string digitos)

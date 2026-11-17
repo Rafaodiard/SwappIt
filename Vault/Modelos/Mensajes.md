@@ -19,7 +19,7 @@ tags:
 ---
 # Mensajes (modelo)
 
-`Models/Mensajes.cs` · [[Tabla Mensajes]]: mensajes del chat de un intercambio, que manda una de las dos partes (`IdUsuariosManda`). `fueVisto` y `FechaRecibido` se completan cuando la otra persona abre el chat ([[BD.MarcarMensajesVistos()]]). Constante `LargoMaximoTexto = 500` ([[Flujo Chat]]).
+`Models/Mensajes.cs` · [[Tabla Mensajes]]: mensajes del chat de un intercambio, que manda una de las dos partes (`IdUsuariosManda`). `fueVisto` y `FechaRecibido` se completan cuando la otra persona abre el chat ([[ChatBD.MarcarMensajesVistos()]]). Constante `LargoMaximoTexto = 500` ([[Flujo Chat]]).
 
 Comunidad del grafo: [[Comunidad - Modelo Mensajes]]
 
@@ -32,4 +32,4 @@ Comunidad del grafo: [[Comunidad - Modelo Mensajes]]
 - usa el tipo [[DateTime]] · `references` EXTRACTED
 
 **Desde otras notas:**
-- [[BD.GetMensajes()]] la usa como tipo · `references` EXTRACTED
+- [[ChatBD.GetMensajes()]] la usa como tipo · `references` EXTRACTED

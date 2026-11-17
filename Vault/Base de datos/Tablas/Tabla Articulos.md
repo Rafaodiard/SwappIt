@@ -32,6 +32,7 @@ tags:
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Conexiones en el grafo (graphify)
+- usa el tipo [[Tabla Categorias]] · `references` EXTRACTED
 - usa el tipo [[Tabla EstadosArticulos]] · `references` EXTRACTED
 - usa el tipo [[Tabla Usuarios]] · `references` EXTRACTED
 
@@ -40,21 +41,32 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Articulos]] es su clase en C# · `maps_to` INFERRED
-- [[BD.ArticuloComprometido()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetArticuloById()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFiltroEstados()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
+- [[SP AgregarArticulos]] lee de acá · `reads_from` EXTRACTED
+- [[SP AlternarFavorito]] lee de acá · `reads_from` EXTRACTED
+- [[SP ArticuloComprometido]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_EstadisticasUsuario]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_Personalizado_GestionarPropuestaYNotificacion]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_RecomendarUsuariosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_SeguimientoIntercambiosPendientes]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarArticulosActivos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarIntercambiosPorEstado]] lee de acá · `reads_from` EXTRACTED
+- [[SP CrearPedido]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetArticuloById]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetArticulosDeIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCambiosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCategoriasDeUsuario]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetDatosMailNotificacion]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFavoritos]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetFiltroCategorias]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetFiltroEstados]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetIntercambios]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetNotificaciones]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetSenalesGustos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ImportarFavoritos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ProponerIntercambio]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP ResponderCambio]] lee de acá · `reads_from` EXTRACTED
 - [[Tabla Imagenes]] la usa como tipo · `references` EXTRACTED
-- [[Tabla Intercambios]] la usa como tipo · `references` EXTRACTED
-- [[BD.PublicarArticulo()]] escribe acá · `writes_to` EXTRACTED
 - [[SP PublicarArticulo]] escribe acá · `writes_to` EXTRACTED
 - [[SP RegistrarArticulo]] escribe acá · `writes_to` EXTRACTED

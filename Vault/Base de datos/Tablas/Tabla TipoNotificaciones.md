@@ -25,12 +25,11 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 **Desde otras notas:**
 - [[Script Estructura.sql]] la contiene · `contains` EXTRACTED
-- [[Script Notificaciones.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[TipoNotificaciones]] es su clase en C# · `maps_to` INFERRED
-- [[BD.CrearNotificacion()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.MarcarMensajesVistos()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.MarcarNotificacionLeida()]] lee de acá · `reads_from` EXTRACTED
+- [[SP CrearNotificacion]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetNotificaciones]] lee de acá · `reads_from` EXTRACTED
+- [[SP MarcarMensajesVistos]] lee de acá · `reads_from` EXTRACTED
+- [[SP MarcarNotificacionLeida]] lee de acá · `reads_from` EXTRACTED
 - [[Tabla Notificaciones]] la usa como tipo · `references` EXTRACTED

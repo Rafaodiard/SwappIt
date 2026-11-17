@@ -20,7 +20,7 @@ flowchart LR
 ```
 
 - **Controllers** ([[AccountController]], [[ArticulosController]], [[PublicarController]], [[PerfilController]], [[ChatController]], [[HomeController]]): reciben el pedido, validan, llaman a [[BD]] y pasan los datos a la vista con `ViewBag` (ver [[Convenciones y decisiones]]).
-- **[[BD]]** (`Models/BD.cs`): clase estática con todas las consultas. Cada método abre su propia `SqlConnection` y usa Dapper (`Query`, `QueryFirstOrDefault`, `Execute`). **El SQL está escrito dentro de C#**: no llama a ningún stored procedure (los SP de [[Script SQLSwappit.sql]] tienen el mismo nombre pero hoy no se usan, ver [[Pendientes y problemas]]).
+- **[[BD]]** (carpeta `Models/BD/`): siete clases estáticas, una por tema (UsuariosBD, ArticulosBD, IntercambiosBD, ChatBD, NotificacionesBD, FavoritosBD, RecomendacionesBD). Desde el 17/11 todos sus métodos llaman a un stored procedure (Dapper con `CommandType.StoredProcedure`): en C# no hay SQL ni LINQ. Cada método abre su propia `SqlConnection` con `ConexionBD.ConnectionString`. Los SP están en [[Script StoredProcedures.sql]] y en los dos scripts completos.
 - **Modelos** ([[Usuarios]], [[Articulos]], …): clases con las mismas columnas que las tablas, para que Dapper las llene.
 - **ViewModels** ([[LoginViewModel]], [[RegistroViewModel]], [[EditarPerfilViewModel]], [[PublicarArticuloViewModel]]): reciben los formularios (POST) y tienen las validaciones con DataAnnotations. [[ArticuloCardViewModel]] y [[OpcionFiltroViewModel]] son resultados de consultas.
 - **Vistas**: todas usan [[Vista _Layout]] (header, buscador, footer, JS comunes). Las cards de artículos son el partial [[Vista _CardObjeto]].

@@ -19,6 +19,3 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - incluye el partial [[Vista _FilaIntercambio]] · `includes` EXTRACTED
 - tiene un link a [[ArticulosController.Buscar()]] · `links_to` EXTRACTED
 - tiene un link a [[IntercambioController.Index()]] · `links_to` EXTRACTED
-
-**Desde otras notas:**
-- [[IntercambioController.Index()]] muestra esta vista · `renders` INFERRED

@@ -16,10 +16,9 @@ Método de [[ChatController]] · `Controllers/ChatController.cs` línea 84. Par�
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetMensajes()]] · `calls` EXTRACTED
-- llama a [[BD.MarcarMensajesVistos()]] · `calls` EXTRACTED
+- llama a [[ChatBD.GetMensajes()]] · `calls` EXTRACTED
+- llama a [[ChatBD.MarcarMensajesVistos()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Chat-_Mensajes]] · `renders` EXTRACTED
 
 **Desde otras notas:**
 - [[Vista Chat-Index]] tiene un link acá · `links_to` EXTRACTED

@@ -16,9 +16,7 @@ Método de [[IntercambioController]] · `Controllers/IntercambioController.cs` l
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.CambiarEstadoIntercambio()]] · `calls` EXTRACTED
-- redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
-- redirige a [[IntercambioController.Detalle()]] · `redirects_to` EXTRACTED
+- llama a [[IntercambiosBD.CambiarEstadoIntercambio()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 
 **Desde otras notas:**

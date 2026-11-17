@@ -18,7 +18,7 @@ tags:
    - si hay errores vuelve al form y pide elegir las fotos de nuevo (`AvisarFotosDeNuevo`); con la revisión de [[publicar.js]] esto queda para casos raros;
    - vuelve a revisar el límite de 5;
    - guarda las fotos en `wwwroot/img/articulos/` (`GuardarFotosArticulo`);
-   - [[BD]].PublicarArticulo inserta en [[Tabla Articulos]] y una fila por foto en [[Tabla Imagenes]], **en una transacción**;
+   - [[ArticulosBD.PublicarArticulo()]] llama a [[SP PublicarArticulo]], que inserta en [[Tabla Articulos]] y una fila por foto en [[Tabla Imagenes]], **en una transacción** (desde el 17/11; antes la transacción estaba en C#);
    - si falla la base o el disco, borra las fotos ya guardadas (`BorrarFotosArticulo`) y muestra "No pudimos publicar tu artículo".
 4. Éxito → redirige a `/Articulos/Detalle/{id}` con el mensaje "¡Listo! Tu artículo ya está publicado." ([[Flujo Ver detalle de artículo]]).
 

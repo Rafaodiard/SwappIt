@@ -2,8 +2,8 @@
     ViewData["Title"] = "Mi perfil";
     Swappit.Models.Usuarios usuario = ViewBag.usuario;
     Swappit.Models.Provincias? provincia = ViewBag.provincia;
-    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
-    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string iniciales = SesionUsuario.Iniciales(usuario.Nombre, usuario.Apellido);
+    string ubicacion = Listas.UnirConComas(usuario.Barrio, provincia?.Nombre);
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
     string? foto = ViewBag.foto;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;

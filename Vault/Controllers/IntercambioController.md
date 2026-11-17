@@ -15,8 +15,8 @@ tags:
 `Controllers/IntercambioController.cs` · Intercambios entre usuarios ([[Flujo Proponer intercambio]]):
 - `Index(estado)` → [[Vista Intercambio-Index]]: Mis intercambios (enviados y recibidos), con filtro por estado (`?estado=Pendiente`) y la cantidad de cada estado.
 - `Detalle(id)` → [[Vista Intercambio-Detalle]]: solo para las dos partes (si no, 404). Calcula si alguno de los artículos ya está comprometido y cuántas propuestas se rechazarían solas al aceptar.
-- `Proponer` (POST, desde el pop up de [[Vista Articulos-Detalle]]): valida que el artículo no sea propio, que el ofrecido sea del usuario y que ninguno esté comprometido; guarda con [[BD.ProponerIntercambio()]].
-- `Aceptar` / `Rechazar` (solo quien recibió la propuesta, mientras está Pendiente), `MarcarRealizado` (cualquiera, una vez aceptado) y `Cancelar`. Los tres primeros pasan por el privado `CambiarEstado` → [[BD.CambiarEstadoIntercambio()]].
+- `Proponer` (POST, desde el pop up de [[Vista Articulos-Detalle]]): valida que el artículo no sea propio, que el ofrecido sea del usuario y que ninguno esté comprometido; guarda con [[IntercambiosBD.ProponerIntercambio()]].
+- `Aceptar` / `Rechazar` (solo quien recibió la propuesta, mientras está Pendiente), `MarcarRealizado` (cualquiera, una vez aceptado) y `Cancelar`. Los tres primeros pasan por el privado `CambiarEstado` → [[IntercambiosBD.CambiarEstadoIntercambio()]].
 
 Al proponer, aceptar, rechazar o cancelar se le avisa a la otra persona con una notificación. Marcar como realizado no avisa. Los mensajes al usuario van en `TempData`.
 

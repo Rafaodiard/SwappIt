@@ -26,3 +26,4 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[NotificacionesController]] la contiene · `contains` EXTRACTED
 - [[PerfilController]] la contiene · `contains` EXTRACTED
 - [[PublicarController]] la contiene · `contains` EXTRACTED
+- [[RecomendacionesController]] la contiene · `contains` EXTRACTED

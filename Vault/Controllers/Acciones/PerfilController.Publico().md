@@ -16,11 +16,12 @@ Método de [[PerfilController]] · `Controllers/PerfilController.cs` línea 42. 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetArticulosCatalogo()]] · `calls` EXTRACTED
-- llama a [[BD.GetFotoUsuario()]] · `calls` EXTRACTED
-- llama a [[BD.GetProvinciaById()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetArticulosCatalogo()]] · `calls` EXTRACTED
 - llama a [[Usuarios]] · `calls` INFERRED
+- llama a [[UsuariosBD.GetFotoUsuario()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetProvinciaById()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioById()]] · `calls` EXTRACTED
+- redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - redirige a [[PerfilController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - muestra la vista [[Vista Perfil-Publico]] · `renders` INFERRED

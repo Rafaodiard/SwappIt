@@ -13,7 +13,7 @@ Comunidad 10 que detectó graphify (agrupa nodos muy conectados entre sí). Tien
 ## Notas
 
 - [[Articulos]]
-- [[BD.GetArticuloById()]]
+- [[ArticulosBD.GetArticuloById()]]
 
 ## Conectada con
 

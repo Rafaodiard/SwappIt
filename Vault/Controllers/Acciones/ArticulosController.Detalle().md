@@ -16,22 +16,22 @@ Método de [[ArticulosController]] · `Controllers/ArticulosController.cs` líne
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.ArticuloComprometido()]] · `calls` EXTRACTED
-- llama a [[BD.GetArticuloById()]] · `calls` EXTRACTED
-- llama a [[BD.GetArticulosCatalogo()]] · `calls` EXTRACTED
-- llama a [[BD.GetCategoriaById()]] · `calls` EXTRACTED
-- llama a [[BD.GetEstadoArticuloById()]] · `calls` EXTRACTED
-- llama a [[BD.GetFotoUsuario()]] · `calls` EXTRACTED
-- llama a [[BD.GetIdPropuestaEnCurso()]] · `calls` EXTRACTED
-- llama a [[BD.GetImagenesArticulo()]] · `calls` EXTRACTED
-- llama a [[BD.GetProvinciaById()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetArticuloById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetArticulosCatalogo()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetCategoriaById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetEstadoArticuloById()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetImagenesArticulo()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ArticuloComprometido()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.GetIdPropuestaEnCurso()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetFotoUsuario()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetProvinciaById()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioById()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - muestra la vista [[Vista Articulos-Detalle]] · `renders` INFERRED
 
 **Desde otras notas:**
-- [[Vista _CardObjeto]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Intercambio-Detalle]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista _CardObjeto]] tiene un link acá · `links_to` EXTRACTED
 - [[ArticulosController]] la tiene como método · `method` EXTRACTED
 - [[IntercambioController.Proponer()]] redirige acá · `redirects_to` EXTRACTED
 - [[PublicarController.Index() POST]] redirige acá · `redirects_to` EXTRACTED

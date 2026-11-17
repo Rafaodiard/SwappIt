@@ -16,17 +16,16 @@ Método de [[AccountController]] · `Controllers/AccountController.cs` línea 33
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.ActualizarContrasena()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioByMail()]] · `calls` EXTRACTED
 - llama a [[Contrasenas.Hashear()]] · `calls` EXTRACTED
 - llama a [[Contrasenas.Verificar()]] · `calls` EXTRACTED
 - llama a [[SesionUsuario.GuardarDatosHeader()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.ActualizarContrasena()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioByMail()]] · `calls` EXTRACTED
 - redirige a [[HomeController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - usa el tipo [[LoginViewModel]] · `references` EXTRACTED
-- muestra la vista [[Vista Account-Login]] · `renders` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista Account-Login]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED
-- [[Vista Account-Login]] envía su formulario acá · `posts_to` EXTRACTED

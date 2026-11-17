@@ -27,11 +27,27 @@ public class IntercambioController : Controller
 
         List<IntercambioViewModel> intercambios = new List<IntercambioViewModel>();
         List<EstadosIntercambios> estados = new List<EstadosIntercambios>();
+        Dictionary<string, int> cantidadPorEstado = new Dictionary<string, int>();
+        int total = 0;
+        string? estadoElegido = null;
         bool errorCarga = false;
         try
         {
-            intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value);
             estados = IntercambiosBD.GetEstadosIntercambios();
+            foreach (EstadosIntercambios e in estados)
+            {
+                if (e.Nombre == estado)
+                {
+                    estadoElegido = estado;
+                }
+            }
+
+            intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value, estado: estadoElegido);
+            foreach (CantidadPorEstado c in IntercambiosBD.ContarIntercambiosPorEstado(usuarioId.Value))
+            {
+                cantidadPorEstado[c.Estado] = c.Cantidad;
+                total += c.Cantidad;
+            }
         }
         catch (SqlException ex)
         {
@@ -39,11 +55,9 @@ public class IntercambioController : Controller
             errorCarga = true;
         }
 
-        string? estadoElegido = estados.Any(e => e.Nombre == estado) ? estado : null;
-
-        ViewBag.intercambios = estadoElegido == null ? intercambios : intercambios.Where(i => i.Estado == estadoElegido).ToList();
-        ViewBag.total = intercambios.Count;
-        ViewBag.cantidadPorEstado = intercambios.GroupBy(i => i.Estado).ToDictionary(g => g.Key, g => g.Count());
+        ViewBag.intercambios = intercambios;
+        ViewBag.total = total;
+        ViewBag.cantidadPorEstado = cantidadPorEstado;
         ViewBag.estados = estados;
         ViewBag.estadoElegido = estadoElegido;
         ViewBag.errorCarga = errorCarga;
@@ -69,8 +83,21 @@ public class IntercambioController : Controller
             else
             {
                 List<ArticuloCardViewModel> articulos = IntercambiosBD.GetArticulosDeIntercambio(id, usuarioId.Value);
-                ViewBag.misArticulos = articulos.Where(a => a.IdUsuarios == usuarioId).ToList();
-                ViewBag.susArticulos = articulos.Where(a => a.IdUsuarios != usuarioId).ToList();
+                List<ArticuloCardViewModel> misArticulos = new List<ArticuloCardViewModel>();
+                List<ArticuloCardViewModel> susArticulos = new List<ArticuloCardViewModel>();
+                foreach (ArticuloCardViewModel a in articulos)
+                {
+                    if (a.IdUsuarios == usuarioId)
+                    {
+                        misArticulos.Add(a);
+                    }
+                    else
+                    {
+                        susArticulos.Add(a);
+                    }
+                }
+                ViewBag.misArticulos = misArticulos;
+                ViewBag.susArticulos = susArticulos;
                 ViewBag.fotoOtro = UsuariosBD.GetFotoUsuario(intercambio.OtroIdUsuario);
                 ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
                     && IntercambiosBD.IntercambioConArticuloComprometido(intercambio.IdIntercambios);
@@ -79,26 +106,43 @@ public class IntercambioController : Controller
                     : 0;
 
                 List<CambioIntercambioViewModel> cambios = IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value);
-                List<CambioIntercambioViewModel> pendientes = cambios.Where(c => c.EsPendiente).ToList();
+                List<CambioIntercambioViewModel> pendientes = new List<CambioIntercambioViewModel>();
+                int ultimoCambio = 0;
+                bool tengoPorResponder = false;
+                foreach (CambioIntercambioViewModel c in cambios)
+                {
+                    if (c.EsPendiente)
+                    {
+                        pendientes.Add(c);
+                        if (c.IdUsuario != usuarioId)
+                        {
+                            tengoPorResponder = true;
+                        }
+                    }
+                    if (c.Id > ultimoCambio)
+                    {
+                        ultimoCambio = c.Id;
+                    }
+                }
+
+                ContextoCambio contexto = new ContextoCambio(usuarioId.Value, intercambio, articulos, pendientes);
                 bool puedeCambiar = intercambio.Estado == EstadosIntercambios.Pendiente || intercambio.Estado == EstadosIntercambios.Aceptado;
-                HashSet<int> enJuego = articulos.Select(a => a.IdArticulos).Concat(pendientes.Select(c => c.IdArticulo)).ToHashSet();
-                int Lugar(int dueno) => Math.Max(0, Intercambios.MaxArticulosOfrecidos - articulos.Count(a => a.IdUsuarios == dueno)
-                    - pendientes.Count(c => c.Tipo == TipoCambios.Pedir && c.IdDuenoArticulo == dueno));
-                int lugarMio = puedeCambiar ? Lugar(usuarioId.Value) : 0;
-                int lugarSuyo = puedeCambiar ? Lugar(intercambio.OtroIdUsuario) : 0;
+                int lugarMio = puedeCambiar ? contexto.Lugar(usuarioId.Value) : 0;
+                int lugarSuyo = puedeCambiar ? contexto.Lugar(intercambio.OtroIdUsuario) : 0;
 
                 ViewBag.cambios = cambios;
+                ViewBag.pendientes = pendientes;
                 ViewBag.puedeCambiar = puedeCambiar;
-                ViewBag.ultimoCambio = cambios.Count == 0 ? 0 : cambios.Max(c => c.Id);
+                ViewBag.ultimoCambio = ultimoCambio;
                 ViewBag.lugarMio = lugarMio;
                 ViewBag.lugarSuyo = lugarSuyo;
-                ViewBag.tengoPorResponder = pendientes.Any(c => c.IdUsuario != usuarioId);
+                ViewBag.tengoPorResponder = tengoPorResponder;
                 ViewBag.hayPendientes = pendientes.Count > 0;
                 ViewBag.paraAgregar = lugarMio > 0
-                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: usuarioId.Value).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
+                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: usuarioId.Value, fueraDeIntercambio: id)
                     : new List<ArticuloCardViewModel>();
                 ViewBag.paraPedir = lugarSuyo > 0
-                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: intercambio.OtroIdUsuario).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
+                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: intercambio.OtroIdUsuario, fueraDeIntercambio: id)
                     : new List<ArticuloCardViewModel>();
             }
             ViewBag.intercambio = intercambio;
@@ -130,7 +174,7 @@ public class IntercambioController : Controller
                 return NotFound();
             }
 
-            List<int> idsOfrecidos = (idsArticulosOfrecidos ?? Array.Empty<int>()).Where(id => id > 0).Distinct().ToList();
+            List<int> idsOfrecidos = Listas.IdsValidos(idsArticulosOfrecidos);
             string? error = null;
             if (pedido.IdUsuarios == usuarioId)
             {
@@ -144,7 +188,7 @@ public class IntercambioController : Controller
             {
                 error = $"Podés ofrecer hasta {Intercambios.MaxArticulosOfrecidos} artículos en una propuesta.";
             }
-            else if (idsOfrecidos.Any(id => ArticulosBD.GetArticuloById(id)?.IdUsuarios != usuarioId))
+            else if (!SonDelUsuario(idsOfrecidos, usuarioId.Value))
             {
                 error = "Solo podés ofrecer artículos tuyos.";
             }
@@ -156,7 +200,7 @@ public class IntercambioController : Controller
             {
                 error = "Este artículo ya tiene un intercambio aceptado.";
             }
-            else if (idsOfrecidos.Any(IntercambiosBD.ArticuloComprometido))
+            else if (AlgunoComprometido(idsOfrecidos))
             {
                 error = idsOfrecidos.Count == 1
                     ? "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro."
@@ -205,7 +249,7 @@ public class IntercambioController : Controller
             IntercambioViewModel? intercambio = IntercambiosBD.GetIntercambio(id, usuarioId.Value);
             if (intercambio != null)
             {
-                if (IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente && c.IdUsuario != usuarioId))
+                if (IntercambiosBD.ContarCambiosPendientes(id, usuarioId.Value, soloDelOtro: true) > 0)
                 {
                     TempData["ErrorIntercambio"] = $"Respondé los cambios de {intercambio.OtroNombre} antes de aceptar.";
                     return RedirectToAction("Detalle", new { id });
@@ -248,7 +292,7 @@ public class IntercambioController : Controller
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         try
         {
-            if (usuarioId != null && IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente))
+            if (usuarioId != null && IntercambiosBD.ContarCambiosPendientes(id, usuarioId.Value) > 0)
             {
                 TempData["ErrorIntercambio"] = "Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.";
                 return RedirectToAction("Detalle", new { id });
@@ -296,20 +340,104 @@ public class IntercambioController : Controller
     private record ContextoCambio(int IdUsuario, IntercambioViewModel Intercambio, List<ArticuloCardViewModel> Articulos,
         List<CambioIntercambioViewModel> Pendientes)
     {
-        public int Confirmados(int dueno) => Articulos.Count(a => a.IdUsuarios == dueno);
-        public int PendientesDe(int dueno, string tipo) => Pendientes.Count(c => c.IdDuenoArticulo == dueno && c.Tipo == tipo);
-        public bool EnJuego(int idArticulo) => Articulos.Any(a => a.IdArticulos == idArticulo) || Pendientes.Any(c => c.IdArticulo == idArticulo);
+        public int Confirmados(int dueno)
+        {
+            int cantidad = 0;
+            foreach (ArticuloCardViewModel a in Articulos)
+            {
+                if (a.IdUsuarios == dueno)
+                {
+                    cantidad++;
+                }
+            }
+            return cantidad;
+        }
+
+        public int PendientesDe(int dueno, string tipo)
+        {
+            int cantidad = 0;
+            foreach (CambioIntercambioViewModel c in Pendientes)
+            {
+                if (c.IdDuenoArticulo == dueno && c.Tipo == tipo)
+                {
+                    cantidad++;
+                }
+            }
+            return cantidad;
+        }
+
+        public int Lugar(int dueno) =>
+            Math.Max(0, Intercambios.MaxArticulosOfrecidos - Confirmados(dueno) - PendientesDe(dueno, TipoCambios.Pedir));
+
+        public ArticuloCardViewModel? Articulo(int idArticulo)
+        {
+            foreach (ArticuloCardViewModel a in Articulos)
+            {
+                if (a.IdArticulos == idArticulo)
+                {
+                    return a;
+                }
+            }
+            return null;
+        }
+
+        public CambioIntercambioViewModel? PendienteDeArticulo(int idArticulo)
+        {
+            foreach (CambioIntercambioViewModel c in Pendientes)
+            {
+                if (c.IdArticulo == idArticulo)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public CambioIntercambioViewModel? Pendiente(int idCambio)
+        {
+            foreach (CambioIntercambioViewModel c in Pendientes)
+            {
+                if (c.Id == idCambio)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public bool EnJuego(int idArticulo) => Articulo(idArticulo) != null || PendienteDeArticulo(idArticulo) != null;
     }
 
-    private static string Nombres(List<string> nombres) =>
-        nombres.Count <= 1 ? nombres.FirstOrDefault() ?? "" : $"{string.Join(", ", nombres.Take(nombres.Count - 1))} y {nombres[^1]}";
+    private static bool SonDelUsuario(List<int> idsArticulos, int idUsuario)
+    {
+        foreach (int idArticulo in idsArticulos)
+        {
+            if (ArticulosBD.GetArticuloById(idArticulo)?.IdUsuarios != idUsuario)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static bool AlgunoComprometido(List<int> idsArticulos)
+    {
+        foreach (int idArticulo in idsArticulos)
+        {
+            if (IntercambiosBD.ArticuloComprometido(idArticulo))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult AgregarArticulos(int id, int[]? idsArticulos)
     {
-        List<int> ids = (idsArticulos ?? Array.Empty<int>()).Where(i => i > 0).Distinct().ToList();
-        List<Articulos?> elegidos = new List<Articulos?>();
+        List<int> ids = Listas.IdsValidos(idsArticulos);
+        List<string> nombres = new List<string>();
         return HacerCambio(id, c =>
         {
             if (ids.Count == 0)
@@ -320,22 +448,30 @@ public class IntercambioController : Controller
             {
                 return $"Cada lado puede tener hasta {Intercambios.MaxArticulosOfrecidos} artículos.";
             }
-            elegidos = ids.Select(ArticulosBD.GetArticuloById).ToList();
-            if (elegidos.Any(a => a?.IdUsuarios != c.IdUsuario))
+            nombres.Clear();
+            foreach (int idArticulo in ids)
             {
-                return "Solo podés agregar artículos tuyos.";
+                Articulos? elegido = ArticulosBD.GetArticuloById(idArticulo);
+                if (elegido == null || elegido.IdUsuarios != c.IdUsuario)
+                {
+                    return "Solo podés agregar artículos tuyos.";
+                }
+                nombres.Add(elegido.Nombre ?? "");
             }
-            if (ids.Any(c.EnJuego))
+            foreach (int idArticulo in ids)
             {
-                return "Ese artículo ya está en el intercambio o tiene un cambio pendiente.";
+                if (c.EnJuego(idArticulo))
+                {
+                    return "Ese artículo ya está en el intercambio o tiene un cambio pendiente.";
+                }
             }
-            if (ids.Any(IntercambiosBD.ArticuloComprometido))
+            if (AlgunoComprometido(ids))
             {
                 return "Uno de los artículos ya tiene un intercambio aceptado. Elegí otro.";
             }
             return null;
         }, (c, creadas) => IntercambiosBD.AgregarArticulos(id, c.IdUsuario, ids, creadas) > 0
-            ? $"Sumaste {Nombres(elegidos.Select(a => a!.Nombre ?? "").ToList())}. A {c.Intercambio.OtroNombre} le llegó un aviso."
+            ? $"Sumaste {Listas.UnirNombres(nombres)}. A {c.Intercambio.OtroNombre} le llegó un aviso."
             : null);
     }
 
@@ -376,12 +512,12 @@ public class IntercambioController : Controller
         ArticuloCardViewModel? articulo = null;
         return HacerCambio(id, c =>
         {
-            articulo = c.Articulos.FirstOrDefault(a => a.IdArticulos == idArticulo && a.IdUsuarios == c.IdUsuario);
-            if (articulo == null)
+            articulo = c.Articulo(idArticulo);
+            if (articulo == null || articulo.IdUsuarios != c.IdUsuario)
             {
                 return "Solo podés sacar artículos tuyos que estén en el intercambio.";
             }
-            if (c.Pendientes.Any(p => p.IdArticulo == idArticulo))
+            if (c.PendienteDeArticulo(idArticulo) != null)
             {
                 return "Ese artículo ya está en el intercambio o tiene un cambio pendiente.";
             }
@@ -401,8 +537,8 @@ public class IntercambioController : Controller
     {
         return HacerCambio(id, c =>
         {
-            CambioIntercambioViewModel? cambio = c.Pendientes.FirstOrDefault(p => p.Id == idCambio && p.IdUsuario != c.IdUsuario);
-            if (cambio == null)
+            CambioIntercambioViewModel? cambio = c.Pendiente(idCambio);
+            if (cambio == null || cambio.IdUsuario == c.IdUsuario)
             {
                 return "Ese cambio ya no está pendiente.";
             }
@@ -420,7 +556,7 @@ public class IntercambioController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult CancelarCambio(int id, int idCambio)
     {
-        return HacerCambio(id, c => c.Pendientes.Any(p => p.Id == idCambio && p.IdUsuario == c.IdUsuario) ? null : "Ese pedido ya no está pendiente.",
+        return HacerCambio(id, c => c.Pendiente(idCambio)?.IdUsuario == c.IdUsuario ? null : "Ese pedido ya no está pendiente.",
             (c, creadas) => IntercambiosBD.CancelarCambio(idCambio, c.IdUsuario) ? "Cancelaste el pedido." : null);
     }
 
@@ -449,7 +585,7 @@ public class IntercambioController : Controller
             {
                 ContextoCambio contexto = new ContextoCambio(usuarioId.Value, intercambio,
                     IntercambiosBD.GetArticulosDeIntercambio(id, usuarioId.Value),
-                    IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Where(c => c.EsPendiente).ToList());
+                    IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value, soloPendientes: true));
                 error = validar(contexto);
                 if (error == null)
                 {

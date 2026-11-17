@@ -20,5 +20,6 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista Perfil-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED

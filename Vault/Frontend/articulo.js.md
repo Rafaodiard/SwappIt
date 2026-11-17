@@ -19,3 +19,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[Vista Articulos-Detalle]] carga este script · `loads_script` EXTRACTED
+- [[Vista Intercambio-Detalle]] carga este script · `loads_script` EXTRACTED

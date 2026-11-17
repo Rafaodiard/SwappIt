@@ -18,7 +18,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Account-CambiarContrasena]] · `renders` INFERRED
 
 **Desde otras notas:**
+- [[Vista Account-CambiarContrasena]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED

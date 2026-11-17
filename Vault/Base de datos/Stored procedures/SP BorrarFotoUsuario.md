@@ -17,7 +17,7 @@ tags:
 
 Stored procedure `dbo.BorrarFotoUsuario`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
-Es la copia en SQL de [[BD]].BorrarFotoUsuario, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[UsuariosBD.BorrarFotoUsuario()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -25,7 +25,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - escribe en [[Tabla Imagenes]] · `writes_to` EXTRACTED
 
 **Desde otras notas:**
+- [[UsuariosBD.BorrarFotoUsuario()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.BorrarFotoUsuario()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

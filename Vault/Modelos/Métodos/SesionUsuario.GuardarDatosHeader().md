@@ -16,8 +16,8 @@ Método de [[SesionUsuario]] · `Models/SesionUsuario.cs` línea 8. Parámetros:
 Comunidad del grafo: [[Comunidad - Usuarios, contraseñas y sesión]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetFotoUsuario()]] · `calls` EXTRACTED
-- llama a [[SesionUsuario.ObtenerIniciales()]] · `calls` EXTRACTED
+- llama a [[SesionUsuario.Iniciales()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetFotoUsuario()]] · `calls` EXTRACTED
 - usa el tipo [[ISession]] · `references` EXTRACTED
 - usa el tipo [[Usuarios]] · `references` EXTRACTED
 

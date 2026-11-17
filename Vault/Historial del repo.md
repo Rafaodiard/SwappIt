@@ -31,4 +31,6 @@ Repositorio: `github.com/rafaodiard/swappit`, rama `main`. Autores: **Martina Dr
 | 29/10 | Rafael | Intercambios: proponer, aceptar, rechazar, realizado, Mis intercambios ([[Flujo Proponer intercambio]], PR #4) |
 | 29/10 | Rafael | Notificaciones de intercambio ([[Flujo Notificaciones y favoritos]], PR #5) |
 | 29/10 | Rafael | Chat y notificaciones de mensajes ([[Flujo Chat]], PR #6) |
-| 29/10 | Rafael | Pantalla de inicio para usuarios logueados ([[Vista Home-Inicio]]) (`f639baa`, el último) |
+| 29/10 | Rafael | Pantalla de inicio para usuarios logueados ([[Vista Home-Inicio]]) (`f639baa`) |
+| 17/11 | Rafael | `README.md` con la guía para instalar y correr el proyecto (`3bbe61f`) |
+| 17/11 | Martina | División de `BD.cs` en una clase por tema (`6e0fb97`, el último; no compilaba, ver [[Bitácora]]) |

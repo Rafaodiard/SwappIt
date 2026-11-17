@@ -20,3 +20,4 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 **Desde otras notas:**
 - [[Vista Publicar-Index]] la llama · `calls` EXTRACTED
 - [[PublicarController.ObtenerCategorias()]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

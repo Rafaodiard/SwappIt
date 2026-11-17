@@ -16,16 +16,18 @@ Método de [[IntercambioController]] · `Controllers/IntercambioController.cs` l
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetEstadosIntercambios()]] · `calls` EXTRACTED
-- llama a [[BD.GetIntercambios()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ContarIntercambiosPorEstado()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.GetEstadosIntercambios()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.GetIntercambios()]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Intercambio-Index]] · `renders` INFERRED
 
 **Desde otras notas:**
 - [[Vista Home-Inicio]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Intercambio-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Intercambio-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Perfil-Index]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Publicar-Index]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[IntercambioController]] la tiene como método · `method` EXTRACTED
 - [[NotificacionesController.Ver()]] redirige acá · `redirects_to` EXTRACTED

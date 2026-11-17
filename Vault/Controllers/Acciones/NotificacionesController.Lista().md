@@ -16,9 +16,8 @@ Método de [[NotificacionesController]] · `Controllers/NotificacionesController
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetNotificaciones()]] · `calls` EXTRACTED
+- llama a [[NotificacionesBD.GetNotificaciones()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Notificaciones-_Lista]] · `renders` EXTRACTED
 
 **Desde otras notas:**
 - [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED

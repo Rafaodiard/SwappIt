@@ -31,5 +31,5 @@ Comunidad del grafo: [[Comunidad - Notificaciones]]
 - usa el tipo [[DateTime]] · `references` EXTRACTED
 
 **Desde otras notas:**
-- [[BD.GetNotificaciones()]] la usa como tipo · `references` EXTRACTED
-- [[BD.MarcarNotificacionLeida()]] la usa como tipo · `references` EXTRACTED
+- [[NotificacionesBD.GetNotificaciones()]] la usa como tipo · `references` EXTRACTED
+- [[NotificacionesBD.MarcarNotificacionLeida()]] la usa como tipo · `references` EXTRACTED

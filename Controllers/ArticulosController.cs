@@ -21,8 +21,8 @@ public class ArticulosController : Controller
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         string ordenElegido = RecomendacionesController.OrdenValido(orden, usuarioId != null);
         string? busqueda = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
-        List<int> categoriasSeleccionadas = (categoria ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
-        List<int> estadosSeleccionados = (estado ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
+        List<int> categoriasSeleccionadas = Listas.IdsValidos(categoria, MaxOpcionesFiltro);
+        List<int> estadosSeleccionados = Listas.IdsValidos(estado, MaxOpcionesFiltro);
 
         List<ArticuloCardViewModel> articulos = new List<ArticuloCardViewModel>();
         List<OpcionFiltroViewModel> categorias = new List<OpcionFiltroViewModel>();
@@ -31,7 +31,8 @@ public class ArticulosController : Controller
 
         try
         {
-            articulos = ArticulosBD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
+            articulos = ArticulosBD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados,
+                excluirUsuario: usuarioId, orden: ordenElegido);
             articulos = RecomendacionesController.Ordenar(articulos, ordenElegido, usuarioId);
             categorias = ArticulosBD.GetFiltroCategorias(busqueda, usuarioId);
             estados = ArticulosBD.GetFiltroEstados(busqueda, usuarioId);
@@ -82,8 +83,7 @@ public class ArticulosController : Controller
             ViewBag.dueno = dueno;
             ViewBag.fotoDueno = UsuariosBD.GetFotoUsuario(dueno.IdUsuarios);
             ViewBag.provinciaDueno = UsuariosBD.GetProvinciaById(dueno.IdProvincias);
-            ViewBag.otrosArticulos = ArticulosBD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
-                .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
+            ViewBag.otrosArticulos = ArticulosBD.GetArticulosCatalogo(cantidad: 4, idUsuario: dueno.IdUsuarios, excluirArticulo: articulo.IdArticulos);
             ViewBag.esPropio = esPropio;
             ViewBag.comprometido = IntercambiosBD.ArticuloComprometido(articulo.IdArticulos);
             ViewBag.logueado = usuarioId != null;

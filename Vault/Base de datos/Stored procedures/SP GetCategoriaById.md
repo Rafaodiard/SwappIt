@@ -17,7 +17,7 @@ tags:
 
 Stored procedure `dbo.GetCategoriaById`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
-Es la copia en SQL de [[BD]].GetCategoriaById, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[ArticulosBD.GetCategoriaById()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -25,7 +25,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - lee de [[Tabla Categorias]] · `reads_from` EXTRACTED
 
 **Desde otras notas:**
+- [[ArticulosBD.GetCategoriaById()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GetCategoriaById()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

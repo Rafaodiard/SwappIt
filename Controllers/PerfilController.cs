@@ -92,7 +92,7 @@ public class PerfilController : Controller
 
         if (!ModelState.IsValid)
         {
-            TempData["ErrorPerfil"] = ModelState.Values.SelectMany(v => v.Errors).First().ErrorMessage;
+            TempData["ErrorPerfil"] = PrimerError();
             return RedirectToAction("Index");
         }
 
@@ -108,7 +108,7 @@ public class PerfilController : Controller
         {
             string extension = Path.GetExtension(e.Foto.FileName).ToLower();
 
-            if (!EditarPerfilViewModel.ExtensionesFoto.Contains(extension))
+            if (Array.IndexOf(EditarPerfilViewModel.ExtensionesFoto, extension) < 0)
             {
                 TempData["ErrorPerfil"] = "La foto tiene que ser JPG o PNG.";
                 return RedirectToAction("Index");
@@ -169,5 +169,17 @@ public class PerfilController : Controller
         {
             System.IO.File.Delete(archivo);
         }
+    }
+
+    private string PrimerError()
+    {
+        foreach (var campo in ModelState.Values)
+        {
+            foreach (var error in campo.Errors)
+            {
+                return error.ErrorMessage;
+            }
+        }
+        return "";
     }
 }

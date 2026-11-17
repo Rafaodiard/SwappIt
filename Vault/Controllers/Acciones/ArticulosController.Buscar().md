@@ -16,14 +16,14 @@ Método de [[ArticulosController]] · `Controllers/ArticulosController.cs` líne
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetArticulosCatalogo()]] · `calls` EXTRACTED
-- llama a [[BD.GetFiltroCategorias()]] · `calls` EXTRACTED
-- llama a [[BD.GetFiltroEstados()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetArticulosCatalogo()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetFiltroCategorias()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetFiltroEstados()]] · `calls` EXTRACTED
+- llama a [[Listas]] · `calls` EXTRACTED
+- llama a [[RecomendacionesController]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Articulos-Buscar]] · `renders` INFERRED
 
 **Desde otras notas:**
-- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Articulos-Buscar]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Chat-Index]] tiene un link acá · `links_to` EXTRACTED
@@ -32,4 +32,5 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[Vista Intercambio-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Intercambio-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Perfil-Publico]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[ArticulosController]] la tiene como método · `method` EXTRACTED

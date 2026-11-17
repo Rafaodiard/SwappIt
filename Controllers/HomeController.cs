@@ -49,13 +49,20 @@ public class HomeController : Controller
         {
             ViewBag.nombre = UsuariosBD.GetUsuarioById(usuarioId)?.Nombre;
 
-            List<IntercambioViewModel> enCurso = IntercambiosBD.GetIntercambios(usuarioId)
-                .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
-                .ToList();
+            int porResponder = 0;
+            int cantidadEnCurso = 0;
+            foreach (CantidadPorEstado c in IntercambiosBD.ContarIntercambiosPorEstado(usuarioId))
+            {
+                if (c.Estado == EstadosIntercambios.Pendiente || c.Estado == EstadosIntercambios.Aceptado)
+                {
+                    cantidadEnCurso += c.Cantidad;
+                    porResponder += c.PorResponder;
+                }
+            }
 
-            ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
-            ViewBag.porResponder = enCurso.Count(PorResponder);
-            ViewBag.cantidadEnCurso = enCurso.Count;
+            ViewBag.intercambios = IntercambiosBD.GetIntercambios(usuarioId, enCurso: true, cantidad: CantidadIntercambiosInicio);
+            ViewBag.porResponder = porResponder;
+            ViewBag.cantidadEnCurso = cantidadEnCurso;
             ViewBag.cantidadArticulos = ArticulosBD.ContarArticulosActivos(usuarioId);
             ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
@@ -67,7 +74,7 @@ public class HomeController : Controller
 
         try
         {
-            ViewBag.mensajesSinLeer = ChatBD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
+            ViewBag.mensajesSinLeer = ChatBD.ContarMensajesNoLeidos(usuarioId);
         }
         catch (SqlException ex)
         {
@@ -80,11 +87,6 @@ public class HomeController : Controller
     private const int CantidadIntercambiosInicio = 4;
     private const int CantidadDestacadosInicio = 9;
     private const int CantidadDestacadosLanding = 4;
-
-    private static bool PorResponder(IntercambioViewModel i)
-    {
-        return i.EsRecibido && i.Estado == EstadosIntercambios.Pendiente;
-    }
 
     public IActionResult Privacy()
     {

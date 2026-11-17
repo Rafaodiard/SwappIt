@@ -94,7 +94,7 @@ public class FavoritosController : Controller
             return Unauthorized();
         }
 
-        List<int> pedidos = (ids ?? []).Where(id => id > 0).Distinct().Take(MaxImportar).ToList();
+        List<int> pedidos = Listas.IdsValidos(ids, MaxImportar);
         try
         {
             FavoritosBD.ImportarFavoritos(usuarioId.Value, pedidos);

@@ -18,31 +18,41 @@ tags:
 ---
 # Tabla EstadosIntercambios
 
-`IdEstadosIntercambios` (PK) y `Nombre`. Datos: 1 Pendiente, 2 Aceptado, 3 Rechazado, 4 Realizado, 5 Cancelado. Aceptado y Realizado dejan los artículos "comprometidos" ([[BD.ArticuloComprometido()]]). Modelo: [[EstadosIntercambios]].
+`IdEstadosIntercambios` (PK) y `Nombre`. Datos: 1 Pendiente, 2 Aceptado, 3 Rechazado, 4 Realizado, 5 Cancelado. Aceptado y Realizado dejan los artículos "comprometidos" ([[IntercambiosBD.ArticuloComprometido()]]). Modelo: [[EstadosIntercambios]].
 
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Conexiones en el grafo (graphify)
 
 **Desde otras notas:**
-- [[Script Estados.sql]] la contiene · `contains` EXTRACTED
 - [[Script Estructura.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[EstadosIntercambios]] es su clase en C# · `maps_to` INFERRED
-- [[BD.ArticuloComprometido()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.CambiarEstadoIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.CancelarIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.ContarPendientesDeArticulos()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.EnviarMensaje()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetEstadosIntercambios()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFiltroEstados()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIdPropuestaEnCurso()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.ProponerIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.RechazarPendientesDeArticulos()]] lee de acá · `reads_from` EXTRACTED
+- [[SP AgregarArticulos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ArticuloComprometido]] lee de acá · `reads_from` EXTRACTED
+- [[SP CambiarEstadoIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP CancelarCambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP CancelarIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarArticulosActivos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarCambiosPendientes]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarIntercambiosActivos]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarIntercambiosPorEstado]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarPendientesDeArticulos]] lee de acá · `reads_from` EXTRACTED
+- [[SP CrearPedido]] lee de acá · `reads_from` EXTRACTED
+- [[SP EnviarMensaje]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCambiosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCategoriasDeUsuario]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetEstadosIntercambios]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFavoritos]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFiltroCategorias]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFiltroEstados]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetIdPropuestaEnCurso]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetIntercambios]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetSenalesGustos]] lee de acá · `reads_from` EXTRACTED
+- [[SP IntercambioConArticuloComprometido]] lee de acá · `reads_from` EXTRACTED
+- [[SP ProponerIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP RechazarPendientesDeArticulos]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarIntercambio]] lee de acá · `reads_from` EXTRACTED
-- [[Tabla Intercambios]] la usa como tipo · `references` EXTRACTED
+- [[SP ResponderCambio]] lee de acá · `reads_from` EXTRACTED

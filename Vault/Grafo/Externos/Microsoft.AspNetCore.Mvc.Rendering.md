@@ -19,4 +19,5 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 **Desde otras notas:**
 - [[PublicarController]] la importa · `imports` EXTRACTED
+- [[RecomendacionesController]] la importa · `imports` EXTRACTED
 - [[Vista Publicar-Index]] la importa · `imports` EXTRACTED

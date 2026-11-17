@@ -21,14 +21,10 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 - importa [[Namespace Swappit.Models]] · `imports` EXTRACTED
 - importa [[Namespace Swappit.Models.ViewModels]] · `imports` EXTRACTED
-- incluye el partial [[Vista Chat-_Mensajes]] · `includes` EXTRACTED
 - tiene un link a [[ArticulosController.Buscar()]] · `links_to` EXTRACTED
+- tiene un link a [[ChatController.Enviar()]] · `links_to` EXTRACTED
 - tiene un link a [[ChatController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[ChatController.Mensajes()]] · `links_to` EXTRACTED
 - tiene un link a [[IntercambioController.Detalle()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Publico()]] · `links_to` EXTRACTED
 - carga el script [[chat.js]] · `loads_script` EXTRACTED
-- envía el formulario a [[ChatController.Enviar()]] · `posts_to` EXTRACTED
-
-**Desde otras notas:**
-- [[ChatController.Index()]] muestra esta vista · `renders` INFERRED

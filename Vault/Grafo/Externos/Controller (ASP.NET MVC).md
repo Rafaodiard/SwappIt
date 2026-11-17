@@ -24,3 +24,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[NotificacionesController]] hereda de acá · `inherits` EXTRACTED
 - [[PerfilController]] hereda de acá · `inherits` EXTRACTED
 - [[PublicarController]] hereda de acá · `inherits` EXTRACTED
+- [[RecomendacionesController]] hereda de acá · `inherits` EXTRACTED

@@ -19,16 +19,16 @@ tags:
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- importa [[Namespace Swappit.Models]] · `imports` EXTRACTED
 - tiene un link a [[ArticulosController.Buscar()]] · `links_to` EXTRACTED
 - tiene un link a [[ArticulosController.Detalle()]] · `links_to` EXTRACTED
 - tiene un link a [[ChatController.Index()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Aceptar()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Cancelar()]] · `links_to` EXTRACTED
 - tiene un link a [[IntercambioController.Index()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.MarcarRealizado()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Rechazar()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Publico()]] · `links_to` EXTRACTED
-- envía el formulario a [[IntercambioController.Aceptar()]] · `posts_to` EXTRACTED
-- envía el formulario a [[IntercambioController.Cancelar()]] · `posts_to` EXTRACTED
-- envía el formulario a [[IntercambioController.MarcarRealizado()]] · `posts_to` EXTRACTED
-- envía el formulario a [[IntercambioController.Rechazar()]] · `posts_to` EXTRACTED
+- carga el script [[articulo.js]] · `loads_script` EXTRACTED
 
 **Desde otras notas:**
 - [[IntercambioController.Detalle()]] muestra esta vista · `renders` INFERRED

@@ -27,10 +27,9 @@ Comunidad del grafo: [[Comunidad - Categorías]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Categorias]] es su clase en C# · `maps_to` INFERRED
-- [[BD.GetCategoriaById()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetCategorias()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFiltroCategorias()]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetCategoriaById]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetCategorias]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetFiltroCategorias]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarArticulo]] lee de acá · `reads_from` EXTRACTED
+- [[SP RegistrarBusqueda]] lee de acá · `reads_from` EXTRACTED
+- [[Tabla Articulos]] la usa como tipo · `references` EXTRACTED

@@ -18,7 +18,7 @@ tags:
 - `Ver(id)` (POST): la marca como leída y redirige al intercambio, o al chat si es "Mensaje nuevo".
 - `MarcarTodasLeidas()` (POST, por fetch).
 
-Las notificaciones se crean en [[BD.ProponerIntercambio()]], [[BD.CambiarEstadoIntercambio()]], [[BD.CancelarIntercambio()]] y [[BD.EnviarMensaje()]]. Ver [[Flujo Notificaciones y favoritos]].
+Las notificaciones se crean en [[IntercambiosBD.ProponerIntercambio()]], [[IntercambiosBD.CambiarEstadoIntercambio()]], [[IntercambiosBD.CancelarIntercambio()]] y [[ChatBD.EnviarMensaje()]]. Ver [[Flujo Notificaciones y favoritos]].
 
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 

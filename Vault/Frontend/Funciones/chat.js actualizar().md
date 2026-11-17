@@ -18,4 +18,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 
 **Desde otras notas:**
-- [[chat.js]] la llama indirectamente · `indirect_call` INFERRED
+- [[chat.js]] indirect_call · `indirect_call` INFERRED

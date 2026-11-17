@@ -59,7 +59,7 @@ public class AccountController : Controller
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
         List<Provincias> provincias = UsuariosBD.GetProvincias();
-        if (r.IdProvincias.HasValue && !provincias.Any(p => p.IdProvincia == r.IdProvincias.Value))
+        if (r.IdProvincias.HasValue && !ExisteProvincia(provincias, r.IdProvincias.Value))
         {
             ModelState.AddModelError(nameof(r.IdProvincias), "Elegí una provincia de la lista");
         }
@@ -190,5 +190,17 @@ public class AccountController : Controller
         int edad = DateTime.Today.Year - fechaNacimiento.Year;
         if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
         return edad;
+    }
+
+    private static bool ExisteProvincia(List<Provincias> provincias, int idProvincia)
+    {
+        foreach (Provincias p in provincias)
+        {
+            if (p.IdProvincia == idProvincia)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

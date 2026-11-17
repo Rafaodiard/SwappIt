@@ -17,9 +17,9 @@ tags:
 
 ## Recorrido de un mail
 1. El controller llama al método de [[BD]] (`ProponerIntercambio`, `CambiarEstadoIntercambio`, `CancelarIntercambio`, `EnviarMensaje`) con una lista vacía de `NotificacionCreada`.
-2. Dentro de la transacción, `CrearNotificacion` inserta la fila en Notificaciones y la suma a la lista. La lista se devuelve recién después del `Commit`.
+2. El SP de la acción crea las notificaciones adentro de su transacción ([[SP CrearNotificacion]]) y las devuelve en un segundo resultado; [[NotificacionesBD.LeerCreadas()]] las suma a la lista (desde el 17/11).
 3. El controller llama a `EnviarNotificaciones`, que arma los links con `Url.Action` y sigue en segundo plano.
-4. Por cada notificación: `GetDatosMailNotificacion` (Intercambios + Usuarios ×2 + Articulos ×2), `CrearMail` (texto plano + HTML con la paleta), copia `.eml` y envío por SMTP.
+4. Por cada notificación: `GetDatosMailNotificacion` ([[SP GetDatosMailNotificacion]]), `CrearMail` (texto plano + HTML con la paleta), copia `.eml` y envío por SMTP.
 
 Qué manda mail: Propuesta recibida (al dueño), Propuesta aceptada y rechazada (a quien propuso; al aceptar, las otras pendientes de esos artículos se rechazan solas y también avisan), Intercambio cancelado y Mensaje nuevo (a la otra persona, solo si no tenía otro "Mensaje nuevo" sin leer en ese chat). Marcar realizado no manda nada.
 

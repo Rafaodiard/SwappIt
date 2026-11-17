@@ -17,7 +17,7 @@ tags:
 ---
 # ConversacionViewModel
 
-`Models/ViewModels/ConversacionViewModel.cs` · Resumen del chat de un intercambio para la lista de conversaciones de [[Vista Chat-Index]]: último mensaje (`UltimoTexto`, `UltimaFecha`, `UltimoEsMio` para mostrar "Vos: ...") y cuántos mensajes de la otra persona no vio (`NoLeidos`). Sale de [[Tabla Mensajes]] con [[BD.GetResumenesChat()]]. El inicio suma los `NoLeidos` para "mensajes sin leer".
+`Models/ViewModels/ConversacionViewModel.cs` · Resumen del chat de un intercambio para la lista de conversaciones de [[Vista Chat-Index]]: último mensaje (`UltimoTexto`, `UltimaFecha`, `UltimoEsMio` para mostrar "Vos: ...") y cuántos mensajes de la otra persona no vio (`NoLeidos`). Sale de [[Tabla Mensajes]] con [[ChatBD.GetResumenesChat()]]. El inicio suma los `NoLeidos` para "mensajes sin leer".
 
 Comunidad del grafo: [[Comunidad - Resumen del chat]]
 
@@ -29,4 +29,4 @@ Comunidad del grafo: [[Comunidad - Resumen del chat]]
 - usa el tipo [[DateTime]] · `references` EXTRACTED
 
 **Desde otras notas:**
-- [[BD.GetResumenesChat()]] la usa como tipo · `references` EXTRACTED
+- [[ChatBD.GetResumenesChat()]] la usa como tipo · `references` EXTRACTED

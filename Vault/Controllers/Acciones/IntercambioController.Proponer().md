@@ -16,9 +16,11 @@ Método de [[IntercambioController]] · `Controllers/IntercambioController.cs` l
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.ArticuloComprometido()]] · `calls` EXTRACTED
-- llama a [[BD.GetArticuloById()]] · `calls` EXTRACTED
-- llama a [[BD.ProponerIntercambio()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetArticuloById()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ArticuloComprometido()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ContarIntercambiosActivos()]] · `calls` EXTRACTED
+- llama a [[IntercambiosBD.ProponerIntercambio()]] · `calls` EXTRACTED
+- llama a [[Listas]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - redirige a [[ArticulosController.Detalle()]] · `redirects_to` EXTRACTED
 - redirige a [[IntercambioController.Detalle()]] · `redirects_to` EXTRACTED
@@ -27,5 +29,5 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - usa el tipo [[ValidateAntiForgeryToken]] · `references` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[IntercambioController]] la tiene como método · `method` EXTRACTED
-- [[Vista Articulos-Detalle]] envía su formulario acá · `posts_to` EXTRACTED

@@ -29,5 +29,5 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 **Desde otras notas:**
 - [[Vista Articulos-Buscar]] la llama · `calls` EXTRACTED
-- [[BD.GetFiltroCategorias()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetFiltroEstados()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetFiltroCategorias()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetFiltroEstados()]] la usa como tipo · `references` EXTRACTED

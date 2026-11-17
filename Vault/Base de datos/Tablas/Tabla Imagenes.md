@@ -33,17 +33,13 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script Estructura.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetFotoUsuario()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetImagenesArticulo()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetArticulosDeIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCambiosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFavoritos]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetFotoUsuario]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetImagenesArticulo]] lee de acá · `reads_from` EXTRACTED
-- [[BD.BorrarFotoUsuario()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.GuardarFotoUsuario()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.PublicarArticulo()]] escribe acá · `writes_to` EXTRACTED
+- [[SP GetIntercambios]] lee de acá · `reads_from` EXTRACTED
 - [[SP BorrarFotoUsuario]] escribe acá · `writes_to` EXTRACTED
 - [[SP GuardarFotoUsuario]] escribe acá · `writes_to` EXTRACTED
 - [[SP PublicarArticulo]] escribe acá · `writes_to` EXTRACTED

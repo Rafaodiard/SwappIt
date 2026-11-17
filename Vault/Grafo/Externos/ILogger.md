@@ -22,3 +22,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[IntercambioController]] la usa como tipo · `references` EXTRACTED
 - [[NotificacionesController]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

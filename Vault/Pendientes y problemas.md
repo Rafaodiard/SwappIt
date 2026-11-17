@@ -12,7 +12,7 @@ Lo que encontré leyendo el código de `main` (revisado el 30/10 sobre `f639baa`
 - **Reputación / calificaciones**: no hay tabla ni código.
 - **Editar o borrar un artículo**: el botón "Editar artículo" está deshabilitado.
 - **Artículos recomendados** del inicio ([[Vista Home-Inicio]]): por ahora son los últimos disponibles de los demás; no hay datos de gustos ni búsquedas para recomendar de verdad.
-- **Select de orden en Buscar** ("Más recientes / A - Z"): no cambia nada, el orden siempre es `ORDER BY IdArticulos DESC` (coincide con "Más recientes"; "A - Z" no hace nada). El filtro de distancia y "Más cercanos" se sacaron el 30/10 porque no hay coordenadas en la base.
+- **Select de orden en Buscar**: funciona (Para vos, Más populares, Más recientes y A - Z). Desde el 17/11 A - Z, populares y recientes los ordena [[SP GetArticulosCatalogo]]. El filtro de distancia y "Más cercanos" se sacaron el 30/10 porque no hay coordenadas en la base.
 - **Ubicación del header** ("Palermo, CABA") es un texto fijo.
 - **¿Olvidaste tu contraseña?** apunta a `#`.
 - **Cambiar contraseña** existe (`/Account/CambiarContrasena`) pero ninguna vista tiene un link a esa pantalla.
@@ -22,12 +22,11 @@ Lo que encontré leyendo el código de `main` (revisado el 30/10 sobre `f639baa`
 Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar intercambios ([[Flujo Proponer intercambio]]), historial en Mi perfil, chat ([[Flujo Chat]]) y notificaciones ([[Flujo Notificaciones y favoritos]]).
 
 ## Stored procedures
-- [[BD]] no llama a ningún SP: todo es SQL inline. Los SP de [[Script SQLSwappit.sql]] son duplicados sin uso, y los de intercambios, notificaciones y chat ni siquiera existen como SP.
-- El 29/10 ("scripts y sp arreglados") se completaron los SP vacíos y se corrigieron [[SP ActualizarContrasena]] y [[SP GuardarFotoUsuario]] (varchar(100)). Ahora los SP nuevos también están en [[Script StoredProcedures.sql]] y [[Script SQLSwappit_CualquierCompu.sql]].
-- [[SP GetArticulosCatalogo]], [[SP GetFiltroCategorias]] y [[SP GetFiltroEstados]] quedaron atrás de [[BD]]: no excluyen al usuario logueado ni ocultan los artículos comprometidos.
-- [[SP RegistrarUsuario]] no inserta `Edad` (columna NOT NULL), así que siempre falla; además rechaza teléfonos repetidos (los usuarios sin teléfono, guardados como vacío, chocan).
+- Desde el 17/11 todo el acceso a datos pasa por SP (devolución docente): no queda SQL en C#, ni SQL armado con texto, ni filtros con LINQ, y la app ya no cambia la estructura de la base (se sacó el `ALTER TABLE` que agregaba `FechaPublicacion`). Para probarlo hay que recrear la base desde los scripts.
+- Sin uso desde la app: [[SP RegistrarArticulo]], [[SP RegistrarIntercambio]], [[SP RegistrarMensaje]] y los `Complejos_*` de la materia.
 - [[SP RegistrarIntercambio]] solo inserta si `@fecha < GETDATE()` y busca artículos **por nombre** (puede haber nombres repetidos).
-- [[SP RegistrarArticulo]] recibe `@descripcion varchar(50)` (la columna es 500) y no carga `Ubicacion` ni `ACambio`.
+- [[SP RegistrarArticulo]] recibe `@descripcion varchar(50)` (la columna es 500) y no carga `Ubicacion` ni `IdCategoriaACambio`.
+- "Para vos" se sigue calculando en C# ([[RecomendacionesController]], con bucles y sin LINQ) con las señales de [[SP GetSenalesGustos]], [[SP GetCategoriasDeUsuario]] y [[SP GetPopularidad]].
 
 ## Base de datos y datos
 - Rafael actualiza su base por su cuenta con los scripts de creación (14/11, sin scripts de migración). Una base creada antes del 14/11 puede no tener: `Usuarios.Telefono` como `varchar(20)` (08/11, [[Telefonos]]), las 24 provincias sin repetir (08/11) y [[Tabla ArticulosIntercambios]] en lugar de `Intercambios.IdArticulos1` e `IdArticulos2` (11/11). Desde el 14/11 también hacen falta [[Tabla CambiosIntercambios]], [[Tabla TipoCambios]], `Notificaciones.IdCambio` y los tipos de notificación 6 a 10. La base de cada compu es aparte.
@@ -37,7 +36,8 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 - El comentario de [[PublicarController]] y [[PerfilController]] dice que `Imagenes.Ruta` es `varchar(50)`, pero ya es `varchar(100)`.
 
 ## Código
-- Para decidir (08/11): elegir el barrio de una lista (tabla Barrios). Proponer varios artículos ya está hecho (11/11, [[Tabla ArticulosIntercambios]]).- La connection string está fija en [[BD]] (`Server=localhost`, autenticación de Windows); en otra compu hay que cambiarla a mano (hay una alternativa `.\SQLEXPRESS` comentada).
+- Para decidir (08/11): elegir el barrio de una lista (tabla Barrios). Proponer varios artículos ya está hecho (11/11, [[Tabla ArticulosIntercambios]]).
+- La connection string está fija en `ConexionBD.ConnectionString` ([[BD]]), con `localhost` y autenticación de Windows (Rafael eligió `localhost` como predeterminada el 17/11, igual que el `README.md`); con SQL Express hay que cambiarla a mano en ese único archivo (la de `.\SQLEXPRESS` está comentada).
 - [[Intercambios]] (modelo) no tiene la columna `Ubicacion` que sí tiene la tabla.
 - [[Usuarios]] ([[BD]].UpdateUsuario) actualiza también `Mail`, `Contraseña` y fecha de nacimiento con lo que traía el objeto: funciona porque [[PerfilController]] primero lee el usuario completo.
 - `bin/` y `obj/` están en git aunque el `.gitignore` los excluye (152 archivos): conviene `git rm -r --cached bin obj`.

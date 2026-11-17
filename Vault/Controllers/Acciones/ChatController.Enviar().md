@@ -16,7 +16,7 @@ Método de [[ChatController]] · `Controllers/ChatController.cs` línea 106. Par
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.EnviarMensaje()]] · `calls` EXTRACTED
+- llama a [[ChatBD.EnviarMensaje()]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - redirige a [[ChatController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
@@ -24,5 +24,5 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - usa el tipo [[ValidateAntiForgeryToken]] · `references` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista Chat-Index]] tiene un link acá · `links_to` EXTRACTED
 - [[ChatController]] la tiene como método · `method` EXTRACTED
-- [[Vista Chat-Index]] envía su formulario acá · `posts_to` EXTRACTED

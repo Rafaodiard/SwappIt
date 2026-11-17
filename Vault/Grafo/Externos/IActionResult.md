@@ -49,3 +49,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[PerfilController.Publico()]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.Index() GET]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.Index() POST]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

@@ -17,18 +17,20 @@ tags:
 
 Stored procedure `dbo.GetFiltroCategorias`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
-Desde el 29/10 tiene código (antes era la plantilla vacía de SSMS): categorías con la cantidad de artículos que coinciden con la búsqueda. **Quedó atrás de [[BD]].GetFiltroCategorias**: no excluye al usuario logueado ni los artículos comprometidos.
+Categorías con la cantidad de artículos que coinciden con la búsqueda, sin los del usuario logueado ni los comprometidos. Desde el 17/11 escapa `[`, `%` y `_` adentro del SP.
 
-Es la copia en SQL de [[BD]].GetFiltroCategorias, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[ArticulosBD.GetFiltroCategorias()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
 ## Conexiones en el grafo (graphify)
 - lee de [[Tabla Articulos]] · `reads_from` EXTRACTED
 - lee de [[Tabla Categorias]] · `reads_from` EXTRACTED
+- lee de [[Tabla EstadosIntercambios]] · `reads_from` EXTRACTED
+- lee de [[Tabla Intercambios]] · `reads_from` EXTRACTED
 
 **Desde otras notas:**
+- [[ArticulosBD.GetFiltroCategorias()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GetFiltroCategorias()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

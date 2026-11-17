@@ -26,5 +26,5 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - corresponde a la tabla [[Tabla Provincias]] · `maps_to` INFERRED
 
 **Desde otras notas:**
-- [[BD.GetProvinciaById()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetProvincias()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.GetProvinciaById()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.GetProvincias()]] la usa como tipo · `references` EXTRACTED

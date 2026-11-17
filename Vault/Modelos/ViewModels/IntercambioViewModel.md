@@ -30,7 +30,7 @@ tags:
 ---
 # IntercambioViewModel
 
-`Models/ViewModels/IntercambioViewModel.cs` · Un intercambio visto desde el usuario logueado (Mis intercambios, Ver intercambio, chat, historial de Mi perfil e inicio). Sale de [[Tabla Intercambios]] + estado + los dos artículos (con su estado y primera foto) + la otra persona. [[BD.GetIntercambios()]] lo da vuelta para que **Mi...** sea siempre lo del usuario logueado y **Su...**/**Otro...** lo de la otra persona. `EsRecibido`: la propuesta la recibió el usuario (es el dueño del artículo pedido).
+`Models/ViewModels/IntercambioViewModel.cs` · Un intercambio visto desde el usuario logueado (Mis intercambios, Ver intercambio, chat, historial de Mi perfil e inicio). Sale de [[Tabla Intercambios]] + estado + los dos artículos (con su estado y primera foto) + la otra persona. [[IntercambiosBD.GetIntercambios()]] lo da vuelta para que **Mi...** sea siempre lo del usuario logueado y **Su...**/**Otro...** lo de la otra persona. `EsRecibido`: la propuesta la recibió el usuario (es el dueño del artículo pedido).
 
 Comunidad del grafo: [[Comunidad - Intercambios del usuario]]
 
@@ -42,6 +42,6 @@ Comunidad del grafo: [[Comunidad - Intercambios del usuario]]
 - usa el tipo [[DateTime]] · `references` EXTRACTED
 
 **Desde otras notas:**
-- [[BD.GetIntercambio()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetIntercambios()]] la usa como tipo · `references` EXTRACTED
-- [[HomeController.PorResponder()]] la usa como tipo · `references` EXTRACTED
+- [[ChatController.PuedeEscribir()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.GetIntercambio()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.GetIntercambios()]] la usa como tipo · `references` EXTRACTED

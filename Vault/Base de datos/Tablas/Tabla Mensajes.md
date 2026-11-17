@@ -21,7 +21,6 @@ tags:
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Conexiones en el grafo (graphify)
-- usa el tipo [[Tabla Intercambios]] · `references` EXTRACTED
 - usa el tipo [[Tabla Usuarios]] · `references` EXTRACTED
 
 **Desde otras notas:**
@@ -29,8 +28,11 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Mensajes]] es su clase en C# · `maps_to` INFERRED
-- [[BD.GetMensajes()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetResumenesChat()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.EnviarMensaje()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.MarcarMensajesVistos()]] escribe acá · `writes_to` EXTRACTED
+- [[SP Complejos_SeguimientoIntercambiosPendientes]] lee de acá · `reads_from` EXTRACTED
+- [[SP ContarMensajesNoLeidos]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetIntercambios]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetMensajes]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetResumenesChat]] lee de acá · `reads_from` EXTRACTED
+- [[SP EnviarMensaje]] escribe acá · `writes_to` EXTRACTED
+- [[SP MarcarMensajesVistos]] escribe acá · `writes_to` EXTRACTED
 - [[SP RegistrarMensaje]] escribe acá · `writes_to` EXTRACTED

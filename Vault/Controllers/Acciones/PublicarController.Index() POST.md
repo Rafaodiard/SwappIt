@@ -17,7 +17,8 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 ## Conexiones en el grafo (graphify)
 - llama a [[Articulos]] · `calls` INFERRED
-- llama a [[BD.PublicarArticulo()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.ContarArticulosActivos()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.PublicarArticulo()]] · `calls` EXTRACTED
 - llama a [[PublicarController.AvisarFotosDeNuevo()]] · `calls` EXTRACTED
 - llama a [[PublicarController.BorrarFotosArticulo()]] · `calls` EXTRACTED
 - llama a [[PublicarController.GuardarFotosArticulo()]] · `calls` EXTRACTED
@@ -36,4 +37,3 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 **Desde otras notas:**
 - [[PublicarController]] la tiene como método · `method` EXTRACTED
-- [[Vista Publicar-Index]] envía su formulario acá · `posts_to` EXTRACTED

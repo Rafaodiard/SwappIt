@@ -4,9 +4,9 @@ public static class SesionUsuario
 {
     public static void GuardarDatosHeader(ISession session, Usuarios u)
     {
-        session.SetString("Iniciales", ObtenerIniciales(u));
+        session.SetString("Iniciales", Iniciales(u.Nombre, u.Apellido));
 
-        string? foto = BD.GetFotoUsuario(u.IdUsuarios);
+        string? foto = UsuariosBD.GetFotoUsuario(u.IdUsuarios);
         if (foto != null)
         {
             session.SetString("Foto", foto);
@@ -17,8 +17,17 @@ public static class SesionUsuario
         }
     }
 
-    private static string ObtenerIniciales(Usuarios u)
+    public static string Iniciales(string? nombre, string? apellido)
     {
-        return $"{u.Nombre?.FirstOrDefault()}{u.Apellido?.FirstOrDefault()}".ToUpper();
+        string iniciales = "";
+        if (!string.IsNullOrEmpty(nombre))
+        {
+            iniciales += nombre[0];
+        }
+        if (!string.IsNullOrEmpty(apellido))
+        {
+            iniciales += apellido[0];
+        }
+        return iniciales.ToUpper();
     }
 }

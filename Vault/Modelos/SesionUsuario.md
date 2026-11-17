@@ -19,4 +19,4 @@ Comunidad del grafo: [[Comunidad - Usuarios, contraseñas y sesión]]
 ## Conexiones en el grafo (graphify)
 - contiene [[Namespace Swappit.Models]] · `contains` EXTRACTED
 - tiene el método [[SesionUsuario.GuardarDatosHeader()]] · `method` EXTRACTED
-- tiene el método [[SesionUsuario.ObtenerIniciales()]] · `method` EXTRACTED
+- tiene el método [[SesionUsuario.Iniciales()]] · `method` EXTRACTED

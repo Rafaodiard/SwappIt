@@ -20,3 +20,4 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[LoginViewModel]] la importa · `imports` EXTRACTED
 - [[PublicarArticuloViewModel]] la importa · `imports` EXTRACTED
 - [[RegistroViewModel]] la importa · `imports` EXTRACTED
+- [[Vista Publicar-Index]] la importa · `imports` EXTRACTED

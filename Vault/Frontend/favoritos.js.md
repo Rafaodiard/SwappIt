@@ -16,3 +16,6 @@ tags:
 Comunidad del grafo: [[Comunidad - Favoritos (sin usar)]]
 
 ## Conexiones en el grafo (graphify)
+
+**Desde otras notas:**
+- [[Vista _Layout]] carga este script · `loads_script` EXTRACTED

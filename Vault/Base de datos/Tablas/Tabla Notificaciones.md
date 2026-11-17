@@ -22,18 +22,19 @@ tags:
 Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 
 ## Conexiones en el grafo (graphify)
+- usa el tipo [[Tabla Intercambios]] · `references` EXTRACTED
 - usa el tipo [[Tabla Provincias]] · `references` EXTRACTED
 - usa el tipo [[Tabla TipoNotificaciones]] · `references` EXTRACTED
 - usa el tipo [[Tabla Usuarios]] · `references` EXTRACTED
 
 **Desde otras notas:**
 - [[Script Estructura.sql]] la contiene · `contains` EXTRACTED
-- [[Script Notificaciones.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GetCantidadNotificacionesNoLeidas()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.CrearNotificacion()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.MarcarMensajesVistos()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.MarcarNotificacionesLeidas()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.MarcarNotificacionLeida()]] escribe acá · `writes_to` EXTRACTED
+- [[SP GetCantidadNotificacionesNoLeidas]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetNotificaciones]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_Personalizado_GestionarPropuestaYNotificacion]] escribe acá · `writes_to` EXTRACTED
+- [[SP CrearNotificacion]] escribe acá · `writes_to` EXTRACTED
+- [[SP MarcarMensajesVistos]] escribe acá · `writes_to` EXTRACTED
+- [[SP MarcarNotificacionLeida]] escribe acá · `writes_to` EXTRACTED
+- [[SP MarcarNotificacionesLeidas]] escribe acá · `writes_to` EXTRACTED

@@ -19,11 +19,12 @@ Comunidad del grafo: [[Comunidad - Publicar artículo]]
 - llama a [[SelectListItem]] · `calls` EXTRACTED
 - importa [[Microsoft.AspNetCore.Mvc.Rendering]] · `imports` EXTRACTED
 - importa [[Namespace Swappit.Models.ViewModels]] · `imports` EXTRACTED
+- importa [[System.ComponentModel.DataAnnotations]] · `imports` EXTRACTED
 - incluye el partial [[Vista _ValidationScriptsPartial]] · `includes` EXTRACTED
 - tiene un link a [[HomeController.Index()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Index()]] · `links_to` EXTRACTED
+- tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
 - carga el script [[publicar.js]] · `loads_script` EXTRACTED
-- envía el formulario a [[PublicarController.Index() POST]] · `posts_to` EXTRACTED
 
 **Desde otras notas:**
-- [[PublicarController.Index() GET]] muestra esta vista · `renders` INFERRED
 - [[PublicarController.Index() POST]] muestra esta vista · `renders` INFERRED

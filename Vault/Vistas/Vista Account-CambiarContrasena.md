@@ -16,9 +16,8 @@ tags:
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
+- tiene un link a [[AccountController.CambiarContrasena() GET]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Index()]] · `links_to` EXTRACTED
-- envía el formulario a [[AccountController.CambiarContrasena() POST]] · `posts_to` EXTRACTED
 
 **Desde otras notas:**
-- [[AccountController.CambiarContrasena() GET]] muestra esta vista · `renders` INFERRED
 - [[AccountController.CambiarContrasena() POST]] muestra esta vista · `renders` INFERRED

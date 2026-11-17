@@ -17,20 +17,22 @@ tags:
 
 Stored procedure `dbo.GetArticulosCatalogo`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
-Desde el 29/10 tiene código (antes era la plantilla vacía de SSMS): búsqueda, categorías y estados como ids separados por coma (`STRING_SPLIT`), `@idUsuario` y `@cantidad`. **Quedó atrás de [[BD]].GetArticulosCatalogo**: no tiene `excluirUsuario` ni oculta los artículos comprometidos en un intercambio.
+Catálogo de Explorar, inicio, perfiles, favoritos y recomendaciones, con todos los filtros adentro del SP: búsqueda (escapa `[`, `%` y `_`), categorías y estados como ids separados por coma (`STRING_SPLIT`), excluir un usuario o un artículo, dejar afuera los comprometidos, solo los que se pueden sumar a un intercambio (`@fueraDeIntercambio`), cantidad y orden (`recientes`, `az` o `populares`, que suma vistas y favoritos de los últimos 30 días). Desde el 17/11 reemplaza al SQL que se armaba en C#.
 
-Es la copia en SQL de [[BD]].GetArticulosCatalogo, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[ArticulosBD.GetArticulosCatalogo()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
 ## Conexiones en el grafo (graphify)
 - lee de [[Tabla Articulos]] · `reads_from` EXTRACTED
 - lee de [[Tabla EstadosArticulos]] · `reads_from` EXTRACTED
+- lee de [[Tabla EstadosIntercambios]] · `reads_from` EXTRACTED
 - lee de [[Tabla Imagenes]] · `reads_from` EXTRACTED
+- lee de [[Tabla Intercambios]] · `reads_from` EXTRACTED
 - lee de [[Tabla Usuarios]] · `reads_from` EXTRACTED
 
 **Desde otras notas:**
+- [[ArticulosBD.GetArticulosCatalogo()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GetArticulosCatalogo()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

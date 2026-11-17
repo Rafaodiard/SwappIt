@@ -27,8 +27,6 @@ public class RecomendacionesController : Controller
     private const double PesoInteresDelOtro = 0.25;
     private const double PesoPopularidad = 0.10;
     private const double InteresSiEstaAbierto = 0.5;
-    private const int DiasPopularidad = 30;
-    private const int VistasPorFavorito = 3;
 
     private const int CadaCuantosUnoParaDescubrir = 5;
     private const double UmbralGusto = 0.2;
@@ -121,7 +119,7 @@ public class RecomendacionesController : Controller
         {
             textoLimpio = textoLimpio.Substring(0, MaxLargoBusqueda);
         }
-        List<int> categoriasLimpias = (categorias ?? []).Where(id => id > 0).Distinct().Take(MaxCategoriasBusqueda).ToList();
+        List<int> categoriasLimpias = Listas.IdsValidos(categorias, MaxCategoriasBusqueda);
 
         try
         {
@@ -154,9 +152,12 @@ public class RecomendacionesController : Controller
     [NonAction]
     public static string OrdenValido(string? orden, bool logueado)
     {
-        if (OpcionesOrden(logueado).Any(o => o.Value == orden))
+        foreach (SelectListItem opcion in OpcionesOrden(logueado))
         {
-            return orden!;
+            if (opcion.Value == orden)
+            {
+                return orden!;
+            }
         }
         return logueado ? OrdenParaVos : OrdenPopulares;
     }
@@ -164,21 +165,12 @@ public class RecomendacionesController : Controller
     [NonAction]
     public static List<ArticuloCardViewModel> Ordenar(List<ArticuloCardViewModel> articulos, string orden, int? idUsuario)
     {
-        if (orden == OrdenAZ)
-        {
-            StringComparer alfabetico = StringComparer.Create(new CultureInfo("es-AR"), ignoreCase: true);
-            return articulos.OrderBy(a => a.Nombre, alfabetico).ToList();
-        }
-        if (orden == OrdenRecientes)
-        {
-            return articulos.OrderByDescending(a => a.IdArticulos).ToList();
-        }
         if (orden == OrdenParaVos && idUsuario != null)
         {
             List<ArticuloPuntuado> puntuados = Puntuar(idUsuario.Value, articulos);
             return Mezclar(idUsuario.Value, puntuados);
         }
-        return Populares(articulos);
+        return articulos;
     }
 
     [NonAction]
@@ -186,23 +178,32 @@ public class RecomendacionesController : Controller
     {
         if (idUsuario == null)
         {
-            return Populares(ArticulosBD.GetArticulosCatalogo()).Take(cantidad).ToList();
+            return ArticulosBD.GetArticulosCatalogo(cantidad: cantidad, orden: OrdenPopulares);
         }
 
         List<ArticuloCardViewModel> candidatos = ArticulosBD.GetArticulosCatalogo(excluirUsuario: idUsuario);
         List<ArticuloPuntuado> puntuados = Puntuar(idUsuario.Value, candidatos);
 
-        List<ArticuloPuntuado> conInteresMutuo = puntuados.Where(p => p.InteresDelOtro > 0).ToList();
+        List<ArticuloPuntuado> conInteresMutuo = new List<ArticuloPuntuado>();
+        foreach (ArticuloPuntuado p in puntuados)
+        {
+            if (p.InteresDelOtro > 0)
+            {
+                conInteresMutuo.Add(p);
+            }
+        }
         if (conInteresMutuo.Count >= cantidad)
         {
             puntuados = conInteresMutuo;
         }
-        return Mezclar(idUsuario.Value, puntuados).Take(cantidad).ToList();
+
+        List<ArticuloCardViewModel> mezclados = Mezclar(idUsuario.Value, puntuados);
+        return mezclados.Count > cantidad ? mezclados.GetRange(0, cantidad) : mezclados;
     }
 
     // ---------- PASO 1: GUSTOS ----------
 
-    private static Dictionary<int, double> ArmarGustos(IEnumerable<SenalGusto> senales)
+    private static Dictionary<int, double> ArmarGustos(List<SenalGusto> senales)
     {
         Dictionary<int, double> puntos = new Dictionary<int, double>();
         foreach (SenalGusto senal in senales)
@@ -221,8 +222,18 @@ public class RecomendacionesController : Controller
         {
             return puntos;
         }
-        double maximo = puntos.Values.Max();
-        return puntos.ToDictionary(p => p.Key, p => p.Value / maximo);
+        double maximo = double.MinValue;
+        foreach (double valor in puntos.Values)
+        {
+            maximo = Math.Max(maximo, valor);
+        }
+
+        Dictionary<int, double> normalizados = new Dictionary<int, double>();
+        foreach (KeyValuePair<int, double> p in puntos)
+        {
+            normalizados[p.Key] = p.Value / maximo;
+        }
+        return normalizados;
     }
 
     private static double PuntosSegunTipo(SenalGusto senal)
@@ -259,17 +270,35 @@ public class RecomendacionesController : Controller
         return 0.25;
     }
 
-    private static List<string> PalabrasBuscadas(IEnumerable<SenalGusto> senales)
+    private static List<string> PalabrasBuscadas(List<SenalGusto> senales)
     {
-        return senales
-            .Where(s => s.Tipo == TipoInteracciones.Busqueda && !string.IsNullOrWhiteSpace(s.Texto))
-            .OrderByDescending(s => s.Fecha)
-            .Take(MaxBusquedasRecientes)
-            .SelectMany(s => s.Texto!.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            .Select(Normalizar)
-            .Where(p => p.Length >= 3)
-            .Distinct()
-            .ToList();
+        List<SenalGusto> busquedas = new List<SenalGusto>();
+        foreach (SenalGusto s in senales)
+        {
+            if (s.Tipo == TipoInteracciones.Busqueda && !string.IsNullOrWhiteSpace(s.Texto))
+            {
+                busquedas.Add(s);
+            }
+        }
+        busquedas.Sort((a, b) => b.Fecha.CompareTo(a.Fecha));
+        if (busquedas.Count > MaxBusquedasRecientes)
+        {
+            busquedas = busquedas.GetRange(0, MaxBusquedasRecientes);
+        }
+
+        List<string> palabras = new List<string>();
+        foreach (SenalGusto s in busquedas)
+        {
+            foreach (string palabra in s.Texto!.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string normalizada = Normalizar(palabra);
+                if (normalizada.Length >= 3 && !palabras.Contains(normalizada))
+                {
+                    palabras.Add(normalizada);
+                }
+            }
+        }
+        return palabras;
     }
 
     // ---------- PASO 2: PUNTAJE DE CADA ARTÍCULO ----------
@@ -287,15 +316,35 @@ public class RecomendacionesController : Controller
 
     private static List<ArticuloPuntuado> Puntuar(int idUsuario, List<ArticuloCardViewModel> articulos)
     {
-        List<int> usuarios = articulos.Select(a => a.IdUsuarios).Append(idUsuario).Distinct().ToList();
-        List<SenalGusto> senales = RecomendacionesBD.GetSenalesGustos(usuarios, DateTime.Now.AddDays(-DiasDeHistorial));
-        Dictionary<int, Dictionary<int, double>> gustos = usuarios.ToDictionary(
-            u => u,
-            u => ArmarGustos(senales.Where(s => s.IdUsuario == u)));
+        HashSet<int> usuarios = new HashSet<int>();
+        foreach (ArticuloCardViewModel a in articulos)
+        {
+            usuarios.Add(a.IdUsuarios);
+        }
+        usuarios.Add(idUsuario);
+
+        Dictionary<int, List<SenalGusto>> senalesPorUsuario = new Dictionary<int, List<SenalGusto>>();
+        foreach (int u in usuarios)
+        {
+            senalesPorUsuario[u] = new List<SenalGusto>();
+        }
+        foreach (SenalGusto s in RecomendacionesBD.GetSenalesGustos(usuarios, DateTime.Now.AddDays(-DiasDeHistorial)))
+        {
+            if (senalesPorUsuario.TryGetValue(s.IdUsuario, out List<SenalGusto>? delUsuario))
+            {
+                delUsuario.Add(s);
+            }
+        }
+
+        Dictionary<int, Dictionary<int, double>> gustos = new Dictionary<int, Dictionary<int, double>>();
+        foreach (int u in usuarios)
+        {
+            gustos[u] = ArmarGustos(senalesPorUsuario[u]);
+        }
 
         Dictionary<int, double> misGustos = gustos[idUsuario];
-        List<string> palabrasBuscadas = PalabrasBuscadas(senales.Where(s => s.IdUsuario == idUsuario));
-        HashSet<int> misCategorias = ArticulosBD.GetArticulosCatalogo(idUsuario: idUsuario).Select(a => a.IdCategorias).ToHashSet();
+        List<string> palabrasBuscadas = PalabrasBuscadas(senalesPorUsuario[idUsuario]);
+        HashSet<int> misCategorias = new HashSet<int>(ArticulosBD.GetCategoriasDeUsuario(idUsuario));
         Dictionary<int, double> popularidad = CalcularPopularidad();
 
         List<ArticuloPuntuado> puntuados = new List<ArticuloPuntuado>();
@@ -328,7 +377,11 @@ public class RecomendacionesController : Controller
             return 1;
         }
 
-        double interes = misCategorias.Max(c => gustosDelDueno.GetValueOrDefault(c));
+        double interes = double.MinValue;
+        foreach (int categoria in misCategorias)
+        {
+            interes = Math.Max(interes, gustosDelDueno.GetValueOrDefault(categoria));
+        }
 
         if (articulo.IdCategoriaACambio == null)
         {
@@ -344,7 +397,14 @@ public class RecomendacionesController : Controller
             return false;
         }
         string nombreNormalizado = Normalizar(nombre);
-        return palabrasBuscadas.Any(p => nombreNormalizado.Contains(p));
+        foreach (string palabra in palabrasBuscadas)
+        {
+            if (nombreNormalizado.Contains(palabra))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static string Normalizar(string texto)
@@ -368,46 +428,70 @@ public class RecomendacionesController : Controller
 
     private static Dictionary<int, double> CalcularPopularidad()
     {
-        Dictionary<int, double> puntos = RecomendacionesBD.GetPopularidad(DateTime.Now.AddDays(-DiasPopularidad))
-            .ToDictionary(d => d.IdArticulo, d => (double)(d.Vistas + VistasPorFavorito * d.Favoritos));
+        List<PopularidadArticulo> filas = RecomendacionesBD.GetPopularidad();
+        double maximo = 0;
+        foreach (PopularidadArticulo fila in filas)
+        {
+            maximo = Math.Max(maximo, fila.Puntos);
+        }
 
-        double maximo = puntos.Count > 0 ? puntos.Values.Max() : 0;
+        Dictionary<int, double> popularidad = new Dictionary<int, double>();
         if (maximo == 0)
         {
-            return new Dictionary<int, double>();
+            return popularidad;
         }
-        return puntos.ToDictionary(p => p.Key, p => p.Value / maximo);
-    }
-
-    private static List<ArticuloCardViewModel> Populares(List<ArticuloCardViewModel> articulos)
-    {
-        Dictionary<int, double> popularidad = CalcularPopularidad();
-        return articulos
-            .OrderByDescending(a => popularidad.GetValueOrDefault(a.IdArticulos))
-            .ThenByDescending(a => a.IdArticulos)
-            .ToList();
+        foreach (PopularidadArticulo fila in filas)
+        {
+            popularidad[fila.IdArticulo] = fila.Puntos / maximo;
+        }
+        return popularidad;
     }
 
     // ---------- PASO 3: ORDENAR Y MEZCLAR ALGO PARA DESCUBRIR ----------
 
     private static List<ArticuloCardViewModel> Mezclar(int idUsuario, List<ArticuloPuntuado> puntuados)
     {
-        List<ArticuloPuntuado> porPuntaje = puntuados
-            .OrderByDescending(p => p.Puntaje)
-            .ThenByDescending(p => p.Articulo.IdArticulos)
-            .ToList();
+        List<ArticuloPuntuado> porPuntaje = new List<ArticuloPuntuado>(puntuados);
+        porPuntaje.Sort(CompararPorPuntaje);
 
-        List<ArticuloPuntuado> deTusGustos = porPuntaje.Where(EsDeTusGustos).ToList();
-        List<ArticuloPuntuado> paraDescubrir = porPuntaje.Where(p => !EsDeTusGustos(p)).ToList();
+        List<ArticuloPuntuado> deTusGustos = new List<ArticuloPuntuado>();
+        List<ArticuloPuntuado> paraDescubrir = new List<ArticuloPuntuado>();
+        foreach (ArticuloPuntuado p in porPuntaje)
+        {
+            if (EsDeTusGustos(p))
+            {
+                deTusGustos.Add(p);
+            }
+            else
+            {
+                paraDescubrir.Add(p);
+            }
+        }
 
         if (deTusGustos.Count == 0 || paraDescubrir.Count == 0)
         {
-            return porPuntaje.Select(ConMotivo).ToList();
+            List<ArticuloCardViewModel> todos = new List<ArticuloCardViewModel>();
+            foreach (ArticuloPuntuado p in porPuntaje)
+            {
+                todos.Add(ConMotivo(p));
+            }
+            return todos;
         }
 
-        List<ArticuloPuntuado> sorteados = Sortear(paraDescubrir, new Random(SemillaDelDia(idUsuario)))
-            .OrderByDescending(p => p.InteresDelOtro > 0)
-            .ToList();
+        List<ArticuloPuntuado> sorteados = new List<ArticuloPuntuado>();
+        List<ArticuloPuntuado> sinInteresDelOtro = new List<ArticuloPuntuado>();
+        foreach (ArticuloPuntuado p in Sortear(paraDescubrir, new Random(SemillaDelDia(idUsuario))))
+        {
+            if (p.InteresDelOtro > 0)
+            {
+                sorteados.Add(p);
+            }
+            else
+            {
+                sinInteresDelOtro.Add(p);
+            }
+        }
+        sorteados.AddRange(sinInteresDelOtro);
 
         List<ArticuloCardViewModel> resultado = new List<ArticuloCardViewModel>();
         HashSet<int> yaDescubiertos = new HashSet<int>();
@@ -429,8 +513,24 @@ public class RecomendacionesController : Controller
             }
         }
 
-        resultado.AddRange(paraDescubrir.Where(p => !yaDescubiertos.Contains(p.Articulo.IdArticulos)).Select(ConMotivo));
+        foreach (ArticuloPuntuado p in paraDescubrir)
+        {
+            if (!yaDescubiertos.Contains(p.Articulo.IdArticulos))
+            {
+                resultado.Add(ConMotivo(p));
+            }
+        }
         return resultado;
+    }
+
+    private static int CompararPorPuntaje(ArticuloPuntuado a, ArticuloPuntuado b)
+    {
+        int porPuntaje = b.Puntaje.CompareTo(a.Puntaje);
+        if (porPuntaje != 0)
+        {
+            return porPuntaje;
+        }
+        return b.Articulo.IdArticulos.CompareTo(a.Articulo.IdArticulos);
     }
 
     private static bool EsDeTusGustos(ArticuloPuntuado p)

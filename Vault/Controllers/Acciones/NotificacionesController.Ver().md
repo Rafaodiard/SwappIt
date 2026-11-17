@@ -16,7 +16,7 @@ Método de [[NotificacionesController]] · `Controllers/NotificacionesController
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.MarcarNotificacionLeida()]] · `calls` EXTRACTED
+- llama a [[NotificacionesBD.MarcarNotificacionLeida()]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - redirige a [[ChatController.Index()]] · `redirects_to` EXTRACTED
 - redirige a [[IntercambioController.Detalle()]] · `redirects_to` EXTRACTED

@@ -60,21 +60,28 @@ public class PublicarController : Controller
         }
 
         List<SelectListItem> categorias = ObtenerCategorias();
-        if (modelo.IdCategorias.HasValue && !categorias.Any(c => c.Value == modelo.IdCategorias.Value.ToString()))
+        if (modelo.IdCategorias.HasValue && !EstaEnLista(categorias, modelo.IdCategorias.Value))
         {
             ModelState.AddModelError(nameof(modelo.IdCategorias), "Elegí una categoría de la lista");
         }
-        if (modelo.IdCategoriaACambio.HasValue && !categorias.Any(c => c.Value == modelo.IdCategoriaACambio.Value.ToString()))
+        if (modelo.IdCategoriaACambio.HasValue && !EstaEnLista(categorias, modelo.IdCategoriaACambio.Value))
         {
             ModelState.AddModelError(nameof(modelo.IdCategoriaACambio), "Elegí una categoría de la lista o dejalo abierto a propuestas");
         }
         List<EstadosArticulos> estados = ObtenerEstados();
-        if (modelo.IdEstado.HasValue && !estados.Any(e => e.IdEstadosArticulos == modelo.IdEstado.Value))
+        if (modelo.IdEstado.HasValue && !ExisteEstado(estados, modelo.IdEstado.Value))
         {
             ModelState.AddModelError(nameof(modelo.IdEstado), "Elegí uno de los estados de la lista");
         }
 
-        List<IFormFile> fotos = (modelo.Fotos ?? []).Where(f => f.Length > 0).ToList();
+        List<IFormFile> fotos = new List<IFormFile>();
+        foreach (IFormFile foto in modelo.Fotos ?? [])
+        {
+            if (foto.Length > 0)
+            {
+                fotos.Add(foto);
+            }
+        }
         ValidarFotos(fotos);
 
         ViewBag.publicar = modelo;
@@ -126,18 +133,56 @@ public class PublicarController : Controller
 
     private void ValidarFotos(List<IFormFile> fotos)
     {
+        bool extensionInvalida = false;
+        bool muyPesada = false;
+        foreach (IFormFile foto in fotos)
+        {
+            if (Array.IndexOf(PublicarArticuloViewModel.ExtensionesFoto, Path.GetExtension(foto.FileName).ToLower()) < 0)
+            {
+                extensionInvalida = true;
+            }
+            if (foto.Length > PublicarArticuloViewModel.MaxFotoMB * 1024 * 1024)
+            {
+                muyPesada = true;
+            }
+        }
+
         if (fotos.Count > PublicarArticuloViewModel.MaxFotos)
         {
             ModelState.AddModelError("Fotos", $"Podés subir hasta {PublicarArticuloViewModel.MaxFotos} fotos.");
         }
-        else if (fotos.Any(f => !PublicarArticuloViewModel.ExtensionesFoto.Contains(Path.GetExtension(f.FileName).ToLower())))
+        else if (extensionInvalida)
         {
             ModelState.AddModelError("Fotos", "Las fotos tienen que ser JPG o PNG.");
         }
-        else if (fotos.Any(f => f.Length > PublicarArticuloViewModel.MaxFotoMB * 1024 * 1024))
+        else if (muyPesada)
         {
             ModelState.AddModelError("Fotos", $"Cada foto puede pesar hasta {PublicarArticuloViewModel.MaxFotoMB} MB.");
         }
+    }
+
+    private static bool EstaEnLista(List<SelectListItem> opciones, int valor)
+    {
+        foreach (SelectListItem opcion in opciones)
+        {
+            if (opcion.Value == valor.ToString())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool ExisteEstado(List<EstadosArticulos> estados, int idEstado)
+    {
+        foreach (EstadosArticulos estado in estados)
+        {
+            if (estado.IdEstadosArticulos == idEstado)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void AvisarFotosDeNuevo(List<IFormFile> fotos)
@@ -183,7 +228,12 @@ public class PublicarController : Controller
     {
         try
         {
-            return ArticulosBD.GetCategorias().Select(c => new SelectListItem(c.Nombre, c.IdCategorias.ToString())).ToList();
+            List<SelectListItem> opciones = new List<SelectListItem>();
+            foreach (Categorias c in ArticulosBD.GetCategorias())
+            {
+                opciones.Add(new SelectListItem(c.Nombre, c.IdCategorias.ToString()));
+            }
+            return opciones;
         }
         catch (SqlException ex)
         {

@@ -20,8 +20,8 @@
     Swappit.Models.Provincias? provincia = ViewBag.provincia;
     string? foto = ViewBag.foto;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
-    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
-    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string iniciales = SesionUsuario.Iniciales(usuario.Nombre, usuario.Apellido);
+    string ubicacion = Listas.UnirConComas(usuario.Barrio, provincia?.Nombre);
 }
 
 <div class="container-xl py-4 py-lg-5">

@@ -16,4 +16,10 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 ## Conexiones en el grafo (graphify)
 
 **Desde otras notas:**
-- [[BD.GetArticulosCatalogo()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetArticulosCatalogo()]] la usa como tipo · `references` EXTRACTED
+- [[ConexionBD.ListaDeIds()]] la usa como tipo · `references` EXTRACTED
+- [[FavoritosBD.ImportarFavoritos()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.AgregarArticulos()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.ProponerIntercambio()]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesBD.GetSenalesGustos()]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesBD.RegistrarBusqueda()]] la usa como tipo · `references` EXTRACTED

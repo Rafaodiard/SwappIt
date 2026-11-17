@@ -42,7 +42,7 @@
             eventos.Add((c.FechaRespuesta.Value, c.Id * 2 + 1, respondioYo, respuesta));
         }
     }
-    eventos = eventos.OrderByDescending(e => e.Fecha).ThenByDescending(e => e.Orden).ToList();
+    eventos.Sort((a, b) => a.Fecha != b.Fecha ? b.Fecha.CompareTo(a.Fecha) : b.Orden.CompareTo(a.Orden));
 }
 @if (eventos.Count > 0)
 {

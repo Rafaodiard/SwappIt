@@ -25,3 +25,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[NotificacionesController.MarcarTodasLeidas()]] la usa como tipo · `references` EXTRACTED
 - [[NotificacionesController.Ver()]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.Index() POST]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

@@ -50,7 +50,7 @@
                         var idCat = "cat-" + cat.Valor;
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="@idCat"
-                                   checked="@(categoriasSeleccionadas.Any(c => c.ToString() == cat.Valor))">
+                                   checked="@(categoriasSeleccionadas.Contains(int.Parse(cat.Valor)))">
                             <label class="form-check-label" for="@idCat">@cat.Texto</label>
                             <span class="contador">@cat.Cantidad</span>
                         </div>
@@ -63,7 +63,7 @@
                     {
                         var idEst = "est-" + est.Valor;
                         <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="@idEst"
-                               checked="@(estadosSeleccionados.Any(e => e.ToString() == est.Valor))">
+                               checked="@(estadosSeleccionados.Contains(int.Parse(est.Valor)))">
                         <label class="sw-chip" for="@idEst">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
                     }
                 </div>

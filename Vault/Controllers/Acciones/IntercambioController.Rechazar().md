@@ -22,5 +22,5 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - usa el tipo [[ValidateAntiForgeryToken]] · `references` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista Intercambio-Detalle]] tiene un link acá · `links_to` EXTRACTED
 - [[IntercambioController]] la tiene como método · `method` EXTRACTED
-- [[Vista Intercambio-Detalle]] envía su formulario acá · `posts_to` EXTRACTED

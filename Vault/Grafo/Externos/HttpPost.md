@@ -29,3 +29,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[NotificacionesController.Ver()]] la usa como tipo · `references` EXTRACTED
 - [[PerfilController.Editar()]] la usa como tipo · `references` EXTRACTED
 - [[PublicarController.Index() POST]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

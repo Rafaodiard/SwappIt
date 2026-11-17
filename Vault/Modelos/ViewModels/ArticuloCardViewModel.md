@@ -31,4 +31,7 @@ Comunidad del grafo: [[Comunidad - Card de artículo]]
 
 **Desde otras notas:**
 - [[Vista Articulos-Buscar]] la llama · `calls` EXTRACTED
-- [[BD.GetArticulosCatalogo()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetArticulosCatalogo()]] la usa como tipo · `references` EXTRACTED
+- [[FavoritosBD.GetFavoritos()]] la usa como tipo · `references` EXTRACTED
+- [[IntercambiosBD.GetArticulosDeIntercambio()]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED

@@ -20,6 +20,3 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 ## Conexiones en el grafo (graphify)
 - importa [[Namespace Swappit.Models.ViewModels]] · `imports` EXTRACTED
 - tiene un link a [[NotificacionesController.Ver()]] · `links_to` EXTRACTED
-
-**Desde otras notas:**
-- [[NotificacionesController.Lista()]] muestra esta vista · `renders` EXTRACTED

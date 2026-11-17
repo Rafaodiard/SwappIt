@@ -17,10 +17,13 @@ Comunidad del grafo: [[Comunidad - Resumen del chat]]
 
 **Desde otras notas:**
 - [[AccountController.CalcularEdad()]] la usa como tipo · `references` EXTRACTED
+- [[Articulos]] la usa como tipo · `references` EXTRACTED
 - [[ConversacionViewModel]] la usa como tipo · `references` EXTRACTED
-- [[Intercambios]] la usa como tipo · `references` EXTRACTED
 - [[IntercambioViewModel]] la usa como tipo · `references` EXTRACTED
+- [[Intercambios]] la usa como tipo · `references` EXTRACTED
 - [[Mensajes]] la usa como tipo · `references` EXTRACTED
 - [[NotificacionViewModel]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesBD.GetSenalesGustos()]] la usa como tipo · `references` EXTRACTED
+- [[RecomendacionesController]] la usa como tipo · `references` EXTRACTED
 - [[RegistroViewModel]] la usa como tipo · `references` EXTRACTED
 - [[Usuarios]] la usa como tipo · `references` EXTRACTED

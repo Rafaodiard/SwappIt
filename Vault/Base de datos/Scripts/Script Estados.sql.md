@@ -21,7 +21,3 @@ tags:
 Según lo acordado, se borra cuando Rafael lo haya ejecutado en su base.
 
 Comunidad del grafo: [[Comunidad - Migración de estados]]
-
-## Conexiones en el grafo (graphify)
-- contiene [[Tabla EstadosArticulos]] · `contains` EXTRACTED
-- contiene [[Tabla EstadosIntercambios]] · `contains` EXTRACTED

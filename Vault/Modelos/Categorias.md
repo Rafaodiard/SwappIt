@@ -26,5 +26,5 @@ Comunidad del grafo: [[Comunidad - Categorías]]
 - corresponde a la tabla [[Tabla Categorias]] · `maps_to` INFERRED
 
 **Desde otras notas:**
-- [[BD.GetCategoriaById()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetCategorias()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetCategoriaById()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetCategorias()]] la usa como tipo · `references` EXTRACTED

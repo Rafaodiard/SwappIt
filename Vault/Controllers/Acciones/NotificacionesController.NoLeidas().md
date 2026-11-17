@@ -16,7 +16,7 @@ Método de [[NotificacionesController]] · `Controllers/NotificacionesController
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetCantidadNotificacionesNoLeidas()]] · `calls` EXTRACTED
+- llama a [[NotificacionesBD.GetCantidadNotificacionesNoLeidas()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 
 **Desde otras notas:**

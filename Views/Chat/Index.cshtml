@@ -12,7 +12,7 @@
     string? error = TempData["ErrorChat"] as string;
     string? textoAnterior = TempData["TextoChat"] as string;
 
-    string Iniciales(IntercambioViewModel i) => $"{i.OtroNombre?.FirstOrDefault()}{i.OtroApellido?.FirstOrDefault()}".ToUpper();
+    string Iniciales(IntercambioViewModel i) => SesionUsuario.Iniciales(i.OtroNombre, i.OtroApellido);
 
     string CuandoFue(DateTime fecha)
     {

@@ -16,7 +16,7 @@ Método de [[PublicarController]] · `Controllers/PublicarController.cs` línea 
 Comunidad del grafo: [[Comunidad - Publicar artículo]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.GetEstadosArticulos()]] · `calls` EXTRACTED
+- llama a [[ArticulosBD.GetEstadosArticulos()]] · `calls` EXTRACTED
 - usa el tipo [[EstadosArticulos]] · `references` EXTRACTED
 - usa el tipo [[List]] · `references` EXTRACTED
 

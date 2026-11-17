@@ -28,4 +28,4 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
 
 **Desde otras notas:**
-- [[HomeController.Inicio()]] muestra esta vista · `renders` EXTRACTED
+- [[HomeController.Index()]] muestra esta vista · `renders` EXTRACTED

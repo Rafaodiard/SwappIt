@@ -19,7 +19,7 @@ Stored procedure `dbo.GuardarFotoUsuario`. Está en: [[Script StoredProcedures.s
 
 Borra la foto de perfil anterior e inserta la nueva. Recibe `@idUsuario` y `@ruta varchar(100)`, como la columna (se corrigió el 29/10).
 
-Es la copia en SQL de [[BD]].GuardarFotoUsuario, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[UsuariosBD.GuardarFotoUsuario()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -27,7 +27,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - escribe en [[Tabla Imagenes]] · `writes_to` EXTRACTED
 
 **Desde otras notas:**
+- [[UsuariosBD.GuardarFotoUsuario()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.GuardarFotoUsuario()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

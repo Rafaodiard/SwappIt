@@ -39,14 +39,17 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Usuarios]] es su clase en C# · `maps_to` INFERRED
-- [[BD.GetArticulosCatalogo()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambio()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetIntercambios()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetNotificaciones()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetUsuarioById()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.GetUsuarioByMail()]] lee de acá · `reads_from` EXTRACTED
-- [[BD.UsuarioExiste()]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_EstadisticasUsuario]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_Personalizado_GestionarPropuestaYNotificacion]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_RecomendarUsuariosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_RendimientoPlataformaPorPeriodo]] lee de acá · `reads_from` EXTRACTED
+- [[SP Complejos_SeguimientoIntercambiosPendientes]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetArticulosCatalogo]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetCambiosIntercambio]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetDatosMailNotificacion]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetFavoritos]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetIntercambios]] lee de acá · `reads_from` EXTRACTED
+- [[SP GetNotificaciones]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetUsuarioById]] lee de acá · `reads_from` EXTRACTED
 - [[SP GetUsuarioByMail]] lee de acá · `reads_from` EXTRACTED
 - [[SP RegistrarArticulo]] lee de acá · `reads_from` EXTRACTED
@@ -58,9 +61,6 @@ Comunidad del grafo: [[Comunidad - Tablas y acceso a datos]]
 - [[Tabla Intercambios]] la usa como tipo · `references` EXTRACTED
 - [[Tabla Mensajes]] la usa como tipo · `references` EXTRACTED
 - [[Tabla Notificaciones]] la usa como tipo · `references` EXTRACTED
-- [[BD.ActualizarContrasena()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.Register()]] escribe acá · `writes_to` EXTRACTED
-- [[BD.UpdateUsuario()]] escribe acá · `writes_to` EXTRACTED
 - [[SP ActualizarContrasena]] escribe acá · `writes_to` EXTRACTED
 - [[SP RegistrarUsuario]] escribe acá · `writes_to` EXTRACTED
 - [[SP UpdateUsuario]] escribe acá · `writes_to` EXTRACTED

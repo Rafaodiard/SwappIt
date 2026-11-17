@@ -12,7 +12,7 @@ Comunidad 5 que detectó graphify (agrupa nodos muy conectados entre sí). Tiene
 
 ## Notas
 
-- [[BD.GetUsuarioByMail()]]
+- [[UsuariosBD.GetUsuarioByMail()]]
 - [[Contrasenas]]
 - [[Contrasenas.EsHash()]]
 - [[Contrasenas.Verificar()]]

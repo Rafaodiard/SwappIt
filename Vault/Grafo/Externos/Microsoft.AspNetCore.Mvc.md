@@ -24,3 +24,4 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[NotificacionesController]] la importa · `imports` EXTRACTED
 - [[PerfilController]] la importa · `imports` EXTRACTED
 - [[PublicarController]] la importa · `imports` EXTRACTED
+- [[RecomendacionesController]] la importa · `imports` EXTRACTED

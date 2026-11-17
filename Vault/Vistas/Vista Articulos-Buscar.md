@@ -26,7 +26,5 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - importa [[Namespace Swappit.Models.ViewModels]] · `imports` EXTRACTED
 - incluye el partial [[Vista _CardObjeto]] · `includes` EXTRACTED
 - tiene un link a [[ArticulosController.Buscar()]] · `links_to` EXTRACTED
+- tiene un link a [[RecomendacionesController]] · `links_to` EXTRACTED
 - carga el script [[buscar.js]] · `loads_script` EXTRACTED
-
-**Desde otras notas:**
-- [[ArticulosController.Buscar()]] muestra esta vista · `renders` INFERRED

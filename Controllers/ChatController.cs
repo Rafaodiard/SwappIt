@@ -32,15 +32,20 @@ public class ChatController : Controller
         bool errorCarga = false;
         try
         {
-            List<IntercambioViewModel> intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value);
-            resumenes = ChatBD.GetResumenesChat(usuarioId.Value).ToDictionary(r => r.IdIntercambio);
+            conversaciones = IntercambiosBD.GetIntercambios(usuarioId.Value, conChat: true);
+            foreach (ConversacionViewModel r in ChatBD.GetResumenesChat(usuarioId.Value))
+            {
+                resumenes[r.IdIntercambio] = r;
+            }
 
-            conversaciones = intercambios
-                .Where(i => PuedeEscribir(i, false) || resumenes.ContainsKey(i.IdIntercambios))
-                .OrderByDescending(i => resumenes.TryGetValue(i.IdIntercambios, out ConversacionViewModel? r) ? r.UltimaFecha : i.Fecha)
-                .ToList();
-
-            abierta = id == null ? conversaciones.FirstOrDefault() : intercambios.FirstOrDefault(i => i.IdIntercambios == id);
+            if (id == null)
+            {
+                abierta = conversaciones.Count > 0 ? conversaciones[0] : null;
+            }
+            else
+            {
+                abierta = IntercambiosBD.GetIntercambio(id.Value, usuarioId.Value);
+            }
             if (abierta != null)
             {
                 ChatBD.MarcarMensajesVistos(abierta.IdIntercambios, usuarioId.Value);
@@ -66,7 +71,7 @@ public class ChatController : Controller
         ViewBag.resumenes = resumenes;
         ViewBag.abierta = abierta;
         ViewBag.mensajes = mensajes;
-        ViewBag.puedeEscribir = abierta != null && PuedeEscribir(abierta, mensajes.Any(m => m.IdUsuariosManda == abierta.OtroIdUsuario));
+        ViewBag.puedeEscribir = abierta != null && PuedeEscribir(abierta, ElOtroEscribio(mensajes, abierta.OtroIdUsuario));
         ViewBag.usuarioId = usuarioId.Value;
         ViewBag.idPedido = id;
         ViewBag.errorCarga = errorCarga;
@@ -133,6 +138,18 @@ public class ChatController : Controller
             TempData["TextoChat"] = texto;
         }
         return RedirectToAction("Index", new { id });
+    }
+
+    private static bool ElOtroEscribio(List<Mensajes> mensajes, int idOtro)
+    {
+        foreach (Mensajes m in mensajes)
+        {
+            if (m.IdUsuariosManda == idOtro)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static bool PuedeEscribir(IntercambioViewModel intercambio, bool elOtroYaEscribio) =>

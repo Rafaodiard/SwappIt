@@ -25,11 +25,12 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - tiene un link a [[AccountController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[ArticulosController.Buscar()]] · `links_to` EXTRACTED
 - tiene un link a [[IntercambioController.Detalle()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Proponer()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Publico()]] · `links_to` EXTRACTED
 - tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
+- tiene un link a [[RecomendacionesController]] · `links_to` EXTRACTED
 - carga el script [[articulo.js]] · `loads_script` EXTRACTED
-- envía el formulario a [[IntercambioController.Proponer()]] · `posts_to` EXTRACTED
 
 **Desde otras notas:**
 - [[ArticulosController.Detalle()]] muestra esta vista · `renders` INFERRED

@@ -16,11 +16,12 @@ Método de [[AccountController]] · `Controllers/AccountController.cs` línea 16
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
+- llama a [[UsuariosBD.GetProvincias()]] · `calls` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
-- muestra la vista [[Vista Account-Registro]] · `renders` INFERRED
 
 **Desde otras notas:**
-- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Account-Login]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista Account-Registro]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Home-Index]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED

@@ -30,8 +30,9 @@ Comunidad del grafo: [[Comunidad - Modelo Articulos]]
 ## Conexiones en el grafo (graphify)
 - contiene [[Namespace Swappit.Models]] · `contains` EXTRACTED
 - corresponde a la tabla [[Tabla Articulos]] · `maps_to` INFERRED
+- usa el tipo [[DateTime]] · `references` EXTRACTED
 
 **Desde otras notas:**
 - [[PublicarController.Index() POST]] la llama · `calls` INFERRED
-- [[BD.GetArticuloById()]] la usa como tipo · `references` EXTRACTED
-- [[BD.PublicarArticulo()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.GetArticuloById()]] la usa como tipo · `references` EXTRACTED
+- [[ArticulosBD.PublicarArticulo()]] la usa como tipo · `references` EXTRACTED

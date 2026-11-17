@@ -16,7 +16,7 @@ tags:
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama indirectamente a [[chat.js actualizar()]] · `indirect_call` INFERRED
+- indirect_call [[chat.js actualizar()]] · `indirect_call` INFERRED
 
 **Desde otras notas:**
 - [[Vista Chat-Index]] carga este script · `loads_script` EXTRACTED

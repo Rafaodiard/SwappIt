@@ -19,7 +19,7 @@ Stored procedure `dbo.ActualizarContrasena`. Está en: [[Script StoredProcedures
 
 Recibe `@contrasenaHash varchar(100)`, como la columna (antes era varchar(50) y cortaba el hash de 84 caracteres; se corrigió el 29/10 en "scripts y sp arreglados").
 
-Es la copia en SQL de [[BD]].ActualizarContrasena, pero **C# no lo llama** (ver [[Pendientes y problemas]]).
+Lo llama [[UsuariosBD.ActualizarContrasena()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -27,7 +27,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - escribe en [[Tabla Usuarios]] · `writes_to` EXTRACTED
 
 **Desde otras notas:**
+- [[UsuariosBD.ActualizarContrasena()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED
-- [[BD.ActualizarContrasena()]] tiene el mismo nombre · `same_name_as_sp` INFERRED

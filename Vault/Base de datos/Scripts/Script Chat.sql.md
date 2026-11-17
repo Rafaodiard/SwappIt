@@ -14,5 +14,3 @@ tags:
 `BaseDatos/Chat.sql` · **Ya no está en el repo** (14/11, pedido de Rafael: en `BaseDatos/` solo van [[Script Estructura.sql]], [[Script Datos.sql]] y [[Script StoredProcedures.sql]]). Era: Para bases **ya creadas**: `Mensajes.Texto` pasa de varchar(50) a varchar(500) y `FechaEnviado`/`FechaRecibido` de date a datetime (el chat muestra la hora). Actualiza [[SP RegistrarMensaje]] con los mismos tipos. Conserva los mensajes que haya y se puede ejecutar varias veces. Ver [[Tabla Mensajes]].
 
 Comunidad del grafo: [[Comunidad - Script del chat]]
-
-## Conexiones en el grafo (graphify)

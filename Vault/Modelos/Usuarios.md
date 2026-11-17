@@ -39,10 +39,9 @@ Comunidad del grafo: [[Comunidad - Usuarios, contraseñas y sesión]]
 **Desde otras notas:**
 - [[AccountController.Registro() POST]] la llama · `calls` INFERRED
 - [[PerfilController.Publico()]] la llama · `calls` INFERRED
-- [[BD.GetUsuarioById()]] la usa como tipo · `references` EXTRACTED
-- [[BD.GetUsuarioByMail()]] la usa como tipo · `references` EXTRACTED
-- [[BD.Register()]] la usa como tipo · `references` EXTRACTED
-- [[BD.UpdateUsuario()]] la usa como tipo · `references` EXTRACTED
 - [[Contrasenas]] la usa como tipo · `references` EXTRACTED
 - [[SesionUsuario.GuardarDatosHeader()]] la usa como tipo · `references` EXTRACTED
-- [[SesionUsuario.ObtenerIniciales()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.GetUsuarioById()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.GetUsuarioByMail()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.Register()]] la usa como tipo · `references` EXTRACTED
+- [[UsuariosBD.UpdateUsuario()]] la usa como tipo · `references` EXTRACTED

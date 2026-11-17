@@ -17,7 +17,9 @@ tags:
 
 Stored procedure `dbo.RegistrarUsuario`. Está en: [[Script StoredProcedures.sql]], [[Script SQLSwappit.sql]], [[Script SQLSwappit_CualquierCompu.sql]].
 
-Original. Inserta un usuario si el `Usuario` y el teléfono no existen. **No inserta `Edad` (NOT NULL), así que siempre falla.** La app usa [[BD]].Register en su lugar.
+Inserta un usuario nuevo con todos sus datos, incluida la edad. Desde el 17/11 lo usa [[UsuariosBD.Register()]] (antes el INSERT estaba escrito en C# y este SP no guardaba la edad).
+
+Lo llama [[UsuariosBD.Register()]].
 
 Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 
@@ -25,6 +27,7 @@ Comunidad del grafo: [[Comunidad - SQLSwappit.sql y SPs nuevos]]
 - escribe en [[Tabla Usuarios]] · `writes_to` EXTRACTED
 
 **Desde otras notas:**
+- [[UsuariosBD.Register()]] lo llama · `calls_sp` EXTRACTED
 - [[Script SQLSwappit.sql]] la contiene · `contains` EXTRACTED
 - [[Script SQLSwappit_CualquierCompu.sql]] la contiene · `contains` EXTRACTED
 - [[Script StoredProcedures.sql]] la contiene · `contains` EXTRACTED

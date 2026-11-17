@@ -15,8 +15,19 @@
 @{
     List<NotificacionViewModel> notificaciones = ViewBag.notificaciones;
     bool errorCarga = ViewBag.errorCarga;
-    List<NotificacionViewModel> nuevas = notificaciones.Where(n => !n.Leida).ToList();
-    List<NotificacionViewModel> anteriores = notificaciones.Where(n => n.Leida).ToList();
+    List<NotificacionViewModel> nuevas = new List<NotificacionViewModel>();
+    List<NotificacionViewModel> anteriores = new List<NotificacionViewModel>();
+    foreach (NotificacionViewModel n in notificaciones)
+    {
+        if (n.Leida)
+        {
+            anteriores.Add(n);
+        }
+        else
+        {
+            nuevas.Add(n);
+        }
+    }
 
     void Item(NotificacionViewModel n)
     {

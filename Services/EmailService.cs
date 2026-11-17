@@ -52,9 +52,14 @@ public class EmailService
         }
 
         string scheme = url.ActionContext.HttpContext.Request.Scheme;
-        var conLink = creadas.Select(n => (Notificacion: n, Link: n.Tipo == TipoNotificaciones.MensajeNuevo
-            ? url.Action("Index", "Chat", new { id = n.IdIntercambio }, scheme)
-            : url.Action("Detalle", "Intercambio", new { id = n.IdIntercambio }, scheme))).ToList();
+        var conLink = new List<(NotificacionCreada Notificacion, string? Link)>();
+        foreach (NotificacionCreada n in creadas)
+        {
+            string? link = n.Tipo == TipoNotificaciones.MensajeNuevo
+                ? url.Action("Index", "Chat", new { id = n.IdIntercambio }, scheme)
+                : url.Action("Detalle", "Intercambio", new { id = n.IdIntercambio }, scheme);
+            conLink.Add((n, link));
+        }
 
         _ = Task.Run(async () =>
         {
@@ -69,7 +74,7 @@ public class EmailService
     {
         try
         {
-            DatosMailNotificacion? datos = BD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio, notificacion.IdCambio);
+            DatosMailNotificacion? datos = NotificacionesBD.GetDatosMailNotificacion(notificacion.IdUsuario, notificacion.IdIntercambio, notificacion.IdCambio);
             if (datos == null || string.IsNullOrWhiteSpace(datos.Mail))
             {
                 _logger.LogWarning("El usuario {IdUsuario} no tiene mail: no se avisa la notificación del intercambio {IdIntercambio}",
@@ -218,8 +223,12 @@ public class EmailService
 
     private static string Lista(List<string> nombres)
     {
-        List<string> citados = (nombres.Count > 0 ? nombres : new List<string> { "artículo" }).Select(n => $"«{n}»").ToList();
-        return citados.Count == 1 ? citados[0] : $"{string.Join(", ", citados.Take(citados.Count - 1))} y {citados[^1]}";
+        List<string> citados = new List<string>();
+        foreach (string nombre in nombres.Count > 0 ? nombres : new List<string> { "artículo" })
+        {
+            citados.Add($"«{nombre}»");
+        }
+        return Listas.UnirNombres(citados);
     }
 
     private static string TextoPlano(string saludo, string texto, string boton, string? link)

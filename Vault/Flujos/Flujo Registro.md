@@ -15,7 +15,7 @@ tags:
    - [[BD]].UsuarioExiste(mail): si el mail ya existe → "Ya existe una cuenta con ese email."
    - Compara contraseña y repetición.
    - Arma un [[Usuarios]]: contraseña con [[Contrasenas]].Hashear, edad calculada (`CalcularEdad`), teléfono con [[Telefonos]].Convertir (si no tiene entre 8 y 15 dígitos, vuelve al formulario con el error debajo del campo), `Usuario` = parte del mail antes de la `@`, y el barrio y la provincia elegidos (hasta el 08/11 se guardaba `IdProvincias = 1`, Buenos Aires, y el barrio vacío).
-   - [[BD]].Register inserta en [[Tabla Usuarios]] (SQL inline, **no** usa [[SP RegistrarUsuario]]).
+   - [[UsuariosBD.Register()]] inserta en [[Tabla Usuarios]] con [[SP RegistrarUsuario]] (desde el 17/11; antes era SQL escrito en C#).
    - Lee el usuario recién creado ([[BD]].GetUsuarioByMail), guarda `UsuarioId` en la sesión y [[SesionUsuario]] guarda iniciales y foto.
 4. Redirige a `/` ([[HomeController]]).
 

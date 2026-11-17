@@ -24,10 +24,11 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 - incluye el partial [[Vista _CardObjeto]] · `includes` EXTRACTED
 - incluye el partial [[Vista _FilaIntercambio]] · `includes` EXTRACTED
+- tiene un link a [[AccountController.Logout()]] · `links_to` EXTRACTED
 - tiene un link a [[IntercambioController.Index()]] · `links_to` EXTRACTED
+- tiene un link a [[PerfilController.Editar()]] · `links_to` EXTRACTED
 - tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
 - carga el script [[perfil.js]] · `loads_script` EXTRACTED
-- envía el formulario a [[PerfilController.Editar()]] · `posts_to` EXTRACTED
 
 **Desde otras notas:**
 - [[PerfilController.Index()]] muestra esta vista · `renders` INFERRED

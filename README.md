@@ -24,7 +24,7 @@ Swappit es una plataforma para intercambiar objetos sin usar dinero. Está pensa
 
    > El script guarda la base en la carpeta de la instancia predeterminada (`MSSQL14.MSSQLSERVER`). Si usás otra, por ejemplo SQL Express, cambiá las rutas `FILENAME` del `CREATE DATABASE` al principio del script.
 
-3. **Configurar la conexión.** La cadena de conexión está en `Models/BD.cs` y por defecto apunta a la instancia local predeterminada:
+3. **Configurar la conexión.** La cadena de conexión está en `Models/BD/ConexionBD.cs` y por defecto apunta a la instancia local predeterminada:
 
    ```csharp
    @"Server=localhost;Database=Base_De_Datos_Swappit;Integrated Security=True;TrustServerCertificate=True;"

@@ -5,4 +5,4 @@ tags:
 ---
 # appsettings.json
 
-Solo logging (`Information`, `Microsoft.AspNetCore: Warning`) y `AllowedHosts: *`. La connection string **no** está acá: está fija en [[BD]]. `appsettings.Development.json` tiene solo logging.
+Solo logging (`Information`, `Microsoft.AspNetCore: Warning`) y `AllowedHosts: *`. La connection string **no** está acá: está fija en `ConexionBD.ConnectionString` ([[BD]]). `appsettings.Development.json` tiene solo logging.

@@ -19,13 +19,15 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 
 **Desde otras notas:**
 - [[Articulos]] la contiene · `contains` EXTRACTED
-- [[BD]] la contiene · `contains` EXTRACTED
+- [[CantidadPorEstado]] la contiene · `contains` EXTRACTED
 - [[Categorias]] la contiene · `contains` EXTRACTED
 - [[Contrasenas]] la contiene · `contains` EXTRACTED
 - [[EstadosArticulos]] la contiene · `contains` EXTRACTED
 - [[EstadosIntercambios]] la contiene · `contains` EXTRACTED
 - [[Intercambios]] la contiene · `contains` EXTRACTED
+- [[Listas]] la contiene · `contains` EXTRACTED
 - [[Mensajes]] la contiene · `contains` EXTRACTED
+- [[PopularidadArticulo]] la contiene · `contains` EXTRACTED
 - [[Provincias]] la contiene · `contains` EXTRACTED
 - [[SesionUsuario]] la contiene · `contains` EXTRACTED
 - [[Telefonos]] la contiene · `contains` EXTRACTED
@@ -39,6 +41,6 @@ Comunidad del grafo: [[Comunidad - Namespaces y formularios]]
 - [[NotificacionesController]] la importa · `imports` EXTRACTED
 - [[PerfilController]] la importa · `imports` EXTRACTED
 - [[PublicarController]] la importa · `imports` EXTRACTED
-- [[Vista _ViewImports]] la importa · `imports` EXTRACTED
+- [[RecomendacionesController]] la importa · `imports` EXTRACTED
 - [[Vista Chat-Index]] la importa · `imports` EXTRACTED
-- [[Vista Intercambio-Detalle]] la importa · `imports` EXTRACTED
+- [[Vista _ViewImports]] la importa · `imports` EXTRACTED

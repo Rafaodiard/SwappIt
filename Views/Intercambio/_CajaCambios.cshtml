@@ -2,9 +2,15 @@
 @{
     IntercambioViewModel intercambio = ViewBag.intercambio;
     List<CambioIntercambioViewModel> cambios = ViewBag.cambios;
-    List<CambioIntercambioViewModel> porResponder = cambios
-        .Where(c => c.EsPendiente && c.IdUsuario == intercambio.OtroIdUsuario)
-        .OrderBy(c => c.Fecha).ThenBy(c => c.Id).ToList();
+    List<CambioIntercambioViewModel> porResponder = new List<CambioIntercambioViewModel>();
+    foreach (CambioIntercambioViewModel c in cambios)
+    {
+        if (c.EsPendiente && c.IdUsuario == intercambio.OtroIdUsuario)
+        {
+            porResponder.Add(c);
+        }
+    }
+    porResponder.Sort((a, b) => a.Fecha != b.Fecha ? a.Fecha.CompareTo(b.Fecha) : a.Id.CompareTo(b.Id));
 }
 @if (porResponder.Count > 0)
 {

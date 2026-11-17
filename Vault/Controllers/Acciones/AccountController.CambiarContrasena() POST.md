@@ -16,10 +16,10 @@ Método de [[AccountController]] · `Controllers/AccountController.cs` línea 10
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.ActualizarContrasena()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioById()]] · `calls` EXTRACTED
 - llama a [[Contrasenas.Hashear()]] · `calls` EXTRACTED
 - llama a [[Contrasenas.Verificar()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.ActualizarContrasena()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioById()]] · `calls` EXTRACTED
 - redirige a [[AccountController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
@@ -27,4 +27,3 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[AccountController]] la tiene como método · `method` EXTRACTED
-- [[Vista Account-CambiarContrasena]] envía su formulario acá · `posts_to` EXTRACTED

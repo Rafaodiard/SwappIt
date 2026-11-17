@@ -36,11 +36,11 @@
     bool comprometido = ViewBag.comprometido;
     int maxOfrecidos = Swappit.Models.Intercambios.MaxArticulosOfrecidos;
 
-    string inicialesDueno = $"{dueno.Nombre?.FirstOrDefault()}{dueno.Apellido?.FirstOrDefault()}".ToUpper();
+    string inicialesDueno = SesionUsuario.Iniciales(dueno.Nombre, dueno.Apellido);
     string ubicacion = !string.IsNullOrWhiteSpace(articulo.Ubicacion)
         ? articulo.Ubicacion
-        : string.Join(", ", new[] { dueno.Barrio, provinciaDueno?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
-    string? fotoPrincipal = imagenes.FirstOrDefault();
+        : Listas.UnirConComas(dueno.Barrio, provinciaDueno?.Nombre);
+    string? fotoPrincipal = imagenes.Count > 0 ? imagenes[0] : null;
     string? mensajeArticulo = TempData["MensajeArticulo"] as string;
     string? errorArticulo = TempData["ErrorArticulo"] as string;
 }

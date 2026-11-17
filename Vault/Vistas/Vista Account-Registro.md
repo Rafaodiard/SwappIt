@@ -18,8 +18,7 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 ## Conexiones en el grafo (graphify)
 - incluye el partial [[Vista _ValidationScriptsPartial]] · `includes` EXTRACTED
 - tiene un link a [[AccountController.Index()]] · `links_to` EXTRACTED
-- envía el formulario a [[AccountController.Registro() POST]] · `posts_to` EXTRACTED
+- tiene un link a [[AccountController.Registro() GET]] · `links_to` EXTRACTED
 
 **Desde otras notas:**
-- [[AccountController.Registro() GET]] muestra esta vista · `renders` INFERRED
 - [[AccountController.Registro() POST]] muestra esta vista · `renders` INFERRED

@@ -16,7 +16,7 @@ tags:
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- envía el formulario a [[NotificacionesController.MarcarTodasLeidas()]] · `posts_to` EXTRACTED
+- tiene un link a [[NotificacionesController.MarcarTodasLeidas()]] · `links_to` EXTRACTED
 
 **Desde otras notas:**
 - [[Vista _Layout]] incluye este partial · `includes` EXTRACTED

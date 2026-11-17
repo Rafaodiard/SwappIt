@@ -20,16 +20,16 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - muestra la vista [[Vista Account-Login]] · `renders` EXTRACTED
 
 **Desde otras notas:**
-- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Account-Registro]] tiene un link acá · `links_to` EXTRACTED
 - [[Vista Articulos-Detalle]] tiene un link acá · `links_to` EXTRACTED
+- [[Vista _Layout]] tiene un link acá · `links_to` EXTRACTED
 - [[AccountController]] la tiene como método · `method` EXTRACTED
 - [[AccountController.CambiarContrasena() GET]] redirige acá · `redirects_to` EXTRACTED
 - [[AccountController.CambiarContrasena() POST]] redirige acá · `redirects_to` EXTRACTED
 - [[AccountController.Logout()]] redirige acá · `redirects_to` EXTRACTED
 - [[ChatController.Enviar()]] redirige acá · `redirects_to` EXTRACTED
 - [[ChatController.Index()]] redirige acá · `redirects_to` EXTRACTED
-- [[IntercambioController.CambiarEstado()]] redirige acá · `redirects_to` EXTRACTED
+- [[IntercambioController.Aceptar()]] redirige acá · `redirects_to` EXTRACTED
 - [[IntercambioController.Cancelar()]] redirige acá · `redirects_to` EXTRACTED
 - [[IntercambioController.Detalle()]] redirige acá · `redirects_to` EXTRACTED
 - [[IntercambioController.Index()]] redirige acá · `redirects_to` EXTRACTED
@@ -37,5 +37,6 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - [[NotificacionesController.Ver()]] redirige acá · `redirects_to` EXTRACTED
 - [[PerfilController.Editar()]] redirige acá · `redirects_to` EXTRACTED
 - [[PerfilController.Index()]] redirige acá · `redirects_to` EXTRACTED
+- [[PerfilController.Publico()]] redirige acá · `redirects_to` EXTRACTED
 - [[PublicarController.Index() GET]] redirige acá · `redirects_to` EXTRACTED
 - [[PublicarController.Index() POST]] redirige acá · `redirects_to` EXTRACTED

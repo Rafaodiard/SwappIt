@@ -16,11 +16,11 @@ Método de [[NotificacionesController]] · `Controllers/NotificacionesController
 Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
-- llama a [[BD.MarcarNotificacionesLeidas()]] · `calls` EXTRACTED
+- llama a [[NotificacionesBD.MarcarNotificacionesLeidas()]] · `calls` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
 - usa el tipo [[ValidateAntiForgeryToken]] · `references` EXTRACTED
 
 **Desde otras notas:**
+- [[Vista _PopupNotificaciones]] tiene un link acá · `links_to` EXTRACTED
 - [[NotificacionesController]] la tiene como método · `method` EXTRACTED
-- [[Vista _PopupNotificaciones]] envía su formulario acá · `posts_to` EXTRACTED

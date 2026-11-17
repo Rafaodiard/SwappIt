@@ -32,10 +32,12 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 - tiene un link a [[ChatController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[HomeController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[HomeController.Privacy()]] · `links_to` EXTRACTED
+- tiene un link a [[IntercambioController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[NotificacionesController.Lista()]] · `links_to` EXTRACTED
 - tiene un link a [[NotificacionesController.NoLeidas()]] · `links_to` EXTRACTED
 - tiene un link a [[PerfilController.Index()]] · `links_to` EXTRACTED
 - tiene un link a [[PublicarController.Index() GET]] · `links_to` EXTRACTED
+- carga el script [[favoritos.js]] · `loads_script` EXTRACTED
 - carga el script [[imagenes.js]] · `loads_script` EXTRACTED
 - carga el script [[notificaciones.js]] · `loads_script` EXTRACTED
 - carga el script [[plantillas.js]] · `loads_script` EXTRACTED

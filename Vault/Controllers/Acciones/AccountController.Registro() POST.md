@@ -17,13 +17,14 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 ## Conexiones en el grafo (graphify)
 - llama a [[AccountController.CalcularEdad()]] · `calls` EXTRACTED
-- llama a [[BD.GetUsuarioByMail()]] · `calls` EXTRACTED
-- llama a [[BD.Register()]] · `calls` EXTRACTED
-- llama a [[BD.UsuarioExiste()]] · `calls` EXTRACTED
 - llama a [[Contrasenas.Hashear()]] · `calls` EXTRACTED
 - llama a [[SesionUsuario.GuardarDatosHeader()]] · `calls` EXTRACTED
 - llama a [[Telefonos.Convertir()]] · `calls` EXTRACTED
 - llama a [[Usuarios]] · `calls` INFERRED
+- llama a [[UsuariosBD.GetProvincias()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.GetUsuarioByMail()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.Register()]] · `calls` EXTRACTED
+- llama a [[UsuariosBD.UsuarioExiste()]] · `calls` EXTRACTED
 - redirige a [[HomeController.Index()]] · `redirects_to` EXTRACTED
 - usa el tipo [[HttpPost]] · `references` EXTRACTED
 - usa el tipo [[IActionResult]] · `references` EXTRACTED
@@ -32,4 +33,3 @@ Comunidad del grafo: [[Comunidad - Controllers, vistas y JS]]
 
 **Desde otras notas:**
 - [[AccountController]] la tiene como método · `method` EXTRACTED
-- [[Vista Account-Registro]] envía su formulario acá · `posts_to` EXTRACTED
