@@ -47,16 +47,16 @@ public class HomeController : Controller
         ViewBag.errorCarga = false;
         try
         {
-            ViewBag.nombre = BD.GetUsuarioById(usuarioId)?.Nombre;
+            ViewBag.nombre = UsuariosBD.GetUsuarioById(usuarioId)?.Nombre;
 
-            List<IntercambioViewModel> enCurso = BD.GetIntercambios(usuarioId)
+            List<IntercambioViewModel> enCurso = IntercambiosBD.GetIntercambios(usuarioId)
                 .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
                 .ToList();
 
             ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
             ViewBag.porResponder = enCurso.Count(PorResponder);
             ViewBag.cantidadEnCurso = enCurso.Count;
-            ViewBag.cantidadArticulos = BD.ContarArticulosActivos(usuarioId);
+            ViewBag.cantidadArticulos = ArticulosBD.ContarArticulosActivos(usuarioId);
             ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)
@@ -67,7 +67,7 @@ public class HomeController : Controller
 
         try
         {
-            ViewBag.mensajesSinLeer = BD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
+            ViewBag.mensajesSinLeer = ChatBD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
         }
         catch (SqlException ex)
         {

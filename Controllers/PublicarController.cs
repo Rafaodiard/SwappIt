@@ -32,8 +32,8 @@ public class PublicarController : Controller
         bool limiteAlcanzado = false;
         try
         {
-            publicar.Ubicacion = BD.GetUsuarioById(usuarioId.Value)?.Barrio ?? string.Empty;
-            limiteAlcanzado = BD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados;
+            publicar.Ubicacion = UsuariosBD.GetUsuarioById(usuarioId.Value)?.Barrio ?? string.Empty;
+            limiteAlcanzado = ArticulosBD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados;
         }
         catch (SqlException ex)
         {
@@ -87,7 +87,7 @@ public class PublicarController : Controller
             return View();
         }
 
-        if (BD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados)
+        if (ArticulosBD.ContarArticulosActivos(usuarioId.Value) >= PublicarArticuloViewModel.MaxPublicados)
         {
             ViewBag.limiteAlcanzado = true;
             return View();
@@ -109,7 +109,7 @@ public class PublicarController : Controller
                 IdCategoriaACambio = modelo.IdCategoriaACambio,
                 FechaPublicacion = DateTime.Today
             };
-            int idArticulo = BD.PublicarArticulo(articulo, rutasFotos);
+            int idArticulo = ArticulosBD.PublicarArticulo(articulo, rutasFotos);
 
             TempData["MensajeArticulo"] = "¡Listo! Tu artículo ya está publicado.";
             return RedirectToAction("Detalle", "Articulos", new { id = idArticulo });
@@ -183,7 +183,7 @@ public class PublicarController : Controller
     {
         try
         {
-            return BD.GetCategorias().Select(c => new SelectListItem(c.Nombre, c.IdCategorias.ToString())).ToList();
+            return ArticulosBD.GetCategorias().Select(c => new SelectListItem(c.Nombre, c.IdCategorias.ToString())).ToList();
         }
         catch (SqlException ex)
         {
@@ -196,7 +196,7 @@ public class PublicarController : Controller
     {
         try
         {
-            return BD.GetEstadosArticulos();
+            return ArticulosBD.GetEstadosArticulos();
         }
         catch (SqlException ex)
         {

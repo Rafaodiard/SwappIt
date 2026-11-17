@@ -28,7 +28,7 @@ public class FavoritosController : Controller
         ViewBag.errorCarga = false;
         try
         {
-            ViewBag.articulos = BD.GetFavoritos(usuarioId.Value);
+            ViewBag.articulos = FavoritosBD.GetFavoritos(usuarioId.Value);
         }
         catch (SqlException ex)
         {
@@ -49,7 +49,7 @@ public class FavoritosController : Controller
 
         try
         {
-            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+            return Json(FavoritosBD.GetIdsFavoritos(usuarioId.Value));
         }
         catch (SqlException ex)
         {
@@ -70,7 +70,7 @@ public class FavoritosController : Controller
 
         try
         {
-            bool? esFavorito = BD.AlternarFavorito(usuarioId.Value, idArticulo);
+            bool? esFavorito = FavoritosBD.AlternarFavorito(usuarioId.Value, idArticulo);
             if (esFavorito == null)
             {
                 return NotFound();
@@ -97,8 +97,8 @@ public class FavoritosController : Controller
         List<int> pedidos = (ids ?? []).Where(id => id > 0).Distinct().Take(MaxImportar).ToList();
         try
         {
-            BD.ImportarFavoritos(usuarioId.Value, pedidos);
-            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+            FavoritosBD.ImportarFavoritos(usuarioId.Value, pedidos);
+            return Json(FavoritosBD.GetIdsFavoritos(usuarioId.Value));
         }
         catch (SqlException ex)
         {

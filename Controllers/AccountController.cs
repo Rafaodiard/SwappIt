@@ -14,7 +14,7 @@ public class AccountController : Controller
 
     public IActionResult Registro()
     {
-        ViewBag.provincias = BD.GetProvincias();
+        ViewBag.provincias = UsuariosBD.GetProvincias();
         return View();
     }
 
@@ -36,13 +36,13 @@ public class AccountController : Controller
         ViewBag.login = l;
         if (!ModelState.IsValid) return View("Login");
 
-        Usuarios? u = BD.GetUsuarioByMail(l.Mail);
+        Usuarios? u = UsuariosBD.GetUsuarioByMail(l.Mail);
 
         if (u != null && Contrasenas.Verificar(u.Contraseña, l.Contrasena, out bool hayQueActualizar))
         {
             if (hayQueActualizar)
             {
-                BD.ActualizarContrasena(u.IdUsuarios, Contrasenas.Hashear(l.Contrasena));
+                UsuariosBD.ActualizarContrasena(u.IdUsuarios, Contrasenas.Hashear(l.Contrasena));
             }
 
             HttpContext.Session.SetInt32("UsuarioId", u.IdUsuarios);
@@ -58,7 +58,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
-        List<Provincias> provincias = BD.GetProvincias();
+        List<Provincias> provincias = UsuariosBD.GetProvincias();
         if (r.IdProvincias.HasValue && !provincias.Any(p => p.IdProvincia == r.IdProvincias.Value))
         {
             ModelState.AddModelError(nameof(r.IdProvincias), "Elegí una provincia de la lista");
@@ -72,7 +72,7 @@ public class AccountController : Controller
         ViewBag.contrasena = contrasenaValida ? r.Contrasena : null;
         if (!ModelState.IsValid) return View();
 
-        if (BD.UsuarioExiste(r.Mail))
+        if (UsuariosBD.UsuarioExiste(r.Mail))
         {
             ViewBag.Error = "Ya existe una cuenta con ese email.";
             return View();
@@ -120,9 +120,9 @@ public class AccountController : Controller
             IdProvincias = r.IdProvincias!.Value
         };
 
-        BD.Register(u);
+        UsuariosBD.Register(u);
 
-        Usuarios? usuario = BD.GetUsuarioByMail(u.Mail);
+        Usuarios? usuario = UsuariosBD.GetUsuarioByMail(u.Mail);
 
         if (usuario != null)
         {
@@ -146,7 +146,7 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        Usuarios? usuario = BD.GetUsuarioById(usuarioId.Value);
+        Usuarios? usuario = UsuariosBD.GetUsuarioById(usuarioId.Value);
 
         if (usuario == null)
         {
@@ -171,7 +171,7 @@ public class AccountController : Controller
             return View();
         }
 
-        BD.ActualizarContrasena(usuario.IdUsuarios, Contrasenas.Hashear(contrasenaNueva));
+        UsuariosBD.ActualizarContrasena(usuario.IdUsuarios, Contrasenas.Hashear(contrasenaNueva));
 
         ViewBag.Message = "Contraseña cambiada exitosamente.";
 

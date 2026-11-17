@@ -32,8 +32,8 @@ public class ChatController : Controller
         bool errorCarga = false;
         try
         {
-            List<IntercambioViewModel> intercambios = BD.GetIntercambios(usuarioId.Value);
-            resumenes = BD.GetResumenesChat(usuarioId.Value).ToDictionary(r => r.IdIntercambio);
+            List<IntercambioViewModel> intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value);
+            resumenes = ChatBD.GetResumenesChat(usuarioId.Value).ToDictionary(r => r.IdIntercambio);
 
             conversaciones = intercambios
                 .Where(i => PuedeEscribir(i, false) || resumenes.ContainsKey(i.IdIntercambios))
@@ -43,9 +43,9 @@ public class ChatController : Controller
             abierta = id == null ? conversaciones.FirstOrDefault() : intercambios.FirstOrDefault(i => i.IdIntercambios == id);
             if (abierta != null)
             {
-                BD.MarcarMensajesVistos(abierta.IdIntercambios, usuarioId.Value);
-                mensajes = BD.GetMensajes(abierta.IdIntercambios, usuarioId.Value);
-                ViewBag.fotoOtro = BD.GetFotoUsuario(abierta.OtroIdUsuario);
+                ChatBD.MarcarMensajesVistos(abierta.IdIntercambios, usuarioId.Value);
+                mensajes = ChatBD.GetMensajes(abierta.IdIntercambios, usuarioId.Value);
+                ViewBag.fotoOtro = UsuariosBD.GetFotoUsuario(abierta.OtroIdUsuario);
                 if (resumenes.TryGetValue(abierta.IdIntercambios, out ConversacionViewModel? resumen))
                 {
                     resumen.NoLeidos = 0;
@@ -83,8 +83,8 @@ public class ChatController : Controller
 
         try
         {
-            BD.MarcarMensajesVistos(id, usuarioId.Value);
-            ViewBag.mensajes = BD.GetMensajes(id, usuarioId.Value);
+            ChatBD.MarcarMensajesVistos(id, usuarioId.Value);
+            ViewBag.mensajes = ChatBD.GetMensajes(id, usuarioId.Value);
             ViewBag.usuarioId = usuarioId.Value;
             return PartialView("_Mensajes");
         }
@@ -120,7 +120,7 @@ public class ChatController : Controller
         try
         {
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (!BD.EnviarMensaje(id, usuarioId.Value, texto, creadas))
+            if (!ChatBD.EnviarMensaje(id, usuarioId.Value, texto, creadas))
             {
                 TempData["ErrorChat"] = "No se pudo mandar el mensaje: este intercambio ya no está en curso.";
             }

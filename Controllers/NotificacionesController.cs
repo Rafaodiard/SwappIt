@@ -28,7 +28,7 @@ public class NotificacionesController : Controller
         bool errorCarga = false;
         try
         {
-            notificaciones = BD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
+            notificaciones = NotificacionesBD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
         }
         catch (SqlException ex)
         {
@@ -51,7 +51,7 @@ public class NotificacionesController : Controller
 
         try
         {
-            return Json(new { cantidad = BD.GetCantidadNotificacionesNoLeidas(usuarioId.Value) });
+            return Json(new { cantidad = NotificacionesBD.GetCantidadNotificacionesNoLeidas(usuarioId.Value) });
         }
         catch (SqlException ex)
         {
@@ -73,7 +73,7 @@ public class NotificacionesController : Controller
         NotificacionViewModel? notificacion;
         try
         {
-            notificacion = BD.MarcarNotificacionLeida(id, usuarioId.Value);
+            notificacion = NotificacionesBD.MarcarNotificacionLeida(id, usuarioId.Value);
         }
         catch (SqlException ex)
         {
@@ -104,7 +104,7 @@ public class NotificacionesController : Controller
 
         try
         {
-            BD.MarcarNotificacionesLeidas(usuarioId.Value);
+            NotificacionesBD.MarcarNotificacionesLeidas(usuarioId.Value);
             return NoContent();
         }
         catch (SqlException ex)

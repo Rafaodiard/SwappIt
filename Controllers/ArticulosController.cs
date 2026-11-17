@@ -31,10 +31,10 @@ public class ArticulosController : Controller
 
         try
         {
-            articulos = BD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
+            articulos = ArticulosBD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
             articulos = RecomendacionesController.Ordenar(articulos, ordenElegido, usuarioId);
-            categorias = BD.GetFiltroCategorias(busqueda, usuarioId);
-            estados = BD.GetFiltroEstados(busqueda, usuarioId);
+            categorias = ArticulosBD.GetFiltroCategorias(busqueda, usuarioId);
+            estados = ArticulosBD.GetFiltroEstados(busqueda, usuarioId);
         }
         catch (SqlException ex)
         {
@@ -63,7 +63,7 @@ public class ArticulosController : Controller
 
         try
         {
-            Articulos? articulo = BD.GetArticuloById(id);
+            Articulos? articulo = ArticulosBD.GetArticuloById(id);
             if (articulo == null)
             {
                 Response.StatusCode = StatusCodes.Status404NotFound;
@@ -71,27 +71,27 @@ public class ArticulosController : Controller
                 return View();
             }
 
-            Usuarios dueno = BD.GetUsuarioById(articulo.IdUsuarios)!;
+            Usuarios dueno = UsuariosBD.GetUsuarioById(articulo.IdUsuarios)!;
             bool esPropio = usuarioId == articulo.IdUsuarios;
 
             ViewBag.detalle = articulo;
-            ViewBag.imagenes = BD.GetImagenesArticulo(articulo.IdArticulos);
-            ViewBag.categoria = BD.GetCategoriaById(articulo.IdCategorias);
-            ViewBag.categoriaACambio = articulo.IdCategoriaACambio.HasValue ? BD.GetCategoriaById(articulo.IdCategoriaACambio.Value) : null;
-            ViewBag.estado = BD.GetEstadoArticuloById(articulo.IdEstado);
+            ViewBag.imagenes = ArticulosBD.GetImagenesArticulo(articulo.IdArticulos);
+            ViewBag.categoria = ArticulosBD.GetCategoriaById(articulo.IdCategorias);
+            ViewBag.categoriaACambio = articulo.IdCategoriaACambio.HasValue ? ArticulosBD.GetCategoriaById(articulo.IdCategoriaACambio.Value) : null;
+            ViewBag.estado = ArticulosBD.GetEstadoArticuloById(articulo.IdEstado);
             ViewBag.dueno = dueno;
-            ViewBag.fotoDueno = BD.GetFotoUsuario(dueno.IdUsuarios);
-            ViewBag.provinciaDueno = BD.GetProvinciaById(dueno.IdProvincias);
-            ViewBag.otrosArticulos = BD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
+            ViewBag.fotoDueno = UsuariosBD.GetFotoUsuario(dueno.IdUsuarios);
+            ViewBag.provinciaDueno = UsuariosBD.GetProvinciaById(dueno.IdProvincias);
+            ViewBag.otrosArticulos = ArticulosBD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
                 .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
             ViewBag.esPropio = esPropio;
-            ViewBag.comprometido = BD.ArticuloComprometido(articulo.IdArticulos);
+            ViewBag.comprometido = IntercambiosBD.ArticuloComprometido(articulo.IdArticulos);
             ViewBag.logueado = usuarioId != null;
             ViewBag.misArticulos = usuarioId != null && !esPropio
-                ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
+                ? ArticulosBD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
                 : new List<ArticuloCardViewModel>();
             ViewBag.idPropuestaEnCurso = usuarioId != null && !esPropio
-                ? BD.GetIdPropuestaEnCurso(usuarioId.Value, articulo.IdArticulos)
+                ? IntercambiosBD.GetIdPropuestaEnCurso(usuarioId.Value, articulo.IdArticulos)
                 : null;
         }
         catch (SqlException ex)

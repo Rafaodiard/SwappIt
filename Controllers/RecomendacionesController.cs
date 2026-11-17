@@ -68,13 +68,13 @@ public class RecomendacionesController : Controller
 
         try
         {
-            Articulos? articulo = BD.GetArticuloById(idArticulo);
+            Articulos? articulo = ArticulosBD.GetArticuloById(idArticulo);
             if (articulo == null || articulo.IdUsuarios == usuarioId)
             {
                 return NoContent();
             }
 
-            int idInteraccion = BD.RegistrarVista(usuarioId.Value, idArticulo);
+            int idInteraccion = RecomendacionesBD.RegistrarVista(usuarioId.Value, idArticulo);
             return Json(new { idInteraccion });
         }
         catch (SqlException ex)
@@ -96,7 +96,7 @@ public class RecomendacionesController : Controller
 
         try
         {
-            BD.GuardarSegundosVista(idInteraccion, usuarioId.Value, Math.Clamp(segundos, 0, MaxSegundosVista));
+            RecomendacionesBD.GuardarSegundosVista(idInteraccion, usuarioId.Value, Math.Clamp(segundos, 0, MaxSegundosVista));
             return NoContent();
         }
         catch (SqlException ex)
@@ -125,7 +125,7 @@ public class RecomendacionesController : Controller
 
         try
         {
-            BD.RegistrarBusqueda(usuarioId.Value, textoLimpio, categoriasLimpias, MinutosSinRepetirBusqueda);
+            RecomendacionesBD.RegistrarBusqueda(usuarioId.Value, textoLimpio, categoriasLimpias, MinutosSinRepetirBusqueda);
             return NoContent();
         }
         catch (SqlException ex)
@@ -186,10 +186,10 @@ public class RecomendacionesController : Controller
     {
         if (idUsuario == null)
         {
-            return Populares(BD.GetArticulosCatalogo()).Take(cantidad).ToList();
+            return Populares(ArticulosBD.GetArticulosCatalogo()).Take(cantidad).ToList();
         }
 
-        List<ArticuloCardViewModel> candidatos = BD.GetArticulosCatalogo(excluirUsuario: idUsuario);
+        List<ArticuloCardViewModel> candidatos = ArticulosBD.GetArticulosCatalogo(excluirUsuario: idUsuario);
         List<ArticuloPuntuado> puntuados = Puntuar(idUsuario.Value, candidatos);
 
         List<ArticuloPuntuado> conInteresMutuo = puntuados.Where(p => p.InteresDelOtro > 0).ToList();
@@ -288,14 +288,14 @@ public class RecomendacionesController : Controller
     private static List<ArticuloPuntuado> Puntuar(int idUsuario, List<ArticuloCardViewModel> articulos)
     {
         List<int> usuarios = articulos.Select(a => a.IdUsuarios).Append(idUsuario).Distinct().ToList();
-        List<SenalGusto> senales = BD.GetSenalesGustos(usuarios, DateTime.Now.AddDays(-DiasDeHistorial));
+        List<SenalGusto> senales = RecomendacionesBD.GetSenalesGustos(usuarios, DateTime.Now.AddDays(-DiasDeHistorial));
         Dictionary<int, Dictionary<int, double>> gustos = usuarios.ToDictionary(
             u => u,
             u => ArmarGustos(senales.Where(s => s.IdUsuario == u)));
 
         Dictionary<int, double> misGustos = gustos[idUsuario];
         List<string> palabrasBuscadas = PalabrasBuscadas(senales.Where(s => s.IdUsuario == idUsuario));
-        HashSet<int> misCategorias = BD.GetArticulosCatalogo(idUsuario: idUsuario).Select(a => a.IdCategorias).ToHashSet();
+        HashSet<int> misCategorias = ArticulosBD.GetArticulosCatalogo(idUsuario: idUsuario).Select(a => a.IdCategorias).ToHashSet();
         Dictionary<int, double> popularidad = CalcularPopularidad();
 
         List<ArticuloPuntuado> puntuados = new List<ArticuloPuntuado>();
@@ -368,7 +368,7 @@ public class RecomendacionesController : Controller
 
     private static Dictionary<int, double> CalcularPopularidad()
     {
-        Dictionary<int, double> puntos = BD.GetPopularidad(DateTime.Now.AddDays(-DiasPopularidad))
+        Dictionary<int, double> puntos = RecomendacionesBD.GetPopularidad(DateTime.Now.AddDays(-DiasPopularidad))
             .ToDictionary(d => d.IdArticulo, d => (double)(d.Vistas + VistasPorFavorito * d.Favoritos));
 
         double maximo = puntos.Count > 0 ? puntos.Values.Max() : 0;

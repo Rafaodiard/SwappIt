@@ -30,8 +30,8 @@ public class IntercambioController : Controller
         bool errorCarga = false;
         try
         {
-            intercambios = BD.GetIntercambios(usuarioId.Value);
-            estados = BD.GetEstadosIntercambios();
+            intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value);
+            estados = IntercambiosBD.GetEstadosIntercambios();
         }
         catch (SqlException ex)
         {
@@ -61,24 +61,24 @@ public class IntercambioController : Controller
         ViewBag.errorCarga = false;
         try
         {
-            IntercambioViewModel? intercambio = BD.GetIntercambio(id, usuarioId.Value);
+            IntercambioViewModel? intercambio = IntercambiosBD.GetIntercambio(id, usuarioId.Value);
             if (intercambio == null)
             {
                 Response.StatusCode = StatusCodes.Status404NotFound;
             }
             else
             {
-                List<ArticuloCardViewModel> articulos = BD.GetArticulosDeIntercambio(id, usuarioId.Value);
+                List<ArticuloCardViewModel> articulos = IntercambiosBD.GetArticulosDeIntercambio(id, usuarioId.Value);
                 ViewBag.misArticulos = articulos.Where(a => a.IdUsuarios == usuarioId).ToList();
                 ViewBag.susArticulos = articulos.Where(a => a.IdUsuarios != usuarioId).ToList();
-                ViewBag.fotoOtro = BD.GetFotoUsuario(intercambio.OtroIdUsuario);
+                ViewBag.fotoOtro = UsuariosBD.GetFotoUsuario(intercambio.OtroIdUsuario);
                 ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
-                    && BD.IntercambioConArticuloComprometido(intercambio.IdIntercambios);
+                    && IntercambiosBD.IntercambioConArticuloComprometido(intercambio.IdIntercambios);
                 ViewBag.pendientesQueSeRechazan = intercambio.EsRecibido && intercambio.Estado == EstadosIntercambios.Pendiente
-                    ? BD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
+                    ? IntercambiosBD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
                     : 0;
 
-                List<CambioIntercambioViewModel> cambios = BD.GetCambiosIntercambio(id, usuarioId.Value);
+                List<CambioIntercambioViewModel> cambios = IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value);
                 List<CambioIntercambioViewModel> pendientes = cambios.Where(c => c.EsPendiente).ToList();
                 bool puedeCambiar = intercambio.Estado == EstadosIntercambios.Pendiente || intercambio.Estado == EstadosIntercambios.Aceptado;
                 HashSet<int> enJuego = articulos.Select(a => a.IdArticulos).Concat(pendientes.Select(c => c.IdArticulo)).ToHashSet();
@@ -95,10 +95,10 @@ public class IntercambioController : Controller
                 ViewBag.tengoPorResponder = pendientes.Any(c => c.IdUsuario != usuarioId);
                 ViewBag.hayPendientes = pendientes.Count > 0;
                 ViewBag.paraAgregar = lugarMio > 0
-                    ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
+                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: usuarioId.Value).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
                     : new List<ArticuloCardViewModel>();
                 ViewBag.paraPedir = lugarSuyo > 0
-                    ? BD.GetArticulosCatalogo(idUsuario: intercambio.OtroIdUsuario).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
+                    ? ArticulosBD.GetArticulosCatalogo(idUsuario: intercambio.OtroIdUsuario).Where(a => !enJuego.Contains(a.IdArticulos)).ToList()
                     : new List<ArticuloCardViewModel>();
             }
             ViewBag.intercambio = intercambio;
@@ -124,7 +124,7 @@ public class IntercambioController : Controller
 
         try
         {
-            Articulos? pedido = BD.GetArticuloById(idArticuloPedido);
+            Articulos? pedido = ArticulosBD.GetArticuloById(idArticuloPedido);
             if (pedido == null)
             {
                 return NotFound();
@@ -144,19 +144,19 @@ public class IntercambioController : Controller
             {
                 error = $"Podés ofrecer hasta {Intercambios.MaxArticulosOfrecidos} artículos en una propuesta.";
             }
-            else if (idsOfrecidos.Any(id => BD.GetArticuloById(id)?.IdUsuarios != usuarioId))
+            else if (idsOfrecidos.Any(id => ArticulosBD.GetArticuloById(id)?.IdUsuarios != usuarioId))
             {
                 error = "Solo podés ofrecer artículos tuyos.";
             }
-            else if (BD.ContarIntercambiosActivos(usuarioId.Value) >= 5)
+            else if (IntercambiosBD.ContarIntercambiosActivos(usuarioId.Value) >= 5)
             {
                 error = "Tenés 5 intercambios activos. Cuando uno se resuelva, podés hacer otro.";
             }
-            else if (BD.ArticuloComprometido(pedido.IdArticulos))
+            else if (IntercambiosBD.ArticuloComprometido(pedido.IdArticulos))
             {
                 error = "Este artículo ya tiene un intercambio aceptado.";
             }
-            else if (idsOfrecidos.Any(BD.ArticuloComprometido))
+            else if (idsOfrecidos.Any(IntercambiosBD.ArticuloComprometido))
             {
                 error = idsOfrecidos.Count == 1
                     ? "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro."
@@ -170,7 +170,7 @@ public class IntercambioController : Controller
             }
 
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idsOfrecidos, pedido.IdUsuarios, idArticuloPedido, creadas);
+            int? idIntercambio = IntercambiosBD.ProponerIntercambio(usuarioId.Value, idsOfrecidos, pedido.IdUsuarios, idArticuloPedido, creadas);
             if (idIntercambio == null)
             {
                 TempData["ErrorArticulo"] = "Ya tenés una propuesta en curso por este artículo.";
@@ -202,22 +202,22 @@ public class IntercambioController : Controller
         string mensaje = "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.";
         try
         {
-            IntercambioViewModel? intercambio = BD.GetIntercambio(id, usuarioId.Value);
+            IntercambioViewModel? intercambio = IntercambiosBD.GetIntercambio(id, usuarioId.Value);
             if (intercambio != null)
             {
-                if (BD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente && c.IdUsuario != usuarioId))
+                if (IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente && c.IdUsuario != usuarioId))
                 {
                     TempData["ErrorIntercambio"] = $"Respondé los cambios de {intercambio.OtroNombre} antes de aceptar.";
                     return RedirectToAction("Detalle", new { id });
                 }
-                if (BD.GetUltimoCambio(id) > ultimoCambio)
+                if (IntercambiosBD.GetUltimoCambio(id) > ultimoCambio)
                 {
                     TempData["ErrorIntercambio"] = $"{intercambio.OtroNombre} cambió el intercambio mientras lo mirabas. Revisalo y aceptá de nuevo.";
                     return RedirectToAction("Detalle", new { id });
                 }
             }
 
-            int pendientes = BD.ContarPendientesDeArticulos(id);
+            int pendientes = IntercambiosBD.ContarPendientesDeArticulos(id);
             if (pendientes > 0)
             {
                 mensaje += pendientes == 1
@@ -248,7 +248,7 @@ public class IntercambioController : Controller
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         try
         {
-            if (usuarioId != null && BD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente))
+            if (usuarioId != null && IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Any(c => c.EsPendiente))
             {
                 TempData["ErrorIntercambio"] = "Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.";
                 return RedirectToAction("Detalle", new { id });
@@ -275,7 +275,7 @@ public class IntercambioController : Controller
         try
         {
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (BD.CancelarIntercambio(id, usuarioId.Value, creadas))
+            if (IntercambiosBD.CancelarIntercambio(id, usuarioId.Value, creadas))
             {
                 _emailService.EnviarNotificaciones(creadas, Url);
                 TempData["MensajeIntercambio"] = "Cancelaste el intercambio. Le avisamos a la otra persona.";
@@ -320,7 +320,7 @@ public class IntercambioController : Controller
             {
                 return $"Cada lado puede tener hasta {Intercambios.MaxArticulosOfrecidos} artículos.";
             }
-            elegidos = ids.Select(BD.GetArticuloById).ToList();
+            elegidos = ids.Select(ArticulosBD.GetArticuloById).ToList();
             if (elegidos.Any(a => a?.IdUsuarios != c.IdUsuario))
             {
                 return "Solo podés agregar artículos tuyos.";
@@ -329,12 +329,12 @@ public class IntercambioController : Controller
             {
                 return "Ese artículo ya está en el intercambio o tiene un cambio pendiente.";
             }
-            if (ids.Any(BD.ArticuloComprometido))
+            if (ids.Any(IntercambiosBD.ArticuloComprometido))
             {
                 return "Uno de los artículos ya tiene un intercambio aceptado. Elegí otro.";
             }
             return null;
-        }, (c, creadas) => BD.AgregarArticulos(id, c.IdUsuario, ids, creadas) > 0
+        }, (c, creadas) => IntercambiosBD.AgregarArticulos(id, c.IdUsuario, ids, creadas) > 0
             ? $"Sumaste {Nombres(elegidos.Select(a => a!.Nombre ?? "").ToList())}. A {c.Intercambio.OtroNombre} le llegó un aviso."
             : null);
     }
@@ -346,7 +346,7 @@ public class IntercambioController : Controller
         Articulos? articulo = null;
         return HacerCambio(id, c =>
         {
-            articulo = BD.GetArticuloById(idArticulo);
+            articulo = ArticulosBD.GetArticuloById(idArticulo);
             if (articulo == null || articulo.IdUsuarios != c.Intercambio.OtroIdUsuario)
             {
                 return $"Solo podés pedir artículos de {c.Intercambio.OtroNombre}.";
@@ -359,12 +359,12 @@ public class IntercambioController : Controller
             {
                 return $"Cada lado puede tener hasta {Intercambios.MaxArticulosOfrecidos} artículos.";
             }
-            if (BD.ArticuloComprometido(idArticulo))
+            if (IntercambiosBD.ArticuloComprometido(idArticulo))
             {
                 return "Ese artículo ya tiene un intercambio aceptado. Elegí otro.";
             }
             return null;
-        }, (c, creadas) => BD.PedirArticulo(id, c.IdUsuario, idArticulo, creadas)
+        }, (c, creadas) => IntercambiosBD.PedirArticulo(id, c.IdUsuario, idArticulo, creadas)
             ? $"Le pediste {articulo!.Nombre} a {c.Intercambio.OtroNombre}. Se suma cuando lo acepte."
             : null);
     }
@@ -390,7 +390,7 @@ public class IntercambioController : Controller
                 return "No podés sacar tu único artículo del intercambio.";
             }
             return null;
-        }, (c, creadas) => BD.PedirSacarArticulo(id, c.IdUsuario, idArticulo, creadas)
+        }, (c, creadas) => IntercambiosBD.PedirSacarArticulo(id, c.IdUsuario, idArticulo, creadas)
             ? $"Le pediste a {c.Intercambio.OtroNombre} sacar {articulo!.Nombre}. Se saca cuando lo acepte."
             : null);
     }
@@ -406,12 +406,12 @@ public class IntercambioController : Controller
             {
                 return "Ese cambio ya no está pendiente.";
             }
-            if (aceptar && cambio.Tipo == TipoCambios.Pedir && BD.ArticuloComprometido(cambio.IdArticulo))
+            if (aceptar && cambio.Tipo == TipoCambios.Pedir && IntercambiosBD.ArticuloComprometido(cambio.IdArticulo))
             {
                 return $"{cambio.ArticuloNombre} ya tiene otro intercambio aceptado, así que no se puede sumar. Tocá No para cerrar el pedido.";
             }
             return null;
-        }, (c, creadas) => BD.ResponderCambio(idCambio, c.IdUsuario, aceptar, creadas)
+        }, (c, creadas) => IntercambiosBD.ResponderCambio(idCambio, c.IdUsuario, aceptar, creadas)
             ? (aceptar ? "Aceptaste el cambio." : $"Rechazaste el cambio. Le avisamos a {c.Intercambio.OtroNombre}.")
             : null);
     }
@@ -421,7 +421,7 @@ public class IntercambioController : Controller
     public IActionResult CancelarCambio(int id, int idCambio)
     {
         return HacerCambio(id, c => c.Pendientes.Any(p => p.Id == idCambio && p.IdUsuario == c.IdUsuario) ? null : "Ese pedido ya no está pendiente.",
-            (c, creadas) => BD.CancelarCambio(idCambio, c.IdUsuario) ? "Cancelaste el pedido." : null);
+            (c, creadas) => IntercambiosBD.CancelarCambio(idCambio, c.IdUsuario) ? "Cancelaste el pedido." : null);
     }
 
     private IActionResult HacerCambio(int id, Func<ContextoCambio, string?> validar, Func<ContextoCambio, List<NotificacionCreada>, string?> hacer)
@@ -434,7 +434,7 @@ public class IntercambioController : Controller
 
         try
         {
-            IntercambioViewModel? intercambio = BD.GetIntercambio(id, usuarioId.Value);
+            IntercambioViewModel? intercambio = IntercambiosBD.GetIntercambio(id, usuarioId.Value);
             if (intercambio == null)
             {
                 return NotFound();
@@ -448,8 +448,8 @@ public class IntercambioController : Controller
             else
             {
                 ContextoCambio contexto = new ContextoCambio(usuarioId.Value, intercambio,
-                    BD.GetArticulosDeIntercambio(id, usuarioId.Value),
-                    BD.GetCambiosIntercambio(id, usuarioId.Value).Where(c => c.EsPendiente).ToList());
+                    IntercambiosBD.GetArticulosDeIntercambio(id, usuarioId.Value),
+                    IntercambiosBD.GetCambiosIntercambio(id, usuarioId.Value).Where(c => c.EsPendiente).ToList());
                 error = validar(contexto);
                 if (error == null)
                 {
@@ -492,7 +492,7 @@ public class IntercambioController : Controller
         try
         {
             List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion, creadas, ultimoCambioVisto))
+            if (IntercambiosBD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion, creadas, ultimoCambioVisto))
             {
                 _emailService.EnviarNotificaciones(creadas, Url);
                 TempData["MensajeIntercambio"] = mensaje;

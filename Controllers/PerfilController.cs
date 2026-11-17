@@ -21,18 +21,18 @@ public class PerfilController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        Usuarios? usuario = BD.GetUsuarioById(usuarioId.Value);
+        Usuarios? usuario = UsuariosBD.GetUsuarioById(usuarioId.Value);
         if (usuario == null)
         {
             return RedirectToAction("Index", "Account");
         }
 
         ViewBag.usuario = usuario;
-        ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
-        ViewBag.provincias = BD.GetProvincias();
-        ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
-        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios, incluirEnIntercambio: true);
-        ViewBag.intercambios = BD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
+        ViewBag.provincia = UsuariosBD.GetProvinciaById(usuario.IdProvincias);
+        ViewBag.provincias = UsuariosBD.GetProvincias();
+        ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
+        ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios, incluirEnIntercambio: true);
+        ViewBag.intercambios = IntercambiosBD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
         return View();
     }
 
@@ -50,7 +50,7 @@ public class PerfilController : Controller
             return RedirectToAction("Index");
         }
 
-        Usuarios? usuario = BD.GetUsuarioById(id);
+        Usuarios? usuario = UsuariosBD.GetUsuarioById(id);
         if (usuario == null)
         {
             Response.StatusCode = StatusCodes.Status404NotFound;
@@ -67,9 +67,9 @@ public class PerfilController : Controller
             Barrio = usuario.Barrio,
             Descripcion = usuario.Descripcion
         };
-        ViewBag.provincia = BD.GetProvinciaById(usuario.IdProvincias);
-        ViewBag.foto = BD.GetFotoUsuario(usuario.IdUsuarios);
-        ViewBag.articulos = BD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
+        ViewBag.provincia = UsuariosBD.GetProvinciaById(usuario.IdProvincias);
+        ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
+        ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
         return View();
     }
 
@@ -83,7 +83,7 @@ public class PerfilController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        Usuarios? usuario = BD.GetUsuarioById(usuarioId.Value);
+        Usuarios? usuario = UsuariosBD.GetUsuarioById(usuarioId.Value);
 
         if (usuario == null)
         {
@@ -120,13 +120,13 @@ public class PerfilController : Controller
                 return RedirectToAction("Index");
             }
 
-            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
-            BD.GuardarFotoUsuario(usuario.IdUsuarios, GuardarFoto(e.Foto, usuario.IdUsuarios, extension));
+            BorrarFoto(UsuariosBD.GetFotoUsuario(usuario.IdUsuarios));
+            UsuariosBD.GuardarFotoUsuario(usuario.IdUsuarios, GuardarFoto(e.Foto, usuario.IdUsuarios, extension));
         }
         else if (e.QuitarFoto)
         {
-            BorrarFoto(BD.GetFotoUsuario(usuario.IdUsuarios));
-            BD.BorrarFotoUsuario(usuario.IdUsuarios);
+            BorrarFoto(UsuariosBD.GetFotoUsuario(usuario.IdUsuarios));
+            UsuariosBD.BorrarFotoUsuario(usuario.IdUsuarios);
         }
 
         usuario.Nombre = e.Nombre.Trim();
@@ -137,7 +137,7 @@ public class PerfilController : Controller
         usuario.IdProvincias = e.IdProvincias;
         usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();
 
-        BD.UpdateUsuario(usuario);
+        UsuariosBD.UpdateUsuario(usuario);
         SesionUsuario.GuardarDatosHeader(HttpContext.Session, usuario);
 
         TempData["MensajePerfil"] = "Perfil actualizado.";
