@@ -12,9 +12,10 @@ public class AccountController : BaseController
         return View("Login");
     }
 
-    public IActionResult Registro()
+    public IActionResult Registro(int? plan)
     {
-        CargarRegistro(null, UsuariosBD.GetProvincias(), null);
+        List<PlanViewModel> planes = Suscripciones.Planes();
+        CargarRegistro(null, UsuariosBD.GetProvincias(), planes, Suscripciones.PlanElegido(planes, plan), null);
         return View();
     }
 
@@ -57,8 +58,15 @@ public class AccountController : BaseController
             ModelState.AddModelError(nameof(r.IdProvincias), errorProvincia);
         }
 
+        List<PlanViewModel> planes = Suscripciones.Planes();
+        string? errorPlan = Suscripciones.ValidarPlan(planes, r.IdPlan);
+        if (errorPlan != null)
+        {
+            ModelState.AddModelError(nameof(r.IdPlan), errorPlan);
+        }
+
         bool contrasenaValida = ModelState.GetFieldValidationState(nameof(r.Contrasena)) == ModelValidationState.Valid;
-        CargarRegistro(r, provincias, Cuentas.ContrasenaParaRepetir(r, password2, contrasenaValida));
+        CargarRegistro(r, provincias, planes, Suscripciones.PlanElegido(planes, r.IdPlan), Cuentas.ContrasenaParaRepetir(r, password2, contrasenaValida));
         if (!ModelState.IsValid) return View();
 
         ErrorCampo? error = Cuentas.ValidarRegistro(r, password2);
@@ -75,12 +83,18 @@ public class AccountController : BaseController
             return View();
         }
 
-        Usuarios? usuario = Cuentas.Registrar(r);
-        if (usuario != null)
+        int idPlanInicial = Suscripciones.PlanAlRegistrarse(planes, r.IdPlan!.Value);
+        Usuarios? usuario = Cuentas.Registrar(r, idPlanInicial);
+        if (usuario == null)
         {
-            SesionUsuario.Iniciar(HttpContext.Session, usuario);
+            return RedirectToAction("Index", "Home");
         }
 
+        SesionUsuario.Iniciar(HttpContext.Session, usuario);
+        if (idPlanInicial != r.IdPlan)
+        {
+            return RedirectToAction("Pago", "Planes", new { id = r.IdPlan });
+        }
         return RedirectToAction("Index", "Home");
     }
 
@@ -113,10 +127,12 @@ public class AccountController : BaseController
         return RedirectToAction("Index", "Account");
     }
 
-    private void CargarRegistro(RegistroViewModel? r, List<Provincias> provincias, string? contrasena)
+    private void CargarRegistro(RegistroViewModel? r, List<Provincias> provincias, List<PlanViewModel> planes, int? idPlanElegido, string? contrasena)
     {
         ViewBag.registro = r;
         ViewBag.provincias = provincias;
+        ViewBag.planes = planes;
+        ViewBag.idPlanElegido = idPlanElegido;
         ViewBag.contrasena = contrasena;
         ViewBag.fechaNacimiento = r?.FechaNacimiento?.ToString("yyyy-MM-dd");
         ViewBag.edadMinima = RegistroViewModel.EdadMinima;

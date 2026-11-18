@@ -36,6 +36,23 @@ INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (4
 INSERT [dbo].[EstadosIntercambios] ([IdEstadosIntercambios], [Nombre]) VALUES (5, N'Cancelado')
 SET IDENTITY_INSERT [dbo].[EstadosIntercambios] OFF
 GO
+SET IDENTITY_INSERT [dbo].[Planes] ON 
+
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (1, N'Gratis', N'Básico', 0, 5, 5, 0)
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (2, N'Plus', N'Intermedio', 1500, 15, 15, 1)
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (3, N'Pro', N'Premium', 3000, NULL, NULL, 2)
+SET IDENTITY_INSERT [dbo].[Planes] OFF
+GO
+SET IDENTITY_INSERT [dbo].[BeneficiosPlanes] ON 
+
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (1, 1, N'Chateá con otros usuarios')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (2, 1, N'Guardá tus favoritos')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (3, 2, N'Tus artículos se recomiendan más a otros usuarios')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (4, 2, N'Insignia Plus en tu perfil público')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (5, 3, N'Tus artículos tienen la máxima prioridad en las recomendaciones')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (6, 3, N'Insignia Pro en tu perfil público')
+SET IDENTITY_INSERT [dbo].[BeneficiosPlanes] OFF
+GO
 SET IDENTITY_INSERT [dbo].[Provincias] ON 
 
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (1, N'Buenos Aires')

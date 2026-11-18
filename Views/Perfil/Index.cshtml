@@ -13,6 +13,9 @@
     int maxDescripcion = ViewBag.maxDescripcion;
     string? errorPerfil = ViewBag.errorPerfil;
     string? mensajePerfil = ViewBag.mensajePerfil;
+    Swappit.Models.ViewModels.PlanViewModel? plan = ViewBag.plan;
+    int articulosActivos = ViewBag.articulosActivos;
+    int intercambiosActivos = ViewBag.intercambiosActivos;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -43,7 +46,13 @@
                                 data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-elegir-foto><i class="bi bi-camera-fill"></i></button>
                     </div>
                     <div>
-                        <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
+                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2">
+                            <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
+                            @if (plan != null && !plan.EsGratis)
+                            {
+                                <span class="sw-insignia-plan sw-insignia-plan--@plan.Clave"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
+                            }
+                        </div>
                         <p class="text-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
                         @if (tieneDescripcion)
                         {
@@ -61,6 +70,38 @@
                     </div>
                 </div>
             </div>
+
+            @if (plan != null)
+            {
+                <section class="sw-card sw-perfil-plan sw-perfil-plan--@plan.Clave p-4" aria-labelledby="titulo-mi-plan">
+                    <div class="sw-perfil-plan-cabecera">
+                        <span class="sw-perfil-plan-icono" aria-hidden="true"><i class="bi bi-stars"></i></span>
+                        <div class="flex-grow-1 min-w-0">
+                            <h2 class="sw-perfil-plan-titulo" id="titulo-mi-plan">Tu plan</h2>
+                            <p class="mb-0"><span class="sw-perfil-plan-nombre">@plan.Nombre</span> <span class="text-suave">· @plan.Precio@(plan.EsGratis ? "" : "/mes")</span></p>
+                        </div>
+                        <a href="@Url.Action("Index", "Planes")" class="btn btn-sw-outline btn-sm text-nowrap">@(plan.EsGratis ? "Mejorar plan" : "Cambiar plan")</a>
+                    </div>
+                    <dl class="sw-perfil-plan-uso">
+                        <div>
+                            <dt>Artículos publicados</dt>
+                            <dd>@Swappit.Models.Suscripciones.TextoUso(articulosActivos, plan.MaxArticulos)</dd>
+                            @if (plan.MaxArticulos != null)
+                            {
+                                <span class="sw-uso-barra" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(articulosActivos, plan.MaxArticulos.Value)%"></span></span>
+                            }
+                        </div>
+                        <div>
+                            <dt>Intercambios propuestos activos</dt>
+                            <dd>@Swappit.Models.Suscripciones.TextoUso(intercambiosActivos, plan.MaxIntercambios)</dd>
+                            @if (plan.MaxIntercambios != null)
+                            {
+                                <span class="sw-uso-barra" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(intercambiosActivos, plan.MaxIntercambios.Value)%"></span></span>
+                            }
+                        </div>
+                    </dl>
+                </section>
+            }
         </div>
 
         <!-- ===== Información personal ===== -->

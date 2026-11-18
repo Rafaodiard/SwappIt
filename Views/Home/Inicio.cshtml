@@ -10,6 +10,7 @@
     int? mensajesSinLeer = ViewBag.mensajesSinLeer;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> destacados = ViewBag.destacados;
     bool errorCarga = ViewBag.errorCarga;
+    List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
 }
 
 <!-- ===== Saludo ===== -->
@@ -151,67 +152,16 @@
     </div>
 </div>
 
-<!-- ===== Sección de planes completos ===== -->
-<section id="planes-completos" class="sw-suscripciones-detalle mt-5">
-    <div class="container-xl">
-        <div class="text-center mb-4">
-            <p class="sw-eyebrow">Planes</p>
-            <h2 class="mb-3">Elegí la opción que mejor se adapte a vos</h2>
-            <p class="text-suave mx-auto sw-suscripciones-copy">Todos los usuarios pueden empezar gratis. Si querés más alcance, podés sumar más visibilidad a tus publicaciones.</p>
+@if (planes.Count > 0)
+{
+    <section id="planes" class="sw-suscripciones-detalle" aria-labelledby="titulo-planes">
+        <div class="container-xl">
+            <div class="sw-planes-encabezado">
+                <p class="sw-eyebrow">Planes</p>
+                <h2 class="font-titulo text-primario mb-3" id="titulo-planes">Elegí la opción que mejor se adapte a vos</h2>
+                <p class="text-suave mb-0">Todos los usuarios pueden intercambiar gratis. Con Plus o Pro publicás y proponés más, y tus artículos se recomiendan más.</p>
+            </div>
+            <partial name="_GrillaPlanes" />
         </div>
-
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-6 col-xl-4">
-                <article class="sw-plan sw-plan--base">
-                    <div class="sw-plan-header">
-                        <span class="sw-plan-tag">Básico</span>
-                        <h3>Gratis</h3>
-                    </div>
-                    <div class="sw-plan-precio">$0</div>
-                    <ul class="sw-plan-lista">
-                        <li>Publicación de artículos sin costo</li>
-                        <li>Contacto directo con otros usuarios</li>
-                        <li>Guardado de favoritos</li>
-                        <li>Acceso completo a la plataforma</li>
-                    </ul>
-                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-outline w-100">Seguir gratis</a>
-                </article>
-            </div>
-
-            <div class="col-md-6 col-xl-4">
-                <article class="sw-plan sw-plan--destacado">
-                    <div class="sw-plan-badge">Más popular</div>
-                    <div class="sw-plan-header">
-                        <span class="sw-plan-tag">Destacados</span>
-                        <h3>Plus</h3>
-                    </div>
-                    <div class="sw-plan-precio">$1.500<span>/mes</span></div>
-                    <ul class="sw-plan-lista">
-                        <li>Publicaciones destacadas</li>
-                        <li>Más visibilidad en búsquedas</li>
-                        <li>Prioridad en chats activos</li>
-                        <li>Mejor posicionamiento en el inicio</li>
-                    </ul>
-                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario w-100">Elegir Plus</a>
-                </article>
-            </div>
-
-            <div class="col-md-6 col-xl-4">
-                <article class="sw-plan sw-plan--pro">
-                    <div class="sw-plan-header">
-                        <span class="sw-plan-tag">Máxima exposición</span>
-                        <h3>Pro</h3>
-                    </div>
-                    <div class="sw-plan-precio">$3.000<span>/mes</span></div>
-                    <ul class="sw-plan-lista">
-                        <li>Mayor alcance para tus objetos</li>
-                        <li>Perfil premium con mayor presencia</li>
-                        <li>Soporte preferencial</li>
-                        <li>Recomendación y prioridad en resultados</li>
-                    </ul>
-                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-secundario w-100">Elegir Pro</a>
-                </article>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
+}

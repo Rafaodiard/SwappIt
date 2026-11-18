@@ -70,7 +70,7 @@ public static class Cuentas
         return null;
     }
 
-    public static Usuarios? Registrar(RegistroViewModel r)
+    public static Usuarios? Registrar(RegistroViewModel r, int idPlan)
     {
         Usuarios u = new Usuarios
         {
@@ -83,7 +83,8 @@ public static class Cuentas
             Telefono = Telefonos.Convertir(r.Telefono),
             Usuario = r.Mail.Split('@')[0],
             Barrio = r.Barrio.Trim(),
-            IdProvincias = r.IdProvincias!.Value
+            IdProvincias = r.IdProvincias!.Value,
+            IdPlan = idPlan
         };
 
         UsuariosBD.Register(u);

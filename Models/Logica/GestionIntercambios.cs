@@ -4,8 +4,6 @@ namespace Swappit.Models;
 
 public static class GestionIntercambios
 {
-    public const int MaxIntercambiosActivos = 5;
-
     public static bool EstaEnCurso(string estado)
     {
         return estado == EstadosIntercambios.Pendiente || estado == EstadosIntercambios.Aceptado;
@@ -112,9 +110,14 @@ public static class GestionIntercambios
         {
             return "Solo podés ofrecer artículos tuyos.";
         }
-        if (IntercambiosBD.ContarIntercambiosActivos(idUsuario) >= MaxIntercambiosActivos)
+        PlanViewModel? plan = PlanesBD.GetPlanDeUsuario(idUsuario);
+        if (plan == null)
         {
-            return $"Tenés {MaxIntercambiosActivos} intercambios activos. Cuando uno se resuelva, podés hacer otro.";
+            return "No pudimos revisar tu plan. Probá de nuevo en un rato.";
+        }
+        if (plan.MaxIntercambios != null && Suscripciones.AlcanzoLimite(IntercambiosBD.ContarIntercambiosActivos(idUsuario), plan.MaxIntercambios))
+        {
+            return $"Con el plan {plan.Nombre} podés tener hasta {plan.MaxIntercambios} intercambios activos propuestos por vos. Cuando uno se resuelva, podés hacer otro, o cambiá de plan para tener más.";
         }
         if (IntercambiosBD.ArticuloComprometido(pedido.IdArticulos))
         {

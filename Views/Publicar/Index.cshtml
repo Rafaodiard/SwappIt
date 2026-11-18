@@ -11,7 +11,7 @@
     string? categoriaACambioElegida = ViewBag.categoriaACambioElegida;
     int maxFotos = ViewBag.maxFotos;
     int maxFotoMB = ViewBag.maxFotoMB;
-    int maxPublicados = ViewBag.maxPublicados;
+    PlanViewModel? plan = ViewBag.plan;
     int maxDescripcion = ViewBag.maxDescripcion;
 }
 
@@ -60,9 +60,17 @@
                 {
                     <p class="sw-aviso-rechazos mb-0" role="alert">
                         <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
-                        Ya tenés @maxPublicados objetos publicados, contando los que están en un intercambio pendiente o aceptado.
+                        @if (plan != null)
+                        {
+                            <text>Con el plan @plan.Nombre podés tener hasta @plan.MaxArticulos objetos publicados, contando los que están en un intercambio pendiente o aceptado.</text>
+                        }
+                        else
+                        {
+                            <text>No pudimos revisar cuántos objetos podés publicar.</text>
+                        }
                         Cuando un intercambio se complete, vas a poder publicar otro.
-                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-reset">Ver mis intercambios</a>
+                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-reset">Ver mis intercambios</a> ·
+                        <a href="@Url.Action("Index", "Planes")" class="fw-semibold text-reset">Ver planes</a>
                     </p>
                 }
 

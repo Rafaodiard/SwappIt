@@ -44,6 +44,7 @@
             @if (esVisitante)
             {
                 <nav class="d-flex align-items-center gap-3 ms-auto">
+                    <a href="@Url.Action("Index", "Planes")" class="text-dark text-decoration-none small fw-semibold d-none d-sm-inline">Planes</a>
                     <a href="@Url.Action("Index", "Account")" class="text-dark text-decoration-none small fw-semibold">Iniciar sesión</a>
                     <a href="@Url.Action("Registro", "Account")" class="btn btn-sw-secundario btn-sm">Registrarse</a>
                 </nav>
@@ -91,6 +92,7 @@
                     <h6>Swappit</h6>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                         <li><a href="@Url.Action("Index", "Home")#como-funciona">Cómo funciona</a></li>
+                        <li><a href="@Url.Action("Index", "Planes")">Planes</a></li>
                         <li><a href="#">Consejos de seguridad</a></li>
                         <li><a href="#">Preguntas frecuentes</a></li>
                     </ul>

@@ -13,4 +13,5 @@ public class Usuarios
     public int Edad { get; set; }
     public int IdProvincias { get; set; }
     public string? Descripcion { get; set; }
+    public int IdPlan { get; set; }
 }

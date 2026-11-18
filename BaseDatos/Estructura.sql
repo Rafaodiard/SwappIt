@@ -124,6 +124,21 @@ CREATE TABLE [dbo].[ArticulosIntercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[BeneficiosPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[BeneficiosPlanes](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdPlan] [int] NOT NULL,
+	[Texto] [varchar](100) NOT NULL,
+ CONSTRAINT [PK_BeneficiosPlanes] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[CambiosIntercambios]    Script Date: 14/11/2026 12:00:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -294,6 +309,25 @@ CREATE TABLE [dbo].[Notificaciones](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[Planes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Planes](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+	[Etiqueta] [varchar](50) NOT NULL,
+	[PrecioMensual] [int] NOT NULL,
+	[MaxArticulos] [int] NULL,
+	[MaxIntercambios] [int] NULL,
+	[Prioridad] [int] NOT NULL,
+ CONSTRAINT [PK_Planes] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Provincias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -368,6 +402,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Edad] [int] NOT NULL,
 	[IdProvincias] [int] NOT NULL,
 	[Descripcion] [varchar](500) NULL,
+	[IdPlan] [int] NOT NULL CONSTRAINT [DF_Usuarios_IdPlan] DEFAULT ((1)),
  CONSTRAINT [PK_Usuarios] PRIMARY KEY CLUSTERED 
 (
 	[IdUsuarios] ASC
@@ -403,6 +438,11 @@ ALTER TABLE [dbo].[ArticulosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_Articu
 REFERENCES [dbo].[Intercambios] ([IdIntercambios])
 GO
 ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Intercambios]
+GO
+ALTER TABLE [dbo].[BeneficiosPlanes]  WITH CHECK ADD  CONSTRAINT [FK_BeneficiosPlanes_Planes] FOREIGN KEY([IdPlan])
+REFERENCES [dbo].[Planes] ([Id])
+GO
+ALTER TABLE [dbo].[BeneficiosPlanes] CHECK CONSTRAINT [FK_BeneficiosPlanes_Planes]
 GO
 ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
 REFERENCES [dbo].[Articulos] ([IdArticulos])
@@ -503,6 +543,11 @@ ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificacione
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_Usuarios]
+GO
+ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD  CONSTRAINT [FK_Usuarios_Planes] FOREIGN KEY([IdPlan])
+REFERENCES [dbo].[Planes] ([Id])
+GO
+ALTER TABLE [dbo].[Usuarios] CHECK CONSTRAINT [FK_Usuarios_Planes]
 GO
 ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD  CONSTRAINT [FK_Usuarios_Provincias] FOREIGN KEY([IdProvincias])
 REFERENCES [dbo].[Provincias] ([IdProvincia])

@@ -29,18 +29,20 @@ public class PublicarController : BaseController
         }
 
         PublicarArticuloViewModel publicar = new PublicarArticuloViewModel();
+        PlanViewModel? plan = null;
         bool limiteAlcanzado = false;
         try
         {
             publicar = Publicaciones.Nueva(usuarioId.Value);
-            limiteAlcanzado = Publicaciones.LimiteAlcanzado(usuarioId.Value);
+            plan = PlanesBD.GetPlanDeUsuario(usuarioId.Value);
+            limiteAlcanzado = Publicaciones.LimiteAlcanzado(usuarioId.Value, plan);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron leer los datos del usuario {IdUsuario}", usuarioId);
         }
 
-        CargarFormulario(publicar, ObtenerCategorias(), ObtenerEstados(), limiteAlcanzado);
+        CargarFormulario(publicar, ObtenerCategorias(), ObtenerEstados(), limiteAlcanzado, plan);
         return View();
     }
 
@@ -61,14 +63,15 @@ public class PublicarController : BaseController
         List<IFormFile> fotos = Publicaciones.FotosConContenido(modelo.Fotos);
         Formularios.AgregarErrores(ModelState, Publicaciones.Validar(modelo, categorias, estados, fotos));
 
-        CargarFormulario(modelo, categorias, estados, false);
+        PlanViewModel? plan = PlanesBD.GetPlanDeUsuario(usuarioId.Value);
+        CargarFormulario(modelo, categorias, estados, false, plan);
         if (!ModelState.IsValid)
         {
             Publicaciones.AvisarFotosDeNuevo(ModelState, fotos);
             return View();
         }
 
-        if (Publicaciones.LimiteAlcanzado(usuarioId.Value))
+        if (Publicaciones.LimiteAlcanzado(usuarioId.Value, plan))
         {
             ViewBag.limiteAlcanzado = true;
             return View();
@@ -89,8 +92,9 @@ public class PublicarController : BaseController
         }
     }
 
-    private void CargarFormulario(PublicarArticuloViewModel publicar, List<SelectListItem> categorias, List<EstadosArticulos> estados, bool limiteAlcanzado)
+    private void CargarFormulario(PublicarArticuloViewModel publicar, List<SelectListItem> categorias, List<EstadosArticulos> estados, bool limiteAlcanzado, PlanViewModel? plan)
     {
+        ViewBag.plan = plan;
         ViewBag.publicar = publicar;
         ViewBag.categorias = categorias;
         ViewBag.estados = estados;
@@ -100,7 +104,6 @@ public class PublicarController : BaseController
         ViewBag.categoriaACambioElegida = publicar.IdCategoriaACambio?.ToString();
         ViewBag.maxFotos = PublicarArticuloViewModel.MaxFotos;
         ViewBag.maxFotoMB = PublicarArticuloViewModel.MaxFotoMB;
-        ViewBag.maxPublicados = PublicarArticuloViewModel.MaxPublicados;
         ViewBag.maxDescripcion = PublicarArticuloViewModel.MaxDescripcion;
     }
 

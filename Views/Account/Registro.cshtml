@@ -2,6 +2,8 @@
     ViewData["Title"] = "Registrarse";
     Swappit.Models.ViewModels.RegistroViewModel? registro = ViewBag.registro;
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
+    List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
+    int? idPlanElegido = ViewBag.idPlanElegido;
     string? contrasena = ViewBag.contrasena;
     string? fechaNacimiento = ViewBag.fechaNacimiento;
     int edadMinima = ViewBag.edadMinima;
@@ -88,23 +90,23 @@
                 </div>
             </div>
 
-            <div class="sw-campo">
-                <label class="sw-label">Suscripción</label>
-                <div class="sw-plan-selector" role="radiogroup" aria-label="Elegí tu tipo de suscripción">
-                    <label class="sw-plan-option">
-                        <input type="radio" name="PlanSuscripcion" value="Gratis" checked="@(registro?.PlanSuscripcion == "Gratis" || string.IsNullOrWhiteSpace(registro?.PlanSuscripcion))" />
-                        <span>Gratis</span>
-                    </label>
-                    <label class="sw-plan-option">
-                        <input type="radio" name="PlanSuscripcion" value="Plus" checked="@(registro?.PlanSuscripcion == "Plus")" />
-                        <span>Plus</span>
-                    </label>
-                    <label class="sw-plan-option">
-                        <input type="radio" name="PlanSuscripcion" value="Pro" checked="@(registro?.PlanSuscripcion == "Pro")" />
-                        <span>Pro</span>
-                    </label>
+            <fieldset class="sw-campo sw-campo-plan">
+                <legend class="sw-label">Plan</legend>
+                <div class="sw-plan-opciones">
+                    @foreach (var plan in planes)
+                    {
+                        <label class="sw-plan-opcion sw-plan-opcion--@plan.Clave">
+                            <input type="radio" class="sw-plan-opcion-radio" name="IdPlan" value="@plan.Id" checked="@(plan.Id == idPlanElegido)">
+                            <span class="sw-plan-opcion-nombre">@plan.Nombre</span>
+                            <span class="sw-plan-opcion-precio">@plan.Precio@(plan.EsGratis ? "" : " /mes")</span>
+                            <span class="sw-plan-opcion-etiqueta">@plan.Etiqueta</span>
+                            <i class="bi bi-check-circle-fill sw-plan-opcion-check" aria-hidden="true"></i>
+                        </label>
+                    }
                 </div>
-            </div>
+                <small class="sw-ayuda">Si elegís Plus o Pro, después de crear la cuenta pasás al pago (es de demostración, no se cobra nada). <a href="@Url.Action("Index", "Planes")" class="sw-link sw-link-chico" target="_blank" rel="noopener">Ver qué incluye cada plan<span class="visually-hidden"> (se abre en otra pestaña)</span></a></small>
+                @Html.ValidationMessage("IdPlan", new { @class = "sw-error" })
+            </fieldset>
 
             <div class="sw-form-acciones">
                 <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Crear cuenta</button>

@@ -81,7 +81,8 @@ public static class UsuariosBD
                     barrio = u.Barrio,
                     fechaNacimiento = u.FechaNacimiento,
                     edad = u.Edad,
-                    idProvincia = u.IdProvincias
+                    idProvincia = u.IdProvincias,
+                    idPlan = u.IdPlan
                 },
                 commandType: CommandType.StoredProcedure);
         }
