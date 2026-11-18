@@ -1,56 +1,35 @@
-@using Swappit.Models.ViewModels
 @{
-    IntercambioViewModel intercambio = ViewBag.intercambio;
-    List<CambioIntercambioViewModel> cambios = ViewBag.cambios;
-    List<CambioIntercambioViewModel> porResponder = new List<CambioIntercambioViewModel>();
-    foreach (CambioIntercambioViewModel c in cambios)
-    {
-        if (c.EsPendiente && c.IdUsuario == intercambio.OtroIdUsuario)
-        {
-            porResponder.Add(c);
-        }
-    }
-    porResponder.Sort((a, b) => a.Fecha != b.Fecha ? a.Fecha.CompareTo(b.Fecha) : a.Id.CompareTo(b.Id));
+    Swappit.Models.ViewModels.DetalleIntercambioViewModel detalle = ViewBag.detalle;
 }
-@if (porResponder.Count > 0)
+@if (detalle.CambiosPorResponder.Count > 0)
 {
     <section class="sw-card sw-caja-cambios p-4 mb-4" aria-labelledby="titulo-caja-cambios">
-        <h2 class="h5 fw-bold mb-1" id="titulo-caja-cambios">@intercambio.OtroNombre te pide @(porResponder.Count == 1 ? "un cambio" : $"{porResponder.Count} cambios")</h2>
+        <h2 class="h5 fw-bold mb-1" id="titulo-caja-cambios">@detalle.TituloCaja</h2>
         <p class="text-suave small mb-2">Hasta que respondas, el intercambio sigue como está.</p>
         <ul class="list-unstyled mb-0">
-            @foreach (var c in porResponder)
+            @foreach (var c in detalle.CambiosPorResponder)
             {
-                bool pedir = c.Tipo == TipoCambios.Pedir;
                 <li class="sw-caja-cambio">
                     <span class="sw-img sw-caja-cambio-img">
-                        @if (!string.IsNullOrEmpty(c.ArticuloImagen))
+                        @if (c.TieneImagen)
                         {
-                            <img src="@c.ArticuloImagen" alt="">
+                            <img src="@c.Imagen" alt="">
                         }
                     </span>
                     <div class="flex-grow-1 min-w-0">
-                        <p class="mb-0">
-                            @if (pedir)
-                            {
-                                <text>@intercambio.OtroNombre te pidió tu <strong>@c.ArticuloNombre</strong>.</text>
-                            }
-                            else
-                            {
-                                <text>@intercambio.OtroNombre quiere sacar su <strong>@c.ArticuloNombre</strong> del intercambio.</text>
-                            }
-                        </p>
-                        <p class="text-suave small mb-0">@(pedir ? "Si aceptás, se suma a lo que das." : "Si aceptás, ya no lo recibís.")</p>
+                        <p class="mb-0">@c.TextoAntes<strong>@c.Articulo</strong>@c.TextoDespues</p>
+                        <p class="text-suave small mb-0">@c.Ayuda</p>
                     </div>
                     <div class="sw-caja-cambio-botones">
-                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true">
                             <input type="hidden" name="idCambio" value="@c.Id">
                             <input type="hidden" name="aceptar" value="false">
                             <button type="submit" class="btn btn-sw-outline btn-sm">No</button>
                         </form>
-                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true">
                             <input type="hidden" name="idCambio" value="@c.Id">
                             <input type="hidden" name="aceptar" value="true">
-                            <button type="submit" class="btn btn-sw-primario btn-sm">@(pedir ? "Sí, sumarlo" : "Sí, sacarlo")</button>
+                            <button type="submit" class="btn btn-sw-primario btn-sm">@c.BotonAceptar</button>
                         </form>
                     </div>
                 </li>

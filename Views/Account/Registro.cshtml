@@ -3,10 +3,9 @@
     Swappit.Models.ViewModels.RegistroViewModel? registro = ViewBag.registro;
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
     string? contrasena = ViewBag.contrasena;
-}
-
-@functions {
-    string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
+    string? fechaNacimiento = ViewBag.fechaNacimiento;
+    int edadMinima = ViewBag.edadMinima;
+    int edadMaxima = ViewBag.edadMaxima;
 }
 
 <section class="sw-auth">
@@ -26,25 +25,25 @@
             <div class="sw-fila">
                 <div class="sw-campo">
                     <label class="sw-label" for="Nombre">Nombre</label>
-                    <input class="sw-input @ClaseError("Nombre")" id="Nombre" name="Nombre" value="@registro?.Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
+                    <input class="sw-input" id="Nombre" name="Nombre" value="@registro?.Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
                     @Html.ValidationMessage("Nombre", new { @class = "sw-error" })
                 </div>
                 <div class="sw-campo">
                     <label class="sw-label" for="Apellido">Apellido</label>
-                    <input class="sw-input @ClaseError("Apellido")" id="Apellido" name="Apellido" value="@registro?.Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
+                    <input class="sw-input" id="Apellido" name="Apellido" value="@registro?.Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
                     @Html.ValidationMessage("Apellido", new { @class = "sw-error" })
                 </div>
             </div>
 
             <div class="sw-campo">
                 <label class="sw-label" for="Mail">Email</label>
-                <input class="sw-input @ClaseError("Mail")" id="Mail" name="Mail" value="@registro?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                <input class="sw-input" id="Mail" name="Mail" value="@registro?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
                 @Html.ValidationMessage("Mail", new { @class = "sw-error" })
             </div>
 
             <div class="sw-campo">
                 <label class="sw-label" for="Contrasena">Contraseña</label>
-                <input class="sw-input @ClaseError("Contrasena")" id="Contrasena" name="Contrasena" value="@contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
+                <input class="sw-input" id="Contrasena" name="Contrasena" value="@contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
                 @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
             </div>
 
@@ -58,14 +57,14 @@
                     <label class="sw-label" for="FechaNacimiento">Fecha de nacimiento</label>
                     <div class="sw-input-icono">
                         <i class="bi bi-calendar3" aria-hidden="true"></i>
-                        <input class="sw-input @ClaseError("FechaNacimiento")" id="FechaNacimiento" name="FechaNacimiento" value="@registro?.FechaNacimiento?.ToString("yyyy-MM-dd")" type="date" autocomplete="bday">
+                        <input class="sw-input" id="FechaNacimiento" name="FechaNacimiento" value="@fechaNacimiento" type="date" autocomplete="bday">
                     </div>
-                    <small class="sw-ayuda">Debes tener entre @Swappit.Models.ViewModels.RegistroViewModel.EdadMinima y @Swappit.Models.ViewModels.RegistroViewModel.EdadMaxima años.</small>
+                    <small class="sw-ayuda">Debes tener entre @edadMinima y @edadMaxima años.</small>
                     @Html.ValidationMessage("FechaNacimiento", new { @class = "sw-error" })
                 </div>
                 <div class="sw-campo">
                     <label class="sw-label" for="Telefono">Número de teléfono</label>
-                    <input class="sw-input @ClaseError("Telefono")" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
+                    <input class="sw-input" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
                     @Html.ValidationMessage("Telefono", new { @class = "sw-error" })
                 </div>
             </div>
@@ -73,7 +72,7 @@
             <div class="sw-fila">
                 <div class="sw-campo">
                     <label class="sw-label" for="IdProvincias">Provincia</label>
-                    <select class="sw-input sw-select @ClaseError("IdProvincias")" id="IdProvincias" name="IdProvincias" autocomplete="address-level1">
+                    <select class="sw-input sw-select" id="IdProvincias" name="IdProvincias" autocomplete="address-level1">
                         <option value="" disabled selected="@(registro?.IdProvincias == null)">Elegí tu provincia</option>
                         @foreach (var p in provincias)
                         {
@@ -84,7 +83,7 @@
                 </div>
                 <div class="sw-campo">
                     <label class="sw-label" for="Barrio">Barrio</label>
-                    <input class="sw-input @ClaseError("Barrio")" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
+                    <input class="sw-input" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
                     @Html.ValidationMessage("Barrio", new { @class = "sw-error" })
                 </div>
             </div>

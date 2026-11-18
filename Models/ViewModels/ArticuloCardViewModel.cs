@@ -14,4 +14,9 @@ public class ArticuloCardViewModel
 
     public string? Motivo { get; set; }
     public bool EnIntercambio { get; set; }
+
+    public bool TieneImagen => !string.IsNullOrEmpty(Imagen);
+    public bool TieneBarrio => !string.IsNullOrWhiteSpace(Barrio);
+    public bool TieneMotivo => !string.IsNullOrEmpty(Motivo);
+    public bool EsParaDescubrir => Motivo == Recomendaciones.MotivoDescubrir;
 }

@@ -5,7 +5,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class FavoritosController : Controller
+public class FavoritosController : BaseController
 {
     private const int MaxImportar = 100;
 
@@ -25,10 +25,13 @@ public class FavoritosController : Controller
         }
 
         ViewBag.articulos = new List<ArticuloCardViewModel>();
+        ViewBag.textoCantidad = "";
         ViewBag.errorCarga = false;
         try
         {
-            ViewBag.articulos = FavoritosBD.GetFavoritos(usuarioId.Value);
+            List<ArticuloCardViewModel> articulos = FavoritosBD.GetFavoritos(usuarioId.Value);
+            ViewBag.articulos = articulos;
+            ViewBag.textoCantidad = Listas.Contar(articulos.Count, "favorito", "favoritos");
         }
         catch (SqlException ex)
         {

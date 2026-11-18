@@ -4,7 +4,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class PerfilController : Controller
+public class PerfilController : BaseController
 {
     private readonly IWebHostEnvironment _env;
 
@@ -28,11 +28,19 @@ public class PerfilController : Controller
         }
 
         ViewBag.usuario = usuario;
-        ViewBag.provincia = UsuariosBD.GetProvinciaById(usuario.IdProvincias);
+        ViewBag.iniciales = SesionUsuario.Iniciales(usuario.Nombre, usuario.Apellido);
+        ViewBag.ubicacion = Perfiles.TextoOGuion(Perfiles.Ubicacion(usuario));
+        ViewBag.tieneDescripcion = Perfiles.TieneDescripcion(usuario);
+        ViewBag.telefono = Perfiles.TextoOGuion(usuario.Telefono);
         ViewBag.provincias = UsuariosBD.GetProvincias();
         ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios, incluirEnIntercambio: true);
+        ViewBag.ocultarFavorito = true;
         ViewBag.intercambios = IntercambiosBD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
+        ViewBag.maxFotoMB = EditarPerfilViewModel.MaxFotoMB;
+        ViewBag.maxDescripcion = EditarPerfilViewModel.MaxDescripcion;
+        ViewBag.errorPerfil = TempData["ErrorPerfil"] as string;
+        ViewBag.mensajePerfil = TempData["MensajePerfil"] as string;
         return View();
     }
 
@@ -55,19 +63,15 @@ public class PerfilController : Controller
         {
             Response.StatusCode = StatusCodes.Status404NotFound;
             ViewBag.usuario = null;
+            ViewBag.Title = "Usuario no encontrado";
             return View();
         }
 
-        ViewBag.usuario = new Usuarios
-        {
-            IdUsuarios = usuario.IdUsuarios,
-            Nombre = usuario.Nombre,
-            Apellido = usuario.Apellido,
-            Usuario = usuario.Usuario,
-            Barrio = usuario.Barrio,
-            Descripcion = usuario.Descripcion
-        };
-        ViewBag.provincia = UsuariosBD.GetProvinciaById(usuario.IdProvincias);
+        ViewBag.usuario = Perfiles.DatosPublicos(usuario);
+        ViewBag.Title = $"{usuario.Nombre} {usuario.Apellido}";
+        ViewBag.iniciales = SesionUsuario.Iniciales(usuario.Nombre, usuario.Apellido);
+        ViewBag.ubicacion = Perfiles.Ubicacion(usuario);
+        ViewBag.tieneDescripcion = Perfiles.TieneDescripcion(usuario);
         ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
         return View();
@@ -92,94 +96,20 @@ public class PerfilController : Controller
 
         if (!ModelState.IsValid)
         {
-            TempData["ErrorPerfil"] = PrimerError();
+            TempData["ErrorPerfil"] = Formularios.PrimerError(ModelState);
             return RedirectToAction("Index");
         }
 
-        string telefono = Telefonos.Convertir(e.Telefono);
-
-        if (telefono.Length > 0 && !Telefonos.EsValido(telefono))
+        string? error = Perfiles.Editar(usuario, e, _env.WebRootPath);
+        if (error != null)
         {
-            TempData["ErrorPerfil"] = $"El teléfono tiene que tener entre {Telefonos.MinDigitos} y {Telefonos.MaxDigitos} dígitos.";
+            TempData["ErrorPerfil"] = error;
             return RedirectToAction("Index");
         }
 
-        if (e.Foto != null)
-        {
-            string extension = Path.GetExtension(e.Foto.FileName).ToLower();
-
-            if (Array.IndexOf(EditarPerfilViewModel.ExtensionesFoto, extension) < 0)
-            {
-                TempData["ErrorPerfil"] = "La foto tiene que ser JPG o PNG.";
-                return RedirectToAction("Index");
-            }
-
-            if (e.Foto.Length > EditarPerfilViewModel.MaxFotoMB * 1024 * 1024)
-            {
-                TempData["ErrorPerfil"] = $"La foto puede pesar hasta {EditarPerfilViewModel.MaxFotoMB} MB.";
-                return RedirectToAction("Index");
-            }
-
-            BorrarFoto(UsuariosBD.GetFotoUsuario(usuario.IdUsuarios));
-            UsuariosBD.GuardarFotoUsuario(usuario.IdUsuarios, GuardarFoto(e.Foto, usuario.IdUsuarios, extension));
-        }
-        else if (e.QuitarFoto)
-        {
-            BorrarFoto(UsuariosBD.GetFotoUsuario(usuario.IdUsuarios));
-            UsuariosBD.BorrarFotoUsuario(usuario.IdUsuarios);
-        }
-
-        usuario.Nombre = e.Nombre.Trim();
-        usuario.Apellido = e.Apellido.Trim();
-        usuario.Usuario = e.Usuario.Trim().TrimStart('@');
-        usuario.Telefono = telefono;
-        usuario.Barrio = e.Barrio?.Trim() ?? string.Empty;
-        usuario.IdProvincias = e.IdProvincias;
-        usuario.Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? null : e.Descripcion.Trim();
-
-        UsuariosBD.UpdateUsuario(usuario);
         SesionUsuario.GuardarDatosHeader(HttpContext.Session, usuario);
-
         TempData["MensajePerfil"] = "Perfil actualizado.";
 
         return RedirectToAction("Index");
-    }
-
-    private string GuardarFoto(IFormFile foto, int idUsuario, string extension)
-    {
-        string carpeta = Path.Combine(_env.WebRootPath, "img", "perfiles");
-        Directory.CreateDirectory(carpeta);
-
-        string nombreArchivo = $"{idUsuario}_{DateTime.Now.Ticks:x}{extension}";
-
-        using (FileStream stream = new FileStream(Path.Combine(carpeta, nombreArchivo), FileMode.Create))
-        {
-            foto.CopyTo(stream);
-        }
-
-        return $"/img/perfiles/{nombreArchivo}";
-    }
-
-    private void BorrarFoto(string? ruta)
-    {
-        if (ruta == null || !ruta.StartsWith("/img/perfiles/")) return;
-
-        string archivo = Path.Combine(_env.WebRootPath, "img", "perfiles", Path.GetFileName(ruta));
-        if (System.IO.File.Exists(archivo))
-        {
-            System.IO.File.Delete(archivo);
-        }
-    }
-
-    private string PrimerError()
-    {
-        foreach (var campo in ModelState.Values)
-        {
-            foreach (var error in campo.Errors)
-            {
-                return error.ErrorMessage;
-            }
-        }
-        return "";
     }
 }

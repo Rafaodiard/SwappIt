@@ -1,0 +1,23 @@
+@{
+    Swappit.Models.ViewModels.ArticuloCardViewModel opcion = ViewBag.opcion;
+    string tipo = ViewBag.opcionTipo;
+    string nombre = ViewBag.opcionNombre;
+    bool marcada = ViewBag.opcionMarcada;
+    bool requerida = ViewBag.opcionRequerida;
+}
+<label class="sw-opcion-articulo">
+    <input type="@tipo" class="sw-estado-radio" name="@nombre" value="@opcion.IdArticulos" checked="@marcada" required="@requerida">
+    <span class="sw-opcion-articulo-cuerpo">
+        <span class="sw-img sw-opcion-articulo-img">
+            @if (opcion.TieneImagen)
+            {
+                <img src="@opcion.Imagen" alt="">
+            }
+        </span>
+        <span class="min-w-0">
+            <span class="d-block fw-semibold text-truncate">@opcion.Nombre</span>
+            <span class="d-block text-suave small">@opcion.Estado</span>
+        </span>
+        <i class="bi bi-check-circle-fill sw-opcion-articulo-marca" aria-hidden="true"></i>
+    </span>
+</label>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Swappit.Models;
 
 namespace Swappit.Models.ViewModels
 {
@@ -55,7 +56,7 @@ namespace Swappit.Models.ViewModels
                 yield break;
             }
 
-            int edad = CalcularEdad(FechaNacimiento.Value);
+            int edad = Cuentas.CalcularEdad(FechaNacimiento.Value);
 
             if (edad < EdadMinima)
             {
@@ -66,13 +67,6 @@ namespace Swappit.Models.ViewModels
             {
                 yield return new ValidationResult($"La edad máxima permitida es {EdadMaxima} años.", new[] { nameof(FechaNacimiento) });
             }
-        }
-
-        private static int CalcularEdad(DateTime fechaNacimiento)
-        {
-            int edad = DateTime.Today.Year - fechaNacimiento.Year;
-            if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
-            return edad;
         }
     }
 }

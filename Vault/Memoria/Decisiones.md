@@ -7,6 +7,9 @@ tags:
 
 | Fecha | Decisión | Motivo / nota |
 |---|---|---|
+| 17/11 | Models separado en `Tablas/`, `Consultas/`, `Logica/`, `BD/` y `ViewModels/`, con el mismo namespace `Swappit.Models` | Pedido de Rafael ("separá los models de lógica de los models de tablas"); el namespace sigue el criterio que ya tenía `Models/BD/` |
+| 17/11 | Controllers sin lógica: sesión, llamada al Model, `ViewBag` y vista. Las vistas solo leen `ViewBag` con `@foreach` e `@if` simples | Lineamientos de entrega de INFO 360; Rafael eligió la lectura práctica ("podés correr un foreach a un viewbag en la view") |
+| 17/11 | Mandar mensajes del chat y cambiar la contraseña con `fetch`, sin recargar | Lineamientos de entrega; el resto de las acciones de intercambio siguen recargando porque cambian toda la pantalla |
 | 22/10 | Filtros de Buscar: categoría y estado desde la base | Distancia quedó visual (no hay coordenadas); se sacó el 30/10 |
 | 25/10 | Paleta oficial en todo el sitio (`#0d596a`, `#6e2c3a`, `#a5babe`, `#ece6d8`) | Elegido por Rafael |
 | 25/10 | Contraseñas con `PasswordHasher`, sin paquetes extra | Las de prueba se re-hashean al primer login |

@@ -5,7 +5,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class NotificacionesController : Controller
+public class NotificacionesController : BaseController
 {
     private const int CantidadEnPopup = 20;
 
@@ -24,20 +24,20 @@ public class NotificacionesController : Controller
             return Unauthorized();
         }
 
-        List<NotificacionViewModel> notificaciones = new List<NotificacionViewModel>();
-        bool errorCarga = false;
+        ViewBag.nuevas = new List<NotificacionViewModel>();
+        ViewBag.anteriores = new List<NotificacionViewModel>();
+        ViewBag.errorCarga = false;
         try
         {
-            notificaciones = NotificacionesBD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
+            List<NotificacionViewModel> notificaciones = NotificacionesBD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
+            ViewBag.nuevas = Notificaciones.Filtrar(notificaciones, leidas: false);
+            ViewBag.anteriores = Notificaciones.Filtrar(notificaciones, leidas: true);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron cargar las notificaciones del usuario {IdUsuario}", usuarioId);
-            errorCarga = true;
+            ViewBag.errorCarga = true;
         }
-
-        ViewBag.notificaciones = notificaciones;
-        ViewBag.errorCarga = errorCarga;
         return PartialView("_Lista");
     }
 
@@ -85,7 +85,7 @@ public class NotificacionesController : Controller
         {
             return NotFound();
         }
-        if (notificacion.Tipo == TipoNotificaciones.MensajeNuevo)
+        if (notificacion.EsDeChat)
         {
             return RedirectToAction("Index", "Chat", new { id = notificacion.IdIntercambio });
         }

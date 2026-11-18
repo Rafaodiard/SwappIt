@@ -5,7 +5,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class AccountController : Controller
+public class AccountController : BaseController
 {
     public IActionResult Index()
     {
@@ -14,7 +14,7 @@ public class AccountController : Controller
 
     public IActionResult Registro()
     {
-        ViewBag.provincias = UsuariosBD.GetProvincias();
+        CargarRegistro(null, UsuariosBD.GetProvincias(), null);
         return View();
     }
 
@@ -36,146 +36,74 @@ public class AccountController : Controller
         ViewBag.login = l;
         if (!ModelState.IsValid) return View("Login");
 
-        Usuarios? u = UsuariosBD.GetUsuarioByMail(l.Mail);
-
-        if (u != null && Contrasenas.Verificar(u.Contraseña, l.Contrasena, out bool hayQueActualizar))
+        Usuarios? u = Cuentas.IniciarSesion(l.Mail, l.Contrasena);
+        if (u == null)
         {
-            if (hayQueActualizar)
-            {
-                UsuariosBD.ActualizarContrasena(u.IdUsuarios, Contrasenas.Hashear(l.Contrasena));
-            }
-
-            HttpContext.Session.SetInt32("UsuarioId", u.IdUsuarios);
-            SesionUsuario.GuardarDatosHeader(HttpContext.Session, u);
-
-            return RedirectToAction("Index", "Home");
+            ViewBag.Error = "Email o contraseña incorrectos";
+            return View("Login");
         }
 
-        ViewBag.Error = "Email o contraseña incorrectos";
-        return View("Login");
+        SesionUsuario.Iniciar(HttpContext.Session, u);
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpPost]
     public IActionResult Registro(RegistroViewModel r, string password2)
     {
         List<Provincias> provincias = UsuariosBD.GetProvincias();
-        if (r.IdProvincias.HasValue && !ExisteProvincia(provincias, r.IdProvincias.Value))
+        string? errorProvincia = Cuentas.ValidarProvincia(provincias, r.IdProvincias);
+        if (errorProvincia != null)
         {
-            ModelState.AddModelError(nameof(r.IdProvincias), "Elegí una provincia de la lista");
+            ModelState.AddModelError(nameof(r.IdProvincias), errorProvincia);
         }
 
-        bool contrasenaValida = ModelState.GetFieldValidationState(nameof(r.Contrasena)) == ModelValidationState.Valid
-            && r.Contrasena == password2;
-
-        ViewBag.registro = r;
-        ViewBag.provincias = provincias;
-        ViewBag.contrasena = contrasenaValida ? r.Contrasena : null;
+        bool contrasenaValida = ModelState.GetFieldValidationState(nameof(r.Contrasena)) == ModelValidationState.Valid;
+        CargarRegistro(r, provincias, Cuentas.ContrasenaParaRepetir(r, password2, contrasenaValida));
         if (!ModelState.IsValid) return View();
 
-        if (UsuariosBD.UsuarioExiste(r.Mail))
+        ErrorCampo? error = Cuentas.ValidarRegistro(r, password2);
+        if (error != null)
         {
-            ViewBag.Error = "Ya existe una cuenta con ese email.";
+            if (error.EsGeneral)
+            {
+                ViewBag.Error = error.Mensaje;
+            }
+            else
+            {
+                ModelState.AddModelError(error.Campo, error.Mensaje);
+            }
             return View();
         }
 
-        if (r.Contrasena != password2)
-        {
-            ViewBag.Error = "Las contraseñas no coinciden.";
-            return View();
-        }
-
-        int edad = CalcularEdad(r.FechaNacimiento!.Value);
-
-        if (edad < RegistroViewModel.EdadMinima)
-        {
-            ModelState.AddModelError(nameof(r.FechaNacimiento), $"Debes tener al menos {RegistroViewModel.EdadMinima} años para registrarte.");
-            return View();
-        }
-
-        if (edad > RegistroViewModel.EdadMaxima)
-        {
-            ModelState.AddModelError(nameof(r.FechaNacimiento), $"La edad máxima permitida es {RegistroViewModel.EdadMaxima} años.");
-            return View();
-        }
-
-        string telefono = Telefonos.Convertir(r.Telefono);
-
-        if (!Telefonos.EsValido(telefono))
-        {
-            ModelState.AddModelError(nameof(r.Telefono), $"El teléfono tiene que tener entre {Telefonos.MinDigitos} y {Telefonos.MaxDigitos} dígitos.");
-            return View();
-        }
-
-        Usuarios u = new Usuarios
-        {
-            Nombre = r.Nombre,
-            Apellido = r.Apellido,
-            Mail = r.Mail,
-            Contraseña = Contrasenas.Hashear(r.Contrasena),
-            FechaNacimiento = r.FechaNacimiento!.Value,
-            Edad = edad,
-            Telefono = telefono,
-            Usuario = r.Mail.Split('@')[0],
-            Barrio = r.Barrio.Trim(),
-            IdProvincias = r.IdProvincias!.Value
-        };
-
-        UsuariosBD.Register(u);
-
-        Usuarios? usuario = UsuariosBD.GetUsuarioByMail(u.Mail);
-
+        Usuarios? usuario = Cuentas.Registrar(r);
         if (usuario != null)
         {
-            HttpContext.Session.SetInt32("UsuarioId", usuario.IdUsuarios);
-            SesionUsuario.GuardarDatosHeader(HttpContext.Session, usuario);
+            SesionUsuario.Iniciar(HttpContext.Session, usuario);
         }
 
         return RedirectToAction("Index", "Home");
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult CambiarContrasena(
         string? contrasenaActual,
         string? contrasenaNueva,
         string? confirmarContrasena)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-
-        if (usuarioId == null)
-        {
-            return RedirectToAction("Index", "Account");
-        }
-
-        Usuarios? usuario = UsuariosBD.GetUsuarioById(usuarioId.Value);
-
+        Usuarios? usuario = usuarioId == null ? null : UsuariosBD.GetUsuarioById(usuarioId.Value);
         if (usuario == null)
         {
-            return RedirectToAction("Index", "Account");
+            return Unauthorized();
         }
 
-        if (!Contrasenas.Verificar(usuario.Contraseña, contrasenaActual ?? string.Empty, out _))
+        string? error = Cuentas.CambiarContrasena(usuario, contrasenaActual, contrasenaNueva, confirmarContrasena);
+        if (error != null)
         {
-            ViewBag.Error = "La contraseña actual es incorrecta.";
-            return View();
+            return Json(new { ok = false, mensaje = error });
         }
-
-        if (string.IsNullOrEmpty(contrasenaNueva) || contrasenaNueva.Length < 8 || contrasenaNueva.Length > 50)
-        {
-            ViewBag.Error = "La nueva contraseña tiene que tener entre 8 y 50 caracteres.";
-            return View();
-        }
-
-        if (contrasenaNueva != confirmarContrasena)
-        {
-            ViewBag.Error = "Las nuevas contraseñas no coinciden.";
-            return View();
-        }
-
-        UsuariosBD.ActualizarContrasena(usuario.IdUsuarios, Contrasenas.Hashear(contrasenaNueva));
-
-        ViewBag.Message = "Contraseña cambiada exitosamente.";
-
-        return View();
+        return Json(new { ok = true, mensaje = "Contraseña cambiada exitosamente." });
     }
 
     public IActionResult Logout()
@@ -185,22 +113,13 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Account");
     }
 
-    private static int CalcularEdad(DateTime fechaNacimiento)
+    private void CargarRegistro(RegistroViewModel? r, List<Provincias> provincias, string? contrasena)
     {
-        int edad = DateTime.Today.Year - fechaNacimiento.Year;
-        if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
-        return edad;
-    }
-
-    private static bool ExisteProvincia(List<Provincias> provincias, int idProvincia)
-    {
-        foreach (Provincias p in provincias)
-        {
-            if (p.IdProvincia == idProvincia)
-            {
-                return true;
-            }
-        }
-        return false;
+        ViewBag.registro = r;
+        ViewBag.provincias = provincias;
+        ViewBag.contrasena = contrasena;
+        ViewBag.fechaNacimiento = r?.FechaNacimiento?.ToString("yyyy-MM-dd");
+        ViewBag.edadMinima = RegistroViewModel.EdadMinima;
+        ViewBag.edadMaxima = RegistroViewModel.EdadMaxima;
     }
 }

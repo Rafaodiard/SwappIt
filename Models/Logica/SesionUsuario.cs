@@ -2,6 +2,12 @@ namespace Swappit.Models;
 
 public static class SesionUsuario
 {
+    public static void Iniciar(ISession session, Usuarios u)
+    {
+        session.SetInt32("UsuarioId", u.IdUsuarios);
+        GuardarDatosHeader(session, u);
+    }
+
     public static void GuardarDatosHeader(ISession session, Usuarios u)
     {
         session.SetString("Iniciales", Iniciales(u.Nombre, u.Apellido));

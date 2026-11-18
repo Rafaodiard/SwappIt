@@ -1,0 +1,19 @@
+@{
+    Swappit.Models.ViewModels.NotificacionViewModel n = ViewBag.notificacion;
+}
+<li class="sw-notif-item @(n.Leida ? "" : "sw-notif-item--sin-leer")">
+    <span class="sw-notif-icono @(n.EsRechazo ? "sw-notif-icono--bordo" : "")" aria-hidden="true"><i class="bi @n.Icono"></i></span>
+    <div class="sw-notif-texto">
+        <p class="mb-0">@if (n.MuestraOtro) {<strong>@n.OtroNombre</strong>}@n.TextoMedio@if (n.TextoDestacado != null) {<strong>@n.TextoDestacado</strong>}@n.TextoFinal</p>
+        <div class="sw-notif-meta">
+            <time datetime="@n.FechaHtml">@n.Hace</time>
+            <form action="@Url.Action("Ver", "Notificaciones", new { id = n.Id })" method="post" asp-antiforgery="true">
+                <button type="submit" class="sw-notif-accion @(n.EsRechazo ? "sw-notif-accion--bordo" : "")">@n.Accion <i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+            </form>
+        </div>
+    </div>
+    @if (!n.Leida)
+    {
+        <span class="sw-notif-punto"><span class="visually-hidden">Sin leer</span></span>
+    }
+</li>

@@ -36,6 +36,11 @@ public static class Listas
         return $"{string.Join(", ", nombres.GetRange(0, nombres.Count - 1))} y {nombres[nombres.Count - 1]}";
     }
 
+    public static string Contar(int cantidad, string singular, string plural)
+    {
+        return cantidad == 1 ? $"1 {singular}" : $"{cantidad} {plural}";
+    }
+
     public static string UnirConComas(params string?[] textos)
     {
         List<string> conTexto = new List<string>();

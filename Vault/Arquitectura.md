@@ -13,15 +13,17 @@ flowchart LR
     N[Navegador] -->|GET/POST| C[Controllers]
     C -->|ViewBag| V[Vistas Razor]
     V -->|HTML + site.css + JS| N
-    C --> M[Models: BD, Contrasenas, SesionUsuario, Telefonos]
-    M -->|Dapper, SQL inline| DB[(SQL Server)]
+    C --> L[Models/Logica]
+    L --> M[Models/BD]
+    M -->|Dapper, stored procedures| DB[(SQL Server)]
     C -->|Session| S[(Sesión: UsuarioId, Iniciales, Foto)]
     C -->|fotos| W[wwwroot/img]
 ```
 
-- **Controllers** ([[AccountController]], [[ArticulosController]], [[PublicarController]], [[PerfilController]], [[ChatController]], [[HomeController]]): reciben el pedido, validan, llaman a [[BD]] y pasan los datos a la vista con `ViewBag` (ver [[Convenciones y decisiones]]).
+- **Controllers** ([[AccountController]], [[ArticulosController]], [[PublicarController]], [[PerfilController]], [[ChatController]], [[HomeController]], [[IntercambioController]], [[NotificacionesController]], [[RecomendacionesController]], FavoritosController): desde el 17/11 solo revisan la sesión, llaman a `Models/Logica/` o a [[BD]] y pasan los datos a la vista con `ViewBag` (ver [[Convenciones y decisiones]]). Heredan de `BaseController`, que pasa la sesión al layout.
+- **Lógica** (carpeta `Models/Logica/`): validaciones y reglas de negocio (Cuentas, Catalogo, Recomendaciones, GestionIntercambios, DetalleIntercambio, Chats, Notificaciones, Perfiles, Publicaciones…). Las acciones que cambian algo devuelven un `Resultado` (error, mensaje y notificaciones para los mails).
 - **[[BD]]** (carpeta `Models/BD/`): siete clases estáticas, una por tema (UsuariosBD, ArticulosBD, IntercambiosBD, ChatBD, NotificacionesBD, FavoritosBD, RecomendacionesBD). Desde el 17/11 todos sus métodos llaman a un stored procedure (Dapper con `CommandType.StoredProcedure`): en C# no hay SQL ni LINQ. Cada método abre su propia `SqlConnection` con `ConexionBD.ConnectionString`. Los SP están en [[Script StoredProcedures.sql]] y en los dos scripts completos.
-- **Modelos** ([[Usuarios]], [[Articulos]], …): clases con las mismas columnas que las tablas, para que Dapper las llene.
+- **Tablas** (carpeta `Models/Tablas/`: [[Usuarios]], [[Articulos]], …): clases con las mismas columnas que las tablas, para que Dapper las llene. Lo que devuelven algunos SP y no es una tabla (CantidadPorEstado, SenalGusto, NotificacionCreada…) está en `Models/Consultas/`.
 - **ViewModels** ([[LoginViewModel]], [[RegistroViewModel]], [[EditarPerfilViewModel]], [[PublicarArticuloViewModel]]): reciben los formularios (POST) y tienen las validaciones con DataAnnotations. [[ArticuloCardViewModel]] y [[OpcionFiltroViewModel]] son resultados de consultas.
 - **Vistas**: todas usan [[Vista _Layout]] (header, buscador, footer, JS comunes). Las cards de artículos son el partial [[Vista _CardObjeto]].
 - **Frontend**: [[site.css]] (paleta oficial y componentes del UI Kit de Figma) y un JS por página.

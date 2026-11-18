@@ -28,6 +28,15 @@ public class IntercambioViewModel
     public string? OtroBarrio { get; set; }
     public string? OtroProvincia { get; set; }
 
+    public bool PorResponder => EsRecibido && Estado == EstadosIntercambios.Pendiente;
+    public string EstadoCss => Estado.ToLowerInvariant();
+    public string FechaTexto => Fecha.ToString("dd/MM/yyyy");
+    public string FechaCorta => Fecha.ToString("dd/MM");
+    public string OtroIniciales => SesionUsuario.Iniciales(OtroNombre, OtroApellido);
+    public string OtroUbicacion => Listas.UnirConComas(OtroBarrio, OtroProvincia);
+    public string OtroNombreVisible => OtroNombre ?? OtroUsuario ?? "";
+    public string OtroUsuarioYUbicacion => OtroUbicacion != "" ? $"@{OtroUsuario} · {OtroUbicacion}" : $"@{OtroUsuario}";
+
     private static string Resumen(string nombre, int cantidad) =>
         cantidad > 1 ? $"{nombre} y {cantidad - 1} más" : nombre;
 }

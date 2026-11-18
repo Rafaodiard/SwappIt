@@ -9,15 +9,9 @@
             <p class="sw-auth-subtitulo">Ingresá tu contraseña actual y elegí una nueva</p>
         </header>
 
-        <form class="sw-form" method="post" action="@Url.Action("CambiarContrasena", "Account")" asp-antiforgery="true">
-            @if (ViewBag.Error != null)
-            {
-                <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
-            }
-            @if (ViewBag.Message != null)
-            {
-                <p class="text-success small mb-0" role="status">@ViewBag.Message</p>
-            }
+        <form class="sw-form" method="post" action="@Url.Action("CambiarContrasena", "Account")" asp-antiforgery="true" data-cambiar-contrasena>
+            <p class="sw-error-resumen" role="alert" data-contrasena-error></p>
+            <p class="text-success small mb-0" role="status" data-contrasena-exito hidden></p>
 
             <div class="sw-campo">
                 <label class="sw-label" for="contrasenaActual">Contraseña actual</label>
@@ -44,3 +38,7 @@
         </p>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/contrasena.js" asp-append-version="true"></script>
+}

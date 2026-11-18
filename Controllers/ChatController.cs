@@ -6,7 +6,7 @@ using Swappit.Services;
 
 namespace Swappit.Controllers;
 
-public class ChatController : Controller
+public class ChatController : BaseController
 {
     private readonly ILogger<ChatController> _logger;
     private readonly EmailService _emailService;
@@ -25,56 +25,42 @@ public class ChatController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        List<IntercambioViewModel> conversaciones = new List<IntercambioViewModel>();
-        Dictionary<int, ConversacionViewModel> resumenes = new Dictionary<int, ConversacionViewModel>();
-        IntercambioViewModel? abierta = null;
-        List<Mensajes> mensajes = new List<Mensajes>();
-        bool errorCarga = false;
+        ViewBag.contactos = new List<ContactoChatViewModel>();
+        ViewBag.abierta = null;
+        ViewBag.mensajes = new List<MensajeChatViewModel>();
+        ViewBag.puedeEscribir = false;
+        ViewBag.textoNoPuedeEscribir = "";
+        ViewBag.fotoOtro = null;
+        ViewBag.errorCarga = false;
         try
         {
-            conversaciones = IntercambiosBD.GetIntercambios(usuarioId.Value, conChat: true);
-            foreach (ConversacionViewModel r in ChatBD.GetResumenesChat(usuarioId.Value))
-            {
-                resumenes[r.IdIntercambio] = r;
-            }
-
-            if (id == null)
-            {
-                abierta = conversaciones.Count > 0 ? conversaciones[0] : null;
-            }
-            else
-            {
-                abierta = IntercambiosBD.GetIntercambio(id.Value, usuarioId.Value);
-            }
+            List<IntercambioViewModel> conversaciones = IntercambiosBD.GetIntercambios(usuarioId.Value, conChat: true);
+            IntercambioViewModel? abierta = Chats.Abierta(conversaciones, id, usuarioId.Value);
+            List<Mensajes> mensajes = new List<Mensajes>();
             if (abierta != null)
             {
-                ChatBD.MarcarMensajesVistos(abierta.IdIntercambios, usuarioId.Value);
-                mensajes = ChatBD.GetMensajes(abierta.IdIntercambios, usuarioId.Value);
+                mensajes = Chats.Abrir(abierta.IdIntercambios, usuarioId.Value);
                 ViewBag.fotoOtro = UsuariosBD.GetFotoUsuario(abierta.OtroIdUsuario);
-                if (resumenes.TryGetValue(abierta.IdIntercambios, out ConversacionViewModel? resumen))
-                {
-                    resumen.NoLeidos = 0;
-                }
+                ViewBag.textoNoPuedeEscribir = Chats.TextoNoPuedeEscribir(abierta);
             }
             else if (id != null)
             {
                 Response.StatusCode = StatusCodes.Status404NotFound;
             }
+
+            ViewBag.contactos = Chats.Contactos(conversaciones, usuarioId.Value, abierta?.IdIntercambios);
+            ViewBag.abierta = abierta;
+            ViewBag.mensajes = Chats.ParaMostrar(mensajes, usuarioId.Value);
+            ViewBag.puedeEscribir = Chats.PuedeEscribir(abierta, mensajes);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudo cargar el chat del usuario {IdUsuario}", usuarioId);
-            errorCarga = true;
+            ViewBag.errorCarga = true;
         }
 
-        ViewBag.conversaciones = conversaciones;
-        ViewBag.resumenes = resumenes;
-        ViewBag.abierta = abierta;
-        ViewBag.mensajes = mensajes;
-        ViewBag.puedeEscribir = abierta != null && PuedeEscribir(abierta, ElOtroEscribio(mensajes, abierta.OtroIdUsuario));
-        ViewBag.usuarioId = usuarioId.Value;
         ViewBag.idPedido = id;
-        ViewBag.errorCarga = errorCarga;
+        ViewBag.largoMaximo = Models.Mensajes.LargoMaximoTexto;
         return View();
     }
 
@@ -88,9 +74,7 @@ public class ChatController : Controller
 
         try
         {
-            ChatBD.MarcarMensajesVistos(id, usuarioId.Value);
-            ViewBag.mensajes = ChatBD.GetMensajes(id, usuarioId.Value);
-            ViewBag.usuarioId = usuarioId.Value;
+            ViewBag.mensajes = Chats.ParaMostrar(Chats.Abrir(id, usuarioId.Value), usuarioId.Value);
             return PartialView("_Mensajes");
         }
         catch (SqlException ex)
@@ -107,52 +91,22 @@ public class ChatController : Controller
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
         {
-            return RedirectToAction("Index", "Account");
-        }
-
-        texto = texto?.Trim();
-        if (string.IsNullOrEmpty(texto))
-        {
-            return RedirectToAction("Index", new { id });
-        }
-        if (texto.Length > Models.Mensajes.LargoMaximoTexto)
-        {
-            TempData["ErrorChat"] = $"El mensaje puede tener hasta {Models.Mensajes.LargoMaximoTexto} caracteres.";
-            TempData["TextoChat"] = texto;
-            return RedirectToAction("Index", new { id });
+            return Unauthorized();
         }
 
         try
         {
-            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (!ChatBD.EnviarMensaje(id, usuarioId.Value, texto, creadas))
+            Resultado resultado = Chats.Enviar(id, usuarioId.Value, texto);
+            if (resultado.Error == null)
             {
-                TempData["ErrorChat"] = "No se pudo mandar el mensaje: este intercambio ya no está en curso.";
+                _emailService.EnviarNotificaciones(resultado.Notificaciones, Url);
             }
-            _emailService.EnviarNotificaciones(creadas, Url);
+            return Json(new { error = resultado.Error });
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudo guardar el mensaje en el intercambio {IdIntercambio}", id);
-            TempData["ErrorChat"] = "No pudimos mandar el mensaje. Probá de nuevo en un rato.";
-            TempData["TextoChat"] = texto;
+            return Json(new { error = "No pudimos mandar el mensaje. Probá de nuevo en un rato." });
         }
-        return RedirectToAction("Index", new { id });
     }
-
-    private static bool ElOtroEscribio(List<Mensajes> mensajes, int idOtro)
-    {
-        foreach (Mensajes m in mensajes)
-        {
-            if (m.IdUsuariosManda == idOtro)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static bool PuedeEscribir(IntercambioViewModel intercambio, bool elOtroYaEscribio) =>
-        intercambio.Estado == EstadosIntercambios.Aceptado
-        || (intercambio.Estado == EstadosIntercambios.Pendiente && (intercambio.EsRecibido || elOtroYaEscribio));
 }

@@ -760,8 +760,12 @@ button.sw-notif-accion--bordo:hover { color: var(--sw-secundario-hover); }
 .sw-input:disabled { color: var(--sw-ui-gray-5); background-color: #fff; border-color: var(--sw-ui-gray-5); cursor: not-allowed; }
 .sw-input.input-validation-error,
 .sw-input.input-validation-error:hover,
-.sw-input.input-validation-error:focus { border-color: var(--sw-ui-error); }
-.sw-input.input-validation-error:focus { box-shadow: 0 0 0 3px rgba(186, 0, 0, .15); }
+.sw-input.input-validation-error:focus,
+.sw-campo:has(.field-validation-error:not(:empty)) .sw-input,
+.sw-campo:has(.field-validation-error:not(:empty)) .sw-input:hover,
+.sw-campo:has(.field-validation-error:not(:empty)) .sw-input:focus { border-color: var(--sw-ui-error); }
+.sw-input.input-validation-error:focus,
+.sw-campo:has(.field-validation-error:not(:empty)) .sw-input:focus { box-shadow: 0 0 0 3px rgba(186, 0, 0, .15); }
 
 .sw-error {
     display: flex;

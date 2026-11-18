@@ -1,6 +1,5 @@
 @{
     Swappit.Models.ViewModels.IntercambioViewModel fila = ViewBag.fila;
-    bool porResponder = fila.EsRecibido && fila.Estado == Swappit.Models.EstadosIntercambios.Pendiente;
 }
 <article class="sw-historial-item d-flex flex-column flex-md-row align-items-md-center gap-3">
     <div class="sw-historial-img sw-img"><img src="@fila.SuArticuloImagen" alt=""></div>
@@ -14,12 +13,12 @@
         </div>
         <div class="d-flex flex-wrap column-gap-3 row-gap-1 text-suave small">
             <span><i class="bi bi-person" aria-hidden="true"></i> Intercambio con @@@fila.OtroUsuario</span>
-            <span><i class="bi bi-calendar3" aria-hidden="true"></i> Fecha: @fila.Fecha.ToString("dd/MM/yyyy")</span>
+            <span><i class="bi bi-calendar3" aria-hidden="true"></i> Fecha: @fila.FechaTexto</span>
         </div>
     </div>
     <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 flex-shrink-0">
-        <span class="sw-estado-intercambio sw-estado-intercambio--@fila.Estado.ToLowerInvariant()">@fila.Estado</span>
-        @if (porResponder)
+        <span class="sw-estado-intercambio sw-estado-intercambio--@(fila.EstadoCss)">@fila.Estado</span>
+        @if (fila.PorResponder)
         {
             <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn btn-sw-primario btn-sm">Responder</a>
         }

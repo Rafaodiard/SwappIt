@@ -1,10 +1,11 @@
 @{
     Swappit.Models.ViewModels.ArticuloCardViewModel articulo = ViewBag.articulo;
+    bool ocultarFavorito = ViewBag.ocultarFavorito ?? false;
 }
 <div class="col col-objeto" data-template="card-objeto">
     <article class="card-objeto" data-id="@articulo.IdArticulos">
         <div class="card-objeto-img sw-img">
-            @if (!string.IsNullOrEmpty(articulo.Imagen))
+            @if (articulo.TieneImagen)
             {
                 <img src="@articulo.Imagen" alt="@articulo.Nombre" data-campo="imagen">
             }
@@ -13,7 +14,7 @@
                 <img alt="" data-campo="imagen">
             }
             <span class="card-objeto-estado" data-campo="estado">@articulo.Estado</span>
-            @if (ViewBag.ocultarFavorito != true)
+            @if (!ocultarFavorito)
             {
                 <button type="button" class="card-objeto-fav" aria-pressed="false" aria-label="Agregar @articulo.Nombre a favoritos"><i class="bi bi-heart" aria-hidden="true"></i></button>
             }
@@ -22,7 +23,7 @@
             <h3 class="card-objeto-titulo">
                 <a href="@Url.Action("Detalle", "Articulos", new { id = articulo.IdArticulos })" class="stretched-link text-reset text-decoration-none" data-campo="nombre">@articulo.Nombre</a>
             </h3>
-            @if (!string.IsNullOrWhiteSpace(articulo.Barrio))
+            @if (articulo.TieneBarrio)
             {
                 <div class="card-objeto-ubicacion">
                     <i class="bi bi-geo-alt"></i>
@@ -36,11 +37,10 @@
                     <span>En intercambio</span>
                 </div>
             }
-            @if (!string.IsNullOrEmpty(articulo.Motivo))
+            @if (articulo.TieneMotivo)
             {
-                bool descubrir = articulo.Motivo == Swappit.Controllers.RecomendacionesController.MotivoDescubrir;
-                <div class="card-objeto-motivo @(descubrir ? "card-objeto-motivo--descubrir" : "")">
-                    <i class="bi @(descubrir ? "bi-compass" : "bi-arrow-left-right")" aria-hidden="true"></i>
+                <div class="card-objeto-motivo @(articulo.EsParaDescubrir ? "card-objeto-motivo--descubrir" : "")">
+                    <i class="bi @(articulo.EsParaDescubrir ? "bi-compass" : "bi-arrow-left-right")" aria-hidden="true"></i>
                     <span>@articulo.Motivo</span>
                 </div>
             }
