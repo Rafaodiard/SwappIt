@@ -35,6 +35,12 @@ namespace Swappit.Models.ViewModels
         [Display(Name = "¿Qué te gustaría recibir a cambio?")]
         public int? IdCategoriaACambio { get; set; }
 
+        public int? IdArticulo { get; set; }
+
         public List<IFormFile>? Fotos { get; set; }
+
+        public List<string>? FotosExistentes { get; set; }
+
+        public List<string>? FotosEliminar { get; set; }
     }
 }
