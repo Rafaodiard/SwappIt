@@ -5,7 +5,7 @@ tags:
 ---
 # Cómo usar esta vault
 
-1. En Obsidian: **Abrir carpeta como bóveda** → `C:\Users\rafae\Proyectos\swappit\Vault`.
+1. En Obsidian: **Abrir carpeta como bóveda** → `C:\Users\rafae\Proyectos\SwappIt\ia\Vault`.
 2. Empezá por [[Inicio]].
 3. **Vista de grafo** (Ctrl+G): cada nota de código es un nodo del grafo de graphify y cada `[[link]]` de la sección "Conexiones en el grafo" es una arista. Los colores ya vienen configurados:
    - azul petróleo: controllers y acciones

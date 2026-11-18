@@ -17,6 +17,7 @@ Reglas que pidió Rafael (con la fecha en que las pidió):
 - **Controllers y vistas limpios** (17/11, entrega de INFO 360): nada de lógica de negocio en los controllers, va en `Models/Logica/`. En las vistas solo C# para leer `ViewBag`; se permiten `@foreach` e `@if` sobre esos valores ("práctica"). Todo el JS en `wwwroot/js`.
 - **Models separados** (17/11): tablas en `Models/Tablas/`, lógica en `Models/Logica/`, acceso a datos en `Models/BD/`.
 - **Scripts SQL completos** (27/10): todos los scripts de creación tienen que tener lo mismo (tablas, datos, SP).
-- **Vault y grafo** (29/10): cada vez que Claude trabaje en `C:\Users\rafae\Proyectos\swappit` y Rafael le escriba, revisa todo el proyecto y actualiza el grafo de graphify y esta vault. Usa el grafo cuando le sirva.
+- **Vault y grafo** (29/10): cada vez que Claude trabaje en `C:\Users\rafae\Proyectos\SwappIt` y Rafael le escriba, revisa todo el proyecto y actualiza el grafo de graphify y esta vault (`ia/Vault`). Usa el grafo cuando le sirva.
 - **Memoria secundaria** (29/10): esta vault es la memoria secundaria de Claude ([[Memoria del proyecto]]).
+- **Carpeta ia** (17/11): todo lo que es solo para Claude va en `ia/`: esta vault (`ia/Vault`), specs y planes de superpowers (`ia/superpowers/`), su carpeta de trabajo (`ia/.superpowers/`) y los archivos temporales (`ia/temporales/`, ignorada por git). Nada de eso va en la raíz, en `docs/` ni en `obj/`.
 - Del proyecto: no inventar tablas, campos ni funcionalidades; no usar datos falsos como reales; señalar problemas de diseño o lógica; preguntar si falta información; explicar los cambios importantes.

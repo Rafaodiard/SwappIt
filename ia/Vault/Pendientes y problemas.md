@@ -30,7 +30,7 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 
 ## Base de datos y datos
 - Rafael actualiza su base por su cuenta con los scripts de creación (14/11, sin scripts de migración). Una base creada antes del 14/11 puede no tener: `Usuarios.Telefono` como `varchar(20)` (08/11, [[Telefonos]]), las 24 provincias sin repetir (08/11) y [[Tabla ArticulosIntercambios]] en lugar de `Intercambios.IdArticulos1` e `IdArticulos2` (11/11). Desde el 14/11 también hacen falta [[Tabla CambiosIntercambios]], [[Tabla TipoCambios]], `Notificaciones.IdCambio` y los tipos de notificación 6 a 10. La base de cada compu es aparte.
-- Cambiar un intercambio (14/11) compila y la pantalla se probó en una página aparte, pero todavía no se probó contra una base de verdad: falta la lista de prueba de `docs/superpowers/specs/2026-11-14-editar-intercambio-design.md`.
+- Cambiar un intercambio (14/11) compila y la pantalla se probó en una página aparte, pero todavía no se probó contra una base de verdad: falta la lista de prueba de `ia/superpowers/specs/2026-11-14-editar-intercambio-design.md`.
 - Desde el 08/11 el registro pide provincia y barrio (Figma no los tiene). Los usuarios que ya se registraron quedaron en Buenos Aires con el barrio vacío: lo corrigen en Editar perfil.
 - `wwwroot/img/perfiles/` está en `.gitignore`, pero las filas de [[Tabla Imagenes]] con la foto de perfil viajan en los scripts: en otra compu la foto no existe y se ven las iniciales (ej. usuario 2).
 - El comentario de [[PublicarController]] y [[PerfilController]] dice que `Imagenes.Ruta` es `varchar(50)`, pero ya es `varchar(100)`.
@@ -50,4 +50,4 @@ Ya funcionan desde el 29/10: proponer, aceptar, rechazar, cancelar y marcar inte
 - El perfil no deja cambiar el mail: una cuenta registrada con un mail mal escrito no recibe ningún aviso.
 
 ## Carpeta local vs GitHub
-El 30/10 la carpeta `C:\Users\rafae\Proyectos\swappit` estaba en `cc3a330`, 12 commits atrás de GitHub; se hizo `git pull` y quedó en `f639baa` ("pantalla incio"). Diferencias locales sin commit: el rediseño del inicio ([[Vista Home-Inicio]], [[HomeController]], [[site.css]]), esta vault actualizada, la copia `Vault-local/` (la vault vieja de la compu, sin nada que no esté acá) y archivos de `bin/` y `obj/` de compilar. Los archivos generados de antes del pull quedaron en un `git stash`.
+El 30/10 la carpeta `C:\Users\rafae\Proyectos\swappit` estaba en `cc3a330`, 12 commits atrás de GitHub; se hizo `git pull` y quedó en `f639baa` ("pantalla incio"). Diferencias locales sin commit: el rediseño del inicio ([[Vista Home-Inicio]], [[HomeController]], [[site.css]]), esta vault actualizada, la copia `ia/Vault-local/` (la vault vieja de la compu, sin nada que no esté acá) y archivos de `bin/` y `obj/` de compilar. Los archivos generados de antes del pull quedaron en un `git stash`.

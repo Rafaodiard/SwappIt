@@ -7,6 +7,7 @@ tags:
 
 | Fecha | Decisión | Motivo / nota |
 |---|---|---|
+| 17/11 | Todo lo que es solo para Claude va en `ia/` (vault, superpowers, temporales); `ia/temporales/` está en `.gitignore` y el `.csproj` excluye `ia\**` | Pedido de Rafael: separar lo de la app de lo que usa Claude |
 | 17/11 | Models separado en `Tablas/`, `Consultas/`, `Logica/`, `BD/` y `ViewModels/`, con el mismo namespace `Swappit.Models` | Pedido de Rafael ("separá los models de lógica de los models de tablas"); el namespace sigue el criterio que ya tenía `Models/BD/` |
 | 17/11 | Controllers sin lógica: sesión, llamada al Model, `ViewBag` y vista. Las vistas solo leen `ViewBag` con `@foreach` e `@if` simples | Lineamientos de entrega de INFO 360; Rafael eligió la lectura práctica ("podés correr un foreach a un viewbag en la view") |
 | 17/11 | Mandar mensajes del chat y cambiar la contraseña con `fetch`, sin recargar | Lineamientos de entrega; el resto de las acciones de intercambio siguen recargando porque cambian toda la pantalla |
