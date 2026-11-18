@@ -163,58 +163,29 @@ public static class ArticulosBD
     private static string? TextoBusqueda(string? busqueda) =>
         string.IsNullOrWhiteSpace(busqueda) ? null : busqueda.Trim();
 
-    public static bool ActualizarArticulo(Articulos a, int idUsuario, IReadOnlyCollection<string>? rutasEliminar,
-        IReadOnlyCollection<string>? rutasNuevas)
+    public static bool ActualizarArticulo(Articulos a, List<string> rutasEliminar, List<string> rutasNuevas, List<string> rutasBorradas)
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
-            connection.Open();
-            using (SqlTransaction transaction = connection.BeginTransaction())
+            using (SqlMapper.GridReader resultado = connection.QueryMultiple("ActualizarArticulo",
+                new
+                {
+                    idArticulo = a.IdArticulos,
+                    idUsuario = a.IdUsuarios,
+                    nombre = a.Nombre,
+                    descripcion = a.Descripcion,
+                    idEstado = a.IdEstado,
+                    idCategoria = a.IdCategorias,
+                    ubicacion = a.Ubicacion,
+                    idCategoriaACambio = a.IdCategoriaACambio,
+                    rutasEliminar = string.Join("|", rutasEliminar),
+                    rutasNuevas = string.Join("|", rutasNuevas)
+                },
+                commandType: CommandType.StoredProcedure))
             {
-                int afectadas = connection.Execute(@"
-                    UPDATE Articulos
-                    SET Nombre = @nombre, Descripcion = @descripcion, IdEstado = @idEstado,
-                        IdCategorias = @idCategoria, Ubicacion = @ubicacion,
-                        IdCategoriaACambio = @idCategoriaACambio
-                    WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario",
-                    new
-                    {
-                        idArticulo = a.IdArticulos,
-                        idUsuario,
-                        nombre = a.Nombre,
-                        descripcion = a.Descripcion,
-                        idEstado = a.IdEstado,
-                        idCategoria = a.IdCategorias,
-                        ubicacion = a.Ubicacion,
-                        idCategoriaACambio = a.IdCategoriaACambio
-                    }, transaction);
-
-                if (afectadas == 0)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-
-                if (rutasEliminar != null)
-                {
-                    foreach (string ruta in rutasEliminar)
-                    {
-                        connection.Execute("DELETE FROM Imagenes WHERE IdArticulos = @idArticulo AND Ruta = @ruta",
-                            new { idArticulo = a.IdArticulos, ruta }, transaction);
-                    }
-                }
-
-                if (rutasNuevas != null)
-                {
-                    foreach (string ruta in rutasNuevas)
-                    {
-                        connection.Execute("INSERT INTO Imagenes (Ruta, IdArticulos, IdUsuarios) VALUES (@ruta, @idArticulo, NULL)",
-                            new { ruta, idArticulo = a.IdArticulos }, transaction);
-                    }
-                }
-
-                transaction.Commit();
-                return true;
+                bool actualizado = resultado.ReadSingle<bool>();
+                rutasBorradas.AddRange(resultado.Read<string>());
+                return actualizado;
             }
         }
     }
@@ -223,38 +194,9 @@ public static class ArticulosBD
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
-            connection.Open();
-            using (SqlTransaction transaction = connection.BeginTransaction())
-            {
-                int existe = connection.ExecuteScalar<int>(@"
-                    SELECT COUNT(*) FROM Articulos
-                    WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario",
-                    new { idArticulo, idUsuario }, transaction);
-                if (existe == 0)
-                {
-                    transaction.Rollback();
-                    return 0;
-                }
-
-                int enUso = connection.ExecuteScalar<int>(@"
-                    SELECT (SELECT COUNT(*) FROM ArticulosIntercambios WHERE IdArticulo = @idArticulo)
-                         + (SELECT COUNT(*) FROM CambiosIntercambios WHERE IdArticulo = @idArticulo)",
-                    new { idArticulo }, transaction);
-                if (enUso > 0)
-                {
-                    transaction.Rollback();
-                    return 2;
-                }
-
-                connection.Execute("DELETE FROM Interacciones WHERE IdArticulo = @idArticulo",
-                    new { idArticulo }, transaction);
-                connection.Execute("DELETE FROM Imagenes WHERE IdArticulos = @idArticulo",
-                    new { idArticulo }, transaction);
-                connection.Execute("DELETE FROM Articulos WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario",
-                    new { idArticulo, idUsuario }, transaction);
-                transaction.Commit();
-                return 1;
-            }
+            return connection.ExecuteScalar<int>("EliminarArticulo",
+                new { idArticulo, idUsuario },
+                commandType: CommandType.StoredProcedure);
         }
     }
 }

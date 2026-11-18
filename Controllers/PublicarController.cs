@@ -143,9 +143,7 @@ public class PublicarController : BaseController
         Formularios.AgregarErrores(ModelState, Publicaciones.Validar(modelo, categorias, estados, fotos));
 
         List<string> existentes = ArticulosBD.GetImagenesArticulo(modelo.IdArticulo.Value);
-        List<string> eliminar = modelo.FotosEliminar ?? new List<string>();
-        int totalFinal = existentes.Count(e => !eliminar.Contains(e)) + fotos.Count;
-        if (totalFinal > PublicarArticuloViewModel.MaxFotos)
+        if (Publicaciones.FotosAlEditar(existentes, modelo.FotosEliminar, fotos.Count) > PublicarArticuloViewModel.MaxFotos)
         {
             ModelState.AddModelError("Fotos", $"Podés tener hasta {PublicarArticuloViewModel.MaxFotos} fotos.");
         }

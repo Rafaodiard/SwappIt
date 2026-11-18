@@ -142,11 +142,24 @@ public static class Publicaciones
         }
     }
 
+    public static int FotosAlEditar(List<string> existentes, List<string>? eliminar, int nuevas)
+    {
+        int total = nuevas;
+        foreach (string ruta in existentes)
+        {
+            if (eliminar == null || !eliminar.Contains(ruta))
+            {
+                total++;
+            }
+        }
+        return total;
+    }
+
     public static bool Editar(PublicarArticuloViewModel modelo, int idUsuario, int idArticulo,
         List<IFormFile> fotos, string carpetaWeb)
     {
         List<string> rutasFotos = new List<string>();
-        List<string> rutasEliminar = modelo.FotosEliminar ?? new List<string>();
+        List<string> rutasBorradas = new List<string>();
         try
         {
             GuardarFotos(fotos, idUsuario, rutasFotos, carpetaWeb);
@@ -163,36 +176,20 @@ public static class Publicaciones
                 IdCategoriaACambio = modelo.IdCategoriaACambio
             };
 
-            bool actualizado = ArticulosBD.ActualizarArticulo(articulo, idUsuario, rutasEliminar, rutasFotos);
-            if (!actualizado)
+            if (!ArticulosBD.ActualizarArticulo(articulo, modelo.FotosEliminar ?? new List<string>(), rutasFotos, rutasBorradas))
             {
                 BorrarFotos(rutasFotos, carpetaWeb);
                 return false;
             }
-
-            foreach (string ruta in rutasEliminar)
-            {
-                if (!rutasFotos.Contains(ruta))
-                {
-                    BorrarRuta(ruta, carpetaWeb);
-                }
-            }
-            return true;
         }
         catch
         {
             BorrarFotos(rutasFotos, carpetaWeb);
             throw;
         }
-    }
 
-    private static void BorrarRuta(string ruta, string carpetaWeb)
-    {
-        if (ruta.StartsWith("/img/articulos/"))
-        {
-            string archivo = Path.Combine(carpetaWeb, "img", "articulos", Path.GetFileName(ruta));
-            if (File.Exists(archivo)) File.Delete(archivo);
-        }
+        BorrarFotos(rutasBorradas, carpetaWeb);
+        return true;
     }
 
     private static bool EstaEnLista(List<SelectListItem> opciones, int valor)

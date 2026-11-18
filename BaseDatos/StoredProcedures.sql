@@ -1,6 +1,61 @@
 ﻿/****** 3 de 3: Stored procedures. Ejecutar después de Estructura.sql. ******/
 USE [Base_De_Datos_Swappit]
 GO
+/****** Object:  StoredProcedure [dbo].[ActualizarArticulo]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[ActualizarArticulo]
+	@idArticulo int,
+	@idUsuario int,
+	@nombre varchar(50),
+	@descripcion varchar(500),
+	@idEstado int,
+	@idCategoria int,
+	@ubicacion varchar(100),
+	@idCategoriaACambio int = NULL,
+	@rutasEliminar varchar(max) = NULL,
+	@rutasNuevas varchar(max) = NULL
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+	DECLARE @borradas TABLE (Ruta varchar(100))
+	DECLARE @ruta varchar(max), @pos int
+
+	BEGIN TRANSACTION
+	UPDATE Articulos
+	SET Nombre = @nombre, Descripcion = @descripcion, IdEstado = @idEstado, IdCategorias = @idCategoria,
+		Ubicacion = @ubicacion, IdCategoriaACambio = @idCategoriaACambio
+	WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario
+
+	IF @@ROWCOUNT = 0
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT CAST(0 AS bit) AS Actualizado
+		SELECT Ruta FROM @borradas
+		RETURN
+	END
+
+	DELETE FROM Imagenes
+	OUTPUT deleted.Ruta INTO @borradas
+	WHERE IdArticulos = @idArticulo AND Ruta IN (SELECT value FROM STRING_SPLIT(@rutasEliminar, '|'))
+
+	WHILE LEN(@rutasNuevas) > 0
+	BEGIN
+		SET @pos = CHARINDEX('|', @rutasNuevas)
+		IF @pos = 0 SET @pos = LEN(@rutasNuevas) + 1
+		SET @ruta = LEFT(@rutasNuevas, @pos - 1)
+		SET @rutasNuevas = SUBSTRING(@rutasNuevas, @pos + 1, LEN(@rutasNuevas))
+		IF @ruta <> '' INSERT INTO Imagenes (Ruta, IdArticulos) VALUES (@ruta, @idArticulo)
+	END
+	COMMIT TRANSACTION
+
+	SELECT CAST(1 AS bit) AS Actualizado
+	SELECT Ruta FROM @borradas
+END
+GO
 /****** Object:  StoredProcedure [dbo].[ActualizarContrasena]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -862,6 +917,43 @@ BEGIN
 
 	SELECT CAST(CASE WHEN @idCambio IS NULL THEN 0 ELSE 1 END AS bit) AS Creado;
 	SELECT IdUsuario, IdIntercambio, Tipo, IdCambio FROM #Creadas;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[EliminarArticulo]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[EliminarArticulo]
+	@idArticulo int,
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+
+	BEGIN TRANSACTION
+	IF NOT EXISTS (SELECT 1 FROM Articulos WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario)
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT 0 AS Resultado
+		RETURN
+	END
+
+	IF EXISTS (SELECT 1 FROM ArticulosIntercambios WHERE IdArticulo = @idArticulo)
+		OR EXISTS (SELECT 1 FROM CambiosIntercambios WHERE IdArticulo = @idArticulo)
+	BEGIN
+		ROLLBACK TRANSACTION
+		SELECT 2 AS Resultado
+		RETURN
+	END
+
+	DELETE FROM Interacciones WHERE IdArticulo = @idArticulo
+	DELETE FROM Imagenes WHERE IdArticulos = @idArticulo
+	DELETE FROM Articulos WHERE IdArticulos = @idArticulo AND IdUsuarios = @idUsuario
+	COMMIT TRANSACTION
+
+	SELECT 1 AS Resultado
 END
 GO
 /****** Object:  StoredProcedure [dbo].[EnviarMensaje]    Script Date: 17/11/2026 19:10:00 ******/
