@@ -11,6 +11,7 @@ public class ArticuloCardViewModel
     public int IdUsuarios { get; set; }
     public int IdCategorias { get; set; }
     public int? IdCategoriaACambio { get; set; }
+    public int PrioridadPlan { get; set; }
 
     public string? Motivo { get; set; }
     public bool EnIntercambio { get; set; }

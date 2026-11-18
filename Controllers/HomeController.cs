@@ -36,6 +36,16 @@ public class HomeController : BaseController
             _logger.LogError(ex, "No se pudieron cargar los artículos destacados");
             ViewBag.destacados = new List<ArticuloCardViewModel>();
         }
+
+        try
+        {
+            ViewBag.planes = Suscripciones.Planes();
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron cargar los planes");
+            ViewBag.planes = new List<PlanViewModel>();
+        }
         return View();
     }
 
@@ -51,9 +61,13 @@ public class HomeController : BaseController
         ViewBag.errorCarga = false;
         ViewBag.estadoPendiente = EstadosIntercambios.Pendiente;
         ViewBag.ordenParaVos = Recomendaciones.OrdenParaVos;
+        ViewBag.planes = new List<PlanViewModel>();
+        ViewBag.idPlanActual = null;
         try
         {
-            ViewBag.saludo = Inicios.Saludo(UsuariosBD.GetUsuarioById(usuarioId)?.Nombre);
+            Usuarios? usuario = UsuariosBD.GetUsuarioById(usuarioId);
+            ViewBag.saludo = Inicios.Saludo(usuario?.Nombre);
+            ViewBag.idPlanActual = usuario?.IdPlan;
             ResumenEnCurso enCurso = GestionIntercambios.ContarEnCurso(usuarioId);
             List<IntercambioViewModel> intercambios = IntercambiosBD.GetIntercambios(usuarioId, enCurso: true, cantidad: CantidadIntercambiosInicio);
 
@@ -67,6 +81,15 @@ public class HomeController : BaseController
         {
             _logger.LogError(ex, "No se pudo cargar el inicio del usuario {UsuarioId}", usuarioId);
             ViewBag.errorCarga = true;
+        }
+
+        try
+        {
+            ViewBag.planes = Suscripciones.Planes();
+        }
+        catch (SqlException ex)
+        {
+            _logger.LogError(ex, "No se pudieron cargar los planes");
         }
 
         try

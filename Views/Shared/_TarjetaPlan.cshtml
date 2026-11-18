@@ -1,0 +1,53 @@
+@{
+    Swappit.Models.ViewModels.PlanViewModel plan = ViewBag.tarjetaPlan;
+    int? idPlanActual = ViewBag.idPlanActual;
+    bool esVisitante = ViewBag.esVisitante ?? true;
+    bool esActual = !esVisitante && plan.Id == idPlanActual;
+}
+<div class="col">
+    <article class="sw-plan sw-plan--@plan.Clave @(esActual ? "sw-plan--actual" : "")" aria-labelledby="plan-@plan.Id">
+        @if (esActual)
+        {
+            <span class="sw-plan-actual"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Tu plan actual</span>
+        }
+        <header>
+            <span class="sw-plan-tag">@plan.Etiqueta</span>
+            <h3 class="sw-plan-nombre" id="plan-@plan.Id">@plan.Nombre</h3>
+        </header>
+        <p class="sw-plan-precio">
+            <span class="sw-plan-monto">@plan.Precio</span>
+            @if (!plan.EsGratis)
+            {
+                <span class="sw-plan-periodo" aria-hidden="true">/mes</span>
+                <span class="visually-hidden">por mes</span>
+            }
+        </p>
+        <ul class="sw-plan-lista">
+            @foreach (string beneficio in plan.Beneficios)
+            {
+                <li><i class="bi bi-check2" aria-hidden="true"></i><span>@beneficio</span></li>
+            }
+        </ul>
+        <div class="sw-plan-accion">
+            @if (esVisitante)
+            {
+                <a href="@Url.Action("Registro", "Account", new { plan = plan.Id })" class="btn sw-plan-boton">@(plan.EsGratis ? "Empezar gratis" : $"Empezar con {plan.Nombre}")</a>
+            }
+            else if (esActual)
+            {
+                <button type="button" class="btn sw-plan-boton" disabled>Es tu plan</button>
+            }
+            else if (plan.EsGratis)
+            {
+                <form method="post" action="@Url.Action("Cambiar", "Planes")" asp-antiforgery="true">
+                    <input type="hidden" name="idPlan" value="@plan.Id">
+                    <button type="submit" class="btn sw-plan-boton">Cambiar a @plan.Nombre</button>
+                </form>
+            }
+            else
+            {
+                <a href="@Url.Action("Pago", "Planes", new { id = plan.Id })" class="btn sw-plan-boton">Pasarme a @plan.Nombre</a>
+            }
+        </div>
+    </article>
+</div>

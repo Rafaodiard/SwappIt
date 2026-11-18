@@ -272,6 +272,22 @@ BEGIN
 	SELECT IdUsuario, IdIntercambio, Tipo, IdCambio FROM #Creadas;
 END
 GO
+/****** Object:  StoredProcedure [dbo].[CambiarPlanUsuario]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CambiarPlanUsuario]
+	@idUsuario int,
+	@idPlan int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE Usuarios SET IdPlan = @idPlan
+	WHERE IdUsuarios = @idUsuario AND EXISTS (SELECT 1 FROM Planes WHERE Id = @idPlan)
+	SELECT @@ROWCOUNT
+END
+GO
 /****** Object:  StoredProcedure [dbo].[CancelarCambio]    Script Date: 17/11/2026 19:10:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -922,13 +938,14 @@ BEGIN
 	SET @busqueda = REPLACE(REPLACE(REPLACE(NULLIF(LTRIM(RTRIM(@busqueda)), ''), '[', '[[]'), '%', '[%]'), '_', '[_]');
 	SELECT TOP (ISNULL(@cantidad, 2147483647)) a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
 		(SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
-		a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio,
+		a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio, pl.Prioridad AS PrioridadPlan,
 		CAST(CASE WHEN EXISTS (SELECT 1 FROM ArticulosIntercambios aic
 			INNER JOIN Intercambios ic ON ic.IdIntercambios = aic.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN ('Aceptado', 'Realizado') AND aic.IdArticulo = a.IdArticulos) THEN 1 ELSE 0 END AS bit) AS EnIntercambio
 	FROM Articulos a
 	INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+	INNER JOIN Planes pl ON pl.Id = u.IdPlan
 	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
 	OUTER APPLY (SELECT SUM(CASE WHEN t.Nombre = 'Vista' THEN 1 WHEN t.Nombre = 'Favorito' THEN 3 ELSE 0 END) AS Puntos
 		FROM Interacciones it
@@ -975,6 +992,18 @@ BEGIN
 	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
 	WHERE ai.IdIntercambio = @idIntercambio AND (i.IdUsuarios1 = @idUsuario OR i.IdUsuarios2 = @idUsuario)
 	ORDER BY ai.Id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetBeneficiosPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetBeneficiosPlanes]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT IdPlan, Texto FROM BeneficiosPlanes ORDER BY IdPlan, Id
 END
 GO
 /****** Object:  StoredProcedure [dbo].[GetCambiosIntercambio]    Script Date: 17/11/2026 19:10:00 ******/
@@ -1392,6 +1421,34 @@ BEGIN
 	ORDER BY n.Fecha DESC, n.Id DESC
 END
 GO
+/****** Object:  StoredProcedure [dbo].[GetPlanDeUsuario]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetPlanDeUsuario]
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT p.Id, p.Nombre, p.Etiqueta, p.PrecioMensual, p.MaxArticulos, p.MaxIntercambios, p.Prioridad
+	FROM Usuarios u
+	INNER JOIN Planes p ON p.Id = u.IdPlan
+	WHERE u.IdUsuarios = @idUsuario
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetPlanes]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT Id, Nombre, Etiqueta, PrecioMensual, MaxArticulos, MaxIntercambios, Prioridad FROM Planes ORDER BY PrecioMensual, Id
+END
+GO
 /****** Object:  StoredProcedure [dbo].[GetPopularidad]    Script Date: 17/11/2026 19:10:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -1518,7 +1575,7 @@ CREATE PROCEDURE  [dbo].[GetUsuarioById]
 AS
 BEGIN
 	SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion 
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion, IdPlan
 		FROM Usuarios
 		 WHERE IdUsuarios = @id
 END
@@ -1533,7 +1590,7 @@ CREATE PROCEDURE [dbo].[GetUsuarioByMail]
 AS
 BEGIN
  SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion FROM Usuarios
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion, IdPlan FROM Usuarios
 		WHERE Mail = @Mail
 END
 GO
@@ -1902,12 +1959,13 @@ CREATE PROCEDURE [dbo].[RegistrarUsuario]
 	@barrio varchar(50),
 	@fechaNacimiento date,
 	@edad int,
-	@idProvincia int
+	@idProvincia int,
+	@idPlan int
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], Edad, IdProvincias)
-	VALUES (@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @edad, @idProvincia)
+	INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], Edad, IdProvincias, IdPlan)
+	VALUES (@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @edad, @idProvincia, @idPlan)
 END
 GO
 /****** Object:  StoredProcedure [dbo].[RegistrarVista]    Script Date: 17/11/2026 19:10:00 ******/

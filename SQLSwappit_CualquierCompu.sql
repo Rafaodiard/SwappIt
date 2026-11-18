@@ -143,6 +143,21 @@ CREATE TABLE [dbo].[ArticulosIntercambios](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[BeneficiosPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[BeneficiosPlanes](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdPlan] [int] NOT NULL,
+	[Texto] [varchar](100) NOT NULL,
+ CONSTRAINT [PK_BeneficiosPlanes] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[CambiosIntercambios]    Script Date: 14/11/2026 12:00:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -313,6 +328,25 @@ CREATE TABLE [dbo].[Notificaciones](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[Planes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Planes](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Nombre] [varchar](50) NOT NULL,
+	[Etiqueta] [varchar](50) NOT NULL,
+	[PrecioMensual] [int] NOT NULL,
+	[MaxArticulos] [int] NULL,
+	[MaxIntercambios] [int] NULL,
+	[Prioridad] [int] NOT NULL,
+ CONSTRAINT [PK_Planes] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[Provincias]    Script Date: 29/10/2026 13:39:32 ******/
 SET ANSI_NULLS ON
 GO
@@ -387,6 +421,7 @@ CREATE TABLE [dbo].[Usuarios](
 	[Edad] [int] NOT NULL,
 	[IdProvincias] [int] NOT NULL,
 	[Descripcion] [varchar](500) NULL,
+	[IdPlan] [int] NOT NULL CONSTRAINT [DF_Usuarios_IdPlan] DEFAULT ((1)),
  CONSTRAINT [PK_Usuarios] PRIMARY KEY CLUSTERED 
 (
 	[IdUsuarios] ASC
@@ -1299,6 +1334,23 @@ INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUE
 INSERT [dbo].[ArticulosIntercambios] ([Id], [IdArticulo], [IdIntercambio]) VALUES (52, 106, 26)
 SET IDENTITY_INSERT [dbo].[ArticulosIntercambios] OFF
 GO
+SET IDENTITY_INSERT [dbo].[Planes] ON 
+
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (1, N'Gratis', N'Básico', 0, 5, 5, 0)
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (2, N'Plus', N'Intermedio', 1500, 15, 15, 1)
+INSERT [dbo].[Planes] ([Id], [Nombre], [Etiqueta], [PrecioMensual], [MaxArticulos], [MaxIntercambios], [Prioridad]) VALUES (3, N'Pro', N'Premium', 3000, NULL, NULL, 2)
+SET IDENTITY_INSERT [dbo].[Planes] OFF
+GO
+SET IDENTITY_INSERT [dbo].[BeneficiosPlanes] ON 
+
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (1, 1, N'Chateá con otros usuarios')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (2, 1, N'Guardá tus favoritos')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (3, 2, N'Tus artículos se recomiendan más a otros usuarios')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (4, 2, N'Insignia Plus en tu perfil público')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (5, 3, N'Tus artículos tienen la máxima prioridad en las recomendaciones')
+INSERT [dbo].[BeneficiosPlanes] ([Id], [IdPlan], [Texto]) VALUES (6, 3, N'Insignia Pro en tu perfil público')
+SET IDENTITY_INSERT [dbo].[BeneficiosPlanes] OFF
+GO
 SET IDENTITY_INSERT [dbo].[Provincias] ON 
 
 INSERT [dbo].[Provincias] ([IdProvincia], [Nombre]) VALUES (1, N'Buenos Aires')
@@ -1434,6 +1486,11 @@ REFERENCES [dbo].[Intercambios] ([IdIntercambios])
 GO
 ALTER TABLE [dbo].[ArticulosIntercambios] CHECK CONSTRAINT [FK_ArticulosIntercambios_Intercambios]
 GO
+ALTER TABLE [dbo].[BeneficiosPlanes]  WITH CHECK ADD  CONSTRAINT [FK_BeneficiosPlanes_Planes] FOREIGN KEY([IdPlan])
+REFERENCES [dbo].[Planes] ([Id])
+GO
+ALTER TABLE [dbo].[BeneficiosPlanes] CHECK CONSTRAINT [FK_BeneficiosPlanes_Planes]
+GO
 ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
 REFERENCES [dbo].[Articulos] ([IdArticulos])
 GO
@@ -1533,6 +1590,11 @@ ALTER TABLE [dbo].[Notificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Notificacione
 REFERENCES [dbo].[Usuarios] ([IdUsuarios])
 GO
 ALTER TABLE [dbo].[Notificaciones] CHECK CONSTRAINT [FK_Notificaciones_Usuarios]
+GO
+ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD  CONSTRAINT [FK_Usuarios_Planes] FOREIGN KEY([IdPlan])
+REFERENCES [dbo].[Planes] ([Id])
+GO
+ALTER TABLE [dbo].[Usuarios] CHECK CONSTRAINT [FK_Usuarios_Planes]
 GO
 ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD  CONSTRAINT [FK_Usuarios_Provincias] FOREIGN KEY([IdProvincias])
 REFERENCES [dbo].[Provincias] ([IdProvincia])
@@ -1808,6 +1870,22 @@ BEGIN
 
 	SELECT CAST(CASE WHEN @idOtro IS NULL THEN 0 ELSE 1 END AS bit) AS Cambiado;
 	SELECT IdUsuario, IdIntercambio, Tipo, IdCambio FROM #Creadas;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[CambiarPlanUsuario]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CambiarPlanUsuario]
+	@idUsuario int,
+	@idPlan int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE Usuarios SET IdPlan = @idPlan
+	WHERE IdUsuarios = @idUsuario AND EXISTS (SELECT 1 FROM Planes WHERE Id = @idPlan)
+	SELECT @@ROWCOUNT
 END
 GO
 /****** Object:  StoredProcedure [dbo].[CancelarCambio]    Script Date: 17/11/2026 19:10:00 ******/
@@ -2460,13 +2538,14 @@ BEGIN
 	SET @busqueda = REPLACE(REPLACE(REPLACE(NULLIF(LTRIM(RTRIM(@busqueda)), ''), '[', '[[]'), '%', '[%]'), '_', '[_]');
 	SELECT TOP (ISNULL(@cantidad, 2147483647)) a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
 		(SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
-		a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio,
+		a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio, pl.Prioridad AS PrioridadPlan,
 		CAST(CASE WHEN EXISTS (SELECT 1 FROM ArticulosIntercambios aic
 			INNER JOIN Intercambios ic ON ic.IdIntercambios = aic.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
 			WHERE eic.Nombre IN ('Aceptado', 'Realizado') AND aic.IdArticulo = a.IdArticulos) THEN 1 ELSE 0 END AS bit) AS EnIntercambio
 	FROM Articulos a
 	INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
+	INNER JOIN Planes pl ON pl.Id = u.IdPlan
 	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
 	OUTER APPLY (SELECT SUM(CASE WHEN t.Nombre = 'Vista' THEN 1 WHEN t.Nombre = 'Favorito' THEN 3 ELSE 0 END) AS Puntos
 		FROM Interacciones it
@@ -2513,6 +2592,18 @@ BEGIN
 	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
 	WHERE ai.IdIntercambio = @idIntercambio AND (i.IdUsuarios1 = @idUsuario OR i.IdUsuarios2 = @idUsuario)
 	ORDER BY ai.Id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetBeneficiosPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetBeneficiosPlanes]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT IdPlan, Texto FROM BeneficiosPlanes ORDER BY IdPlan, Id
 END
 GO
 /****** Object:  StoredProcedure [dbo].[GetCambiosIntercambio]    Script Date: 17/11/2026 19:10:00 ******/
@@ -2930,6 +3021,34 @@ BEGIN
 	ORDER BY n.Fecha DESC, n.Id DESC
 END
 GO
+/****** Object:  StoredProcedure [dbo].[GetPlanDeUsuario]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetPlanDeUsuario]
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT p.Id, p.Nombre, p.Etiqueta, p.PrecioMensual, p.MaxArticulos, p.MaxIntercambios, p.Prioridad
+	FROM Usuarios u
+	INNER JOIN Planes p ON p.Id = u.IdPlan
+	WHERE u.IdUsuarios = @idUsuario
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetPlanes]    Script Date: 18/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetPlanes]
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT Id, Nombre, Etiqueta, PrecioMensual, MaxArticulos, MaxIntercambios, Prioridad FROM Planes ORDER BY PrecioMensual, Id
+END
+GO
 /****** Object:  StoredProcedure [dbo].[GetPopularidad]    Script Date: 17/11/2026 19:10:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -3056,7 +3175,7 @@ CREATE PROCEDURE  [dbo].[GetUsuarioById]
 AS
 BEGIN
 	SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion 
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion, IdPlan
 		FROM Usuarios
 		 WHERE IdUsuarios = @id
 END
@@ -3071,7 +3190,7 @@ CREATE PROCEDURE [dbo].[GetUsuarioByMail]
 AS
 BEGIN
  SELECT IdUsuarios, Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio,
-        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion FROM Usuarios
+        [Fecha nacimiento] AS FechaNacimiento, Edad, IdProvincias, Descripcion, IdPlan FROM Usuarios
 		WHERE Mail = @Mail
 END
 GO
@@ -3440,12 +3559,13 @@ CREATE PROCEDURE [dbo].[RegistrarUsuario]
 	@barrio varchar(50),
 	@fechaNacimiento date,
 	@edad int,
-	@idProvincia int
+	@idProvincia int,
+	@idPlan int
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], Edad, IdProvincias)
-	VALUES (@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @edad, @idProvincia)
+	INSERT INTO Usuarios (Nombre, Apellido, Usuario, Mail, Telefono, Contraseña, Barrio, [Fecha nacimiento], Edad, IdProvincias, IdPlan)
+	VALUES (@nombre, @apellido, @usuario, @mail, @telefono, @contraseña, @barrio, @fechaNacimiento, @edad, @idProvincia, @idPlan)
 END
 GO
 /****** Object:  StoredProcedure [dbo].[RegistrarVista]    Script Date: 17/11/2026 19:10:00 ******/

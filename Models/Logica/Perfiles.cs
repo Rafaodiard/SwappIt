@@ -13,7 +13,8 @@ public static class Perfiles
             Apellido = usuario.Apellido,
             Usuario = usuario.Usuario,
             Barrio = usuario.Barrio,
-            Descripcion = usuario.Descripcion
+            Descripcion = usuario.Descripcion,
+            IdPlan = usuario.IdPlan
         };
     }
 

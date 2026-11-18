@@ -23,6 +23,7 @@ public static class Recomendaciones
     private const double PesoInteresDelOtro = 0.25;
     private const double PesoPopularidad = 0.10;
     private const double InteresSiEstaAbierto = 0.5;
+    private const double PuntosPorPrioridadPlan = 0.10;
 
     private const int CadaCuantosUnoParaDescubrir = 5;
     private const double UmbralGusto = 0.2;
@@ -291,7 +292,8 @@ public static class Recomendaciones
             p.Puntaje = PesoGusto * p.Gusto
                 + PesoBusqueda * (p.CoincideBusqueda ? 1 : 0)
                 + PesoInteresDelOtro * p.InteresDelOtro
-                + PesoPopularidad * p.Popularidad;
+                + PesoPopularidad * p.Popularidad
+                + PuntosPorPrioridadPlan * articulo.PrioridadPlan;
             puntuados.Add(p);
         }
         return puntuados;

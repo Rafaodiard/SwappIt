@@ -10,6 +10,7 @@
     int? mensajesSinLeer = ViewBag.mensajesSinLeer;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> destacados = ViewBag.destacados;
     bool errorCarga = ViewBag.errorCarga;
+    List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
 }
 
 <!-- ===== Saludo ===== -->
@@ -150,3 +151,17 @@
         </div>
     </div>
 </div>
+
+@if (planes.Count > 0)
+{
+    <section id="planes" class="sw-suscripciones-detalle" aria-labelledby="titulo-planes">
+        <div class="container-xl">
+            <div class="sw-planes-encabezado">
+                <p class="sw-eyebrow">Planes</p>
+                <h2 class="font-titulo text-primario mb-3" id="titulo-planes">Elegí la opción que mejor se adapte a vos</h2>
+                <p class="text-suave mb-0">Todos los usuarios pueden intercambiar gratis. Con Plus o Pro publicás y proponés más, y tus artículos se recomiendan más.</p>
+            </div>
+            <partial name="_GrillaPlanes" />
+        </div>
+    </section>
+}

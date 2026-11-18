@@ -14,9 +14,13 @@ public static class Publicaciones
         };
     }
 
-    public static bool LimiteAlcanzado(int idUsuario)
+    public static bool LimiteAlcanzado(int idUsuario, PlanViewModel? plan)
     {
-        return ArticulosBD.ContarArticulosActivos(idUsuario) >= PublicarArticuloViewModel.MaxPublicados;
+        if (plan == null)
+        {
+            return true;
+        }
+        return plan.MaxArticulos != null && Suscripciones.AlcanzoLimite(ArticulosBD.ContarArticulosActivos(idUsuario), plan.MaxArticulos);
     }
 
     public static List<SelectListItem> OpcionesCategorias()

@@ -37,6 +37,9 @@ public class PerfilController : BaseController
         ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios, incluirEnIntercambio: true);
         ViewBag.ocultarFavorito = true;
         ViewBag.intercambios = IntercambiosBD.GetIntercambios(usuario.IdUsuarios, cantidad: 3);
+        ViewBag.plan = Suscripciones.Buscar(Suscripciones.Planes(), usuario.IdPlan);
+        ViewBag.articulosActivos = ArticulosBD.ContarArticulosActivos(usuario.IdUsuarios);
+        ViewBag.intercambiosActivos = IntercambiosBD.ContarIntercambiosActivos(usuario.IdUsuarios);
         ViewBag.maxFotoMB = EditarPerfilViewModel.MaxFotoMB;
         ViewBag.maxDescripcion = EditarPerfilViewModel.MaxDescripcion;
         ViewBag.errorPerfil = TempData["ErrorPerfil"] as string;
@@ -74,6 +77,7 @@ public class PerfilController : BaseController
         ViewBag.tieneDescripcion = Perfiles.TieneDescripcion(usuario);
         ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
+        ViewBag.plan = Suscripciones.Buscar(Suscripciones.Planes(), usuario.IdPlan);
         return View();
     }
 

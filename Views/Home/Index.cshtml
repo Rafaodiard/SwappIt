@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> destacados = ViewBag.destacados;
+    List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
 }
 
 <!-- ===== Hero ===== -->
@@ -146,3 +147,19 @@
         </div>
     </div>
 </section>
+
+@if (planes.Count > 0)
+{
+    <!-- ===== Suscripciones ===== -->
+    <section class="sw-seccion sw-suscripciones bg-crema" aria-labelledby="titulo-suscripciones">
+        <div class="container-xl">
+            <div class="sw-planes-encabezado">
+                <p class="sw-eyebrow">Suscripciones</p>
+                <h2 class="mb-3" id="titulo-suscripciones">Elegí tu plan</h2>
+                <p class="text-suave mb-0">Intercambiar en Swappit es gratis. Con Plus o Pro publicás y proponés más, y tus artículos se recomiendan más.</p>
+            </div>
+            <partial name="_GrillaPlanes" />
+            <p class="text-center mt-4 mb-0"><a href="@Url.Action("Index", "Planes")" class="sw-link fw-semibold">Ver los planes en detalle <i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
+        </div>
+    </section>
+}

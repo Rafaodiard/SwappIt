@@ -4,7 +4,6 @@ namespace Swappit.Models.ViewModels
 {
     public class PublicarArticuloViewModel
     {
-        public const int MaxPublicados = 5;
         public const int MaxFotos = 6;
         public const int MaxFotoMB = 10;
         public const int MaxDescripcion = 500;
