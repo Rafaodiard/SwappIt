@@ -138,6 +138,59 @@ public static class Publicaciones
         }
     }
 
+    public static bool Editar(PublicarArticuloViewModel modelo, int idUsuario, int idArticulo,
+        List<IFormFile> fotos, string carpetaWeb)
+    {
+        List<string> rutasFotos = new List<string>();
+        List<string> rutasEliminar = modelo.FotosEliminar ?? new List<string>();
+        try
+        {
+            GuardarFotos(fotos, idUsuario, rutasFotos, carpetaWeb);
+
+            Articulos articulo = new Articulos
+            {
+                IdArticulos = idArticulo,
+                Nombre = modelo.Titulo.Trim(),
+                Descripcion = modelo.Descripcion.Trim(),
+                IdEstado = modelo.IdEstado!.Value,
+                IdUsuarios = idUsuario,
+                IdCategorias = modelo.IdCategorias!.Value,
+                Ubicacion = modelo.Ubicacion.Trim(),
+                IdCategoriaACambio = modelo.IdCategoriaACambio
+            };
+
+            bool actualizado = ArticulosBD.ActualizarArticulo(articulo, idUsuario, rutasEliminar, rutasFotos);
+            if (!actualizado)
+            {
+                BorrarFotos(rutasFotos, carpetaWeb);
+                return false;
+            }
+
+            foreach (string ruta in rutasEliminar)
+            {
+                if (!rutasFotos.Contains(ruta))
+                {
+                    BorrarRuta(ruta, carpetaWeb);
+                }
+            }
+            return true;
+        }
+        catch
+        {
+            BorrarFotos(rutasFotos, carpetaWeb);
+            throw;
+        }
+    }
+
+    private static void BorrarRuta(string ruta, string carpetaWeb)
+    {
+        if (ruta.StartsWith("/img/articulos/"))
+        {
+            string archivo = Path.Combine(carpetaWeb, "img", "articulos", Path.GetFileName(ruta));
+            if (File.Exists(archivo)) File.Delete(archivo);
+        }
+    }
+
     private static bool EstaEnLista(List<SelectListItem> opciones, int valor)
     {
         foreach (SelectListItem opcion in opciones)

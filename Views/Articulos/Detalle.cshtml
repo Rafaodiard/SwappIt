@@ -164,10 +164,16 @@
                 <div class="d-flex flex-column gap-2">
                     @if (esPropio)
                     {
-                        <button type="button" class="btn btn-sw-primario btn-lg" disabled aria-describedby="editar-pendiente">
+                        <a href="@Url.Action("Editar", "Publicar", new { id = articulo.IdArticulos })" class="btn btn-sw-primario btn-lg">
                             <i class="bi bi-pencil-square me-1"></i> Editar artículo
-                        </button>
-                        <span id="editar-pendiente" class="text-suave small text-center">La edición de artículos todavía no está disponible.</span>
+                        </a>
+                        <form method="post" action="@Url.Action("Eliminar", "Publicar")" asp-antiforgery="true"
+                              onsubmit="return confirm('¿Querés eliminar esta publicación? Esta acción no se puede deshacer.');">
+                            <input type="hidden" name="id" value="@articulo.IdArticulos">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-trash3 me-1"></i> Eliminar publicación
+                            </button>
+                        </form>
                         <a href="@Url.Action("Index", "Perfil")" class="btn btn-sw-outline">Ver mis artículos publicados</a>
                     }
                     else if (idPropuestaEnCurso != null)

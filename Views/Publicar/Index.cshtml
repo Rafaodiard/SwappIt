@@ -1,7 +1,8 @@
 @using Swappit.Models.ViewModels
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
-    ViewData["Title"] = "Publicar objeto";
+    bool esEdicion = ViewBag.esEdicion == true;
+    ViewData["Title"] = esEdicion ? "Editar objeto" : "Publicar objeto";
     PublicarArticuloViewModel publicar = ViewBag.publicar;
     List<SelectListItem> categorias = ViewBag.categorias;
     List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
@@ -13,17 +14,23 @@
     int maxFotoMB = ViewBag.maxFotoMB;
     int maxPublicados = ViewBag.maxPublicados;
     int maxDescripcion = ViewBag.maxDescripcion;
+    List<string> fotosExistentes = publicar.FotosExistentes ?? new List<string>();
 }
 
 <section class="sw-publicar">
     <div class="sw-publicar-wrap">
 
         <header class="sw-publicar-encabezado">
-            <h1 class="sw-auth-titulo">Publicá tu objeto</h1>
-            <p class="sw-auth-subtitulo">Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio</p>
+            <h1 class="sw-auth-titulo">@(esEdicion ? "Editá tu objeto" : "Publicá tu objeto")</h1>
+            <p class="sw-auth-subtitulo">@(esEdicion ? "Cambiar fotos, descripción o lo que buscás a cambio" : "Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio")</p>
         </header>
 
-        <form class="sw-publicar-card" method="post" enctype="multipart/form-data" action="@Url.Action("Index", "Publicar")" asp-antiforgery="true" novalidate>
+        <form class="sw-publicar-card" method="post" enctype="multipart/form-data"
+              action="@Url.Action(esEdicion ? "Editar" : "Index", "Publicar")" asp-antiforgery="true" novalidate>
+            @if (esEdicion)
+            {
+                <input type="hidden" name="IdArticulo" value="@publicar.IdArticulo">
+            }
 
             <!-- ===== Columna izquierda: fotos ===== -->
             <div class="sw-publicar-fotos">
@@ -51,6 +58,21 @@
                 <p class="sw-nota">Hasta @maxFotos fotos · JPG o PNG · máx. @maxFotoMB MB cada una</p>
                 @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
                 <p class="sw-error" id="aviso-fotos" role="alert"></p>
+
+                @if (esEdicion && fotosExistentes.Count > 0)
+                {
+                    <div class="sw-miniaturas mb-2" aria-label="Fotos actuales">
+                        @foreach (string foto in fotosExistentes)
+                        {
+                            <label class="sw-miniatura sw-miniatura--llena position-relative">
+                                <img src="@foto" alt="Foto actual del artículo">
+                                <input type="checkbox" name="FotosEliminar" value="@foto" class="position-absolute top-0 end-0 m-2"
+                                       aria-label="Eliminar esta foto">
+                            </label>
+                        }
+                    </div>
+                    <p class="sw-ayuda">Marcá las fotos que querés eliminar.</p>
+                }
             </div>
 
             <!-- ===== Columna derecha: datos ===== -->
@@ -126,8 +148,8 @@
                 <hr class="sw-divisor">
 
                 <div class="sw-publicar-acciones">
-                    <a href="@Url.Action("Index", "Home")" class="sw-btn sw-btn-contorno">Cancelar</a>
-                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@limiteAlcanzado">Publicar objeto</button>
+                    <a href="@(esEdicion ? Url.Action("Detalle", "Articulos", new { id = publicar.IdArticulo }) : Url.Action("Index", "Home"))" class="sw-btn sw-btn-contorno">Cancelar</a>
+                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@limiteAlcanzado">@(esEdicion ? "Guardar cambios" : "Publicar objeto")</button>
                 </div>
             </div>
         </form>
