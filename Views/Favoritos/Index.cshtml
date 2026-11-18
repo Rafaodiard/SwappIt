@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Favoritos";
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
+    string textoCantidad = ViewBag.textoCantidad;
     bool errorCarga = ViewBag.errorCarga;
 }
 
@@ -21,7 +22,7 @@
     }
 
     <p id="favoritos-estado" class="text-suave small mb-3" role="status" aria-live="polite" hidden="@(articulos.Count == 0)">
-        @(articulos.Count == 1 ? "1 favorito" : $"{articulos.Count} favoritos")
+        @textoCantidad
     </p>
 
     <div id="lista-favoritos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">

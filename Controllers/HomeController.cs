@@ -6,8 +6,12 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
+    private const int CantidadIntercambiosInicio = 4;
+    private const int CantidadDestacadosInicio = 9;
+    private const int CantidadDestacadosLanding = 4;
+
     private readonly ILogger<HomeController> _logger;
 
     public HomeController(ILogger<HomeController> logger)
@@ -25,7 +29,7 @@ public class HomeController : Controller
 
         try
         {
-            ViewBag.destacados = RecomendacionesController.Destacados(null, CantidadDestacadosLanding);
+            ViewBag.destacados = Recomendaciones.Destacados(null, CantidadDestacadosLanding);
         }
         catch (SqlException ex)
         {
@@ -37,27 +41,27 @@ public class HomeController : Controller
 
     private IActionResult Inicio(int usuarioId)
     {
-        ViewBag.nombre = null;
+        ViewBag.saludo = Inicios.Saludo(null);
         ViewBag.intercambios = new List<IntercambioViewModel>();
         ViewBag.porResponder = 0;
-        ViewBag.cantidadEnCurso = 0;
+        ViewBag.textoVerTodos = "Ver todos";
         ViewBag.cantidadArticulos = 0;
         ViewBag.destacados = new List<ArticuloCardViewModel>();
         ViewBag.mensajesSinLeer = null;
         ViewBag.errorCarga = false;
+        ViewBag.estadoPendiente = EstadosIntercambios.Pendiente;
+        ViewBag.ordenParaVos = Recomendaciones.OrdenParaVos;
         try
         {
-            ViewBag.nombre = BD.GetUsuarioById(usuarioId)?.Nombre;
+            ViewBag.saludo = Inicios.Saludo(UsuariosBD.GetUsuarioById(usuarioId)?.Nombre);
+            ResumenEnCurso enCurso = GestionIntercambios.ContarEnCurso(usuarioId);
+            List<IntercambioViewModel> intercambios = IntercambiosBD.GetIntercambios(usuarioId, enCurso: true, cantidad: CantidadIntercambiosInicio);
 
-            List<IntercambioViewModel> enCurso = BD.GetIntercambios(usuarioId)
-                .Where(i => i.Estado == EstadosIntercambios.Pendiente || i.Estado == EstadosIntercambios.Aceptado)
-                .ToList();
-
-            ViewBag.intercambios = enCurso.OrderByDescending(PorResponder).Take(CantidadIntercambiosInicio).ToList();
-            ViewBag.porResponder = enCurso.Count(PorResponder);
-            ViewBag.cantidadEnCurso = enCurso.Count;
-            ViewBag.cantidadArticulos = BD.ContarArticulosActivos(usuarioId);
-            ViewBag.destacados = RecomendacionesController.Destacados(usuarioId, CantidadDestacadosInicio);
+            ViewBag.intercambios = intercambios;
+            ViewBag.porResponder = enCurso.PorResponder;
+            ViewBag.textoVerTodos = Inicios.TextoVerTodos(enCurso.Cantidad, intercambios.Count);
+            ViewBag.cantidadArticulos = ArticulosBD.ContarArticulosActivos(usuarioId);
+            ViewBag.destacados = Recomendaciones.Destacados(usuarioId, CantidadDestacadosInicio);
         }
         catch (SqlException ex)
         {
@@ -67,7 +71,7 @@ public class HomeController : Controller
 
         try
         {
-            ViewBag.mensajesSinLeer = BD.GetResumenesChat(usuarioId).Sum(r => r.NoLeidos);
+            ViewBag.mensajesSinLeer = ChatBD.ContarMensajesNoLeidos(usuarioId);
         }
         catch (SqlException ex)
         {
@@ -75,15 +79,6 @@ public class HomeController : Controller
         }
 
         return View("Inicio");
-    }
-
-    private const int CantidadIntercambiosInicio = 4;
-    private const int CantidadDestacadosInicio = 9;
-    private const int CantidadDestacadosLanding = 4;
-
-    private static bool PorResponder(IntercambioViewModel i)
-    {
-        return i.EsRecibido && i.Estado == EstadosIntercambios.Pendiente;
     }
 
     public IActionResult Privacy()

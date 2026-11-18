@@ -277,3 +277,6 @@ __pycache__/
 wwwroot/img/perfiles/
 # Copias .eml de los mails de notificaciones (Smtp:CarpetaPrueba)
 MailsPrueba/
+
+# Archivos temporales de Claude
+ia/temporales/

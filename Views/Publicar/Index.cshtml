@@ -1,5 +1,3 @@
-@using System.ComponentModel.DataAnnotations
-@using System.Reflection
 @using Swappit.Models.ViewModels
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
@@ -8,11 +6,13 @@
     List<SelectListItem> categorias = ViewBag.categorias;
     List<Swappit.Models.EstadosArticulos> estados = ViewBag.estados;
     bool limiteAlcanzado = ViewBag.limiteAlcanzado;
-}
-
-@functions {
-    string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
-    string Requerido(string campo) => typeof(PublicarArticuloViewModel).GetProperty(campo)?.GetCustomAttribute<RequiredAttribute>()?.ErrorMessage ?? "";
+    Dictionary<string, string> requeridos = ViewBag.requeridos;
+    string? categoriaElegida = ViewBag.categoriaElegida;
+    string? categoriaACambioElegida = ViewBag.categoriaACambioElegida;
+    int maxFotos = ViewBag.maxFotos;
+    int maxFotoMB = ViewBag.maxFotoMB;
+    int maxPublicados = ViewBag.maxPublicados;
+    int maxDescripcion = ViewBag.maxDescripcion;
 }
 
 <section class="sw-publicar">
@@ -39,7 +39,7 @@
                     <button type="button" class="sw-btn sw-btn-contorno" id="boton-subir-fotos" tabindex="-1">Subir fotos</button>
                 </div>
                 <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden
-                       data-max-fotos="@PublicarArticuloViewModel.MaxFotos" data-max-mb="@PublicarArticuloViewModel.MaxFotoMB">
+                       data-max-fotos="@maxFotos" data-max-mb="@maxFotoMB">
 
                 <div class="sw-miniaturas" id="miniaturas">
                     <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
@@ -48,7 +48,7 @@
                     <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
                 </div>
 
-                <p class="sw-nota">Hasta @PublicarArticuloViewModel.MaxFotos fotos · JPG o PNG · máx. @PublicarArticuloViewModel.MaxFotoMB MB cada una</p>
+                <p class="sw-nota">Hasta @maxFotos fotos · JPG o PNG · máx. @maxFotoMB MB cada una</p>
                 @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
                 <p class="sw-error" id="aviso-fotos" role="alert"></p>
             </div>
@@ -60,7 +60,7 @@
                 {
                     <p class="sw-aviso-rechazos mb-0" role="alert">
                         <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
-                        Ya tenés @PublicarArticuloViewModel.MaxPublicados objetos publicados, contando los que están en un intercambio pendiente o aceptado.
+                        Ya tenés @maxPublicados objetos publicados, contando los que están en un intercambio pendiente o aceptado.
                         Cuando un intercambio se complete, vas a poder publicar otro.
                         <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-reset">Ver mis intercambios</a>
                     </p>
@@ -68,37 +68,36 @@
 
                 <div class="sw-campo">
                     <label class="sw-label" for="Titulo">Título</label>
-                    <input class="sw-input @ClaseError("Titulo")" id="Titulo" name="Titulo" value="@publicar.Titulo" data-requerido="@Requerido("Titulo")" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
+                    <input class="sw-input" id="Titulo" name="Titulo" value="@publicar.Titulo" data-requerido="@requeridos["Titulo"]" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
                     @Html.ValidationMessage("Titulo", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-fila">
                     <div class="sw-campo">
                         <label class="sw-label" for="IdCategorias">Categoría</label>
-                        <select class="sw-input sw-select @ClaseError("IdCategorias")" id="IdCategorias" name="IdCategorias" required data-requerido="@Requerido("IdCategorias")">
+                        <select class="sw-input sw-select" id="IdCategorias" name="IdCategorias" required data-requerido="@requeridos["IdCategorias"]">
                             <option value="" disabled selected="@(publicar.IdCategorias == null)">Elegí una categoría</option>
                             @foreach (var c in categorias)
                             {
-                                <option value="@c.Value" selected="@(c.Value == publicar.IdCategorias?.ToString())">@c.Text</option>
+                                <option value="@c.Value" selected="@(c.Value == categoriaElegida)">@c.Text</option>
                             }
                         </select>
                         @Html.ValidationMessage("IdCategorias", new { @class = "sw-error" })
                     </div>
                     <div class="sw-campo">
                         <label class="sw-label" for="Ubicacion">Ubicación</label>
-                        <input class="sw-input @ClaseError("Ubicacion")" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" data-requerido="@Requerido("Ubicacion")" placeholder="Palermo, CABA" maxlength="100">
+                        <input class="sw-input" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" data-requerido="@requeridos["Ubicacion"]" placeholder="Palermo, CABA" maxlength="100">
                         @Html.ValidationMessage("Ubicacion", new { @class = "sw-error" })
                     </div>
                 </div>
 
                 <div class="sw-campo sw-campo-estado">
                     <span class="sw-label" id="etiqueta-estado">Estado del objeto</span>
-                    <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado" data-nombre="IdEstado" data-requerido="@Requerido("IdEstado")">
+                    <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado" data-nombre="IdEstado" data-requerido="@requeridos["IdEstado"]">
                         @foreach (var estado in estados)
                         {
-                            var idEstado = "Estado_" + estado.IdEstadosArticulos;
-                            <input type="radio" class="sw-estado-radio" id="@idEstado" name="IdEstado" value="@estado.IdEstadosArticulos" checked="@(publicar.IdEstado == estado.IdEstadosArticulos)">
-                            <label class="sw-estado" for="@idEstado">@estado.Nombre</label>
+                            <input type="radio" class="sw-estado-radio" id="Estado_@(estado.IdEstadosArticulos)" name="IdEstado" value="@estado.IdEstadosArticulos" checked="@(publicar.IdEstado == estado.IdEstadosArticulos)">
+                            <label class="sw-estado" for="Estado_@(estado.IdEstadosArticulos)">@estado.Nombre</label>
                         }
                     </div>
                     @Html.ValidationMessage("IdEstado", new { @class = "sw-error" })
@@ -106,19 +105,19 @@
 
                 <div class="sw-campo">
                     <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea @ClaseError("Descripcion")" id="Descripcion" name="Descripcion" rows="5" data-requerido="@Requerido("Descripcion")" maxlength="@PublicarArticuloViewModel.MaxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
-                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@PublicarArticuloViewModel.MaxDescripcion</span>
+                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="5" data-requerido="@requeridos["Descripcion"]" maxlength="@maxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
+                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
                     @Html.ValidationMessage("Descripcion", new { @class = "sw-error" })
                 </div>
 
                 <div class="sw-campo">
                     <label class="sw-label" for="IdCategoriaACambio">¿Qué te gustaría recibir a cambio?</label>
                     <span class="sw-ayuda" id="ayuda-a-cambio">Elegí una categoría o dejalo abierto a propuestas.</span>
-                    <select class="sw-input sw-select @ClaseError("IdCategoriaACambio")" id="IdCategoriaACambio" name="IdCategoriaACambio" aria-describedby="ayuda-a-cambio">
+                    <select class="sw-input sw-select" id="IdCategoriaACambio" name="IdCategoriaACambio" aria-describedby="ayuda-a-cambio">
                         <option value="" selected="@(publicar.IdCategoriaACambio == null)">Abierto a propuestas</option>
                         @foreach (var c in categorias)
                         {
-                            <option value="@c.Value" selected="@(c.Value == publicar.IdCategoriaACambio?.ToString())">@c.Text</option>
+                            <option value="@c.Value" selected="@(c.Value == categoriaACambioElegida)">@c.Text</option>
                         }
                     </select>
                     @Html.ValidationMessage("IdCategoriaACambio", new { @class = "sw-error" })

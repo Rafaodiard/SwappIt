@@ -1,0 +1,15 @@
+@{
+    Swappit.Models.ViewModels.DetalleIntercambioViewModel detalle = ViewBag.detalle;
+}
+@if (detalle.Historial.Count > 0)
+{
+    <section class="sw-card p-4" aria-labelledby="titulo-historial-cambios">
+        <h2 class="h6 fw-bold mb-3" id="titulo-historial-cambios">Últimos cambios</h2>
+        <ol class="list-unstyled mb-0 sw-historial-cambios">
+            @foreach (var e in detalle.Historial)
+            {
+                <li><span class="fw-semibold">@e.Quien</span> @e.Texto <span class="text-suave">· @e.Cuando</span></li>
+            }
+        </ol>
+    </section>
+}

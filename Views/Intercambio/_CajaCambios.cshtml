@@ -1,0 +1,39 @@
+@{
+    Swappit.Models.ViewModels.DetalleIntercambioViewModel detalle = ViewBag.detalle;
+}
+@if (detalle.CambiosPorResponder.Count > 0)
+{
+    <section class="sw-card sw-caja-cambios p-4 mb-4" aria-labelledby="titulo-caja-cambios">
+        <h2 class="h5 fw-bold mb-1" id="titulo-caja-cambios">@detalle.TituloCaja</h2>
+        <p class="text-suave small mb-2">Hasta que respondas, el intercambio sigue como está.</p>
+        <ul class="list-unstyled mb-0">
+            @foreach (var c in detalle.CambiosPorResponder)
+            {
+                <li class="sw-caja-cambio">
+                    <span class="sw-img sw-caja-cambio-img">
+                        @if (c.TieneImagen)
+                        {
+                            <img src="@c.Imagen" alt="">
+                        }
+                    </span>
+                    <div class="flex-grow-1 min-w-0">
+                        <p class="mb-0">@c.TextoAntes<strong>@c.Articulo</strong>@c.TextoDespues</p>
+                        <p class="text-suave small mb-0">@c.Ayuda</p>
+                    </div>
+                    <div class="sw-caja-cambio-botones">
+                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true">
+                            <input type="hidden" name="idCambio" value="@c.Id">
+                            <input type="hidden" name="aceptar" value="false">
+                            <button type="submit" class="btn btn-sw-outline btn-sm">No</button>
+                        </form>
+                        <form method="post" action="@Url.Action("ResponderCambio", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true">
+                            <input type="hidden" name="idCambio" value="@c.Id">
+                            <input type="hidden" name="aceptar" value="true">
+                            <button type="submit" class="btn btn-sw-primario btn-sm">@c.BotonAceptar</button>
+                        </form>
+                    </div>
+                </li>
+            }
+        </ul>
+    </section>
+}

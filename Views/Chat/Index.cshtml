@@ -1,24 +1,14 @@
-@using Swappit.Models
 @using Swappit.Models.ViewModels
 @{
     ViewData["Title"] = "Mensajes";
-    List<IntercambioViewModel> conversaciones = ViewBag.conversaciones;
-    Dictionary<int, ConversacionViewModel> resumenes = ViewBag.resumenes;
+    List<ContactoChatViewModel> contactos = ViewBag.contactos;
     IntercambioViewModel? abierta = ViewBag.abierta;
     bool puedeEscribir = ViewBag.puedeEscribir;
+    string textoNoPuedeEscribir = ViewBag.textoNoPuedeEscribir;
     int? idPedido = ViewBag.idPedido;
     bool errorCarga = ViewBag.errorCarga;
     string? fotoOtro = ViewBag.fotoOtro;
-    string? error = TempData["ErrorChat"] as string;
-    string? textoAnterior = TempData["TextoChat"] as string;
-
-    string Iniciales(IntercambioViewModel i) => $"{i.OtroNombre?.FirstOrDefault()}{i.OtroApellido?.FirstOrDefault()}".ToUpper();
-
-    string CuandoFue(DateTime fecha)
-    {
-        int dias = (DateTime.Today - fecha.Date).Days;
-        return dias == 0 ? fecha.ToString("HH:mm") : dias == 1 ? "Ayer" : fecha.ToString("dd/MM");
-    }
+    int largoMaximo = ViewBag.largoMaximo;
 }
 
 <div class="container-xl py-4">
@@ -32,7 +22,7 @@
         return;
     }
 
-    @if (conversaciones.Count == 0 && abierta == null)
+    @if (contactos.Count == 0 && abierta == null)
     {
         <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
             <i class="bi bi-chat-dots fs-1 text-suave" aria-hidden="true"></i>
@@ -55,35 +45,24 @@
             </div>
 
             <nav>
-                @foreach (IntercambioViewModel c in conversaciones)
+                @foreach (var contacto in contactos)
                 {
-                    resumenes.TryGetValue(c.IdIntercambios, out ConversacionViewModel? resumen);
-                    bool activa = c.IdIntercambios == abierta?.IdIntercambios;
-                    <a href="@Url.Action("Index", "Chat", new { id = c.IdIntercambios })" class="sw-chat-contacto @(activa ? "activo" : "")"
-                       aria-current="@(activa ? "page" : null)" data-chat-contacto="@($"{c.OtroNombre} {c.OtroApellido} {c.OtroUsuario} {c.MiArticuloNombre} {c.SuArticuloNombre}")">
-                        <span class="sw-avatar" aria-hidden="true">@Iniciales(c)</span>
+                    <a href="@Url.Action("Index", "Chat", new { id = contacto.Intercambio.IdIntercambios })" class="sw-chat-contacto @(contacto.Activa ? "activo" : "")"
+                       aria-current="@(contacto.Activa ? "page" : null)" data-chat-contacto="@contacto.TextoBusqueda">
+                        <span class="sw-avatar" aria-hidden="true">@contacto.Intercambio.OtroIniciales</span>
                         <div class="flex-grow-1 min-w-0">
                             <div class="d-flex justify-content-between gap-2">
-                                <span class="fw-semibold text-truncate">@c.OtroNombre @c.OtroApellido</span>
-                                @if (resumen != null)
+                                <span class="fw-semibold text-truncate">@contacto.Intercambio.OtroNombre @contacto.Intercambio.OtroApellido</span>
+                                @if (contacto.Cuando != null)
                                 {
-                                    <span class="small text-suave flex-shrink-0">@CuandoFue(resumen.UltimaFecha)</span>
+                                    <span class="small text-suave flex-shrink-0">@contacto.Cuando</span>
                                 }
                             </div>
-                            <div class="small text-suave text-truncate">
-                                @if (resumen != null)
-                                {
-                                    @:@(resumen.UltimoEsMio ? "Vos: " : "")@resumen.UltimoTexto
-                                }
-                                else
-                                {
-                                    @:@c.MiArticuloNombre ⇄ @c.SuArticuloNombre
-                                }
-                            </div>
+                            <div class="small text-suave text-truncate">@contacto.VistaPrevia</div>
                         </div>
-                        @if (resumen != null && resumen.NoLeidos > 0)
+                        @if (contacto.NoLeidos > 0)
                         {
-                            <span class="no-leidos">@(resumen.NoLeidos > 9 ? "9+" : resumen.NoLeidos.ToString())<span class="visually-hidden"> sin leer</span></span>
+                            <span class="no-leidos">@contacto.NoLeidosTexto<span class="visually-hidden"> sin leer</span></span>
                         }
                     </a>
                 }
@@ -102,14 +81,13 @@
             }
             else
             {
-                string iniciales = Iniciales(abierta);
                 <header class="sw-chat-header d-flex align-items-center gap-3">
-                    <span class="sw-avatar" data-iniciales="@iniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @iniciales }</span>
+                    <span class="sw-avatar" data-iniciales="@abierta.OtroIniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @abierta.OtroIniciales }</span>
                     <div class="flex-grow-1 min-w-0">
                         <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
-                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloNombre ⇄ @abierta.SuArticuloNombre</div>
+                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloResumen ⇄ @abierta.SuArticuloResumen</div>
                     </div>
-                    <span class="sw-estado-intercambio sw-estado-intercambio--@abierta.Estado.ToLowerInvariant() d-none d-sm-inline-block">@abierta.Estado</span>
+                    <span class="sw-estado-intercambio sw-estado-intercambio--@(abierta.EstadoCss) d-none d-sm-inline-block">@abierta.Estado</span>
                     <a href="@Url.Action("Detalle", "Intercambio", new { id = abierta.IdIntercambios })" class="btn btn-sw-outline btn-sm flex-shrink-0">Ver intercambio</a>
                 </header>
 
@@ -118,31 +96,19 @@
                     <partial name="_Mensajes" />
                 </div>
 
-                @if (error != null)
-                {
-                    <div class="alert alert-danger rounded-0 mb-0 py-2 small" role="alert"><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> @error</div>
-                }
+                <div class="alert alert-danger rounded-0 mb-0 py-2 small" role="alert" data-chat-error hidden><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> <span data-chat-error-texto></span></div>
 
                 @if (puedeEscribir)
                 {
-                    <form method="post" action="@Url.Action("Enviar", "Chat", new { id = abierta.IdIntercambios })" asp-antiforgery="true" class="sw-chat-input d-flex align-items-center gap-2">
-                        <input type="text" class="form-control" aria-label="Mensaje" name="texto" value="@textoAnterior" placeholder="Escribí un mensaje"
-                               maxlength="@Mensajes.LargoMaximoTexto" autocomplete="off" required data-chat-texto>
+                    <form method="post" action="@Url.Action("Enviar", "Chat", new { id = abierta.IdIntercambios })" asp-antiforgery="true" class="sw-chat-input d-flex align-items-center gap-2" data-chat-enviar>
+                        <input type="text" class="form-control" aria-label="Mensaje" name="texto" placeholder="Escribí un mensaje"
+                               maxlength="@largoMaximo" autocomplete="off" required data-chat-texto>
                         <button type="submit" class="sw-btn-icono" aria-label="Enviar"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
                     </form>
                 }
                 else
                 {
-                    <p class="sw-chat-input small text-suave text-center mb-0">
-                        @if (abierta.Estado == EstadosIntercambios.Pendiente)
-                        {
-                            @:Cuando @abierta.OtroNombre te escriba, vas a poder responderle. Si acepta tu propuesta, también vas a poder escribirle vos.
-                        }
-                        else
-                        {
-                            @:Este intercambio está @abierta.Estado.ToLowerInvariant(): ya no se pueden mandar mensajes.
-                        }
-                    </p>
+                    <p class="sw-chat-input small text-suave text-center mb-0">@textoNoPuedeEscribir</p>
                 }
             }
         </section>

@@ -1,0 +1,73 @@
+@{
+    Swappit.Models.ViewModels.DetalleIntercambioViewModel detalle = ViewBag.detalle;
+    Swappit.Models.ViewModels.PanelIntercambioViewModel panel = ViewBag.panel;
+    int idIntercambio = detalle.Intercambio.IdIntercambios;
+}
+@if (panel.Simple && panel.Unico != null)
+{
+    <a href="@Url.Action("Detalle", "Articulos", new { id = panel.Unico.IdArticulos })" class="sw-intercambio-panel">
+        <span class="sw-intercambio-etiqueta">@panel.Etiqueta</span>
+        <span class="sw-img sw-intercambio-foto"><img src="@panel.Unico.Imagen" alt=""></span>
+        <span class="d-block h5 fw-bold mt-3 mb-2">@panel.Unico.Nombre</span>
+        <span class="d-flex flex-wrap align-items-center gap-2 small">
+            <span class="sw-articulo-estado">@panel.Unico.Estado</span>
+            <span class="text-suave">@panel.DeQuien</span>
+        </span>
+    </a>
+}
+else
+{
+    <div class="sw-intercambio-panel sw-intercambio-panel--varios">
+        <span class="sw-intercambio-etiqueta">@panel.Etiqueta · @panel.CantidadTexto</span>
+        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+            @foreach (var fila in panel.Filas)
+            {
+                <li class="sw-intercambio-fila @(fila.Pendiente ? "sw-cambio-pendiente" : "")">
+                    <a href="@Url.Action("Detalle", "Articulos", new { id = fila.IdArticulo })" class="sw-intercambio-item">
+                        <span class="sw-img sw-intercambio-item-img">
+                            @if (fila.TieneImagen)
+                            {
+                                <img src="@fila.Imagen" alt="">
+                            }
+                        </span>
+                        <span class="min-w-0">
+                            <span class="d-block fw-bold text-truncate">@fila.Nombre</span>
+                            <span class="d-flex flex-wrap align-items-center gap-2 small mt-1">
+                                <span class="sw-articulo-estado">@fila.Estado</span>
+                                <span class="text-suave">@panel.DeQuien</span>
+                            </span>
+                            @if (fila.Que != null)
+                            {
+                                <span class="d-block text-suave small mt-1">@fila.Que</span>
+                            }
+                            @if (fila.Etiqueta != null)
+                            {
+                                <span class="sw-cambio-etiqueta @fila.EtiquetaCss">@fila.Etiqueta</span>
+                            }
+                        </span>
+                    </a>
+                    @if (fila.IdCambioCancelable != null)
+                    {
+                        <form method="post" action="@Url.Action("CancelarCambio", "Intercambio", new { id = idIntercambio })" asp-antiforgery="true">
+                            <input type="hidden" name="idCambio" value="@fila.IdCambioCancelable">
+                            <button type="submit" class="sw-cambio-accion">@fila.TextoCancelar</button>
+                        </form>
+                    }
+                    else if (fila.PuedeSacar)
+                    {
+                        <form method="post" action="@Url.Action("SacarArticulo", "Intercambio", new { id = idIntercambio })" asp-antiforgery="true">
+                            <input type="hidden" name="idArticulo" value="@fila.IdArticulo">
+                            <button type="submit" class="sw-cambio-accion">Sacar</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+        @if (panel.BotonAgregar)
+        {
+            <button type="button" class="sw-agregar-articulo mt-2" data-bs-toggle="modal" data-bs-target="@panel.ModalAgregar">
+                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> @panel.TextoAgregar
+            </button>
+        }
+    </div>
+}

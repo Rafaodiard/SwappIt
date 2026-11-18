@@ -1,10 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 @{
-    var usuarioId = Context.Session.GetInt32("UsuarioId");
-    var esVisitante = usuarioId == null;
-    var iniciales = Context.Session.GetString("Iniciales");
-    var foto = Context.Session.GetString("Foto");
+    int? usuarioId = ViewBag.sesionId;
+    bool esVisitante = ViewBag.esVisitante ?? true;
+    string? iniciales = ViewBag.sesionIniciales;
+    string? foto = ViewBag.sesionFoto;
 }
 <head>
     <meta charset="utf-8" />

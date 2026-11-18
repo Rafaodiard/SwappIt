@@ -1,10 +1,12 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
-    string? nombre = ViewBag.nombre;
+    string saludo = ViewBag.saludo;
     List<Swappit.Models.ViewModels.IntercambioViewModel> intercambios = ViewBag.intercambios;
     int porResponder = ViewBag.porResponder;
-    int cantidadEnCurso = ViewBag.cantidadEnCurso;
+    string textoVerTodos = ViewBag.textoVerTodos;
     int cantidadArticulos = ViewBag.cantidadArticulos;
+    string estadoPendiente = ViewBag.estadoPendiente;
+    string ordenParaVos = ViewBag.ordenParaVos;
     int? mensajesSinLeer = ViewBag.mensajesSinLeer;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> destacados = ViewBag.destacados;
     bool errorCarga = ViewBag.errorCarga;
@@ -13,7 +15,7 @@
 <!-- ===== Saludo ===== -->
 <section class="sw-inicio-saludo text-center" aria-labelledby="titulo-inicio">
     <div class="container-xl">
-        <h1 class="mb-3" id="titulo-inicio">@(string.IsNullOrWhiteSpace(nombre) ? "¡Hola!" : $"¡Hola, {nombre}!")</h1>
+        <h1 class="mb-3" id="titulo-inicio">@saludo</h1>
         <p class="lead text-secundario mb-4 mb-md-5">¿Qué vas a intercambiar hoy?</p>
         <div class="d-flex flex-wrap justify-content-center gap-3">
             <a href="@Url.Action("Index", "Publicar")" class="btn btn-lg btn-sw-primario"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar un artículo</a>
@@ -41,7 +43,7 @@
                     <h2 class="font-titulo h4 mb-3" id="titulo-resumen">Tu resumen</h2>
                     <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                         <li>
-                            <a href="@Url.Action("Index", "Intercambio", new { estado = Swappit.Models.EstadosIntercambios.Pendiente })" class="sw-resumen @(porResponder > 0 ? "sw-resumen--alerta" : "")">
+                            <a href="@Url.Action("Index", "Intercambio", new { estado = estadoPendiente })" class="sw-resumen @(porResponder > 0 ? "sw-resumen--alerta" : "")">
                                 <span class="sw-resumen-icono"><i class="bi bi-inbox" aria-hidden="true"></i></span>
                                 <span class="sw-resumen-texto">@(porResponder == 1 ? "Propuesta por responder" : "Propuestas por responder")</span>
                                 <span class="sw-resumen-numero">@porResponder</span>
@@ -70,7 +72,7 @@
                 <section class="sw-card p-3 p-md-4" aria-labelledby="titulo-en-curso">
                     <div class="d-flex justify-content-between align-items-baseline gap-3 mb-3">
                         <h2 class="font-titulo h4 mb-0" id="titulo-en-curso">Intercambios en curso</h2>
-                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold small text-decoration-none text-primario text-nowrap">@(cantidadEnCurso > intercambios.Count ? $"Ver todos ({cantidadEnCurso})" : "Ver todos") <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold small text-decoration-none text-primario text-nowrap">@textoVerTodos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                     </div>
 
                     @if (intercambios.Count > 0)
@@ -78,22 +80,21 @@
                         <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
                             @foreach (var intercambio in intercambios)
                             {
-                                bool responder = intercambio.EsRecibido && intercambio.Estado == Swappit.Models.EstadosIntercambios.Pendiente;
                                 <li>
                                     <a href="@Url.Action("Detalle", "Intercambio", new { id = intercambio.IdIntercambios })" class="sw-inicio-intercambio">
                                         <span class="sw-inicio-intercambio-img sw-img"><img src="@intercambio.SuArticuloImagen" alt=""></span>
                                         <span class="flex-grow-1 min-w-0">
-                                            <span class="sw-inicio-intercambio-nombre">@intercambio.SuArticuloNombre</span>
-                                            <span class="sw-inicio-intercambio-detalle"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @intercambio.MiArticuloNombre</span>
+                                            <span class="sw-inicio-intercambio-nombre">@intercambio.SuArticuloResumen</span>
+                                            <span class="sw-inicio-intercambio-detalle"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @intercambio.MiArticuloResumen</span>
                                             <span class="sw-inicio-intercambio-detalle">con @@@intercambio.OtroUsuario</span>
                                         </span>
-                                        @if (responder)
+                                        @if (intercambio.PorResponder)
                                         {
                                             <span class="sw-estado-intercambio sw-inicio-responder">Responder</span>
                                         }
                                         else
                                         {
-                                            <span class="sw-estado-intercambio sw-estado-intercambio--@intercambio.Estado.ToLowerInvariant()">@intercambio.Estado</span>
+                                            <span class="sw-estado-intercambio sw-estado-intercambio--@(intercambio.EstadoCss)">@intercambio.Estado</span>
                                         }
                                     </a>
                                 </li>
@@ -125,7 +126,7 @@
             <section aria-labelledby="titulo-destacados">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
                     <h2 class="font-titulo h3 text-primario mb-0" id="titulo-destacados">Destacados para vos</h2>
-                    <a href="@Url.Action("Buscar", "Articulos", new { orden = Swappit.Controllers.RecomendacionesController.OrdenParaVos })" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    <a href="@Url.Action("Buscar", "Articulos", new { orden = ordenParaVos })" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                 </div>
 
                 @if (destacados.Count > 0)

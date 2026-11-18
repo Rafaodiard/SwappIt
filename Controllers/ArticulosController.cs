@@ -5,10 +5,8 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class ArticulosController : Controller
+public class ArticulosController : BaseController
 {
-    private const int MaxOpcionesFiltro = 20;
-
     private readonly ILogger<ArticulosController> _logger;
 
     public ArticulosController(ILogger<ArticulosController> logger)
@@ -19,40 +17,37 @@ public class ArticulosController : Controller
     public IActionResult Buscar(string? q, int[]? categoria, int[]? estado, string? orden)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-        string ordenElegido = RecomendacionesController.OrdenValido(orden, usuarioId != null);
-        string? busqueda = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
-        List<int> categoriasSeleccionadas = (categoria ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
-        List<int> estadosSeleccionados = (estado ?? []).Where(id => id > 0).Distinct().Take(MaxOpcionesFiltro).ToList();
+        bool logueado = usuarioId != null;
+        string ordenElegido = Recomendaciones.OrdenValido(orden, logueado);
+        string? busqueda = Catalogo.LimpiarBusqueda(q);
+        List<int> categoriasSeleccionadas = Listas.IdsValidos(categoria, Catalogo.MaxOpcionesFiltro);
+        List<int> estadosSeleccionados = Listas.IdsValidos(estado, Catalogo.MaxOpcionesFiltro);
+        bool hayFiltros = Catalogo.HayFiltros(categoriasSeleccionadas, estadosSeleccionados);
 
-        List<ArticuloCardViewModel> articulos = new List<ArticuloCardViewModel>();
-        List<OpcionFiltroViewModel> categorias = new List<OpcionFiltroViewModel>();
-        List<OpcionFiltroViewModel> estados = new List<OpcionFiltroViewModel>();
-        bool errorCarga = false;
-
+        ViewBag.articulos = new List<ArticuloCardViewModel>();
+        ViewBag.categorias = new List<OpcionFiltroViewModel>();
+        ViewBag.estados = new List<OpcionFiltroViewModel>();
+        ViewBag.errorCarga = false;
         try
         {
-            articulos = BD.GetArticulosCatalogo(busqueda, categorias: categoriasSeleccionadas, estados: estadosSeleccionados, excluirUsuario: usuarioId);
-            articulos = RecomendacionesController.Ordenar(articulos, ordenElegido, usuarioId);
-            categorias = BD.GetFiltroCategorias(busqueda, usuarioId);
-            estados = BD.GetFiltroEstados(busqueda, usuarioId);
+            ViewBag.articulos = Catalogo.Buscar(busqueda, categoriasSeleccionadas, estadosSeleccionados, usuarioId, ordenElegido);
+            ViewBag.categorias = Catalogo.FiltroCategorias(busqueda, usuarioId, categoriasSeleccionadas);
+            ViewBag.estados = Catalogo.FiltroEstados(busqueda, usuarioId, estadosSeleccionados);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron cargar los artículos del catálogo");
-            errorCarga = true;
+            ViewBag.errorCarga = true;
         }
 
-        ViewBag.articulos = articulos;
         ViewBag.busqueda = busqueda;
-        ViewBag.categorias = categorias;
-        ViewBag.estados = estados;
         ViewBag.categoriasSeleccionadas = categoriasSeleccionadas;
-        ViewBag.estadosSeleccionados = estadosSeleccionados;
-        ViewBag.errorCarga = errorCarga;
-        ViewBag.hayFiltros = categoriasSeleccionadas.Count > 0 || estadosSeleccionados.Count > 0;
+        ViewBag.hayFiltros = hayFiltros;
         ViewBag.orden = ordenElegido;
-        ViewBag.opcionesOrden = RecomendacionesController.OpcionesOrden(usuarioId != null);
-        ViewBag.logueado = usuarioId != null;
+        ViewBag.opcionesOrden = Recomendaciones.OpcionesOrden(logueado);
+        ViewBag.titulo = Catalogo.TituloBusqueda(busqueda, ordenElegido);
+        ViewBag.textoSinResultados = Catalogo.TextoSinResultados(busqueda, hayFiltros);
+        ViewBag.registrarBusqueda = Catalogo.HayQueRegistrarBusqueda(logueado, busqueda, categoriasSeleccionadas);
         return View();
     }
 
@@ -60,45 +55,54 @@ public class ArticulosController : Controller
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         ViewBag.errorCarga = false;
+        ViewBag.detalle = null;
+        ViewBag.Title = "Artículo no encontrado";
 
         try
         {
-            Articulos? articulo = BD.GetArticuloById(id);
+            Articulos? articulo = ArticulosBD.GetArticuloById(id);
             if (articulo == null)
             {
                 Response.StatusCode = StatusCodes.Status404NotFound;
-                ViewBag.detalle = null;
                 return View();
             }
 
-            Usuarios dueno = BD.GetUsuarioById(articulo.IdUsuarios)!;
-            bool esPropio = usuarioId == articulo.IdUsuarios;
+            Usuarios dueno = UsuariosBD.GetUsuarioById(articulo.IdUsuarios)!;
+            List<string> imagenes = ArticulosBD.GetImagenesArticulo(articulo.IdArticulos);
+            List<ArticuloCardViewModel> misArticulos = Catalogo.ArticulosParaOfrecer(usuarioId, articulo);
+            int? idPropuestaEnCurso = Catalogo.PropuestaEnCurso(usuarioId, articulo);
+            bool comprometido = IntercambiosBD.ArticuloComprometido(articulo.IdArticulos);
 
+            ViewBag.Title = articulo.Nombre;
             ViewBag.detalle = articulo;
-            ViewBag.imagenes = BD.GetImagenesArticulo(articulo.IdArticulos);
-            ViewBag.categoria = BD.GetCategoriaById(articulo.IdCategorias);
-            ViewBag.categoriaACambio = articulo.IdCategoriaACambio.HasValue ? BD.GetCategoriaById(articulo.IdCategoriaACambio.Value) : null;
-            ViewBag.estado = BD.GetEstadoArticuloById(articulo.IdEstado);
+            ViewBag.fotos = Catalogo.Fotos(imagenes);
+            ViewBag.fotoPrincipal = Catalogo.FotoPrincipal(imagenes);
+            ViewBag.altFotoPrincipal = Catalogo.AltFotoPrincipal(articulo, imagenes);
+            ViewBag.categoria = ArticulosBD.GetCategoriaById(articulo.IdCategorias);
+            ViewBag.textoACambio = Catalogo.TextoACambio(articulo);
+            ViewBag.estado = ArticulosBD.GetEstadoArticuloById(articulo.IdEstado);
             ViewBag.dueno = dueno;
-            ViewBag.fotoDueno = BD.GetFotoUsuario(dueno.IdUsuarios);
-            ViewBag.provinciaDueno = BD.GetProvinciaById(dueno.IdProvincias);
-            ViewBag.otrosArticulos = BD.GetArticulosCatalogo(idUsuario: dueno.IdUsuarios)
-                .Where(a => a.IdArticulos != articulo.IdArticulos).Take(4).ToList();
-            ViewBag.esPropio = esPropio;
-            ViewBag.comprometido = BD.ArticuloComprometido(articulo.IdArticulos);
+            ViewBag.inicialesDueno = SesionUsuario.Iniciales(dueno.Nombre, dueno.Apellido);
+            ViewBag.fotoDueno = UsuariosBD.GetFotoUsuario(dueno.IdUsuarios);
+            ViewBag.ubicacion = Catalogo.Ubicacion(articulo, dueno);
+            ViewBag.otrosArticulos = ArticulosBD.GetArticulosCatalogo(cantidad: 4, idUsuario: dueno.IdUsuarios, excluirArticulo: articulo.IdArticulos);
+            ViewBag.esPropio = usuarioId == articulo.IdUsuarios;
+            ViewBag.comprometido = comprometido;
             ViewBag.logueado = usuarioId != null;
-            ViewBag.misArticulos = usuarioId != null && !esPropio
-                ? BD.GetArticulosCatalogo(idUsuario: usuarioId.Value)
-                : new List<ArticuloCardViewModel>();
-            ViewBag.idPropuestaEnCurso = usuarioId != null && !esPropio
-                ? BD.GetIdPropuestaEnCurso(usuarioId.Value, articulo.IdArticulos)
-                : null;
+            ViewBag.misArticulos = misArticulos;
+            ViewBag.idPropuestaEnCurso = idPropuestaEnCurso;
+            ViewBag.puedeProponer = Catalogo.PuedeProponer(usuarioId, articulo, idPropuestaEnCurso, comprometido);
+            ViewBag.maxOfrecidos = Intercambios.MaxArticulosOfrecidos;
+            ViewBag.leyendaOfrecer = Catalogo.LeyendaOfrecer(misArticulos.Count);
+            ViewBag.mensaje = TempData["MensajeArticulo"] as string;
+            ViewBag.error = TempData["ErrorArticulo"] as string;
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudo cargar el artículo {IdArticulo}", id);
             ViewBag.errorCarga = true;
             ViewBag.detalle = null;
+            ViewBag.Title = "Artículo";
         }
         return View();
     }

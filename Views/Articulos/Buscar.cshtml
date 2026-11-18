@@ -6,19 +6,13 @@
     List<OpcionFiltroViewModel> categorias = ViewBag.categorias;
     List<OpcionFiltroViewModel> estados = ViewBag.estados;
     List<int> categoriasSeleccionadas = ViewBag.categoriasSeleccionadas;
-    List<int> estadosSeleccionados = ViewBag.estadosSeleccionados;
     bool errorCarga = ViewBag.errorCarga;
     bool hayFiltros = ViewBag.hayFiltros;
     string orden = ViewBag.orden;
     List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> opcionesOrden = ViewBag.opcionesOrden;
-    bool logueado = ViewBag.logueado;
-    string titulo = orden switch
-    {
-        Swappit.Controllers.RecomendacionesController.OrdenParaVos => "Elegidos para vos",
-        Swappit.Controllers.RecomendacionesController.OrdenRecientes => "Recién publicados",
-        Swappit.Controllers.RecomendacionesController.OrdenAZ => "Todos los artículos",
-        _ => "Los más buscados"
-    };
+    string titulo = ViewBag.titulo;
+    string textoSinResultados = ViewBag.textoSinResultados;
+    bool registrarBusqueda = ViewBag.registrarBusqueda;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -31,7 +25,7 @@
             </button>
 
             <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
-                @if (!string.IsNullOrEmpty(busqueda))
+                @if (busqueda != null)
                 {
                     <input type="hidden" name="q" value="@busqueda">
                 }
@@ -47,11 +41,10 @@
                 <div id="filtro-categorias" class="mb-4">
                     @foreach (var cat in categorias)
                     {
-                        var idCat = "cat-" + cat.Valor;
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="@idCat"
-                                   checked="@(categoriasSeleccionadas.Any(c => c.ToString() == cat.Valor))">
-                            <label class="form-check-label" for="@idCat">@cat.Texto</label>
+                            <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="cat-@(cat.Valor)"
+                                   checked="@cat.Seleccionada">
+                            <label class="form-check-label" for="cat-@(cat.Valor)">@cat.Texto</label>
                             <span class="contador">@cat.Cantidad</span>
                         </div>
                     }
@@ -61,10 +54,9 @@
                 <div>
                     @foreach (var est in estados)
                     {
-                        var idEst = "est-" + est.Valor;
-                        <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="@idEst"
-                               checked="@(estadosSeleccionados.Any(e => e.ToString() == est.Valor))">
-                        <label class="sw-chip" for="@idEst">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
+                        <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="est-@(est.Valor)"
+                               checked="@est.Seleccionada">
+                        <label class="sw-chip" for="est-@(est.Valor)">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
                     }
                 </div>
 
@@ -75,10 +67,7 @@
         <!-- ===== Resultados ===== -->
         <section class="col-lg-9">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                <h1 class="font-titulo h2 mb-0">
-                    @if (string.IsNullOrEmpty(busqueda)) { @titulo }
-                    else { <text>Resultados para “@busqueda”</text> }
-                </h1>
+                <h1 class="font-titulo h2 mb-0">@titulo</h1>
                 <div class="d-flex align-items-center gap-2">
                     <select class="form-select form-select-sm" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por" style="width:auto">
                         @foreach (var opcion in opcionesOrden)
@@ -114,17 +103,14 @@
             {
                 <div id="sin-resultados" class="text-center py-5 @(articulos.Count > 0 ? "d-none" : "")">
                     <i class="bi bi-inbox fs-1 text-suave"></i>
-                    <p class="text-suave mt-2">
-                        @if (string.IsNullOrEmpty(busqueda) && !hayFiltros) { <text>Todavía no hay objetos publicados.</text> }
-                        else { <text>No encontramos objetos con esos filtros.</text> }
-                    </p>
+                    <p class="text-suave mt-2">@textoSinResultados</p>
                 </div>
             }
         </section>
     </div>
 </div>
 
-@if (logueado && (!string.IsNullOrEmpty(busqueda) || categoriasSeleccionadas.Count > 0))
+@if (registrarBusqueda)
 {
     <form hidden data-reco-busqueda method="post" asp-antiforgery="true" action="@Url.Action("Busqueda", "Recomendaciones")">
         <input type="hidden" name="texto" value="@busqueda">

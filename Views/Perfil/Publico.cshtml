@@ -1,6 +1,5 @@
 @{
     Swappit.Models.Usuarios? usuario = ViewBag.usuario;
-    ViewData["Title"] = usuario != null ? $"{usuario.Nombre} {usuario.Apellido}" : "Usuario no encontrado";
 }
 
 @if (usuario == null)
@@ -17,11 +16,11 @@
 }
 
 @{
-    Swappit.Models.Provincias? provincia = ViewBag.provincia;
     string? foto = ViewBag.foto;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
-    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
-    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string iniciales = ViewBag.iniciales;
+    string ubicacion = ViewBag.ubicacion;
+    bool tieneDescripcion = ViewBag.tieneDescripcion;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -44,7 +43,7 @@
                     <div class="min-w-0">
                         <h1 class="font-titulo h2 mb-0">@usuario.Nombre @usuario.Apellido</h1>
                         <p class="text-suave mb-2">@@@usuario.Usuario</p>
-                        @if (!string.IsNullOrWhiteSpace(usuario.Descripcion))
+                        @if (tieneDescripcion)
                         {
                             <p class="sw-perfil-descripcion mb-3">@usuario.Descripcion</p>
                         }

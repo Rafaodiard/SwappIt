@@ -5,7 +5,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class NotificacionesController : Controller
+public class NotificacionesController : BaseController
 {
     private const int CantidadEnPopup = 20;
 
@@ -24,20 +24,20 @@ public class NotificacionesController : Controller
             return Unauthorized();
         }
 
-        List<NotificacionViewModel> notificaciones = new List<NotificacionViewModel>();
-        bool errorCarga = false;
+        ViewBag.nuevas = new List<NotificacionViewModel>();
+        ViewBag.anteriores = new List<NotificacionViewModel>();
+        ViewBag.errorCarga = false;
         try
         {
-            notificaciones = BD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
+            List<NotificacionViewModel> notificaciones = NotificacionesBD.GetNotificaciones(usuarioId.Value, CantidadEnPopup);
+            ViewBag.nuevas = Notificaciones.Filtrar(notificaciones, leidas: false);
+            ViewBag.anteriores = Notificaciones.Filtrar(notificaciones, leidas: true);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron cargar las notificaciones del usuario {IdUsuario}", usuarioId);
-            errorCarga = true;
+            ViewBag.errorCarga = true;
         }
-
-        ViewBag.notificaciones = notificaciones;
-        ViewBag.errorCarga = errorCarga;
         return PartialView("_Lista");
     }
 
@@ -51,7 +51,7 @@ public class NotificacionesController : Controller
 
         try
         {
-            return Json(new { cantidad = BD.GetCantidadNotificacionesNoLeidas(usuarioId.Value) });
+            return Json(new { cantidad = NotificacionesBD.GetCantidadNotificacionesNoLeidas(usuarioId.Value) });
         }
         catch (SqlException ex)
         {
@@ -73,7 +73,7 @@ public class NotificacionesController : Controller
         NotificacionViewModel? notificacion;
         try
         {
-            notificacion = BD.MarcarNotificacionLeida(id, usuarioId.Value);
+            notificacion = NotificacionesBD.MarcarNotificacionLeida(id, usuarioId.Value);
         }
         catch (SqlException ex)
         {
@@ -85,7 +85,7 @@ public class NotificacionesController : Controller
         {
             return NotFound();
         }
-        if (notificacion.Tipo == TipoNotificaciones.MensajeNuevo)
+        if (notificacion.EsDeChat)
         {
             return RedirectToAction("Index", "Chat", new { id = notificacion.IdIntercambio });
         }
@@ -104,7 +104,7 @@ public class NotificacionesController : Controller
 
         try
         {
-            BD.MarcarNotificacionesLeidas(usuarioId.Value);
+            NotificacionesBD.MarcarNotificacionesLeidas(usuarioId.Value);
             return NoContent();
         }
         catch (SqlException ex)

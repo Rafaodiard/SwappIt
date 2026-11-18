@@ -1,8 +1,7 @@
 @{
     ViewData["Title"] = "Mis intercambios";
     List<Swappit.Models.ViewModels.IntercambioViewModel> intercambios = ViewBag.intercambios;
-    List<Swappit.Models.EstadosIntercambios> estados = ViewBag.estados;
-    Dictionary<string, int> cantidadPorEstado = ViewBag.cantidadPorEstado;
+    List<Swappit.Models.ViewModels.FiltroEstadoViewModel> filtros = ViewBag.filtros;
     int total = ViewBag.total;
     string? estadoElegido = ViewBag.estadoElegido;
     bool errorCarga = ViewBag.errorCarga;
@@ -27,14 +26,10 @@
     @if (total > 0)
     {
         <nav class="mb-3" aria-label="Filtrar por estado">
-            <a href="@Url.Action("Index", "Intercambio")" class="sw-chip @(estadoElegido == null ? "activo" : "")" aria-current="@(estadoElegido == null ? "page" : null)">
-                Todos <span class="sw-chip-cantidad">@total</span>
-            </a>
-            @foreach (var estado in estados)
+            @foreach (var filtro in filtros)
             {
-                bool elegido = estado.Nombre == estadoElegido;
-                <a href="@Url.Action("Index", "Intercambio", new { estado = estado.Nombre })" class="sw-chip @(elegido ? "activo" : "")" aria-current="@(elegido ? "page" : null)">
-                    @(estado.Nombre)s <span class="sw-chip-cantidad">@cantidadPorEstado.GetValueOrDefault(estado.Nombre ?? "")</span>
+                <a href="@Url.Action("Index", "Intercambio", new { estado = filtro.Nombre })" class="sw-chip @(filtro.Elegido ? "activo" : "")" aria-current="@(filtro.Elegido ? "page" : null)">
+                    @filtro.Texto <span class="sw-chip-cantidad">@filtro.Cantidad</span>
                 </a>
             }
         </nav>
@@ -64,7 +59,7 @@
         {
             <div class="text-center py-5 px-3">
                 <i class="bi bi-funnel fs-1 text-suave"></i>
-                <p class="text-suave mt-2 mb-3">No tenés intercambios en estado @estadoElegido?.ToLowerInvariant().</p>
+                <p class="text-suave mt-2 mb-3">No tenés intercambios en estado @estadoElegido.</p>
                 <a href="@Url.Action("Index", "Intercambio")" class="btn btn-sw-outline btn-sm">Ver todos</a>
             </div>
         }

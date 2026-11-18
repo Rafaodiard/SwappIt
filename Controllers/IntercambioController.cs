@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Swappit.Models;
 using Swappit.Models.ViewModels;
@@ -6,7 +6,7 @@ using Swappit.Services;
 
 namespace Swappit.Controllers;
 
-public class IntercambioController : Controller
+public class IntercambioController : BaseController
 {
     private readonly ILogger<IntercambioController> _logger;
     private readonly EmailService _emailService;
@@ -25,28 +25,25 @@ public class IntercambioController : Controller
             return RedirectToAction("Index", "Account");
         }
 
-        List<IntercambioViewModel> intercambios = new List<IntercambioViewModel>();
-        List<EstadosIntercambios> estados = new List<EstadosIntercambios>();
-        bool errorCarga = false;
+        ViewBag.intercambios = new List<IntercambioViewModel>();
+        ViewBag.filtros = new List<FiltroEstadoViewModel>();
+        ViewBag.total = 0;
+        ViewBag.estadoElegido = null;
+        ViewBag.errorCarga = false;
         try
         {
-            intercambios = BD.GetIntercambios(usuarioId.Value);
-            estados = BD.GetEstadosIntercambios();
+            List<EstadosIntercambios> estados = IntercambiosBD.GetEstadosIntercambios();
+            string? estadoElegido = GestionIntercambios.EstadoValido(estados, estado);
+            ViewBag.intercambios = IntercambiosBD.GetIntercambios(usuarioId.Value, estado: estadoElegido);
+            ViewBag.filtros = GestionIntercambios.FiltrosPorEstado(usuarioId.Value, estados, estadoElegido, out int total);
+            ViewBag.total = total;
+            ViewBag.estadoElegido = estadoElegido?.ToLowerInvariant();
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudieron cargar los intercambios del usuario {IdUsuario}", usuarioId);
-            errorCarga = true;
+            ViewBag.errorCarga = true;
         }
-
-        string? estadoElegido = estados.Any(e => e.Nombre == estado) ? estado : null;
-
-        ViewBag.intercambios = estadoElegido == null ? intercambios : intercambios.Where(i => i.Estado == estadoElegido).ToList();
-        ViewBag.total = intercambios.Count;
-        ViewBag.cantidadPorEstado = intercambios.GroupBy(i => i.Estado).ToDictionary(g => g.Key, g => g.Count());
-        ViewBag.estados = estados;
-        ViewBag.estadoElegido = estadoElegido;
-        ViewBag.errorCarga = errorCarga;
         return View();
     }
 
@@ -59,36 +56,32 @@ public class IntercambioController : Controller
         }
 
         ViewBag.errorCarga = false;
+        ViewBag.detalle = null;
         try
         {
-            IntercambioViewModel? intercambio = BD.GetIntercambio(id, usuarioId.Value);
-            if (intercambio == null)
+            DetalleIntercambioViewModel? detalle = DetalleIntercambio.Armar(id, usuarioId.Value);
+            if (detalle == null)
             {
                 Response.StatusCode = StatusCodes.Status404NotFound;
             }
-            else
-            {
-                ViewBag.fotoOtro = BD.GetFotoUsuario(intercambio.OtroIdUsuario);
-                ViewBag.articuloComprometido = intercambio.Estado == EstadosIntercambios.Pendiente
-                    && (BD.ArticuloComprometido(intercambio.MiArticuloId) || BD.ArticuloComprometido(intercambio.SuArticuloId));
-                ViewBag.pendientesQueSeRechazan = intercambio.EsRecibido && intercambio.Estado == EstadosIntercambios.Pendiente
-                    ? BD.ContarPendientesDeArticulos(intercambio.IdIntercambios)
-                    : 0;
-            }
-            ViewBag.intercambio = intercambio;
+            ViewBag.detalle = detalle;
+            ViewBag.Title = DetalleIntercambio.Titulo(detalle?.Intercambio);
         }
         catch (SqlException ex)
         {
             _logger.LogError(ex, "No se pudo cargar el intercambio {IdIntercambio}", id);
             ViewBag.errorCarga = true;
-            ViewBag.intercambio = null;
+            ViewBag.detalle = null;
+            ViewBag.Title = DetalleIntercambio.Titulo(null);
         }
+        ViewBag.mensaje = TempData["MensajeIntercambio"] as string;
+        ViewBag.error = TempData["ErrorIntercambio"] as string;
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Proponer(int idArticuloPedido, int idArticuloOfrecido)
+    public IActionResult Proponer(int idArticuloPedido, int[]? idsArticulosOfrecidos)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -98,52 +91,20 @@ public class IntercambioController : Controller
 
         try
         {
-            Articulos? pedido = BD.GetArticuloById(idArticuloPedido);
-            if (pedido == null)
+            Resultado resultado = GestionIntercambios.Proponer(usuarioId.Value, idArticuloPedido, idsArticulosOfrecidos);
+            if (resultado.NoExiste)
             {
                 return NotFound();
             }
-
-            string? error = null;
-            Articulos? ofrecido = idArticuloOfrecido > 0 ? BD.GetArticuloById(idArticuloOfrecido) : null;
-            if (pedido.IdUsuarios == usuarioId)
+            if (resultado.Error != null)
             {
-                error = "No podés proponer un intercambio por un artículo tuyo.";
-            }
-            else if (ofrecido == null || ofrecido.IdUsuarios != usuarioId)
-            {
-                error = "Elegí uno de tus artículos para ofrecer a cambio.";
-            }
-            else if (BD.ContarIntercambiosActivos(usuarioId.Value) >= 5)
-            {
-                error = "Tenés 5 intercambios activos. Cuando uno se resuelva, podés hacer otro.";
-            }
-            else if (BD.ArticuloComprometido(pedido.IdArticulos))
-            {
-                error = "Este artículo ya tiene un intercambio aceptado.";
-            }
-            else if (BD.ArticuloComprometido(ofrecido.IdArticulos))
-            {
-                error = "El artículo que elegiste ya tiene un intercambio aceptado. Elegí otro.";
-            }
-
-            if (error != null)
-            {
-                TempData["ErrorArticulo"] = error;
+                TempData["ErrorArticulo"] = resultado.Error;
                 return RedirectToAction("Detalle", "Articulos", new { id = idArticuloPedido });
             }
 
-            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            int? idIntercambio = BD.ProponerIntercambio(usuarioId.Value, idArticuloOfrecido, pedido.IdUsuarios, idArticuloPedido, creadas);
-            if (idIntercambio == null)
-            {
-                TempData["ErrorArticulo"] = "Ya tenés una propuesta en curso por este artículo.";
-                return RedirectToAction("Detalle", "Articulos", new { id = idArticuloPedido });
-            }
-            _emailService.EnviarNotificaciones(creadas, Url);
-
-            TempData["MensajeIntercambio"] = "¡Listo! Enviaste tu propuesta. Cuando la respondan, la vas a ver acá.";
-            return RedirectToAction("Detalle", new { id = idIntercambio });
+            _emailService.EnviarNotificaciones(resultado.Notificaciones, Url);
+            TempData["MensajeIntercambio"] = resultado.Mensaje;
+            return RedirectToAction("Detalle", new { id = resultado.Id });
         }
         catch (SqlException ex)
         {
@@ -155,76 +116,77 @@ public class IntercambioController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Aceptar(int id)
+    public IActionResult Aceptar(int id, int ultimoCambio)
     {
-        string mensaje = "Aceptaste el intercambio. Ahora coordinen dónde y cuándo hacerlo.";
-        try
-        {
-            int pendientes = BD.ContarPendientesDeArticulos(id);
-            if (pendientes > 0)
-            {
-                mensaje += pendientes == 1
-                    ? " Se rechazó automáticamente otra propuesta que incluía estos artículos."
-                    : $" Se rechazaron automáticamente otras {pendientes} propuestas que incluían estos artículos.";
-            }
-        }
-        catch (SqlException ex)
-        {
-            _logger.LogError(ex, "No se pudieron contar las propuestas pendientes del intercambio {IdIntercambio}", id);
-        }
-        return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Aceptado, soloQuienRecibe: true,
-            TipoNotificaciones.PropuestaAceptada, mensaje);
+        return Responder(id, idUsuario => GestionIntercambios.Aceptar(id, idUsuario, ultimoCambio),
+            "No pudimos actualizar el intercambio. Probá de nuevo en un rato.");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Rechazar(int id)
     {
-        return CambiarEstado(id, EstadosIntercambios.Pendiente, EstadosIntercambios.Rechazado, soloQuienRecibe: true,
-            TipoNotificaciones.PropuestaRechazada, "Rechazaste la propuesta.");
+        return Responder(id, idUsuario => GestionIntercambios.Rechazar(id, idUsuario),
+            "No pudimos actualizar el intercambio. Probá de nuevo en un rato.");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult MarcarRealizado(int id)
     {
-        return CambiarEstado(id, EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado, soloQuienRecibe: false,
-            tipoNotificacion: null, "¡Intercambio realizado!");
+        return Responder(id, idUsuario => GestionIntercambios.MarcarRealizado(id, idUsuario),
+            "No pudimos actualizar el intercambio. Probá de nuevo en un rato.");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Cancelar(int id)
     {
-        int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-        if (usuarioId == null)
-        {
-            return RedirectToAction("Index", "Account");
-        }
-
-        try
-        {
-            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (BD.CancelarIntercambio(id, usuarioId.Value, creadas))
-            {
-                _emailService.EnviarNotificaciones(creadas, Url);
-                TempData["MensajeIntercambio"] = "Cancelaste el intercambio. Le avisamos a la otra persona.";
-            }
-            else
-            {
-                TempData["ErrorIntercambio"] = "No se pudo cancelar el intercambio. Puede que ya haya cambiado de estado.";
-            }
-        }
-        catch (SqlException ex)
-        {
-            _logger.LogError(ex, "No se pudo cancelar el intercambio {IdIntercambio}", id);
-            TempData["ErrorIntercambio"] = "No pudimos cancelar el intercambio. Probá de nuevo en un rato.";
-        }
-        return RedirectToAction("Detalle", new { id });
+        return Responder(id, idUsuario => GestionIntercambios.Cancelar(id, idUsuario),
+            "No pudimos cancelar el intercambio. Probá de nuevo en un rato.");
     }
 
-    private IActionResult CambiarEstado(int id, string estadoActual, string estadoNuevo, bool soloQuienRecibe,
-        string? tipoNotificacion, string mensaje)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AgregarArticulos(int id, int[]? idsArticulos)
+    {
+        return Responder(id, idUsuario => GestionIntercambios.AgregarArticulos(id, idUsuario, idsArticulos),
+            "No pudimos guardar el cambio. Probá de nuevo en un rato.");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult PedirArticulo(int id, int idArticulo)
+    {
+        return Responder(id, idUsuario => GestionIntercambios.PedirArticulo(id, idUsuario, idArticulo),
+            "No pudimos guardar el cambio. Probá de nuevo en un rato.");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult SacarArticulo(int id, int idArticulo)
+    {
+        return Responder(id, idUsuario => GestionIntercambios.SacarArticulo(id, idUsuario, idArticulo),
+            "No pudimos guardar el cambio. Probá de nuevo en un rato.");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ResponderCambio(int id, int idCambio, bool aceptar)
+    {
+        return Responder(id, idUsuario => GestionIntercambios.ResponderCambio(id, idUsuario, idCambio, aceptar),
+            "No pudimos guardar el cambio. Probá de nuevo en un rato.");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult CancelarCambio(int id, int idCambio)
+    {
+        return Responder(id, idUsuario => GestionIntercambios.CancelarCambio(id, idUsuario, idCambio),
+            "No pudimos guardar el cambio. Probá de nuevo en un rato.");
+    }
+
+    private IActionResult Responder(int id, Func<int, Resultado> accion, string errorBase)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -234,21 +196,25 @@ public class IntercambioController : Controller
 
         try
         {
-            List<NotificacionCreada> creadas = new List<NotificacionCreada>();
-            if (BD.CambiarEstadoIntercambio(id, usuarioId.Value, estadoActual, estadoNuevo, soloQuienRecibe, tipoNotificacion, creadas))
+            Resultado resultado = accion(usuarioId.Value);
+            if (resultado.NoExiste)
             {
-                _emailService.EnviarNotificaciones(creadas, Url);
-                TempData["MensajeIntercambio"] = mensaje;
+                return NotFound();
+            }
+            if (resultado.Error != null)
+            {
+                TempData["ErrorIntercambio"] = resultado.Error;
             }
             else
             {
-                TempData["ErrorIntercambio"] = "No se pudo actualizar el intercambio. Puede que ya haya cambiado de estado.";
+                _emailService.EnviarNotificaciones(resultado.Notificaciones, Url);
+                TempData["MensajeIntercambio"] = resultado.Mensaje;
             }
         }
         catch (SqlException ex)
         {
-            _logger.LogError(ex, "No se pudo pasar el intercambio {IdIntercambio} a {Estado}", id, estadoNuevo);
-            TempData["ErrorIntercambio"] = "No pudimos actualizar el intercambio. Probá de nuevo en un rato.";
+            _logger.LogError(ex, "No se pudo actualizar el intercambio {IdIntercambio}", id);
+            TempData["ErrorIntercambio"] = errorBase;
         }
         return RedirectToAction("Detalle", new { id });
     }

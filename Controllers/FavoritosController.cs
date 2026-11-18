@@ -5,7 +5,7 @@ using Swappit.Models.ViewModels;
 
 namespace Swappit.Controllers;
 
-public class FavoritosController : Controller
+public class FavoritosController : BaseController
 {
     private const int MaxImportar = 100;
 
@@ -25,10 +25,13 @@ public class FavoritosController : Controller
         }
 
         ViewBag.articulos = new List<ArticuloCardViewModel>();
+        ViewBag.textoCantidad = "";
         ViewBag.errorCarga = false;
         try
         {
-            ViewBag.articulos = BD.GetFavoritos(usuarioId.Value);
+            List<ArticuloCardViewModel> articulos = FavoritosBD.GetFavoritos(usuarioId.Value);
+            ViewBag.articulos = articulos;
+            ViewBag.textoCantidad = Listas.Contar(articulos.Count, "favorito", "favoritos");
         }
         catch (SqlException ex)
         {
@@ -49,7 +52,7 @@ public class FavoritosController : Controller
 
         try
         {
-            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+            return Json(FavoritosBD.GetIdsFavoritos(usuarioId.Value));
         }
         catch (SqlException ex)
         {
@@ -70,7 +73,7 @@ public class FavoritosController : Controller
 
         try
         {
-            bool? esFavorito = BD.AlternarFavorito(usuarioId.Value, idArticulo);
+            bool? esFavorito = FavoritosBD.AlternarFavorito(usuarioId.Value, idArticulo);
             if (esFavorito == null)
             {
                 return NotFound();
@@ -94,11 +97,11 @@ public class FavoritosController : Controller
             return Unauthorized();
         }
 
-        List<int> pedidos = (ids ?? []).Where(id => id > 0).Distinct().Take(MaxImportar).ToList();
+        List<int> pedidos = Listas.IdsValidos(ids, MaxImportar);
         try
         {
-            BD.ImportarFavoritos(usuarioId.Value, pedidos);
-            return Json(BD.GetIdsFavoritos(usuarioId.Value));
+            FavoritosBD.ImportarFavoritos(usuarioId.Value, pedidos);
+            return Json(FavoritosBD.GetIdsFavoritos(usuarioId.Value));
         }
         catch (SqlException ex)
         {

@@ -3,10 +3,6 @@
     Swappit.Models.ViewModels.LoginViewModel? login = ViewBag.login;
 }
 
-@functions {
-    string ClaseError(string campo) => ViewData.ModelState[campo]?.Errors.Count > 0 ? "input-validation-error" : "";
-}
-
 <section class="sw-auth">
     <div class="sw-auth-card sw-auth-card--angosta">
         <header class="sw-auth-encabezado">
@@ -23,13 +19,13 @@
 
             <div class="sw-campo">
                 <label class="sw-label" for="Mail">Email</label>
-                <input class="sw-input @ClaseError("Mail")" id="Mail" name="Mail" value="@login?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                <input class="sw-input" id="Mail" name="Mail" value="@login?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
                 @Html.ValidationMessage("Mail", new { @class = "sw-error" })
             </div>
 
             <div class="sw-campo">
                 <label class="sw-label" for="Contrasena">Contraseña</label>
-                <input class="sw-input @ClaseError("Contrasena")" id="Contrasena" name="Contrasena" type="password" placeholder="Tu contraseña" autocomplete="current-password" maxlength="50">
+                <input class="sw-input" id="Contrasena" name="Contrasena" type="password" placeholder="Tu contraseña" autocomplete="current-password" maxlength="50">
                 @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
                 <a href="#" class="sw-link sw-link-chico sw-campo-extra">¿Olvidaste tu contraseña?</a>
             </div>

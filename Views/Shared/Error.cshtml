@@ -10,7 +10,7 @@
         <p class="text-suave mb-4">Hubo un problema al procesar tu pedido. Probá de nuevo en unos minutos.</p>
         <a href="@Url.Action("Index", "Home")" class="btn btn-sw-primario">Volver al inicio</a>
 
-        @if (!string.IsNullOrEmpty(requestId))
+        @if (requestId != null)
         {
             <p class="small text-suave mt-4 mb-0">Código del error: <code>@requestId</code></p>
         }

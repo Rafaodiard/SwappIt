@@ -1,15 +1,18 @@
 @{
     ViewData["Title"] = "Mi perfil";
     Swappit.Models.Usuarios usuario = ViewBag.usuario;
-    Swappit.Models.Provincias? provincia = ViewBag.provincia;
-    string iniciales = $"{usuario.Nombre?.FirstOrDefault()}{usuario.Apellido?.FirstOrDefault()}".ToUpper();
-    string ubicacion = string.Join(", ", new[] { usuario.Barrio, provincia?.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    string iniciales = ViewBag.iniciales;
+    string ubicacion = ViewBag.ubicacion;
+    bool tieneDescripcion = ViewBag.tieneDescripcion;
+    string telefono = ViewBag.telefono;
     List<Swappit.Models.Provincias> provincias = ViewBag.provincias;
     string? foto = ViewBag.foto;
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
     List<Swappit.Models.ViewModels.IntercambioViewModel> intercambios = ViewBag.intercambios;
-    string? errorPerfil = TempData["ErrorPerfil"] as string;
-    string? mensajePerfil = TempData["MensajePerfil"] as string;
+    int maxFotoMB = ViewBag.maxFotoMB;
+    int maxDescripcion = ViewBag.maxDescripcion;
+    string? errorPerfil = ViewBag.errorPerfil;
+    string? mensajePerfil = ViewBag.mensajePerfil;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -42,7 +45,7 @@
                     <div>
                         <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
                         <p class="text-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
-                        @if (!string.IsNullOrWhiteSpace(usuario.Descripcion))
+                        @if (tieneDescripcion)
                         {
                             <p class="sw-perfil-descripcion mb-3" data-campo="descripcion">@usuario.Descripcion</p>
                         }
@@ -82,12 +85,12 @@
                     <li class="d-flex align-items-center gap-3">
                         <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-telephone-fill"></i></span>
                         <span class="fw-semibold sw-info-etiqueta">Teléfono</span>
-                        <span class="text-suave sw-info-valor" data-campo="telefono">@(string.IsNullOrEmpty(usuario.Telefono) ? "—" : usuario.Telefono)</span>
+                        <span class="text-suave sw-info-valor" data-campo="telefono">@telefono</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
                         <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
                         <span class="fw-semibold sw-info-etiqueta">Barrio</span>
-                        <span class="text-suave sw-info-valor" data-campo="barrio">@(ubicacion != "" ? ubicacion : "—")</span>
+                        <span class="text-suave sw-info-valor" data-campo="barrio">@ubicacion</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
                         <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-calendar-fill"></i></span>
@@ -115,13 +118,11 @@
                 @if (articulos.Count > 0)
                 {
                     <div id="mis-articulos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-                        @{ ViewBag.ocultarFavorito = true; /* son mis artículos: sin corazón */ }
                         @foreach (var articulo in articulos)
                         {
                             ViewBag.articulo = articulo;
                             <partial name="_CardObjeto" />
                         }
-                        @{ ViewBag.ocultarFavorito = null; }
                     </div>
                 }
                 else
@@ -201,9 +202,9 @@
                             <button type="button" class="sw-btn sw-btn-contorno @(foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
                         </div>
                         <input type="file" class="d-none" id="Foto" name="Foto" accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                               data-max-mb="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxFotoMB">
+                               data-max-mb="@maxFotoMB">
                         <input type="hidden" id="QuitarFoto" name="QuitarFoto" value="false">
-                        <span class="sw-ayuda">JPG o PNG, hasta @Swappit.Models.ViewModels.EditarPerfilViewModel.MaxFotoMB MB.</span>
+                        <span class="sw-ayuda">JPG o PNG, hasta @maxFotoMB MB.</span>
                         <span class="sw-error" id="error-foto" role="alert"></span>
                     </div>
                 </div>
@@ -249,9 +250,9 @@
 
                 <div class="sw-campo">
                     <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4" maxlength="@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion"
+                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4" maxlength="@maxDescripcion"
                               placeholder="Contá quién sos, qué te gusta intercambiar o cómo preferís coordinar…">@usuario.Descripcion</textarea>
-                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@Swappit.Models.ViewModels.EditarPerfilViewModel.MaxDescripcion</span>
+                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
                     <span class="sw-ayuda">La ven todos en tu perfil público.</span>
                 </div>
 
