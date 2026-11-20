@@ -694,6 +694,7 @@ BEGIN
         a1.Nombre AS Articulo1,
         a1.Cantidad AS CantidadOfrecidos,
         a2.Nombre AS Articulo2,
+        a2.Cantidad AS CantidadPedidos,
         DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) AS DiasTranscurridos,
         COUNT(m.IdMensajes) AS MensajesTotales,
         ISNULL(SUM(CASE WHEN m.fueVisto = 0 THEN 1 ELSE 0 END), 0) AS MensajesNoVistos,
@@ -710,7 +711,7 @@ BEGIN
         INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
         WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios1
         ORDER BY ai.Id) a1
-    CROSS APPLY (SELECT TOP 1 a.Nombre
+    CROSS APPLY (SELECT TOP 1 a.Nombre, COUNT(*) OVER () AS Cantidad
         FROM ArticulosIntercambios ai
         INNER JOIN Articulos a ON a.IdArticulos = ai.IdArticulo
         WHERE ai.IdIntercambio = Intercambios.IdIntercambios AND a.IdUsuarios = Intercambios.IdUsuarios2
@@ -718,7 +719,7 @@ BEGIN
     LEFT JOIN Mensajes m ON Intercambios.IdIntercambios = m.IdIntercambio
     WHERE Intercambios.IdEstado = 1 -- Estado 1 = Pendiente
       AND DATEDIFF(DAY, Intercambios.Fecha, GETDATE()) >= @AntiguedadMinimaDias
-    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a1.Cantidad, a2.Nombre
+    GROUP BY Intercambios.IdIntercambios, Intercambios.Fecha, u1.Usuario, u2.Usuario, a1.Nombre, a1.Cantidad, a2.Nombre, a2.Cantidad
     ORDER BY DiasTranscurridos DESC;
 
     IF @@ROWCOUNT = 0
