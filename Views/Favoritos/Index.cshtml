@@ -11,6 +11,14 @@
         <p class="text-suave mb-0">Los artículos que guardaste para ver después.</p>
     </header>
 
+    @if (!errorCarga)
+    {
+        <div class="sw-buscador border mb-3" style="max-width: 420px;">
+            <input type="search" id="buscador-favoritos" placeholder="Buscar por nombre" aria-label="Buscar favoritos por nombre" autocomplete="off">
+            <i class="bi bi-search me-2 text-suave" aria-hidden="true"></i>
+        </div>
+    }
+
     @if (errorCarga)
     {
         <div class="sw-card p-5 text-center" role="alert">
@@ -31,6 +39,12 @@
             ViewBag.articulo = articulo;
             <partial name="_CardObjeto" />
         }
+    </div>
+
+    <div id="favoritos-sin-resultados" class="sw-card p-5 text-center" hidden>
+        <i class="bi bi-search fs-1 text-suave" aria-hidden="true"></i>
+        <h2 class="font-titulo h3 mt-3">No encontramos favoritos</h2>
+        <p class="text-suave mb-0">Probá con otro nombre.</p>
     </div>
 
     <div id="favoritos-vacio" class="sw-card p-5 text-center" hidden="@(articulos.Count > 0)">
