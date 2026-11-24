@@ -42,6 +42,21 @@ Swappit es una plataforma para intercambiar objetos sin usar dinero. Está pensa
 
 Para probar podés entrar con `prueba.uno@example.com` / `SwappitPrueba1!` o `prueba.dos@example.com` / `SwappitPrueba2!`.
 
+## Funcionalidades
+
+- Registro e inicio de sesión de usuarios.
+- Publicación, edición y eliminación de artículos.
+- Carga de fotos, categorías, estados y preferencias de intercambio.
+- Búsqueda y filtrado de artículos por texto, categoría, estado y orden.
+- Recomendaciones personalizadas según favoritos, búsquedas, vistas y intereses de los usuarios.
+- Perfil público y privado con datos personales, artículos publicados e intercambios.
+- Gestión de favoritos para marcar y consultar artículos de interés.
+- Creación y seguimiento de propuestas e intercambios.
+- Chat asociado a cada intercambio.
+- Notificaciones sobre propuestas, cambios de estado y mensajes.
+- Gestión de planes y suscripciones.
+- Interfaz adaptable para dispositivos móviles y escritorio.
+
 ## Equipo
 
 - Rafael Odiard Wesler
