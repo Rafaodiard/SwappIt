@@ -4,7 +4,7 @@
 
 @if (mensajes.Count == 0)
 {
-    <div class="sw-chat-vacio">
+    <div class="bloque-centrado">
         <i class="bi bi-chat-dots fs-2" aria-hidden="true"></i>
         <p class="mb-0">Todavía no hay mensajes. Escribí para coordinar el intercambio.</p>
     </div>
@@ -14,15 +14,15 @@
 {
     if (m.Dia != null)
     {
-        <div class="sw-chat-dia"><span>@m.Dia</span></div>
+        <div class="separador-centrado"><span>@m.Dia</span></div>
     }
-    <div class="sw-msg @(m.EsMio ? "enviado" : "recibido")">
-        <div class="sw-msg-burbuja">@m.Texto</div>
-        <div class="sw-msg-hora">
+    <div class="@(m.EsMio ? "globo-derecha" : "globo-izquierda")">
+        <div class="globo-texto">@m.Texto</div>
+        <div class="globo-pie">
             <time datetime="@m.FechaHtml">@m.Hora</time>
             @if (m.EsMio)
             {
-                <i class="bi @(m.Visto ? "bi-check2-all visto" : "bi-check2")" aria-hidden="true"></i>
+                <i class="bi @(m.Visto ? "bi-check2-all texto-azul" : "bi-check2")" aria-hidden="true"></i>
                 <span class="visually-hidden">@(m.Visto ? "Visto" : "Enviado")</span>
             }
         </div>

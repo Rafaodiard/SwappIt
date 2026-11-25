@@ -2,7 +2,7 @@
     const contenedor = document.querySelector('[data-notif]');
     if (!contenedor) return;
     const boton = contenedor.querySelector('[data-notif-boton]');
-    const popup = contenedor.querySelector('.sw-notif-popup');
+    const popup = contenedor.querySelector('.desplegable');
     const contenido = popup.querySelector('[data-notif-contenido]');
     const contador = boton.querySelector('[data-notif-contador]');
     const marcarTodas = popup.querySelector('[data-notif-marcar-todas]');
@@ -39,7 +39,7 @@
             if (!respuesta.ok) throw new Error(respuesta.status);
             contenido.innerHTML = await respuesta.text();
         } catch {
-            contenido.innerHTML = '<p class="sw-notif-cargando">No pudimos cargar tus notificaciones. Probá de nuevo en un rato.</p>';
+            contenido.innerHTML = '<p class="desplegable-aviso">No pudimos cargar tus notificaciones. Probá de nuevo en un rato.</p>';
         }
         contenido.setAttribute('aria-busy', 'false');
         cargarCantidad();

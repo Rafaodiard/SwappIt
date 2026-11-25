@@ -10,117 +10,112 @@
     int edadMaxima = ViewBag.edadMaxima;
 }
 
-<section class="sw-auth">
-    <div class="sw-auth-card">
-        <header class="sw-auth-encabezado">
-            <h1 class="sw-auth-titulo">Registrate</h1>
-            <p class="sw-auth-subtitulo">Creá tu cuenta y empezá a intercambiar</p>
+<section class="franja-crema">
+    <div class="tarjeta-grande">
+        <header class="cabecera-centrada">
+            <h1 class="titulo-serif-enorme">Registrate</h1>
+            <p class="subtitulo-suave">Creá tu cuenta y empezá a intercambiar</p>
         </header>
 
-        <form class="sw-form" method="post" action="@Url.Action("Registro", "Account")" asp-antiforgery="true" novalidate>
-            @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
+        <form class="formulario-espaciado" method="post" action="@Url.Action("Registro", "Account")" asp-antiforgery="true" novalidate>
+            @Html.ValidationSummary(true, "", new { @class = "aviso-rojo", role = "alert" })
             @if (ViewBag.Error != null)
             {
-                <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
+                <p class="aviso-rojo" role="alert">@ViewBag.Error</p>
             }
 
-            <div class="sw-fila">
-                <div class="sw-campo">
-                    <label class="sw-label" for="Nombre">Nombre</label>
-                    <input class="sw-input" id="Nombre" name="Nombre" value="@registro?.Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
-                    @Html.ValidationMessage("Nombre", new { @class = "sw-error" })
+            <div class="grilla-dos-columnas">
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Nombre">Nombre</label>
+                    <input class="caja-texto" id="Nombre" name="Nombre" value="@registro?.Nombre" placeholder="Martina" autocomplete="given-name" maxlength="50">
+                    @Html.ValidationMessage("Nombre", new { @class = "texto-rojo" })
                 </div>
-                <div class="sw-campo">
-                    <label class="sw-label" for="Apellido">Apellido</label>
-                    <input class="sw-input" id="Apellido" name="Apellido" value="@registro?.Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
-                    @Html.ValidationMessage("Apellido", new { @class = "sw-error" })
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Apellido">Apellido</label>
+                    <input class="caja-texto" id="Apellido" name="Apellido" value="@registro?.Apellido" placeholder="González" autocomplete="family-name" maxlength="50">
+                    @Html.ValidationMessage("Apellido", new { @class = "texto-rojo" })
                 </div>
             </div>
 
-            <div class="sw-campo">
-                <label class="sw-label" for="Mail">Email</label>
-                <input class="sw-input" id="Mail" name="Mail" value="@registro?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
-                @Html.ValidationMessage("Mail", new { @class = "sw-error" })
+            <div class="columna-campo">
+                <label class="etiqueta-negrita" for="Mail">Email</label>
+                <input class="caja-texto" id="Mail" name="Mail" value="@registro?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                @Html.ValidationMessage("Mail", new { @class = "texto-rojo" })
             </div>
 
-            <div class="sw-campo">
-                <label class="sw-label" for="Contrasena">Contraseña</label>
-                <input class="sw-input" id="Contrasena" name="Contrasena" value="@contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
-                @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
+            <div class="columna-campo">
+                <label class="etiqueta-negrita" for="Contrasena">Contraseña</label>
+                <input class="caja-texto" id="Contrasena" name="Contrasena" value="@contrasena" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" maxlength="50">
+                @Html.ValidationMessage("Contrasena", new { @class = "texto-rojo" })
             </div>
 
-            <div class="sw-campo">
-                <label class="sw-label" for="password2">Repetir contraseña</label>
-                <input class="sw-input" id="password2" name="password2" value="@contrasena" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password" maxlength="50">
+            <div class="columna-campo">
+                <label class="etiqueta-negrita" for="password2">Repetir contraseña</label>
+                <input class="caja-texto" id="password2" name="password2" value="@contrasena" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password" maxlength="50">
             </div>
 
-            <div class="sw-fila">
-                <div class="sw-campo">
-                    <label class="sw-label" for="FechaNacimiento">Fecha de nacimiento</label>
-                    <div class="sw-input-icono">
+            <div class="grilla-dos-columnas">
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="FechaNacimiento">Fecha de nacimiento</label>
+                    <div class="con-icono">
                         <i class="bi bi-calendar3" aria-hidden="true"></i>
-                        <input class="sw-input" id="FechaNacimiento" name="FechaNacimiento" value="@fechaNacimiento" type="date" autocomplete="bday">
+                        <input class="caja-texto" id="FechaNacimiento" name="FechaNacimiento" value="@fechaNacimiento" type="date" autocomplete="bday">
                     </div>
-                    <small class="sw-ayuda">Debes tener entre @edadMinima y @edadMaxima años.</small>
-                    @Html.ValidationMessage("FechaNacimiento", new { @class = "sw-error" })
+                    <small class="texto-chico">Tenés que tener entre @edadMinima y @edadMaxima años.</small>
+                    @Html.ValidationMessage("FechaNacimiento", new { @class = "texto-rojo" })
                 </div>
-                <div class="sw-campo">
-                    <label class="sw-label" for="Telefono">Número de teléfono</label>
-                    <input class="sw-input" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
-                    @Html.ValidationMessage("Telefono", new { @class = "sw-error" })
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Telefono">Número de teléfono</label>
+                    <input class="caja-texto" id="Telefono" name="Telefono" value="@registro?.Telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
+                    @Html.ValidationMessage("Telefono", new { @class = "texto-rojo" })
                 </div>
             </div>
 
-            <div class="sw-fila">
-                <div class="sw-campo">
-                    <label class="sw-label" for="IdProvincias">Provincia</label>
-                    <select class="sw-input sw-select" id="IdProvincias" name="IdProvincias" autocomplete="address-level1">
+            <div class="grilla-dos-columnas">
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="IdProvincias">Provincia</label>
+                    <select class="caja-texto con-flecha" id="IdProvincias" name="IdProvincias" autocomplete="address-level1">
                         <option value="" disabled selected="@(registro?.IdProvincias == null)">Elegí tu provincia</option>
                         @foreach (var p in provincias)
                         {
                             <option value="@p.IdProvincia" selected="@(p.IdProvincia == registro?.IdProvincias)">@p.Nombre</option>
                         }
                     </select>
-                    @Html.ValidationMessage("IdProvincias", new { @class = "sw-error" })
+                    @Html.ValidationMessage("IdProvincias", new { @class = "texto-rojo" })
                 </div>
-                <div class="sw-campo">
-                    <label class="sw-label" for="Barrio">Barrio</label>
-                    <input class="sw-input" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
-                    @Html.ValidationMessage("Barrio", new { @class = "sw-error" })
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Barrio">Barrio</label>
+                    <input class="caja-texto" id="Barrio" name="Barrio" value="@registro?.Barrio" placeholder="Ej: Palermo" autocomplete="address-level2" maxlength="50">
+                    @Html.ValidationMessage("Barrio", new { @class = "texto-rojo" })
                 </div>
             </div>
 
-            <fieldset class="sw-campo sw-campo-plan">
-                <legend class="sw-label">Plan</legend>
-                <div class="sw-plan-opciones">
+            <fieldset class="columna-campo grupo-sin-borde">
+                <legend class="etiqueta-negrita">Plan</legend>
+                <div class="grilla-tres-columnas">
                     @foreach (var plan in planes)
                     {
-                        <label class="sw-plan-opcion sw-plan-opcion--@plan.Clave">
-                            <input type="radio" class="sw-plan-opcion-radio" name="IdPlan" value="@plan.Id" checked="@(plan.Id == idPlanElegido)">
-                            <span class="sw-plan-opcion-nombre">@plan.Nombre</span>
-                            <span class="sw-plan-opcion-precio">@plan.Precio@(plan.EsGratis ? "" : " /mes")</span>
-                            <span class="sw-plan-opcion-etiqueta">@plan.Etiqueta</span>
-                            <i class="bi bi-check-circle-fill sw-plan-opcion-check" aria-hidden="true"></i>
+                        <label class="opcion-recuadro tono-@plan.Tono">
+                            <input type="radio" class="radio-oculto" name="IdPlan" value="@plan.Id" checked="@(plan.Id == idPlanElegido)">
+                            <span class="opcion-recuadro-titulo">@plan.Nombre</span>
+                            <span class="opcion-recuadro-dato">@plan.Precio@(plan.EsGratis ? "" : " /mes")</span>
+                            <span class="opcion-recuadro-nota">@plan.Etiqueta</span>
+                            <i class="bi bi-check-circle-fill opcion-recuadro-check" aria-hidden="true"></i>
                         </label>
                     }
                 </div>
-                <small class="sw-ayuda">Si elegís Plus o Pro, después de crear la cuenta pasás al pago (es de demostración, no se cobra nada). <a href="@Url.Action("Index", "Planes")" class="sw-link sw-link-chico" target="_blank" rel="noopener">Ver qué incluye cada plan<span class="visually-hidden"> (se abre en otra pestaña)</span></a></small>
-                @Html.ValidationMessage("IdPlan", new { @class = "sw-error" })
+                <small class="texto-chico">Si elegís Plus o Pro, después de crear la cuenta pasás al pago (es de demostración, no se cobra nada). <a href="@Url.Action("Index", "Planes")" class="enlace-azul enlace-chico" target="_blank" rel="noopener">Ver qué incluye cada plan<span class="visually-hidden"> (se abre en otra pestaña)</span></a></small>
+                @Html.ValidationMessage("IdPlan", new { @class = "texto-rojo" })
             </fieldset>
 
-            <div class="sw-form-acciones">
-                <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Crear cuenta</button>
+            <div class="separado-arriba">
+                <button type="submit" class="boton-alto boton-azul ancho-completo">Crear cuenta</button>
             </div>
         </form>
 
-        <p class="sw-auth-pie">
+        <p class="pie-centrado">
             <span>¿Ya tenés cuenta?</span>
-            <a href="@Url.Action("Index", "Account")" class="sw-link">Iniciar sesión</a>
+            <a href="@Url.Action("Index", "Account")" class="enlace-azul">Iniciar sesión</a>
         </p>
     </div>
 </section>
-
-@section Scripts {
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <partial name="_ValidationScriptsPartial" />
-}

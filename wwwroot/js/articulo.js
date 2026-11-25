@@ -1,6 +1,6 @@
 (() => {
     const principal = document.getElementById('articulo-foto-principal');
-    const miniaturas = document.querySelectorAll('.sw-articulo-miniatura');
+    const miniaturas = document.querySelectorAll('.boton-miniatura');
     if (!principal || miniaturas.length === 0) return;
 
     miniaturas.forEach(boton => {

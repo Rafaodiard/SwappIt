@@ -1,12 +1,12 @@
-<section id="popup-notificaciones" class="sw-notif-popup" aria-labelledby="notif-titulo">
-    <header class="sw-notif-encabezado">
-        <h2 id="notif-titulo" class="sw-notif-titulo">Notificaciones</h2>
+<section id="popup-notificaciones" class="desplegable" aria-labelledby="notif-titulo">
+    <header class="desplegable-cabecera">
+        <h2 id="notif-titulo" class="desplegable-titulo">Notificaciones</h2>
         <form action="@Url.Action("MarcarTodasLeidas", "Notificaciones")" asp-antiforgery="true" method="post" data-notif-marcar-todas hidden>
-            <button type="submit" class="sw-notif-accion">Marcar todas como leídas</button>
+            <button type="submit" class="desplegable-enlace">Marcar todas como leídas</button>
         </form>
     </header>
 
-    <div class="sw-notif-cuerpo" data-notif-contenido aria-busy="true">
-        <p class="sw-notif-cargando">Cargando notificaciones…</p>
+    <div class="desplegable-cuerpo" data-notif-contenido aria-busy="true">
+        <p class="desplegable-aviso">Cargando notificaciones…</p>
     </div>
 </section>

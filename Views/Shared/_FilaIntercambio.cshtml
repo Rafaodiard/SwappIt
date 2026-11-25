@@ -1,30 +1,30 @@
 @{
     Swappit.Models.ViewModels.IntercambioViewModel fila = ViewBag.fila;
 }
-<article class="sw-historial-item d-flex flex-column flex-md-row align-items-md-center gap-3">
-    <div class="sw-historial-img sw-img"><img src="@fila.SuArticuloImagen" alt=""></div>
-    <div class="flex-grow-1 min-w-0">
+<article class="caja-gris d-flex flex-column flex-md-row align-items-md-center gap-3">
+    <div class="caja-gris-imagen marco-imagen"><img src="@fila.SuArticuloImagen" alt=""></div>
+    <div class="flex-grow-1 sin-ancho-minimo">
         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
             <h3 class="h5 fw-bold mb-0 text-truncate">@fila.SuArticuloResumen</h3>
-            <span class="sw-badge @(fila.EsRecibido ? "sw-badge-recibido" : "sw-badge-enviado")">@(fila.EsRecibido ? "Recibido" : "Enviado")</span>
+            <span class="rotulo @(fila.EsRecibido ? "tono-azul" : "tono-bordo")">@(fila.EsRecibido ? "Recibido" : "Enviado")</span>
         </div>
-        <div class="text-suave small mb-1">
+        <div class="texto-suave small mb-1">
             <i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @fila.MiArticuloResumen
         </div>
-        <div class="d-flex flex-wrap column-gap-3 row-gap-1 text-suave small">
+        <div class="d-flex flex-wrap column-gap-3 row-gap-1 texto-suave small">
             <span><i class="bi bi-person" aria-hidden="true"></i> Intercambio con @@@fila.OtroUsuario</span>
             <span><i class="bi bi-calendar3" aria-hidden="true"></i> Fecha: @fila.FechaTexto</span>
         </div>
     </div>
     <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 flex-shrink-0">
-        <span class="sw-estado-intercambio sw-estado-intercambio--@(fila.EstadoCss)">@fila.Estado</span>
+        <span class="pastilla @(fila.EstadoCss)">@fila.Estado</span>
         @if (fila.PorResponder)
         {
-            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn btn-sw-primario btn-sm">Responder</a>
+            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn boton-bordo btn-sm">Responder</a>
         }
         else
         {
-            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn btn-sw-outline btn-sm">Ver intercambio <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+            <a href="@Url.Action("Detalle", "Intercambio", new { id = fila.IdIntercambios })" class="btn boton-contorno-azul btn-sm">Ver intercambio <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
         }
     </div>
 </article>

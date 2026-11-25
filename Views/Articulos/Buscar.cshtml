@@ -20,66 +20,66 @@
 
         <!-- ===== Filtros ===== -->
         <aside class="col-lg-3">
-            <button class="btn btn-sw-outline w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros">
-                <i class="bi bi-funnel"></i> Filtros
+            <button class="btn boton-contorno-azul w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros" aria-controls="filtros" aria-expanded="@(hayFiltros ? "true" : "false")">
+                <i class="bi bi-funnel" aria-hidden="true"></i> Filtros
             </button>
 
-            <form id="filtros" class="sw-filtros collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
+            <form id="filtros" class="panel-celeste collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@Url.Action("Buscar", "Articulos")">
                 @if (busqueda != null)
                 {
                     <input type="hidden" name="q" value="@busqueda">
                 }
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="fs-5 fw-semibold"><i class="bi bi-filter-left"></i> Filtros</span>
+                    <span class="fs-5 fw-semibold"><i class="bi bi-filter-left" aria-hidden="true"></i> Filtros</span>
                     @if (hayFiltros)
                     {
-                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda, orden })" class="btn btn-link btn-sm text-suave text-decoration-none p-0">Limpiar</a>
+                        <a href="@Url.Action("Buscar", "Articulos", new { q = busqueda, orden })" class="btn btn-link btn-sm texto-suave text-decoration-none p-0">Limpiar</a>
                     }
                 </div>
 
-                <h6>Categoría</h6>
-                <div id="filtro-categorias" class="mb-4">
+                <fieldset id="filtro-categorias" class="mb-4">
+                    <legend>Categoría</legend>
                     @foreach (var cat in categorias)
                     {
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="cat-@(cat.Valor)"
                                    checked="@cat.Seleccionada">
-                            <label class="form-check-label" for="cat-@(cat.Valor)">@cat.Texto</label>
-                            <span class="contador">@cat.Cantidad</span>
+                            <label class="form-check-label" for="cat-@(cat.Valor)">@cat.Texto <span class="visually-hidden">(@cat.Cantidad)</span></label>
+                            <span class="numero-suave" aria-hidden="true">@cat.Cantidad</span>
                         </div>
                     }
-                </div>
+                </fieldset>
 
-                <h6>Estado</h6>
-                <div>
+                <fieldset>
+                    <legend>Estado</legend>
                     @foreach (var est in estados)
                     {
                         <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="est-@(est.Valor)"
                                checked="@est.Seleccionada">
-                        <label class="sw-chip" for="est-@(est.Valor)">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
+                        <label class="pastilla-blanca" for="est-@(est.Valor)">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
                     }
-                </div>
+                </fieldset>
 
-                <noscript><button type="submit" class="btn btn-sw-outline w-100 mt-4">Aplicar filtros</button></noscript>
+                <noscript><button type="submit" class="btn boton-contorno-azul w-100 mt-4">Aplicar filtros</button></noscript>
             </form>
         </aside>
 
         <!-- ===== Resultados ===== -->
-        <section class="col-lg-9">
+        <section class="col-lg-9 seccion-simple">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                <h1 class="font-titulo h2 mb-0">@titulo</h1>
+                <h1 class="letra-serif h2 mb-0">@titulo</h1>
                 <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por" style="width:auto">
+                    <select class="form-select form-select-sm w-auto" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por">
                         @foreach (var opcion in opcionesOrden)
                         {
                             <option value="@opcion.Value" selected="@(opcion.Value == orden)">@opcion.Text</option>
                         }
                     </select>
-                    <div class="btn-group btn-group-sm sw-vista-toggle" role="group" aria-label="Vista">
+                    <div class="btn-group btn-group-sm grupo-botones-claro" role="group" aria-label="Vista">
                         <input type="radio" class="btn-check" name="vista" id="vista-grilla" value="grilla" checked>
-                        <label class="btn" for="vista-grilla" title="Grilla"><i class="bi bi-grid"></i></label>
+                        <label class="btn" for="vista-grilla" title="Grilla"><i class="bi bi-grid" aria-hidden="true"></i><span class="visually-hidden">Ver en grilla</span></label>
                         <input type="radio" class="btn-check" name="vista" id="vista-lista" value="lista">
-                        <label class="btn" for="vista-lista" title="Lista"><i class="bi bi-list-ul"></i></label>
+                        <label class="btn" for="vista-lista" title="Lista"><i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden">Ver en lista</span></label>
                     </div>
                 </div>
             </div>
@@ -95,15 +95,15 @@
             @if (errorCarga)
             {
                 <div class="text-center py-5" role="alert">
-                    <i class="bi bi-exclamation-circle fs-1 text-suave"></i>
-                    <p class="text-suave mt-2">No pudimos cargar los objetos. Probá de nuevo en unos minutos.</p>
+                    <i class="bi bi-exclamation-circle fs-1 texto-suave" aria-hidden="true"></i>
+                    <p class="texto-suave mt-2">No pudimos cargar los objetos. Probá de nuevo en unos minutos.</p>
                 </div>
             }
             else
             {
                 <div id="sin-resultados" class="text-center py-5 @(articulos.Count > 0 ? "d-none" : "")">
-                    <i class="bi bi-inbox fs-1 text-suave"></i>
-                    <p class="text-suave mt-2">@textoSinResultados</p>
+                    <i class="bi bi-inbox fs-1 texto-suave" aria-hidden="true"></i>
+                    <p class="texto-suave mt-2">@textoSinResultados</p>
                 </div>
             }
         </section>

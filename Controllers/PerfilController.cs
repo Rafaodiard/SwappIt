@@ -43,7 +43,7 @@ public class PerfilController : BaseController
         ViewBag.maxFotoMB = EditarPerfilViewModel.MaxFotoMB;
         ViewBag.maxDescripcion = EditarPerfilViewModel.MaxDescripcion;
         ViewBag.errorPerfil = TempData["ErrorPerfil"] as string;
-        ViewBag.mensajePerfil = TempData["MensajePerfil"] as string;
+        ViewBag.mensaje = TempData["MensajePerfil"] as string;
         return View();
     }
 

@@ -17,15 +17,15 @@
     List<string> fotosExistentes = publicar.FotosExistentes ?? new List<string>();
 }
 
-<section class="sw-publicar">
-    <div class="sw-publicar-wrap">
+<section class="franja-gris">
+    <div class="columna-centrada">
 
-        <header class="sw-publicar-encabezado">
-            <h1 class="sw-auth-titulo">@(esEdicion ? "Editá tu objeto" : "Publicá tu objeto")</h1>
-            <p class="sw-auth-subtitulo">@(esEdicion ? "Cambiar fotos, descripción o lo que buscás a cambio" : "Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio")</p>
+        <header class="cabecera-sin-margen">
+            <h1 class="titulo-serif-enorme">@(esEdicion ? "Editá tu objeto" : "Publicá tu objeto")</h1>
+            <p class="subtitulo-suave">@(esEdicion ? "Cambiar fotos, descripción o lo que buscás a cambio" : "Subí fotos, contá cómo está y elegí qué te gustaría recibir a cambio")</p>
         </header>
 
-        <form class="sw-publicar-card" method="post" enctype="multipart/form-data"
+        <form class="tarjeta-dos-columnas" method="post" enctype="multipart/form-data"
               action="@Url.Action(esEdicion ? "Editar" : "Index", "Publicar")" asp-antiforgery="true" novalidate>
             @if (esEdicion)
             {
@@ -33,54 +33,54 @@
             }
 
             <!-- ===== Columna izquierda: fotos ===== -->
-            <div class="sw-publicar-fotos">
-                <div class="sw-campo">
-                    <span class="sw-label" id="etiqueta-fotos">Fotos del objeto</span>
-                    <span class="sw-ayuda">La primera foto va a ser la portada de tu publicación.</span>
+            <div class="columna-ancha">
+                <div class="columna-campo">
+                    <span class="etiqueta-negrita" id="etiqueta-fotos">Fotos del objeto</span>
+                    <span class="texto-chico">La primera foto va a ser la portada de tu publicación.</span>
                 </div>
 
-                <div class="sw-zona-carga" id="zona-carga" role="button" tabindex="0" aria-labelledby="etiqueta-fotos">
-                    <span class="sw-zona-carga-icono"><i class="bi bi-camera" aria-hidden="true"></i></span>
-                    <p class="sw-zona-carga-titulo">Arrastrá tus fotos acá</p>
-                    <p class="sw-zona-carga-ayuda">o hacé clic para buscarlas en tu dispositivo</p>
-                    <button type="button" class="sw-btn sw-btn-contorno" id="boton-subir-fotos" tabindex="-1">Subir fotos</button>
+                <div class="zona-punteada" id="zona-carga" role="button" tabindex="0" aria-labelledby="etiqueta-fotos">
+                    <span class="circulo-azul-grande"><i class="bi bi-camera" aria-hidden="true"></i></span>
+                    <p class="zona-punteada-titulo">Arrastrá tus fotos acá</p>
+                    <p class="zona-punteada-texto">o hacé clic para buscarlas en tu dispositivo</p>
+                    <span class="boton-alto boton-blanco" aria-hidden="true">Subir fotos</span>
                 </div>
                 <input id="Fotos" name="Fotos" type="file" accept="image/jpeg,image/png" multiple hidden
                        data-max-fotos="@maxFotos" data-max-mb="@maxFotoMB">
 
-                <div class="sw-miniaturas" id="miniaturas">
-                    <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
-                    <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
-                    <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
-                    <button type="button" class="sw-miniatura" aria-label="Agregar foto">+</button>
+                <div class="grilla-cuatro-columnas" id="miniaturas">
+                    <button type="button" class="cuadro-punteado" aria-label="Agregar foto">+</button>
+                    <button type="button" class="cuadro-punteado" aria-label="Agregar foto">+</button>
+                    <button type="button" class="cuadro-punteado" aria-label="Agregar foto">+</button>
+                    <button type="button" class="cuadro-punteado" aria-label="Agregar foto">+</button>
                 </div>
 
-                <p class="sw-nota">Hasta @maxFotos fotos · JPG o PNG · máx. @maxFotoMB MB cada una</p>
-                @Html.ValidationMessage("Fotos", new { @class = "sw-error" })
-                <p class="sw-error" id="aviso-fotos" role="alert"></p>
+                <p class="texto-mini">Hasta @maxFotos fotos · JPG o PNG · máx. @maxFotoMB MB cada una</p>
+                @Html.ValidationMessage("Fotos", new { @class = "texto-rojo" })
+                <p class="texto-rojo" id="aviso-fotos" role="alert"></p>
 
                 @if (esEdicion && fotosExistentes.Count > 0)
                 {
-                    <div class="sw-miniaturas mb-2" aria-label="Fotos actuales">
+                    <div class="grilla-cuatro-columnas mb-2" role="group" aria-label="Fotos actuales">
                         @foreach (string foto in fotosExistentes)
                         {
-                            <label class="sw-miniatura sw-miniatura--llena position-relative">
+                            <label class="cuadro-punteado llena position-relative">
                                 <img src="@foto" alt="Foto actual del artículo">
                                 <input type="checkbox" name="FotosEliminar" value="@foto" class="position-absolute top-0 end-0 m-2"
                                        aria-label="Eliminar esta foto">
                             </label>
                         }
                     </div>
-                    <p class="sw-ayuda">Marcá las fotos que querés eliminar.</p>
+                    <p class="texto-chico">Marcá las fotos que querés eliminar.</p>
                 }
             </div>
 
             <!-- ===== Columna derecha: datos ===== -->
-            <div class="sw-publicar-datos">
-                @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
+            <div class="columna-flexible">
+                @Html.ValidationSummary(true, "", new { @class = "aviso-rojo", role = "alert" })
                 @if (limiteAlcanzado)
                 {
-                    <p class="sw-aviso-rechazos mb-0" role="alert">
+                    <p class="aviso-rosa mb-0" role="alert">
                         <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
                         @if (plan != null)
                         {
@@ -96,68 +96,68 @@
                     </p>
                 }
 
-                <div class="sw-campo">
-                    <label class="sw-label" for="Titulo">Título</label>
-                    <input class="sw-input" id="Titulo" name="Titulo" value="@publicar.Titulo" data-requerido="@requeridos["Titulo"]" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
-                    @Html.ValidationMessage("Titulo", new { @class = "sw-error" })
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Titulo">Título</label>
+                    <input class="caja-texto" id="Titulo" name="Titulo" value="@publicar.Titulo" data-requerido="@requeridos["Titulo"]" placeholder="Ej: Silla de madera estilo nórdico" maxlength="50">
+                    @Html.ValidationMessage("Titulo", new { @class = "texto-rojo" })
                 </div>
 
-                <div class="sw-fila">
-                    <div class="sw-campo">
-                        <label class="sw-label" for="IdCategorias">Categoría</label>
-                        <select class="sw-input sw-select" id="IdCategorias" name="IdCategorias" required data-requerido="@requeridos["IdCategorias"]">
+                <div class="grilla-dos-columnas">
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="IdCategorias">Categoría</label>
+                        <select class="caja-texto con-flecha" id="IdCategorias" name="IdCategorias" required data-requerido="@requeridos["IdCategorias"]">
                             <option value="" disabled selected="@(publicar.IdCategorias == null)">Elegí una categoría</option>
                             @foreach (var c in categorias)
                             {
                                 <option value="@c.Value" selected="@(c.Value == categoriaElegida)">@c.Text</option>
                             }
                         </select>
-                        @Html.ValidationMessage("IdCategorias", new { @class = "sw-error" })
+                        @Html.ValidationMessage("IdCategorias", new { @class = "texto-rojo" })
                     </div>
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Ubicacion">Ubicación</label>
-                        <input class="sw-input" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" data-requerido="@requeridos["Ubicacion"]" placeholder="Palermo, CABA" maxlength="100">
-                        @Html.ValidationMessage("Ubicacion", new { @class = "sw-error" })
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Ubicacion">Ubicación</label>
+                        <input class="caja-texto" id="Ubicacion" name="Ubicacion" value="@publicar.Ubicacion" data-requerido="@requeridos["Ubicacion"]" placeholder="Palermo, CABA" maxlength="100">
+                        @Html.ValidationMessage("Ubicacion", new { @class = "texto-rojo" })
                     </div>
                 </div>
 
-                <div class="sw-campo sw-campo-estado">
-                    <span class="sw-label" id="etiqueta-estado">Estado del objeto</span>
-                    <div class="sw-estados" role="radiogroup" aria-labelledby="etiqueta-estado" data-nombre="IdEstado" data-requerido="@requeridos["IdEstado"]">
+                <div class="columna-campo separada">
+                    <span class="etiqueta-negrita" id="etiqueta-estado">Estado del objeto</span>
+                    <div class="grupo-pastillas" role="radiogroup" aria-labelledby="etiqueta-estado" data-nombre="IdEstado" data-requerido="@requeridos["IdEstado"]">
                         @foreach (var estado in estados)
                         {
-                            <input type="radio" class="sw-estado-radio" id="Estado_@(estado.IdEstadosArticulos)" name="IdEstado" value="@estado.IdEstadosArticulos" checked="@(publicar.IdEstado == estado.IdEstadosArticulos)">
-                            <label class="sw-estado" for="Estado_@(estado.IdEstadosArticulos)">@estado.Nombre</label>
+                            <input type="radio" class="radio-oculto" id="Estado_@(estado.IdEstadosArticulos)" name="IdEstado" value="@estado.IdEstadosArticulos" checked="@(publicar.IdEstado == estado.IdEstadosArticulos)">
+                            <label class="pastilla-celeste" for="Estado_@(estado.IdEstadosArticulos)">@estado.Nombre</label>
                         }
                     </div>
-                    @Html.ValidationMessage("IdEstado", new { @class = "sw-error" })
+                    @Html.ValidationMessage("IdEstado", new { @class = "texto-rojo" })
                 </div>
 
-                <div class="sw-campo">
-                    <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="5" data-requerido="@requeridos["Descripcion"]" maxlength="@maxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
-                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
-                    @Html.ValidationMessage("Descripcion", new { @class = "sw-error" })
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Descripcion">Descripción</label>
+                    <textarea class="caja-texto caja-alta" id="Descripcion" name="Descripcion" rows="5" data-requerido="@requeridos["Descripcion"]" maxlength="@maxDescripcion" placeholder="Contá medidas, antigüedad, detalles o marcas de uso…">@publicar.Descripcion</textarea>
+                    <span class="texto-mini-derecha" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
+                    @Html.ValidationMessage("Descripcion", new { @class = "texto-rojo" })
                 </div>
 
-                <div class="sw-campo">
-                    <label class="sw-label" for="IdCategoriaACambio">¿Qué te gustaría recibir a cambio?</label>
-                    <span class="sw-ayuda" id="ayuda-a-cambio">Elegí una categoría o dejalo abierto a propuestas.</span>
-                    <select class="sw-input sw-select" id="IdCategoriaACambio" name="IdCategoriaACambio" aria-describedby="ayuda-a-cambio">
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="IdCategoriaACambio">¿Qué te gustaría recibir a cambio?</label>
+                    <span class="texto-chico" id="ayuda-a-cambio">Elegí una categoría o dejalo abierto a propuestas.</span>
+                    <select class="caja-texto con-flecha" id="IdCategoriaACambio" name="IdCategoriaACambio" aria-describedby="ayuda-a-cambio">
                         <option value="" selected="@(publicar.IdCategoriaACambio == null)">Abierto a propuestas</option>
                         @foreach (var c in categorias)
                         {
                             <option value="@c.Value" selected="@(c.Value == categoriaACambioElegida)">@c.Text</option>
                         }
                     </select>
-                    @Html.ValidationMessage("IdCategoriaACambio", new { @class = "sw-error" })
+                    @Html.ValidationMessage("IdCategoriaACambio", new { @class = "texto-rojo" })
                 </div>
 
-                <hr class="sw-divisor">
+                <hr class="linea-divisoria">
 
-                <div class="sw-publicar-acciones">
-                    <a href="@(esEdicion ? Url.Action("Detalle", "Articulos", new { id = publicar.IdArticulo }) : Url.Action("Index", "Home"))" class="sw-btn sw-btn-contorno">Cancelar</a>
-                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@limiteAlcanzado">@(esEdicion ? "Guardar cambios" : "Publicar objeto")</button>
+                <div class="fila-botones-derecha">
+                    <a href="@(esEdicion ? Url.Action("Detalle", "Articulos", new { id = publicar.IdArticulo }) : Url.Action("Index", "Home"))" class="boton-alto boton-blanco">Cancelar</a>
+                    <button type="submit" class="boton-alto boton-azul" disabled="@limiteAlcanzado">@(esEdicion ? "Guardar cambios" : "Publicar objeto")</button>
                 </div>
             </div>
         </form>
@@ -165,7 +165,5 @@
 </section>
 
 @section Scripts {
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <partial name="_ValidationScriptsPartial" />
     <script src="~/js/publicar.js" asp-append-version="true"></script>
 }

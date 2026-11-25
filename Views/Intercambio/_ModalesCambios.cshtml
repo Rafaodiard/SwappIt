@@ -4,18 +4,18 @@
 @if (detalle.MostrarAgregar)
 {
     <!-- ===== Pop up: agregar artículos propios ===== -->
-    <div class="modal fade sw-modal" id="modal-agregar" tabindex="-1" aria-labelledby="titulo-agregar" aria-hidden="true">
+    <div class="modal fade ventana-redondeada" id="modal-agregar" tabindex="-1" aria-labelledby="titulo-agregar" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <form class="modal-content" method="post" action="@Url.Action("AgregarArticulos", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true"
                   data-proponer data-max-ofrecidos="@detalle.LugarMio">
                 <div class="modal-header">
-                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-agregar">Agregar de tus artículos</h2>
+                    <h2 class="modal-title letra-serif h3 mb-0" id="titulo-agregar">Agregar de tus artículos</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body d-flex flex-column gap-3">
-                    <p class="sw-articulo-propio mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> Se suman enseguida. A @detalle.Intercambio.OtroNombre le llega un aviso.</p>
+                    <p class="aviso-crema mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> Se suman enseguida. A @detalle.Intercambio.OtroNombre le llega un aviso.</p>
                     <fieldset class="d-flex flex-column gap-2" aria-describedby="agregar-contador">
-                        <legend class="sw-proponer-leyenda">@detalle.LeyendaAgregar</legend>
+                        <legend class="leyenda-chica">@detalle.LeyendaAgregar</legend>
                         @{
                             ViewBag.opcionTipo = "checkbox";
                             ViewBag.opcionNombre = "idsArticulos";
@@ -28,11 +28,11 @@
                             <partial name="_OpcionArticulo" />
                         }
                     </fieldset>
-                    <p class="sw-nota mb-0" id="agregar-contador" data-proponer-contador aria-live="polite">Elegí qué querés sumar.</p>
+                    <p class="texto-mini mb-0" id="agregar-contador" data-proponer-contador aria-live="polite">Elegí qué querés sumar.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="sw-btn sw-btn-solido">Agregar</button>
+                    <button type="button" class="boton-alto boton-blanco" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="boton-alto boton-azul">Agregar</button>
                 </div>
             </form>
         </div>
@@ -41,17 +41,17 @@
 @if (detalle.MostrarPedir)
 {
     <!-- ===== Pop up: pedirle un artículo al otro ===== -->
-    <div class="modal fade sw-modal" id="modal-pedir" tabindex="-1" aria-labelledby="titulo-pedir" aria-hidden="true">
+    <div class="modal fade ventana-redondeada" id="modal-pedir" tabindex="-1" aria-labelledby="titulo-pedir" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <form class="modal-content" method="post" action="@Url.Action("PedirArticulo", "Intercambio", new { id = detalle.Intercambio.IdIntercambios })" asp-antiforgery="true">
                 <div class="modal-header">
-                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-pedir">Pedirle un artículo a @detalle.Intercambio.OtroNombre</h2>
+                    <h2 class="modal-title letra-serif h3 mb-0" id="titulo-pedir">Pedirle un artículo a @detalle.Intercambio.OtroNombre</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body d-flex flex-column gap-3">
-                    <p class="sw-articulo-propio mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> @detalle.Intercambio.OtroNombre tiene que aceptarlo para que se sume.</p>
+                    <p class="aviso-crema mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> @detalle.Intercambio.OtroNombre tiene que aceptarlo para que se sume.</p>
                     <fieldset class="d-flex flex-column gap-2">
-                        <legend class="sw-proponer-leyenda">Elegí un artículo</legend>
+                        <legend class="leyenda-chica">Elegí un artículo</legend>
                         @{
                             ViewBag.opcionTipo = "radio";
                             ViewBag.opcionNombre = "idArticulo";
@@ -66,8 +66,8 @@
                     </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="sw-btn sw-btn-solido">Pedir</button>
+                    <button type="button" class="boton-alto boton-blanco" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="boton-alto boton-azul">Pedir</button>
                 </div>
             </form>
         </div>

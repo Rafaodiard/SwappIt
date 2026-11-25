@@ -3,68 +3,54 @@
     List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
     bool errorCarga = ViewBag.errorCarga;
     bool esVisitante = ViewBag.esVisitante ?? true;
-    string? mensaje = ViewBag.mensaje;
-    string? error = ViewBag.error;
 }
 
-<section class="sw-planes-pagina" aria-labelledby="titulo-planes">
+<section class="seccion-espaciada" aria-labelledby="titulo-planes">
     <div class="container-xl">
-        @if (mensaje != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
-                <i class="bi bi-check-circle-fill me-1"></i> @mensaje
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        }
-        @if (error != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i> @error
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-        }
+        <partial name="_Alertas" />
 
-        <header class="sw-planes-encabezado">
-            <p class="sw-eyebrow">Planes</p>
-            <h1 class="font-titulo text-primario" id="titulo-planes">Elegí tu plan</h1>
-            <p class="text-suave mb-0">Intercambiar en Swappit es gratis. Con Plus o Pro publicás y proponés más intercambios a la vez, y tus artículos se recomiendan más a otros usuarios.</p>
+        <header class="cabecera-angosta">
+            <p class="antetitulo">Planes</p>
+            <h1 class="letra-serif texto-azul" id="titulo-planes">Elegí tu plan</h1>
+            <p class="texto-suave mb-0">Intercambiar en Swappit es gratis. Con Plus o Pro publicás y proponés más intercambios a la vez, y tus artículos se recomiendan más a otros usuarios.</p>
         </header>
 
         @if (errorCarga || planes.Count == 0)
         {
-            <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
-                <i class="bi bi-exclamation-triangle fs-1 text-suave"></i>
-                <h2 class="font-titulo h3 mt-3">No pudimos cargar los planes</h2>
-                <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+            <div class="tarjeta-blanca angosta p-5 text-center mx-auto">
+                <i class="bi bi-exclamation-triangle fs-1 texto-suave" aria-hidden="true"></i>
+                <h2 class="letra-serif h3 mt-3">No pudimos cargar los planes</h2>
+                <p class="texto-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
             </div>
-            return;
         }
+        else
+        {
+            <h2 class="visually-hidden">Planes disponibles</h2>
+            <partial name="_GrillaPlanes" />
 
-        <h2 class="visually-hidden">Planes disponibles</h2>
-        <partial name="_GrillaPlanes" />
-
-        <ul class="sw-planes-notas">
-            <li>
-                <span class="sw-planes-nota-icono" aria-hidden="true"><i class="bi bi-arrow-down-up"></i></span>
-                <div>
-                    <h2>Si bajás de plan</h2>
-                    <p>Lo que ya publicaste sigue publicado, pero no vas a poder publicar ni proponer más hasta quedar dentro del nuevo límite.</p>
-                </div>
-            </li>
-            <li>
-                <span class="sw-planes-nota-icono" aria-hidden="true"><i class="bi bi-arrow-repeat"></i></span>
-                <div>
-                    <h2>Cambiá cuando quieras</h2>
-                    <p>@(esVisitante ? "Elegí un plan al registrarte y cambialo después desde esta página." : "Pasá de un plan a otro cuando quieras, desde esta página.")</p>
-                </div>
-            </li>
-            <li>
-                <span class="sw-planes-nota-icono" aria-hidden="true"><i class="bi bi-credit-card"></i></span>
-                <div>
-                    <h2>Pago de demostración</h2>
-                    <p>Swappit todavía no cobra: los datos de la tarjeta no se guardan ni se envían, y el plan se activa al confirmar.</p>
-                </div>
-            </li>
-        </ul>
+            <ul class="lista-tres-columnas">
+                <li>
+                    <span class="circulo-celeste" aria-hidden="true"><i class="bi bi-arrow-down-up"></i></span>
+                    <div>
+                        <h2>Si bajás de plan</h2>
+                        <p>Lo que ya publicaste sigue publicado, pero no vas a poder publicar ni proponer más hasta quedar dentro del nuevo límite.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="circulo-celeste" aria-hidden="true"><i class="bi bi-arrow-repeat"></i></span>
+                    <div>
+                        <h2>Cambiá cuando quieras</h2>
+                        <p>@(esVisitante ? "Elegí un plan al registrarte y cambialo después desde esta página." : "Pasá de un plan a otro cuando quieras, desde esta página.")</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="circulo-celeste" aria-hidden="true"><i class="bi bi-credit-card"></i></span>
+                    <div>
+                        <h2>Pago de demostración</h2>
+                        <p>Swappit todavía no cobra: los datos de la tarjeta no se guardan ni se envían, y el plan se activa al confirmar.</p>
+                    </div>
+                </li>
+            </ul>
+        }
     </div>
 </section>

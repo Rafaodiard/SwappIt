@@ -6,7 +6,7 @@ const swappitFavoritos = (() => {
     const enCamino = new Set();
 
     function pintar(boton, esFavorito) {
-        const nombre = boton.closest('.card-objeto')?.querySelector('.card-objeto-titulo')?.textContent.trim() || 'este artículo';
+        const nombre = boton.closest('.tarjeta-foto')?.querySelector('.tarjeta-foto-titulo')?.textContent.trim() || 'este artículo';
         const icono = boton.querySelector('i');
         boton.classList.toggle('activo', esFavorito);
         if (form) {
@@ -21,8 +21,8 @@ const swappitFavoritos = (() => {
     }
 
     function marcar(contenedor = document) {
-        contenedor.querySelectorAll('.card-objeto[data-id]').forEach(card => {
-            const boton = card.querySelector('.card-objeto-fav');
+        contenedor.querySelectorAll('.tarjeta-foto[data-id]').forEach(card => {
+            const boton = card.querySelector('.tarjeta-foto-boton');
             if (boton) pintar(boton, favoritos.has(Number(card.dataset.id)));
         });
     }
@@ -64,12 +64,12 @@ const swappitFavoritos = (() => {
 
     function aplicar(id, esFavorito) {
         if (esFavorito) favoritos.add(id); else favoritos.delete(id);
-        document.querySelectorAll(`.card-objeto[data-id="${id}"] .card-objeto-fav`).forEach(b => pintar(b, esFavorito));
+        document.querySelectorAll(`.tarjeta-foto[data-id="${id}"] .tarjeta-foto-boton`).forEach(b => pintar(b, esFavorito));
         document.dispatchEvent(new CustomEvent('swappit:favorito', { detail: { id, esFavorito } }));
     }
 
     document.addEventListener('click', async (e) => {
-        const boton = e.target.closest('.card-objeto-fav');
+        const boton = e.target.closest('.tarjeta-foto-boton');
         if (!boton) return;
 
         if (!form) {
@@ -77,7 +77,7 @@ const swappitFavoritos = (() => {
             return;
         }
 
-        const id = Number(boton.closest('.card-objeto')?.dataset.id);
+        const id = Number(boton.closest('.tarjeta-foto')?.dataset.id);
         if (!Number.isInteger(id) || enCamino.has(id)) return;
 
         const antes = favoritos.has(id);

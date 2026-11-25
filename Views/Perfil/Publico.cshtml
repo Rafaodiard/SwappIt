@@ -5,11 +5,11 @@
 @if (usuario == null)
 {
     <div class="container-xl py-5">
-        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
-            <i class="bi bi-person-x fs-1 text-suave"></i>
-            <h1 class="font-titulo h2 mt-3">Este usuario no existe</h1>
-            <p class="text-suave mb-4">Puede que el enlace esté mal.</p>
-            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Ver artículos</a>
+        <div class="tarjeta-blanca angosta p-5 text-center mx-auto">
+            <i class="bi bi-person-x fs-1 texto-suave" aria-hidden="true"></i>
+            <h1 class="letra-serif h2 mt-3">Este usuario no existe</h1>
+            <p class="texto-suave mb-4">Puede que el enlace esté mal.</p>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Ver artículos</a>
         </div>
     </div>
     return;
@@ -29,9 +29,9 @@
 
         <!-- ===== Nombre + foto ===== -->
         <div class="col-12">
-            <div class="sw-card p-4 p-lg-5">
+            <div class="tarjeta-blanca p-4 p-lg-5">
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
-                    <div class="sw-perfil-avatar" data-iniciales="@iniciales">
+                    <div class="foto-redonda-grande" data-iniciales="@iniciales">
                         @if (foto != null)
                         {
                             <img src="@foto" alt="Foto de @usuario.Nombre">
@@ -41,25 +41,25 @@
                             <span aria-hidden="true">@iniciales</span>
                         }
                     </div>
-                    <div class="min-w-0">
+                    <div class="sin-ancho-minimo">
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2">
-                            <h1 class="font-titulo h2 mb-0">@usuario.Nombre @usuario.Apellido</h1>
+                            <h1 class="letra-serif h2 mb-0">@usuario.Nombre @usuario.Apellido</h1>
                             @if (plan != null && !plan.EsGratis)
                             {
-                                <span class="sw-insignia-plan sw-insignia-plan--@plan.Clave"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
+                                <span class="insignia tono-@plan.Tono"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
                             }
                         </div>
-                        <p class="text-suave mb-2">@@@usuario.Usuario</p>
+                        <p class="texto-suave mb-2">@@@usuario.Usuario</p>
                         @if (tieneDescripcion)
                         {
-                            <p class="sw-perfil-descripcion mb-3">@usuario.Descripcion</p>
+                            <p class="texto-con-saltos mb-3">@usuario.Descripcion</p>
                         }
-                        <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-3 text-suave small">
+                        <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-3 texto-suave small">
                             @if (ubicacion != "")
                             {
-                                <span><i class="bi bi-geo-alt me-1"></i>@ubicacion</span>
+                                <span><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>@ubicacion</span>
                             }
-                            <span><i class="bi bi-box-seam me-1"></i>@articulos.Count @(articulos.Count == 1 ? "artículo publicado" : "artículos publicados")</span>
+                            <span><i class="bi bi-box-seam me-1" aria-hidden="true"></i>@articulos.Count @(articulos.Count == 1 ? "artículo publicado" : "artículos publicados")</span>
                         </div>
                     </div>
                 </div>
@@ -68,8 +68,8 @@
 
         <!-- ===== Artículos publicados ===== -->
         <div class="col-12">
-            <section class="sw-card p-4" aria-labelledby="titulo-articulos-usuario">
-                <h2 class="font-titulo h3 mb-4" id="titulo-articulos-usuario">Artículos de @usuario.Nombre</h2>
+            <section class="tarjeta-blanca p-4" aria-labelledby="titulo-articulos-usuario">
+                <h2 class="letra-serif h3 mb-4" id="titulo-articulos-usuario">Artículos de @usuario.Nombre</h2>
 
                 @if (articulos.Count > 0)
                 {
@@ -84,8 +84,8 @@
                 else
                 {
                     <div class="text-center py-4">
-                        <i class="bi bi-box-seam fs-1 text-suave"></i>
-                        <p class="text-suave mt-2 mb-0">@usuario.Nombre todavía no publicó ningún artículo.</p>
+                        <i class="bi bi-box-seam fs-1 texto-suave" aria-hidden="true"></i>
+                        <p class="texto-suave mt-2 mb-0">@usuario.Nombre todavía no publicó ningún artículo.</p>
                     </div>
                 }
             </section>

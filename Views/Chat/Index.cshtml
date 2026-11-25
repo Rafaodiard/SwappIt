@@ -14,105 +14,104 @@
 <div class="container-xl py-4">
     @if (errorCarga)
     {
-        <div class="sw-card p-5 text-center">
-            <i class="bi bi-exclamation-triangle fs-1 text-suave" aria-hidden="true"></i>
-            <h1 class="font-titulo h2 mt-3">No pudimos cargar tus mensajes</h1>
-            <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+        <div class="tarjeta-blanca p-5 text-center">
+            <i class="bi bi-exclamation-triangle fs-1 texto-suave" aria-hidden="true"></i>
+            <h1 class="letra-serif h2 mt-3">No pudimos cargar tus mensajes</h1>
+            <p class="texto-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
         </div>
-        return;
     }
-
-    @if (contactos.Count == 0 && abierta == null)
+    else if (contactos.Count == 0 && abierta == null)
     {
-        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
-            <i class="bi bi-chat-dots fs-1 text-suave" aria-hidden="true"></i>
-            <h1 class="font-titulo h2 mt-3">@(idPedido != null ? "Esta conversación no existe" : "Todavía no tenés conversaciones")</h1>
-            <p class="text-suave mb-4">Cuando propongas o recibas un intercambio, vas a poder chatear acá con la otra persona para coordinarlo.</p>
-            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Buscar artículos</a>
+        <div class="tarjeta-blanca angosta p-5 text-center mx-auto">
+            <i class="bi bi-chat-dots fs-1 texto-suave" aria-hidden="true"></i>
+            <h1 class="letra-serif h2 mt-3">@(idPedido != null ? "Esta conversación no existe" : "Todavía no tenés conversaciones")</h1>
+            <p class="texto-suave mb-4">Cuando propongas o recibas un intercambio, vas a poder chatear acá con la otra persona para coordinarlo.</p>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Buscar artículos</a>
         </div>
-        return;
     }
+    else
+    {
+        <div class="alto-pantalla tarjeta-blanca row g-0">
 
-    <div class="sw-chat sw-card row g-0">
-
-        <!-- ===== Lista de conversaciones ===== -->
-        <aside class="col-md-4 col-lg-3 sw-chat-lista d-flex flex-column" aria-label="Conversaciones">
-            <div class="p-3">
-                <div class="sw-buscador border">
-                    <input type="search" placeholder="Buscar" aria-label="Buscar conversación" data-chat-buscar>
-                    <i class="bi bi-search me-2" aria-hidden="true"></i>
-                </div>
-            </div>
-
-            <nav>
-                @foreach (var contacto in contactos)
-                {
-                    <a href="@Url.Action("Index", "Chat", new { id = contacto.Intercambio.IdIntercambios })" class="sw-chat-contacto @(contacto.Activa ? "activo" : "")"
-                       aria-current="@(contacto.Activa ? "page" : null)" data-chat-contacto="@contacto.TextoBusqueda">
-                        <span class="sw-avatar" aria-hidden="true">@contacto.Intercambio.OtroIniciales</span>
-                        <div class="flex-grow-1 min-w-0">
-                            <div class="d-flex justify-content-between gap-2">
-                                <span class="fw-semibold text-truncate">@contacto.Intercambio.OtroNombre @contacto.Intercambio.OtroApellido</span>
-                                @if (contacto.Cuando != null)
-                                {
-                                    <span class="small text-suave flex-shrink-0">@contacto.Cuando</span>
-                                }
-                            </div>
-                            <div class="small text-suave text-truncate">@contacto.VistaPrevia</div>
-                        </div>
-                        @if (contacto.NoLeidos > 0)
-                        {
-                            <span class="no-leidos">@contacto.NoLeidosTexto<span class="visually-hidden"> sin leer</span></span>
-                        }
-                    </a>
-                }
-                <p class="small text-suave px-3 py-2 mb-0" data-chat-sin-resultados hidden>No hay conversaciones con ese nombre.</p>
-            </nav>
-        </aside>
-
-        <!-- ===== Conversación ===== -->
-        <section class="col-md-8 col-lg-9 d-flex flex-column h-100" aria-label="Conversación">
-            @if (abierta == null)
-            {
-                <div class="sw-chat-vacio flex-grow-1">
-                    <i class="bi bi-chat-dots fs-2" aria-hidden="true"></i>
-                    <p class="mb-0">Esta conversación no existe. Elegí otra de la lista.</p>
-                </div>
-            }
-            else
-            {
-                <header class="sw-chat-header d-flex align-items-center gap-3">
-                    <span class="sw-avatar" data-iniciales="@abierta.OtroIniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @abierta.OtroIniciales }</span>
-                    <div class="flex-grow-1 min-w-0">
-                        <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
-                        <div class="small text-suave text-truncate">Intercambio: @abierta.MiArticuloResumen ⇄ @abierta.SuArticuloResumen</div>
+            <!-- ===== Lista de conversaciones ===== -->
+            <aside class="col-md-4 col-lg-3 columna-celeste d-flex flex-column" aria-label="Conversaciones">
+                <div class="p-3">
+                    <div class="campo-redondeado border">
+                        <input type="search" placeholder="Buscar" aria-label="Buscar conversación" data-chat-buscar>
+                        <i class="bi bi-search me-2" aria-hidden="true"></i>
                     </div>
-                    <span class="sw-estado-intercambio sw-estado-intercambio--@(abierta.EstadoCss) d-none d-sm-inline-block">@abierta.Estado</span>
-                    <a href="@Url.Action("Detalle", "Intercambio", new { id = abierta.IdIntercambios })" class="btn btn-sw-outline btn-sm flex-shrink-0">Ver intercambio</a>
-                </header>
-
-                <div id="mensajes" class="sw-chat-mensajes flex-grow-1" data-url-mensajes="@Url.Action("Mensajes", "Chat", new { id = abierta.IdIntercambios })"
-                     role="log" aria-live="polite" aria-label="Mensajes con @abierta.OtroNombre">
-                    <partial name="_Mensajes" />
                 </div>
 
-                <div class="alert alert-danger rounded-0 mb-0 py-2 small" role="alert" data-chat-error hidden><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> <span data-chat-error-texto></span></div>
+                <nav>
+                    @foreach (var contacto in contactos)
+                    {
+                        <a href="@Url.Action("Index", "Chat", new { id = contacto.Intercambio.IdIntercambios })" class="fila-seleccionable @(contacto.Activa ? "activo" : "")"
+                           aria-current="@(contacto.Activa ? "page" : null)" data-chat-contacto="@contacto.TextoBusqueda">
+                            <span class="foto-redonda-mini" aria-hidden="true">@contacto.Intercambio.OtroIniciales</span>
+                            <div class="flex-grow-1 sin-ancho-minimo">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <span class="fw-semibold text-truncate">@contacto.Intercambio.OtroNombre @contacto.Intercambio.OtroApellido</span>
+                                    @if (contacto.Cuando != null)
+                                    {
+                                        <span class="small texto-suave flex-shrink-0">@contacto.Cuando</span>
+                                    }
+                                </div>
+                                <div class="small texto-suave text-truncate">@contacto.VistaPrevia</div>
+                            </div>
+                            @if (contacto.NoLeidos > 0)
+                            {
+                                <span class="numero-bordo">@contacto.NoLeidosTexto<span class="visually-hidden"> sin leer</span></span>
+                            }
+                        </a>
+                    }
+                    <p class="small texto-suave px-3 py-2 mb-0" data-chat-sin-resultados hidden>No hay conversaciones con ese nombre.</p>
+                </nav>
+            </aside>
 
-                @if (puedeEscribir)
+            <!-- ===== Conversación ===== -->
+            <section class="col-md-8 col-lg-9 d-flex flex-column h-100 seccion-simple" aria-label="Conversación">
+                @if (abierta == null)
                 {
-                    <form method="post" action="@Url.Action("Enviar", "Chat", new { id = abierta.IdIntercambios })" asp-antiforgery="true" class="sw-chat-input d-flex align-items-center gap-2" data-chat-enviar>
-                        <input type="text" class="form-control" aria-label="Mensaje" name="texto" placeholder="Escribí un mensaje"
-                               maxlength="@largoMaximo" autocomplete="off" required data-chat-texto>
-                        <button type="submit" class="sw-btn-icono" aria-label="Enviar"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
-                    </form>
+                    <div class="bloque-centrado flex-grow-1">
+                        <i class="bi bi-chat-dots fs-2" aria-hidden="true"></i>
+                        <p class="mb-0">Esta conversación no existe. Elegí otra de la lista.</p>
+                    </div>
                 }
                 else
                 {
-                    <p class="sw-chat-input small text-suave text-center mb-0">@textoNoPuedeEscribir</p>
+                    <header class="cabecera-blanca d-flex align-items-center gap-3">
+                        <span class="foto-redonda-mini" data-iniciales="@abierta.OtroIniciales" aria-hidden="true">@if (fotoOtro != null) { <img src="@fotoOtro" alt=""> } else { @abierta.OtroIniciales }</span>
+                        <div class="flex-grow-1 sin-ancho-minimo">
+                            <a href="@Url.Action("Publico", "Perfil", new { id = abierta.OtroIdUsuario })" class="fw-semibold text-dark text-decoration-none">@abierta.OtroNombre @abierta.OtroApellido</a>
+                            <div class="small texto-suave text-truncate">Intercambio: @abierta.MiArticuloResumen ⇄ @abierta.SuArticuloResumen</div>
+                        </div>
+                        <span class="pastilla @(abierta.EstadoCss) d-none d-sm-inline-block">@abierta.Estado</span>
+                        <a href="@Url.Action("Detalle", "Intercambio", new { id = abierta.IdIntercambios })" class="btn boton-contorno-azul btn-sm flex-shrink-0">Ver intercambio</a>
+                    </header>
+
+                    <div id="mensajes" class="zona-desplazable flex-grow-1" data-url-mensajes="@Url.Action("Mensajes", "Chat", new { id = abierta.IdIntercambios })"
+                         role="log" aria-live="polite" aria-label="Mensajes con @abierta.OtroNombre">
+                        <partial name="_Mensajes" />
+                    </div>
+
+                    <div class="alert alert-danger rounded-0 mb-0 py-2 small" role="alert" data-chat-error hidden><i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i> <span data-chat-error-texto></span></div>
+
+                    @if (puedeEscribir)
+                    {
+                        <form method="post" action="@Url.Action("Enviar", "Chat", new { id = abierta.IdIntercambios })" asp-antiforgery="true" class="barra-inferior d-flex align-items-center gap-2" data-chat-enviar>
+                            <input type="text" class="form-control" aria-label="Mensaje" name="texto" placeholder="Escribí un mensaje"
+                                   maxlength="@largoMaximo" autocomplete="off" required data-chat-texto>
+                            <button type="submit" class="boton-redondo-bordo" aria-label="Enviar"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="barra-inferior small texto-suave text-center mb-0">@textoNoPuedeEscribir</p>
+                    }
                 }
-            }
-        </section>
-    </div>
+            </section>
+        </div>
+    }
 </div>
 
 @section Scripts {

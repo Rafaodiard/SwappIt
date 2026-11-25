@@ -7,52 +7,50 @@
 
 <div class="container-xl py-4 py-lg-5">
     <header class="mb-4">
-        <h1 class="font-titulo display-5 text-primario mb-1">Favoritos</h1>
-        <p class="text-suave mb-0">Los artículos que guardaste para ver después.</p>
+        <h1 class="letra-serif display-5 texto-azul mb-1">Favoritos</h1>
+        <p class="texto-suave mb-0">Los artículos que guardaste para ver después.</p>
     </header>
-
-    @if (!errorCarga)
-    {
-        <div class="sw-buscador border mb-3" style="max-width: 420px;">
-            <input type="search" id="buscador-favoritos" placeholder="Buscar por nombre" aria-label="Buscar favoritos por nombre" autocomplete="off">
-            <i class="bi bi-search me-2 text-suave" aria-hidden="true"></i>
-        </div>
-    }
 
     @if (errorCarga)
     {
-        <div class="sw-card p-5 text-center" role="alert">
-            <i class="bi bi-exclamation-triangle fs-1 text-suave" aria-hidden="true"></i>
-            <h2 class="font-titulo h3 mt-3">No pudimos cargar tus favoritos</h2>
-            <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+        <div class="tarjeta-blanca p-5 text-center" role="alert">
+            <i class="bi bi-exclamation-triangle fs-1 texto-suave" aria-hidden="true"></i>
+            <h2 class="letra-serif h3 mt-3">No pudimos cargar tus favoritos</h2>
+            <p class="texto-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
         </div>
-        return;
     }
+    else
+    {
+        <div class="campo-redondeado campo-angosto border mb-3">
+            <input type="search" id="buscador-favoritos" placeholder="Buscar por nombre" aria-label="Buscar favoritos por nombre" autocomplete="off">
+            <i class="bi bi-search me-2 texto-suave" aria-hidden="true"></i>
+        </div>
 
-    <p id="favoritos-estado" class="text-suave small mb-3" role="status" aria-live="polite" hidden="@(articulos.Count == 0)">
-        @textoCantidad
-    </p>
+        <p id="favoritos-estado" class="texto-suave small mb-3" role="status" aria-live="polite" hidden="@(articulos.Count == 0)">
+            @textoCantidad
+        </p>
 
-    <div id="lista-favoritos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-        @foreach (var articulo in articulos)
-        {
-            ViewBag.articulo = articulo;
-            <partial name="_CardObjeto" />
-        }
-    </div>
+        <div id="lista-favoritos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+            @foreach (var articulo in articulos)
+            {
+                ViewBag.articulo = articulo;
+                <partial name="_CardObjeto" />
+            }
+        </div>
 
-    <div id="favoritos-sin-resultados" class="sw-card p-5 text-center" hidden>
-        <i class="bi bi-search fs-1 text-suave" aria-hidden="true"></i>
-        <h2 class="font-titulo h3 mt-3">No encontramos favoritos</h2>
-        <p class="text-suave mb-0">Probá con otro nombre.</p>
-    </div>
+        <div id="favoritos-sin-resultados" class="tarjeta-blanca p-5 text-center" hidden>
+            <i class="bi bi-search fs-1 texto-suave" aria-hidden="true"></i>
+            <h2 class="letra-serif h3 mt-3">No encontramos favoritos</h2>
+            <p class="texto-suave mb-0">Probá con otro nombre.</p>
+        </div>
 
-    <div id="favoritos-vacio" class="sw-card p-5 text-center" hidden="@(articulos.Count > 0)">
-        <i class="bi bi-heart fs-1 text-suave" aria-hidden="true"></i>
-        <h2 class="font-titulo h3 mt-3">Todavía no tenés favoritos</h2>
-        <p class="text-suave">Tocá el corazón de un artículo para guardarlo acá.</p>
-        <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Explorar artículos</a>
-    </div>
+        <div id="favoritos-vacio" class="tarjeta-blanca p-5 text-center" hidden="@(articulos.Count > 0)">
+            <i class="bi bi-heart fs-1 texto-suave" aria-hidden="true"></i>
+            <h2 class="letra-serif h3 mt-3">Todavía no tenés favoritos</h2>
+            <p class="texto-suave">Tocá el corazón de un artículo para guardarlo acá.</p>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Explorar artículos</a>
+        </div>
+    }
 </div>
 
 @section Scripts {

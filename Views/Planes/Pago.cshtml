@@ -4,69 +4,69 @@
     ViewData["Title"] = $"Pasarme a {plan.Nombre}";
 }
 
-<section class="sw-planes-pagina" aria-labelledby="titulo-pago">
+<section class="seccion-espaciada" aria-labelledby="titulo-pago">
     <div class="container-xl">
-        <a href="@Url.Action("Index", "Planes")" class="sw-volver mb-3"><i class="bi bi-chevron-left" aria-hidden="true"></i> Planes</a>
+        <a href="@Url.Action("Index", "Planes")" class="enlace-flecha mb-3"><i class="bi bi-chevron-left" aria-hidden="true"></i> Planes</a>
 
         <header class="mb-4 mb-lg-5">
-            <p class="sw-eyebrow">Pago</p>
-            <h1 class="font-titulo display-5 text-primario mb-0" id="titulo-pago">Pasate a @plan.Nombre</h1>
+            <p class="antetitulo">Pago</p>
+            <h1 class="letra-serif display-5 texto-azul mb-0" id="titulo-pago">Pasate a @plan.Nombre</h1>
         </header>
 
         <div class="row g-4 g-xl-5 align-items-start">
             <div class="col-lg-7">
-                <form class="sw-card sw-form sw-pago p-4 p-md-5" method="post" action="@Url.Action("Cambiar", "Planes")" asp-antiforgery="true" autocomplete="off">
+                <form class="tarjeta-blanca formulario-espaciado p-4 p-md-5" method="post" action="@Url.Action("Cambiar", "Planes")" asp-antiforgery="true" autocomplete="off">
                     <input type="hidden" name="idPlan" value="@plan.Id">
 
-                    <div class="sw-pago-aviso" role="note">
+                    <div class="aviso-crema-icono" role="note">
                         <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
                         <p class="mb-0"><strong>Pago de demostración.</strong> Swappit todavía no cobra: los datos que escribas acá no se guardan ni se envían. Al confirmar solo se activa el plan.</p>
                     </div>
 
-                    <div class="sw-campo">
-                        <label class="sw-label" for="pago-titular">Nombre del titular</label>
-                        <input class="sw-input" id="pago-titular" placeholder="Como figura en la tarjeta" maxlength="60" autocomplete="off" required>
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="pago-titular">Nombre del titular</label>
+                        <input class="caja-texto" id="pago-titular" placeholder="Como figura en la tarjeta" maxlength="60" autocomplete="off" required>
                     </div>
 
-                    <div class="sw-campo">
-                        <label class="sw-label" for="pago-numero">Número de tarjeta</label>
-                        <div class="sw-input-icono">
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="pago-numero">Número de tarjeta</label>
+                        <div class="con-icono">
                             <i class="bi bi-credit-card" aria-hidden="true"></i>
-                            <input class="sw-input" id="pago-numero" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off" required>
+                            <input class="caja-texto" id="pago-numero" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="off" required>
                         </div>
                     </div>
 
-                    <div class="sw-fila">
-                        <div class="sw-campo">
-                            <label class="sw-label" for="pago-vencimiento">Vencimiento</label>
-                            <input class="sw-input" id="pago-vencimiento" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="off" required>
+                    <div class="grilla-dos-columnas">
+                        <div class="columna-campo">
+                            <label class="etiqueta-negrita" for="pago-vencimiento">Vencimiento</label>
+                            <input class="caja-texto" id="pago-vencimiento" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="off" required>
                         </div>
-                        <div class="sw-campo">
-                            <label class="sw-label" for="pago-codigo">Código de seguridad</label>
-                            <input class="sw-input" id="pago-codigo" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="off" required>
+                        <div class="columna-campo">
+                            <label class="etiqueta-negrita" for="pago-codigo">Código de seguridad</label>
+                            <input class="caja-texto" id="pago-codigo" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="off" required>
                         </div>
                     </div>
 
-                    <div class="sw-campo">
-                        <label class="sw-label" for="pago-dni">DNI del titular</label>
-                        <input class="sw-input" id="pago-dni" inputmode="numeric" placeholder="Sin puntos" maxlength="10" autocomplete="off" required>
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="pago-dni">DNI del titular</label>
+                        <input class="caja-texto" id="pago-dni" inputmode="numeric" placeholder="Sin puntos" maxlength="10" autocomplete="off" required>
                     </div>
 
                     <div class="d-flex flex-column gap-3">
-                        <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Pagar @plan.Precio y activar @plan.Nombre</button>
-                        <a href="@Url.Action("Index", "Planes")" class="sw-link text-center">Cancelar</a>
+                        <button type="submit" class="boton-alto boton-azul ancho-completo">Pagar @plan.Precio y activar @plan.Nombre</button>
+                        <a href="@Url.Action("Index", "Planes")" class="enlace-azul text-center">Cancelar</a>
                     </div>
                 </form>
             </div>
 
             <div class="col-lg-5">
-                <aside class="sw-card sw-pago-resumen sw-pago-resumen--@plan.Clave p-4 p-md-5" aria-labelledby="titulo-resumen-pago">
-                    <h2 class="sw-perfil-plan-titulo" id="titulo-resumen-pago">Resumen</h2>
-                    <div class="sw-pago-resumen-plan">
-                        <span class="sw-plan-nombre">@plan.Nombre</span>
-                        <span><span class="sw-plan-monto">@plan.Precio</span><span class="sw-plan-periodo" aria-hidden="true">/mes</span><span class="visually-hidden">por mes</span></span>
+                <aside class="tarjeta-blanca tarjeta-fija tono-@plan.Tono p-4 p-md-5" aria-labelledby="titulo-resumen-pago">
+                    <h2 class="antetitulo-suave" id="titulo-resumen-pago">Resumen</h2>
+                    <div class="fila-separada">
+                        <span class="tarjeta-precio-titulo">@plan.Nombre</span>
+                        <span><span class="numero-grande">@plan.Precio</span><span class="sufijo-suave" aria-hidden="true">/mes</span><span class="visually-hidden">por mes</span></span>
                     </div>
-                    <ul class="sw-plan-lista">
+                    <ul class="lista-tildes">
                         @foreach (string beneficio in plan.Beneficios)
                         {
                             <li><i class="bi bi-check2" aria-hidden="true"></i><span>@beneficio</span></li>
@@ -74,7 +74,7 @@
                     </ul>
                     @if (planActual != null)
                     {
-                        <p class="text-suave small mb-0">Hoy tenés el plan @planActual.Nombre. El cambio se aplica apenas confirmás y podés volver a cambiarlo cuando quieras.</p>
+                        <p class="texto-suave small mb-0">Hoy tenés el plan @planActual.Nombre. El cambio se aplica apenas confirmás y podés volver a cambiarlo cuando quieras.</p>
                     }
                 </aside>
             </div>

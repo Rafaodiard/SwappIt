@@ -29,7 +29,15 @@ public class IntercambioViewModel
     public string? OtroProvincia { get; set; }
 
     public bool PorResponder => EsRecibido && Estado == EstadosIntercambios.Pendiente;
-    public string EstadoCss => Estado.ToLowerInvariant();
+    public string EstadoCss => Estado switch
+    {
+        EstadosIntercambios.Pendiente => "tono-crema",
+        EstadosIntercambios.Aceptado => "tono-azul",
+        EstadosIntercambios.Realizado => "tono-celeste",
+        EstadosIntercambios.Rechazado => "tono-bordo",
+        EstadosIntercambios.Cancelado => "tono-rosa",
+        _ => ""
+    };
     public string FechaTexto => Fecha.ToString("dd/MM/yyyy");
     public string FechaCorta => Fecha.ToString("dd/MM");
     public string OtroIniciales => SesionUsuario.Iniciales(OtroNombre, OtroApellido);

@@ -14,13 +14,13 @@
 }
 
 <!-- ===== Saludo ===== -->
-<section class="sw-inicio-saludo text-center" aria-labelledby="titulo-inicio">
+<section class="franja-blanca text-center" aria-labelledby="titulo-inicio">
     <div class="container-xl">
         <h1 class="mb-3" id="titulo-inicio">@saludo</h1>
-        <p class="lead text-secundario mb-4 mb-md-5">¿Qué vas a intercambiar hoy?</p>
+        <p class="lead texto-bordo mb-4 mb-md-5">¿Qué vas a intercambiar hoy?</p>
         <div class="d-flex flex-wrap justify-content-center gap-3">
-            <a href="@Url.Action("Index", "Publicar")" class="btn btn-lg btn-sw-primario"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar un artículo</a>
-            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-lg btn-sw-outline">Explorar artículos</a>
+            <a href="@Url.Action("Index", "Publicar")" class="btn btn-lg boton-bordo"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar un artículo</a>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-lg boton-contorno-azul">Explorar artículos</a>
         </div>
     </div>
 </section>
@@ -28,138 +28,139 @@
 <div class="container-xl py-4 py-lg-5">
     @if (errorCarga)
     {
-        <div class="sw-card p-5 text-center">
-            <i class="bi bi-exclamation-triangle fs-1 text-suave"></i>
-            <h2 class="font-titulo h3 mt-3">No pudimos cargar tu inicio</h2>
-            <p class="text-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
+        <div class="tarjeta-blanca p-5 text-center">
+            <i class="bi bi-exclamation-triangle fs-1 texto-suave" aria-hidden="true"></i>
+            <h2 class="letra-serif h3 mt-3">No pudimos cargar tu inicio</h2>
+            <p class="texto-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
         </div>
-        return;
     }
-
-    <div class="row g-4 g-xl-5">
-        <!-- ===== Columna lateral: resumen e intercambios en curso ===== -->
-        <aside class="col-lg-4 order-lg-2" aria-label="Tu actividad">
-            <div class="sw-inicio-lateral d-flex flex-column gap-4">
-                <section class="sw-card p-3 p-md-4" aria-labelledby="titulo-resumen">
-                    <h2 class="font-titulo h4 mb-3" id="titulo-resumen">Tu resumen</h2>
-                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
-                        <li>
-                            <a href="@Url.Action("Index", "Intercambio", new { estado = estadoPendiente })" class="sw-resumen @(porResponder > 0 ? "sw-resumen--alerta" : "")">
-                                <span class="sw-resumen-icono"><i class="bi bi-inbox" aria-hidden="true"></i></span>
-                                <span class="sw-resumen-texto">@(porResponder == 1 ? "Propuesta por responder" : "Propuestas por responder")</span>
-                                <span class="sw-resumen-numero">@porResponder</span>
-                            </a>
-                        </li>
-                        @if (mensajesSinLeer != null)
-                        {
+    else
+    {
+        <div class="row g-4 g-xl-5">
+            <!-- ===== Columna lateral: resumen e intercambios en curso ===== -->
+            <aside class="col-lg-4 order-lg-2" aria-label="Tu actividad">
+                <div class="columna-pegajosa d-flex flex-column gap-4">
+                    <section class="tarjeta-blanca p-3 p-md-4" aria-labelledby="titulo-resumen">
+                        <h2 class="letra-serif h4 mb-3" id="titulo-resumen">Tu resumen</h2>
+                        <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
                             <li>
-                                <a href="@Url.Action("Index", "Chat")" class="sw-resumen @(mensajesSinLeer > 0 ? "sw-resumen--alerta" : "")">
-                                    <span class="sw-resumen-icono"><i class="bi bi-chat-dots" aria-hidden="true"></i></span>
-                                    <span class="sw-resumen-texto">@(mensajesSinLeer == 1 ? "Mensaje sin leer" : "Mensajes sin leer")</span>
-                                    <span class="sw-resumen-numero">@mensajesSinLeer</span>
+                                <a href="@Url.Action("Index", "Intercambio", new { estado = estadoPendiente })" class="enlace-elevable @(porResponder > 0 ? "tono-rosa" : "")">
+                                    <span class="circulo-crema"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+                                    <span class="enlace-elevable-texto">@(porResponder == 1 ? "Propuesta por responder" : "Propuestas por responder")</span>
+                                    <span class="numero-serif">@porResponder</span>
                                 </a>
                             </li>
-                        }
-                        <li>
-                            <a href="@Url.Action("Index", "Perfil")" class="sw-resumen">
-                                <span class="sw-resumen-icono"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-                                <span class="sw-resumen-texto">@(cantidadArticulos == 1 ? "Artículo publicado" : "Artículos publicados")</span>
-                                <span class="sw-resumen-numero">@cantidadArticulos</span>
-                            </a>
-                        </li>
-                    </ul>
-                </section>
-
-                <section class="sw-card p-3 p-md-4" aria-labelledby="titulo-en-curso">
-                    <div class="d-flex justify-content-between align-items-baseline gap-3 mb-3">
-                        <h2 class="font-titulo h4 mb-0" id="titulo-en-curso">Intercambios en curso</h2>
-                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold small text-decoration-none text-primario text-nowrap">@textoVerTodos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
-                    </div>
-
-                    @if (intercambios.Count > 0)
-                    {
-                        <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
-                            @foreach (var intercambio in intercambios)
+                            @if (mensajesSinLeer != null)
                             {
                                 <li>
-                                    <a href="@Url.Action("Detalle", "Intercambio", new { id = intercambio.IdIntercambios })" class="sw-inicio-intercambio">
-                                        <span class="sw-inicio-intercambio-img sw-img"><img src="@intercambio.SuArticuloImagen" alt=""></span>
-                                        <span class="flex-grow-1 min-w-0">
-                                            <span class="sw-inicio-intercambio-nombre">@intercambio.SuArticuloResumen</span>
-                                            <span class="sw-inicio-intercambio-detalle"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @intercambio.MiArticuloResumen</span>
-                                            <span class="sw-inicio-intercambio-detalle">con @@@intercambio.OtroUsuario</span>
-                                        </span>
-                                        @if (intercambio.PorResponder)
-                                        {
-                                            <span class="sw-estado-intercambio sw-inicio-responder">Responder</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="sw-estado-intercambio sw-estado-intercambio--@(intercambio.EstadoCss)">@intercambio.Estado</span>
-                                        }
+                                    <a href="@Url.Action("Index", "Chat")" class="enlace-elevable @(mensajesSinLeer > 0 ? "tono-rosa" : "")">
+                                        <span class="circulo-crema"><i class="bi bi-chat-dots" aria-hidden="true"></i></span>
+                                        <span class="enlace-elevable-texto">@(mensajesSinLeer == 1 ? "Mensaje sin leer" : "Mensajes sin leer")</span>
+                                        <span class="numero-serif">@mensajesSinLeer</span>
                                     </a>
                                 </li>
                             }
+                            <li>
+                                <a href="@Url.Action("Index", "Perfil")" class="enlace-elevable">
+                                    <span class="circulo-crema"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+                                    <span class="enlace-elevable-texto">@(cantidadArticulos == 1 ? "Artículo publicado" : "Artículos publicados")</span>
+                                    <span class="numero-serif">@cantidadArticulos</span>
+                                </a>
+                            </li>
                         </ul>
+                    </section>
+
+                    <section class="tarjeta-blanca p-3 p-md-4" aria-labelledby="titulo-en-curso">
+                        <div class="d-flex justify-content-between align-items-baseline gap-3 mb-3">
+                            <h2 class="letra-serif h4 mb-0" id="titulo-en-curso">Intercambios en curso</h2>
+                            <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold small text-decoration-none texto-azul text-nowrap">@textoVerTodos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                        </div>
+
+                        @if (intercambios.Count > 0)
+                        {
+                            <ul class="list-unstyled d-flex flex-column gap-1 mb-0">
+                                @foreach (var intercambio in intercambios)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Detalle", "Intercambio", new { id = intercambio.IdIntercambios })" class="fila-enlace">
+                                            <span class="fila-enlace-imagen marco-imagen"><img src="@intercambio.SuArticuloImagen" alt=""></span>
+                                            <span class="flex-grow-1 sin-ancho-minimo">
+                                                <span class="fila-enlace-titulo">@intercambio.SuArticuloResumen</span>
+                                                <span class="fila-enlace-texto"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> <span class="visually-hidden">a cambio de</span> @intercambio.MiArticuloResumen</span>
+                                                <span class="fila-enlace-texto">con @@@intercambio.OtroUsuario</span>
+                                            </span>
+                                            @if (intercambio.PorResponder)
+                                            {
+                                                <span class="pastilla tono-bordo">Responder</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="pastilla @(intercambio.EstadoCss)">@intercambio.Estado</span>
+                                            }
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="texto-suave small mb-0">No tenés intercambios en curso. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
+                        }
+                    </section>
+                </div>
+            </aside>
+
+            <!-- ===== Columna principal: destacados para vos ===== -->
+            <div class="col-lg-8 order-lg-1">
+                @if (cantidadArticulos == 0)
+                {
+                    <section class="aviso-crema-grande mb-4" aria-labelledby="titulo-aviso">
+                        <span class="circulo-crema"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
+                        <div class="flex-grow-1">
+                            <h2 class="h6 fw-bold mb-1" id="titulo-aviso">Publicá tu primer artículo</h2>
+                            <p class="texto-suave small mb-0">Para proponer un intercambio necesitás ofrecer algo tuyo. Subí un objeto que ya no uses y empezá a intercambiar.</p>
+                        </div>
+                        <a href="@Url.Action("Index", "Publicar")" class="btn boton-bordo btn-sm text-nowrap">Publicar</a>
+                    </section>
+                }
+
+                <section class="seccion-simple" aria-labelledby="titulo-destacados">
+                    <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
+                        <h2 class="letra-serif h3 texto-azul mb-0" id="titulo-destacados">Destacados para vos</h2>
+                        <a href="@Url.Action("Buscar", "Articulos", new { orden = ordenParaVos })" class="fw-semibold text-decoration-none texto-azul text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    </div>
+
+                    @if (destacados.Count > 0)
+                    {
+                        <div class="row row-cols-2 row-cols-md-3 g-3">
+                            @foreach (var articulo in destacados)
+                            {
+                                ViewBag.articulo = articulo;
+                                <partial name="_CardObjeto" />
+                            }
+                        </div>
                     }
                     else
                     {
-                        <p class="text-suave small mb-0">No tenés intercambios en curso. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
+                        <div class="tarjeta-blanca p-5 text-center">
+                            <i class="bi bi-box-seam fs-1 texto-suave" aria-hidden="true"></i>
+                            <p class="texto-suave mt-2 mb-0">Todavía no hay artículos de otras personas para intercambiar.</p>
+                        </div>
                     }
                 </section>
             </div>
-        </aside>
-
-        <!-- ===== Columna principal: destacados para vos ===== -->
-        <div class="col-lg-8 order-lg-1">
-            @if (cantidadArticulos == 0)
-            {
-                <section class="sw-inicio-aviso mb-4" aria-labelledby="titulo-aviso">
-                    <span class="sw-resumen-icono"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
-                    <div class="flex-grow-1">
-                        <h2 class="h6 fw-bold mb-1" id="titulo-aviso">Publicá tu primer artículo</h2>
-                        <p class="text-suave small mb-0">Para proponer un intercambio necesitás ofrecer algo tuyo. Subí un objeto que ya no uses y empezá a intercambiar.</p>
-                    </div>
-                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario btn-sm text-nowrap">Publicar</a>
-                </section>
-            }
-
-            <section aria-labelledby="titulo-destacados">
-                <div class="d-flex justify-content-between align-items-center gap-3 mb-3 mb-md-4">
-                    <h2 class="font-titulo h3 text-primario mb-0" id="titulo-destacados">Destacados para vos</h2>
-                    <a href="@Url.Action("Buscar", "Articulos", new { orden = ordenParaVos })" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
-                </div>
-
-                @if (destacados.Count > 0)
-                {
-                    <div class="row row-cols-2 row-cols-md-3 g-3">
-                        @foreach (var articulo in destacados)
-                        {
-                            ViewBag.articulo = articulo;
-                            <partial name="_CardObjeto" />
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="sw-card p-5 text-center">
-                        <i class="bi bi-box-seam fs-1 text-suave"></i>
-                        <p class="text-suave mt-2 mb-0">Todavía no hay artículos de otras personas para intercambiar.</p>
-                    </div>
-                }
-            </section>
         </div>
-    </div>
+    }
 </div>
 
-@if (planes.Count > 0)
+@if (!errorCarga && planes.Count > 0)
 {
-    <section id="planes" class="sw-suscripciones-detalle" aria-labelledby="titulo-planes">
+    <section id="planes" class="seccion-con-linea" aria-labelledby="titulo-planes">
         <div class="container-xl">
-            <div class="sw-planes-encabezado">
-                <p class="sw-eyebrow">Planes</p>
-                <h2 class="font-titulo text-primario mb-3" id="titulo-planes">Elegí la opción que mejor se adapte a vos</h2>
-                <p class="text-suave mb-0">Todos los usuarios pueden intercambiar gratis. Con Plus o Pro publicás y proponés más, y tus artículos se recomiendan más.</p>
+            <div class="cabecera-angosta">
+                <p class="antetitulo">Planes</p>
+                <h2 class="letra-serif texto-azul mb-3" id="titulo-planes">Elegí la opción que mejor se adapte a vos</h2>
+                <p class="texto-suave mb-0">Todos los usuarios pueden intercambiar gratis. Con Plus o Pro publicás y proponés más, y tus artículos se recomiendan más.</p>
             </div>
             <partial name="_GrillaPlanes" />
         </div>

@@ -4,15 +4,15 @@
 }
 
 <div class="container-xl py-5">
-    <div class="sw-card sw-error-pagina p-5 text-center mx-auto">
-        <span class="sw-error-pagina-icono mb-3" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
-        <h1 class="font-titulo h2 text-primario">Algo salió mal</h1>
-        <p class="text-suave mb-4">Hubo un problema al procesar tu pedido. Probá de nuevo en unos minutos.</p>
-        <a href="@Url.Action("Index", "Home")" class="btn btn-sw-primario">Volver al inicio</a>
+    <div class="tarjeta-blanca angosta p-5 text-center mx-auto">
+        <span class="circulo-crema-grande mb-3" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+        <h1 class="letra-serif h2 texto-azul">Algo salió mal</h1>
+        <p class="texto-suave mb-4">Hubo un problema al procesar tu pedido. Probá de nuevo en unos minutos.</p>
+        <a href="@Url.Action("Index", "Home")" class="btn boton-bordo">Volver al inicio</a>
 
         @if (requestId != null)
         {
-            <p class="small text-suave mt-4 mb-0">Código del error: <code>@requestId</code></p>
+            <p class="small texto-suave mt-4 mb-0">Código del error: <code>@requestId</code></p>
         }
     </div>
 </div>

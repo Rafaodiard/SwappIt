@@ -16,7 +16,7 @@
     }
 
     function tarjetas() {
-        return Array.from(lista.querySelectorAll('.col-objeto'));
+        return Array.from(lista.querySelectorAll('.columna-tarjeta'));
     }
 
     function actualizar() {
@@ -56,8 +56,8 @@
 
     document.addEventListener('swappit:favorito', (e) => {
         if (e.detail.esFavorito) return;
-        lista.querySelectorAll(`.card-objeto[data-id="${e.detail.id}"]`).forEach(card => {
-            const col = card.closest('.col-objeto');
+        lista.querySelectorAll(`.tarjeta-foto[data-id="${e.detail.id}"]`).forEach(card => {
+            const col = card.closest('.columna-tarjeta');
             if (!col) return;
 
             const teniaFoco = col.contains(document.activeElement);
@@ -65,7 +65,7 @@
             col.remove();
 
             if (teniaFoco) {
-                (vecina?.querySelector('.card-objeto-fav') || buscador || vacio.querySelector('a'))?.focus();
+                (vecina?.querySelector('.tarjeta-foto-boton') || buscador || vacio.querySelector('a'))?.focus();
             }
         });
         actualizar();

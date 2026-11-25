@@ -5,19 +5,19 @@
     bool marcada = ViewBag.opcionMarcada;
     bool requerida = ViewBag.opcionRequerida;
 }
-<label class="sw-opcion-articulo">
-    <input type="@tipo" class="sw-estado-radio" name="@nombre" value="@opcion.IdArticulos" checked="@marcada" required="@requerida">
-    <span class="sw-opcion-articulo-cuerpo">
-        <span class="sw-img sw-opcion-articulo-img">
+<label class="opcion-tarjeta">
+    <input type="@tipo" class="radio-oculto" name="@nombre" value="@opcion.IdArticulos" checked="@marcada" required="@requerida">
+    <span class="opcion-tarjeta-cuerpo">
+        <span class="marco-imagen opcion-tarjeta-imagen">
             @if (opcion.TieneImagen)
             {
                 <img src="@opcion.Imagen" alt="">
             }
         </span>
-        <span class="min-w-0">
+        <span class="sin-ancho-minimo">
             <span class="d-block fw-semibold text-truncate">@opcion.Nombre</span>
-            <span class="d-block text-suave small">@opcion.Estado</span>
+            <span class="d-block texto-suave small">@opcion.Estado</span>
         </span>
-        <i class="bi bi-check-circle-fill sw-opcion-articulo-marca" aria-hidden="true"></i>
+        <i class="bi bi-check-circle-fill opcion-tarjeta-check" aria-hidden="true"></i>
     </span>
 </label>

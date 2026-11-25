@@ -13,5 +13,10 @@ public class PlanViewModel
 
     public bool EsGratis => PrecioMensual == 0;
     public string Precio => Suscripciones.Precio(PrecioMensual);
-    public string Clave => Nombre.ToLowerInvariant();
+    public string Tono => Nombre.ToLowerInvariant() switch
+    {
+        "plus" => "azul",
+        "pro" => "bordo",
+        _ => "celeste"
+    };
 }

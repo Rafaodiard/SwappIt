@@ -3,46 +3,40 @@
     Swappit.Models.ViewModels.LoginViewModel? login = ViewBag.login;
 }
 
-<section class="sw-auth">
-    <div class="sw-auth-card sw-auth-card--angosta">
-        <header class="sw-auth-encabezado">
-            <h1 class="sw-auth-titulo">Iniciá sesión</h1>
-            <p class="sw-auth-subtitulo">Ingresá para seguir intercambiando</p>
+<section class="franja-crema">
+    <div class="tarjeta-grande angosta">
+        <header class="cabecera-centrada">
+            <h1 class="titulo-serif-enorme">Iniciá sesión</h1>
+            <p class="subtitulo-suave">Ingresá para seguir intercambiando</p>
         </header>
 
-        <form class="sw-form" method="post" action="@Url.Action("Login", "Account")" asp-antiforgery="true" novalidate>
-            @Html.ValidationSummary(true, "", new { @class = "sw-error-resumen", role = "alert" })
+        <form class="formulario-espaciado" method="post" action="@Url.Action("Login", "Account")" asp-antiforgery="true" novalidate>
+            @Html.ValidationSummary(true, "", new { @class = "aviso-rojo", role = "alert" })
             @if (ViewBag.Error != null)
             {
-                <p class="sw-error-resumen" role="alert">@ViewBag.Error</p>
+                <p class="aviso-rojo" role="alert">@ViewBag.Error</p>
             }
 
-            <div class="sw-campo">
-                <label class="sw-label" for="Mail">Email</label>
-                <input class="sw-input" id="Mail" name="Mail" value="@login?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
-                @Html.ValidationMessage("Mail", new { @class = "sw-error" })
+            <div class="columna-campo">
+                <label class="etiqueta-negrita" for="Mail">Email</label>
+                <input class="caja-texto" id="Mail" name="Mail" value="@login?.Mail" type="email" placeholder="tunombre@@email.com" autocomplete="email" maxlength="50">
+                @Html.ValidationMessage("Mail", new { @class = "texto-rojo" })
             </div>
 
-            <div class="sw-campo">
-                <label class="sw-label" for="Contrasena">Contraseña</label>
-                <input class="sw-input" id="Contrasena" name="Contrasena" type="password" placeholder="Tu contraseña" autocomplete="current-password" maxlength="50">
-                @Html.ValidationMessage("Contrasena", new { @class = "sw-error" })
-                <a href="#" class="sw-link sw-link-chico sw-campo-extra">¿Olvidaste tu contraseña?</a>
+            <div class="columna-campo">
+                <label class="etiqueta-negrita" for="Contrasena">Contraseña</label>
+                <input class="caja-texto" id="Contrasena" name="Contrasena" type="password" placeholder="Tu contraseña" autocomplete="current-password" maxlength="50">
+                @Html.ValidationMessage("Contrasena", new { @class = "texto-rojo" })
             </div>
 
-            <div class="sw-form-acciones">
-                <button type="submit" class="sw-btn sw-btn-solido sw-btn-bloque">Iniciar sesión</button>
+            <div class="separado-arriba">
+                <button type="submit" class="boton-alto boton-azul ancho-completo">Iniciar sesión</button>
             </div>
         </form>
 
-        <p class="sw-auth-pie">
+        <p class="pie-centrado">
             <span>¿Todavía no tenés cuenta?</span>
-            <a href="@Url.Action("Registro", "Account")" class="sw-link">Registrate</a>
+            <a href="@Url.Action("Registro", "Account")" class="enlace-azul">Registrate</a>
         </p>
     </div>
 </section>
-
-@section Scripts {
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <partial name="_ValidationScriptsPartial" />
-}

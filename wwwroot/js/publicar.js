@@ -21,11 +21,11 @@
 
     ['dragenter', 'dragover'].forEach(tipo => zona.addEventListener(tipo, e => {
         e.preventDefault();
-        zona.classList.add('sw-zona-carga--activa');
+        zona.classList.add('activa');
     }));
     ['dragleave', 'drop'].forEach(tipo => zona.addEventListener(tipo, e => {
         e.preventDefault();
-        zona.classList.remove('sw-zona-carga--activa');
+        zona.classList.remove('activa');
     }));
     zona.addEventListener('drop', e => agregar(e.dataTransfer.files));
 
@@ -69,7 +69,7 @@
 
         archivos.forEach((archivo, i) => {
             const celda = document.createElement('div');
-            celda.className = 'sw-miniatura sw-miniatura--llena';
+            celda.className = 'cuadro-punteado llena';
 
             const img = document.createElement('img');
             img.src = URL.createObjectURL(archivo);
@@ -77,7 +77,7 @@
 
             const quitarBtn = document.createElement('button');
             quitarBtn.type = 'button';
-            quitarBtn.className = 'sw-miniatura-quitar';
+            quitarBtn.className = 'boton-redondo-oscuro';
             quitarBtn.setAttribute('aria-label', `Quitar foto ${i + 1}`);
             quitarBtn.innerHTML = '<i class="bi bi-x-lg" aria-hidden="true"></i>';
             quitarBtn.addEventListener('click', () => quitar(i));
@@ -90,7 +90,7 @@
         for (let i = 0; i < vacios; i++) {
             const vacio = document.createElement('button');
             vacio.type = 'button';
-            vacio.className = 'sw-miniatura';
+            vacio.className = 'cuadro-punteado';
             vacio.setAttribute('aria-label', 'Agregar foto');
             vacio.textContent = '+';
             vacio.addEventListener('click', abrirSelector);
@@ -98,7 +98,7 @@
         }
     }
 
-    miniaturas.querySelectorAll('button.sw-miniatura').forEach(b => b.addEventListener('click', abrirSelector));
+    miniaturas.querySelectorAll('button.cuadro-punteado').forEach(b => b.addEventListener('click', abrirSelector));
 
     // ---------- Campos obligatorios ----------
     const form = zona.closest('form');

@@ -6,14 +6,14 @@
 @if (articulo == null)
 {
     <div class="container-xl py-5">
-        <div class="sw-card p-5 text-center mx-auto" style="max-width: 560px">
-            <i class="bi @(errorCarga ? "bi-exclamation-triangle" : "bi-search") fs-1 text-suave"></i>
-            <h1 class="font-titulo h2 mt-3">@(errorCarga ? "No pudimos cargar el artículo" : "Este artículo no existe")</h1>
-            <p class="text-suave mb-4">
+        <div class="tarjeta-blanca angosta p-5 text-center mx-auto">
+            <i class="bi @(errorCarga ? "bi-exclamation-triangle" : "bi-search") fs-1 texto-suave" aria-hidden="true"></i>
+            <h1 class="letra-serif h2 mt-3">@(errorCarga ? "No pudimos cargar el artículo" : "Este artículo no existe")</h1>
+            <p class="texto-suave mb-4">
                 @(errorCarga ? "Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato."
                              : "Puede que lo hayan dado de baja o que el enlace esté mal.")
             </p>
-            <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-primario">Ver otros artículos</a>
+            <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Ver otros artículos</a>
         </div>
     </div>
     return;
@@ -39,33 +39,18 @@
     bool puedeProponer = ViewBag.puedeProponer;
     int maxOfrecidos = ViewBag.maxOfrecidos;
     string leyendaOfrecer = ViewBag.leyendaOfrecer;
-    string? mensajeArticulo = ViewBag.mensaje;
-    string? errorArticulo = ViewBag.error;
 }
 
 <div class="container-xl py-4 py-lg-5">
-    @if (mensajeArticulo != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
-            <i class="bi bi-check-circle-fill me-1"></i> @mensajeArticulo
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    }
-    @if (errorArticulo != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i> @errorArticulo
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    }
+    <partial name="_Alertas" />
 
     <!-- ===== Migas de pan ===== -->
     <nav aria-label="Ubicación" class="mb-4">
         <ol class="breadcrumb small mb-0">
-            <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos")" class="text-decoration-none text-primario">Artículos</a></li>
+            <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos")" class="text-decoration-none texto-azul">Artículos</a></li>
             @if (categoria != null)
             {
-                <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos", new { categoria = categoria.IdCategorias })" class="text-decoration-none text-primario">@categoria.Nombre</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Buscar", "Articulos", new { categoria = categoria.IdCategorias })" class="text-decoration-none texto-azul">@categoria.Nombre</a></li>
             }
             <li class="breadcrumb-item active text-truncate" aria-current="page">@articulo.Nombre</li>
         </ol>
@@ -75,15 +60,15 @@
 
         <!-- ===== Fotos ===== -->
         <div class="col-lg-7">
-            <div class="sw-img sw-articulo-foto">
+            <div class="marco-imagen imagen-con-borde">
                 <img id="articulo-foto-principal" src="@fotoPrincipal" alt="@altFotoPrincipal">
             </div>
             @if (fotos.Count > 1)
             {
-                <div class="sw-articulo-miniaturas" role="group" aria-label="Fotos del artículo">
+                <div class="fila-miniaturas" role="group" aria-label="Fotos del artículo">
                     @foreach (var foto in fotos)
                     {
-                        <button type="button" class="sw-img sw-articulo-miniatura" data-foto="@foto.Ruta"
+                        <button type="button" class="marco-imagen boton-miniatura" data-foto="@foto.Ruta"
                                 aria-label="@foto.Etiqueta" aria-current="@(foto.EsPrimera ? "true" : "false")">
                             <img src="@foto.Ruta" alt="">
                         </button>
@@ -92,56 +77,56 @@
             }
             else if (fotos.Count == 0)
             {
-                <p class="text-suave small mt-2 mb-0"><i class="bi bi-image me-1"></i> Este artículo todavía no tiene fotos.</p>
+                <p class="texto-suave small mt-2 mb-0"><i class="bi bi-image me-1" aria-hidden="true"></i> Este artículo todavía no tiene fotos.</p>
             }
         </div>
 
         <!-- ===== Información del artículo ===== -->
         <div class="col-lg-5">
-            <div class="sw-card p-4 p-lg-5 d-flex flex-column gap-4">
+            <div class="tarjeta-blanca p-4 p-lg-5 d-flex flex-column gap-4">
 
                 @if (esPropio)
                 {
-                    <p class="sw-articulo-propio mb-0" role="status"><i class="bi bi-person-check-fill me-1"></i> Este artículo es tuyo. Así lo ven los demás usuarios.</p>
+                    <p class="aviso-crema mb-0" role="status"><i class="bi bi-person-check-fill me-1" aria-hidden="true"></i> Este artículo es tuyo. Así lo ven los demás usuarios.</p>
                 }
                 @if (comprometido)
                 {
-                    <p class="sw-articulo-propio mb-0" role="status"><i class="bi bi-arrow-left-right me-1"></i> Este artículo ya tiene un intercambio aceptado, así que no aparece en el catálogo.</p>
+                    <p class="aviso-crema mb-0" role="status"><i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i> Este artículo ya tiene un intercambio aceptado, así que no aparece en el catálogo.</p>
                 }
 
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                        <span class="sw-articulo-estado">@estado?.Nombre</span>
+                        <span class="etiqueta-crema">@estado?.Nombre</span>
                         @if (categoria != null)
                         {
-                            <span class="text-suave small"><i class="bi bi-tag me-1"></i>@categoria.Nombre</span>
+                            <span class="texto-suave small"><i class="bi bi-tag me-1" aria-hidden="true"></i>@categoria.Nombre</span>
                         }
                     </div>
-                    <h1 class="font-titulo display-6 text-primario mb-2">@articulo.Nombre</h1>
+                    <h1 class="letra-serif display-6 texto-azul mb-2">@articulo.Nombre</h1>
                     @if (ubicacion != "")
                     {
-                        <p class="text-suave mb-0"><i class="bi bi-geo-alt me-1"></i>@ubicacion</p>
+                        <p class="texto-suave mb-0"><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>@ubicacion</p>
                     }
                 </div>
 
                 <div>
                     <h2 class="h6 fw-bold mb-2">Descripción</h2>
-                    <p class="sw-articulo-descripcion mb-0">@articulo.Descripcion</p>
+                    <p class="texto-con-saltos mb-0">@articulo.Descripcion</p>
                 </div>
 
                 <div>
                     <h2 class="h6 fw-bold mb-2">Busca a cambio</h2>
-                    <p class="sw-articulo-descripcion mb-0">@textoACambio</p>
+                    <p class="texto-con-saltos mb-0">@textoACambio</p>
                 </div>
 
-                <hr class="sw-divisor">
+                <hr class="linea-divisoria">
 
                 @if (logueado)
                 {
                     <div>
                         <h2 class="h6 fw-bold mb-2">Publicado por</h2>
-                        <a class="sw-dueno" href="@(esPropio ? Url.Action("Index", "Perfil") : Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios }))">
-                            <span class="sw-perfil-avatar sw-perfil-avatar--mini" data-iniciales="@inicialesDueno">
+                        <a class="enlace-caja-gris" href="@(esPropio ? Url.Action("Index", "Perfil") : Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios }))">
+                            <span class="foto-redonda-chica" data-iniciales="@inicialesDueno">
                                 @if (fotoDueno != null)
                                 {
                                     <img src="@fotoDueno" alt="">
@@ -151,11 +136,11 @@
                                     <span aria-hidden="true">@inicialesDueno</span>
                                 }
                             </span>
-                            <span class="flex-grow-1 min-w-0">
+                            <span class="flex-grow-1 sin-ancho-minimo">
                                 <span class="d-block fw-bold text-truncate">@dueno.Nombre @dueno.Apellido @(esPropio ? "(vos)" : "")</span>
-                                <span class="d-block text-suave small text-truncate">@@@dueno.Usuario</span>
+                                <span class="d-block texto-suave small text-truncate">@@@dueno.Usuario</span>
                             </span>
-                            <span class="text-primario small fw-semibold text-nowrap">@(esPropio ? "Mi perfil" : "Ver perfil") <i class="bi bi-chevron-right"></i></span>
+                            <span class="texto-azul small fw-semibold text-nowrap">@(esPropio ? "Mi perfil" : "Ver perfil") <i class="bi bi-chevron-right" aria-hidden="true"></i></span>
                         </a>
                     </div>
                 }
@@ -164,41 +149,37 @@
                 <div class="d-flex flex-column gap-2">
                     @if (esPropio)
                     {
-                        <a href="@Url.Action("Editar", "Publicar", new { id = articulo.IdArticulos })" class="btn btn-sw-primario btn-lg">
-                            <i class="bi bi-pencil-square me-1"></i> Editar artículo
+                        <a href="@Url.Action("Editar", "Publicar", new { id = articulo.IdArticulos })" class="btn boton-bordo btn-lg">
+                            <i class="bi bi-pencil-square me-1" aria-hidden="true"></i> Editar artículo
                         </a>
-                        <form method="post" action="@Url.Action("Eliminar", "Publicar")" asp-antiforgery="true"
-                              onsubmit="return confirm('¿Querés eliminar esta publicación? Esta acción no se puede deshacer.');">
-                            <input type="hidden" name="id" value="@articulo.IdArticulos">
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-trash3 me-1"></i> Eliminar publicación
-                            </button>
-                        </form>
-                        <a href="@Url.Action("Index", "Perfil")" class="btn btn-sw-outline">Ver mis artículos publicados</a>
+                        <button type="button" class="btn boton-contorno-bordo" data-bs-toggle="modal" data-bs-target="#modal-eliminar">
+                            <i class="bi bi-trash3 me-1" aria-hidden="true"></i> Eliminar publicación
+                        </button>
+                        <a href="@Url.Action("Index", "Perfil")" class="btn boton-contorno-azul">Ver mis artículos publicados</a>
                     }
                     else if (idPropuestaEnCurso != null)
                     {
-                        <a href="@Url.Action("Detalle", "Intercambio", new { id = idPropuestaEnCurso })" class="btn btn-sw-primario btn-lg" aria-describedby="propuesta-enviada">
-                            <i class="bi bi-arrow-repeat me-1"></i> Propuesta enviada
+                        <a href="@Url.Action("Detalle", "Intercambio", new { id = idPropuestaEnCurso })" class="btn boton-bordo btn-lg" aria-describedby="propuesta-enviada">
+                            <i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i> Propuesta enviada
                         </a>
-                        <span id="propuesta-enviada" class="text-suave small text-center">Ya propusiste un intercambio por este artículo. Tocá el botón para ver cómo sigue.</span>
+                        <span id="propuesta-enviada" class="texto-suave small text-center">Ya propusiste un intercambio por este artículo. Tocá el botón para ver cómo sigue.</span>
                     }
                     else if (comprometido)
                     {
-                        <a href="@Url.Action("Buscar", "Articulos")" class="btn btn-sw-outline btn-lg">Buscar otros artículos</a>
+                        <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-contorno-azul btn-lg">Buscar otros artículos</a>
                     }
                     else if (logueado)
                     {
-                        <button type="button" class="btn btn-sw-primario btn-lg" data-bs-toggle="modal" data-bs-target="#modal-proponer">
-                            <i class="bi bi-arrow-left-right me-1"></i> Proponer intercambio
+                        <button type="button" class="btn boton-bordo btn-lg" data-bs-toggle="modal" data-bs-target="#modal-proponer">
+                            <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i> Proponer intercambio
                         </button>
                     }
                     else
                     {
-                        <a href="@Url.Action("Index", "Account")" class="btn btn-sw-primario btn-lg">
-                            <i class="bi bi-arrow-left-right me-1"></i> Proponer intercambio
+                        <a href="@Url.Action("Index", "Account")" class="btn boton-bordo btn-lg">
+                            <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i> Proponer intercambio
                         </a>
-                        <span class="text-suave small text-center">Iniciá sesión para proponer un intercambio.</span>
+                        <span class="texto-suave small text-center">Iniciá sesión para proponer un intercambio.</span>
                     }
                 </div>
             </div>
@@ -208,14 +189,14 @@
         @if (otrosArticulos.Count > 0 && logueado)
         {
             <div class="col-12">
-                <section aria-labelledby="titulo-otros-articulos">
+                <section class="seccion-simple" aria-labelledby="titulo-otros-articulos">
                     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-                        <h2 class="font-titulo h3 mb-0" id="titulo-otros-articulos">
+                        <h2 class="letra-serif h3 mb-0" id="titulo-otros-articulos">
                             @if (esPropio) { <text>Tus otros artículos</text> } else { <text>Más artículos de @dueno.Nombre</text> }
                         </h2>
                         @if (!esPropio)
                         {
-                            <a href="@Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios })" class="fw-semibold text-decoration-none text-primario">Ver todos <i class="bi bi-chevron-right"></i></a>
+                            <a href="@Url.Action("Publico", "Perfil", new { id = dueno.IdUsuarios })" class="fw-semibold text-decoration-none texto-azul">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                         }
                     </div>
                     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
@@ -234,13 +215,13 @@
 @if (puedeProponer)
 {
     <!-- ===== Pop up: Proponer intercambio ===== -->
-    <div class="modal fade sw-modal" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
+    <div class="modal fade ventana-redondeada" id="modal-proponer" tabindex="-1" aria-labelledby="titulo-proponer" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <form class="modal-content" method="post" action="@Url.Action("Proponer", "Intercambio")" asp-antiforgery="true"
                   data-proponer data-max-ofrecidos="@maxOfrecidos">
                 <input type="hidden" name="idArticuloPedido" value="@articulo.IdArticulos">
                 <div class="modal-header">
-                    <h2 class="modal-title font-titulo h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
+                    <h2 class="modal-title letra-serif h3 mb-0" id="titulo-proponer">Proponer intercambio</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
@@ -250,7 +231,7 @@
                     @if (misArticulos.Count > 0)
                     {
                         <fieldset class="d-flex flex-column gap-2" aria-describedby="@(misArticulos.Count > 1 ? "proponer-contador" : null)">
-                            <legend class="sw-proponer-leyenda">
+                            <legend class="leyenda-chica">
                                 @leyendaOfrecer
                             </legend>
                             @{
@@ -267,27 +248,50 @@
                         </fieldset>
                         @if (misArticulos.Count > 1)
                         {
-                            <p class="sw-nota mb-0" id="proponer-contador" data-proponer-contador aria-live="polite">Podés ofrecer hasta @maxOfrecidos artículos juntos.</p>
+                            <p class="texto-mini mb-0" id="proponer-contador" data-proponer-contador aria-live="polite">Podés ofrecer hasta @maxOfrecidos artículos juntos.</p>
                         }
                     }
                     else
                     {
                         <div class="text-center py-3">
-                            <i class="bi bi-box-seam fs-1 text-suave"></i>
-                            <p class="text-suave mt-2 mb-3">Para proponer un intercambio necesitás tener al menos un artículo publicado.</p>
-                            <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario btn-sm"><i class="bi bi-plus-lg me-1"></i> Publicar un artículo</a>
+                            <i class="bi bi-box-seam fs-1 texto-suave" aria-hidden="true"></i>
+                            <p class="texto-suave mt-2 mb-3">Para proponer un intercambio necesitás tener al menos un artículo publicado.</p>
+                            <a href="@Url.Action("Index", "Publicar")" class="btn boton-bordo btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar un artículo</a>
                         </div>
                     }
 
                     @if (misArticulos.Count > 0)
                     {
-                        <p class="sw-nota mb-0"><i class="bi bi-info-circle me-1"></i> @dueno.Nombre va a poder aceptar o rechazar tu propuesta. La seguís desde Mis intercambios.</p>
+                        <p class="texto-mini mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i> @dueno.Nombre va a poder aceptar o rechazar tu propuesta. La seguís desde Mis intercambios.</p>
                     }
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="sw-btn sw-btn-solido" disabled="@(misArticulos.Count == 0)">Enviar propuesta</button>
+                    <button type="button" class="boton-alto boton-blanco" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="boton-alto boton-azul" disabled="@(misArticulos.Count == 0)">Enviar propuesta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@if (esPropio)
+{
+    <!-- ===== Pop up: confirmar que se elimina la publicación ===== -->
+    <div class="modal fade ventana-redondeada" id="modal-eliminar" tabindex="-1" aria-labelledby="titulo-eliminar" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" action="@Url.Action("Eliminar", "Publicar")" asp-antiforgery="true">
+                <input type="hidden" name="id" value="@articulo.IdArticulos">
+                <div class="modal-header">
+                    <h2 class="modal-title letra-serif h3 mb-0" id="titulo-eliminar">¿Querés eliminar esta publicación?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="aviso-rosa mb-0"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i> Vas a eliminar <strong>@articulo.Nombre</strong>. Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="boton-alto boton-blanco" data-bs-dismiss="modal">Volver</button>
+                    <button type="submit" class="boton-alto boton-azul">Sí, eliminar</button>
                 </div>
             </form>
         </div>

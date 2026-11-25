@@ -6,26 +6,26 @@
 
 @if (errorCarga)
 {
-    <div class="sw-notif-vacio">
-        <span class="sw-notif-icono sw-notif-icono--bordo" aria-hidden="true"><i class="bi bi-exclamation-lg"></i></span>
-        <p class="sw-notif-vacio-titulo">No pudimos cargar tus notificaciones</p>
-        <p class="sw-notif-vacio-texto">Probá de nuevo en un rato.</p>
+    <div class="desplegable-centrado">
+        <span class="circulo-crema tono-rosa" aria-hidden="true"><i class="bi bi-exclamation-lg"></i></span>
+        <p class="desplegable-centrado-titulo">No pudimos cargar tus notificaciones</p>
+        <p class="desplegable-centrado-texto">Probá de nuevo en un rato.</p>
     </div>
 }
 else if (nuevas.Count == 0 && anteriores.Count == 0)
 {
-    <div class="sw-notif-vacio">
-        <span class="sw-notif-icono" aria-hidden="true"><i class="bi bi-bell"></i></span>
-        <p class="sw-notif-vacio-titulo">No tenés notificaciones</p>
-        <p class="sw-notif-vacio-texto">Acá vas a ver las propuestas de intercambio, los mensajes nuevos y cuándo calificar un intercambio.</p>
+    <div class="desplegable-centrado">
+        <span class="circulo-crema" aria-hidden="true"><i class="bi bi-bell"></i></span>
+        <p class="desplegable-centrado-titulo">No tenés notificaciones</p>
+        <p class="desplegable-centrado-texto">Acá vas a ver las propuestas de intercambio, los mensajes nuevos y cuándo calificar un intercambio.</p>
     </div>
 }
 else
 {
-    <div class="sw-notif-lista">
+    <div class="desplegable-lista">
         @if (nuevas.Count > 0)
         {
-            <h3 class="sw-notif-grupo">Nuevas</h3>
+            <h3 class="desplegable-subtitulo">Nuevas</h3>
             <ul class="list-unstyled mb-0">
                 @foreach (var n in nuevas)
                 {
@@ -36,7 +36,7 @@ else
         }
         @if (anteriores.Count > 0)
         {
-            <h3 class="sw-notif-grupo">Anteriores</h3>
+            <h3 class="desplegable-subtitulo">Anteriores</h3>
             <ul class="list-unstyled mb-0">
                 @foreach (var n in anteriores)
                 {

@@ -268,7 +268,7 @@ public class DetalleIntercambio
                 ? (loHiceYo ? "Lo pediste" : $"{_otroNombre} te lo pidió")
                 : (loHiceYo ? "Pediste sacarlo" : $"{_otroNombre} quiere sacarlo");
             fila.Etiqueta = loHiceYo ? $"Esperando a {_otroNombre}" : "Te toca responder";
-            fila.EtiquetaCss = loHiceYo ? "sw-cambio-etiqueta--espera" : "sw-cambio-etiqueta--responder";
+            fila.EtiquetaCss = loHiceYo ? "tono-celeste" : "tono-rosa";
         }
         else
         {
@@ -280,7 +280,7 @@ public class DetalleIntercambio
                     ? (loHiceYo ? "Lo agregaste vos" : $"Lo agregó {_otroNombre}")
                     : (loHiceYo ? "Lo pediste vos" : $"Lo pidió {_otroNombre}");
                 fila.Etiqueta = $"{quien} · {(sumado.FechaRespuesta ?? sumado.Fecha).ToString("dd/MM")}";
-                fila.EtiquetaCss = "sw-cambio-etiqueta--info";
+                fila.EtiquetaCss = "tono-crema";
             }
         }
 

@@ -1,7 +1,7 @@
 @{
     List<Swappit.Models.ViewModels.PlanViewModel> planes = ViewBag.planes;
 }
-<div class="row row-cols-1 row-cols-lg-3 g-4 sw-planes-grilla">
+<div class="row row-cols-1 row-cols-lg-3 g-4 grilla-centrada">
     @foreach (var plan in planes)
     {
         ViewBag.tarjetaPlan = plan;

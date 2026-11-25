@@ -12,28 +12,21 @@
     int maxFotoMB = ViewBag.maxFotoMB;
     int maxDescripcion = ViewBag.maxDescripcion;
     string? errorPerfil = ViewBag.errorPerfil;
-    string? mensajePerfil = ViewBag.mensajePerfil;
     Swappit.Models.ViewModels.PlanViewModel? plan = ViewBag.plan;
     int articulosActivos = ViewBag.articulosActivos;
     int intercambiosActivos = ViewBag.intercambiosActivos;
 }
 
 <div class="container-xl py-4 py-lg-5">
-    @if (mensajePerfil != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="status">
-            <i class="bi bi-check-circle-fill me-1"></i> @mensajePerfil
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    }
+    <partial name="_Alertas" />
 
     <div class="row g-4">
 
         <!-- ===== Nombre + foto ===== -->
         <div class="col-lg-6 d-flex flex-column gap-4">
-            <div class="sw-card p-4 flex-grow-1 d-flex align-items-center">
+            <div class="tarjeta-blanca p-4 flex-grow-1 d-flex align-items-center">
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start w-100">
-                    <div class="sw-perfil-avatar" data-iniciales="@iniciales">
+                    <div class="foto-redonda-grande" data-iniciales="@iniciales">
                         @if (foto != null)
                         {
                             <img src="@foto" alt="Foto de @usuario.Nombre">
@@ -42,53 +35,53 @@
                         {
                             <span data-campo="iniciales">@iniciales</span>
                         }
-                        <button type="button" class="sw-perfil-avatar-editar border-0" aria-label="Cambiar foto"
-                                data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-elegir-foto><i class="bi bi-camera-fill"></i></button>
+                        <button type="button" class="boton-esquina border-0" aria-label="Cambiar foto"
+                                data-bs-toggle="modal" data-bs-target="#modal-editar-perfil" data-elegir-foto><i class="bi bi-camera-fill" aria-hidden="true"></i></button>
                     </div>
                     <div>
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2">
-                            <h1 class="font-titulo h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
+                            <h1 class="letra-serif h2 mb-0" data-campo="nombreCompleto">@usuario.Nombre @usuario.Apellido</h1>
                             @if (plan != null && !plan.EsGratis)
                             {
-                                <span class="sw-insignia-plan sw-insignia-plan--@plan.Clave"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
+                                <span class="insignia tono-@plan.Tono"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
                             }
                         </div>
-                        <p class="text-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        <p class="texto-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
                         @if (tieneDescripcion)
                         {
-                            <p class="sw-perfil-descripcion mb-3" data-campo="descripcion">@usuario.Descripcion</p>
+                            <p class="texto-con-saltos mb-3" data-campo="descripcion">@usuario.Descripcion</p>
                         }
                         else
                         {
                             <p class="mb-3">
-                                <button type="button" class="btn btn-link text-suave p-0" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"
-                                        data-enfocar="Descripcion"><i class="bi bi-plus-circle me-1"></i> Agregá una descripción</button>
+                                <button type="button" class="btn btn-link texto-suave p-0" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"
+                                        data-enfocar="Descripcion"><i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Agregá una descripción</button>
                             </p>
                         }
-                        <button type="button" class="btn btn-sw-primario btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1"></i> Editar perfil</button>
-                        <a href="@Url.Action("Logout", "Account")" class="btn btn-sw-outline btn-sm d-sm-none ms-1"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión</a>
+                        <button type="button" class="btn boton-bordo btn-sm" data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i> Editar perfil</button>
+                        <a href="@Url.Action("Logout", "Account")" class="btn boton-contorno-azul btn-sm d-sm-none ms-1"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión</a>
                     </div>
                 </div>
             </div>
 
             @if (plan != null)
             {
-                <section class="sw-card sw-perfil-plan sw-perfil-plan--@plan.Clave p-4" aria-labelledby="titulo-mi-plan">
-                    <div class="sw-perfil-plan-cabecera">
-                        <span class="sw-perfil-plan-icono" aria-hidden="true"><i class="bi bi-stars"></i></span>
-                        <div class="flex-grow-1 min-w-0">
-                            <h2 class="sw-perfil-plan-titulo" id="titulo-mi-plan">Tu plan</h2>
-                            <p class="mb-0"><span class="sw-perfil-plan-nombre">@plan.Nombre</span> <span class="text-suave">· @plan.Precio@(plan.EsGratis ? "" : "/mes")</span></p>
+                <section class="tarjeta-acento-@plan.Tono p-4" aria-labelledby="titulo-mi-plan">
+                    <div class="cabecera-flexible">
+                        <span class="cuadro-icono" aria-hidden="true"><i class="bi bi-stars"></i></span>
+                        <div class="flex-grow-1 sin-ancho-minimo">
+                            <h2 class="antetitulo-suave" id="titulo-mi-plan">Tu plan</h2>
+                            <p class="mb-0"><span class="texto-destacado">@plan.Nombre</span> <span class="texto-suave">· @plan.Precio@(plan.EsGratis ? "" : "/mes")</span></p>
                         </div>
-                        <a href="@Url.Action("Index", "Planes")" class="btn btn-sw-outline btn-sm text-nowrap">@(plan.EsGratis ? "Mejorar plan" : "Cambiar plan")</a>
+                        <a href="@Url.Action("Index", "Planes")" class="btn boton-contorno-azul btn-sm text-nowrap">@(plan.EsGratis ? "Mejorar plan" : "Cambiar plan")</a>
                     </div>
-                    <dl class="sw-perfil-plan-uso">
+                    <dl class="lista-barras">
                         <div>
                             <dt>Artículos publicados</dt>
                             <dd>@Swappit.Models.Suscripciones.TextoUso(articulosActivos, plan.MaxArticulos)</dd>
                             @if (plan.MaxArticulos != null)
                             {
-                                <span class="sw-uso-barra" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(articulosActivos, plan.MaxArticulos.Value)%"></span></span>
+                                <span class="barra-progreso" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(articulosActivos, plan.MaxArticulos.Value)%"></span></span>
                             }
                         </div>
                         <div>
@@ -96,7 +89,7 @@
                             <dd>@Swappit.Models.Suscripciones.TextoUso(intercambiosActivos, plan.MaxIntercambios)</dd>
                             @if (plan.MaxIntercambios != null)
                             {
-                                <span class="sw-uso-barra" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(intercambiosActivos, plan.MaxIntercambios.Value)%"></span></span>
+                                <span class="barra-progreso" aria-hidden="true"><span style="width: @Swappit.Models.Suscripciones.PorcentajeUso(intercambiosActivos, plan.MaxIntercambios.Value)%"></span></span>
                             }
                         </div>
                     </dl>
@@ -106,37 +99,37 @@
 
         <!-- ===== Información personal ===== -->
         <div class="col-lg-6">
-            <div class="sw-card p-4 h-100">
+            <div class="tarjeta-blanca p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
                     <h2 class="h5 fw-bold mb-0">Información personal</h2>
-                    <button type="button" class="btn btn-link text-suave p-0" aria-label="Editar información"
-                            data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil"></i></button>
+                    <button type="button" class="btn btn-link texto-suave p-0" aria-label="Editar información"
+                            data-bs-toggle="modal" data-bs-target="#modal-editar-perfil"><i class="bi bi-pencil" aria-hidden="true"></i></button>
                 </div>
                 <ul class="list-unstyled d-flex flex-column gap-4 mb-0">
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
-                        <span class="fw-semibold sw-info-etiqueta">Usuario</span>
-                        <span class="text-suave sw-info-valor" data-campo="usuario">@@@usuario.Usuario</span>
+                        <span class="circulo-celeste-chico" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                        <span class="fw-semibold ancho-etiqueta">Usuario</span>
+                        <span class="texto-suave texto-cortable" data-campo="usuario">@@@usuario.Usuario</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-envelope-fill"></i></span>
-                        <span class="fw-semibold sw-info-etiqueta">Email</span>
-                        <span class="text-suave sw-info-valor" data-campo="mail">@usuario.Mail</span>
+                        <span class="circulo-celeste-chico" aria-hidden="true"><i class="bi bi-envelope-fill"></i></span>
+                        <span class="fw-semibold ancho-etiqueta">Email</span>
+                        <span class="texto-suave texto-cortable" data-campo="mail">@usuario.Mail</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-telephone-fill"></i></span>
-                        <span class="fw-semibold sw-info-etiqueta">Teléfono</span>
-                        <span class="text-suave sw-info-valor" data-campo="telefono">@telefono</span>
+                        <span class="circulo-celeste-chico" aria-hidden="true"><i class="bi bi-telephone-fill"></i></span>
+                        <span class="fw-semibold ancho-etiqueta">Teléfono</span>
+                        <span class="texto-suave texto-cortable" data-campo="telefono">@telefono</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
-                        <span class="fw-semibold sw-info-etiqueta">Barrio</span>
-                        <span class="text-suave sw-info-valor" data-campo="barrio">@ubicacion</span>
+                        <span class="circulo-celeste-chico" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+                        <span class="fw-semibold ancho-etiqueta">Barrio</span>
+                        <span class="texto-suave texto-cortable" data-campo="barrio">@ubicacion</span>
                     </li>
                     <li class="d-flex align-items-center gap-3">
-                        <span class="sw-info-icono" aria-hidden="true"><i class="bi bi-calendar-fill"></i></span>
-                        <span class="fw-semibold sw-info-etiqueta">Edad</span>
-                        <span class="text-suave sw-info-valor" data-campo="edad">@usuario.Edad años</span>
+                        <span class="circulo-celeste-chico" aria-hidden="true"><i class="bi bi-calendar-fill"></i></span>
+                        <span class="fw-semibold ancho-etiqueta">Edad</span>
+                        <span class="texto-suave texto-cortable" data-campo="edad">@usuario.Edad años</span>
                     </li>
                 </ul>
             </div>
@@ -144,16 +137,16 @@
 
         <!-- ===== Artículos publicados ===== -->
         <div class="col-12">
-            <section class="sw-card p-4" aria-labelledby="titulo-mis-articulos">
+            <section class="tarjeta-blanca p-4" aria-labelledby="titulo-mis-articulos">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-                    <h2 class="font-titulo h3 mb-0" id="titulo-mis-articulos">
+                    <h2 class="letra-serif h3 mb-0" id="titulo-mis-articulos">
                         Mis artículos publicados
                         @if (articulos.Count > 0)
                         {
-                            <span class="text-suave fs-6 fw-normal ms-1">(@articulos.Count)</span>
+                            <span class="texto-suave fs-6 fw-normal ms-1">(@articulos.Count)</span>
                         }
                     </h2>
-                    <a href="@Url.Action("Index", "Publicar")" class="btn btn-sw-primario btn-sm text-nowrap flex-shrink-0"><i class="bi bi-plus-lg me-1"></i> Publicar</a>
+                    <a href="@Url.Action("Index", "Publicar")" class="btn boton-bordo btn-sm text-nowrap flex-shrink-0"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Publicar</a>
                 </div>
 
                 @if (articulos.Count > 0)
@@ -169,8 +162,8 @@
                 else
                 {
                     <div class="text-center py-4">
-                        <i class="bi bi-box-seam fs-1 text-suave"></i>
-                        <p class="text-suave mt-2 mb-0">Todavía no publicaste ningún artículo.</p>
+                        <i class="bi bi-box-seam fs-1 texto-suave" aria-hidden="true"></i>
+                        <p class="texto-suave mt-2 mb-0">Todavía no publicaste ningún artículo.</p>
                     </div>
                 }
             </section>
@@ -178,12 +171,12 @@
 
         <!-- ===== Historial de intercambios ===== -->
         <div class="col-12">
-            <section class="sw-card p-4" aria-labelledby="titulo-historial">
+            <section class="tarjeta-blanca p-4" aria-labelledby="titulo-historial">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-                    <h2 class="font-titulo h3 mb-0" id="titulo-historial">Historial de intercambios</h2>
+                    <h2 class="letra-serif h3 mb-0" id="titulo-historial">Historial de intercambios</h2>
                     @if (intercambios.Count > 0)
                     {
-                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-decoration-none text-primario text-nowrap">Ver todos <i class="bi bi-chevron-right"></i></a>
+                        <a href="@Url.Action("Index", "Intercambio")" class="fw-semibold text-decoration-none texto-azul text-nowrap">Ver todos <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
                     }
                 </div>
 
@@ -200,8 +193,8 @@
                 else
                 {
                     <div class="text-center py-4">
-                        <i class="bi bi-arrow-left-right fs-1 text-suave"></i>
-                        <p class="text-suave mt-2 mb-0">Todavía no tenés intercambios. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
+                        <i class="bi bi-arrow-left-right fs-1 texto-suave" aria-hidden="true"></i>
+                        <p class="texto-suave mt-2 mb-0">Todavía no tenés intercambios. Cuando propongas uno o te llegue una propuesta, lo vas a ver acá.</p>
                     </div>
                 }
             </section>
@@ -210,24 +203,24 @@
 </div>
 
 <!-- ===== Pop up: Editar perfil ===== -->
-<div class="modal fade sw-modal" id="modal-editar-perfil" tabindex="-1" aria-labelledby="titulo-editar-perfil" aria-hidden="true"
+<div class="modal fade ventana-redondeada" id="modal-editar-perfil" tabindex="-1" aria-labelledby="titulo-editar-perfil" aria-hidden="true"
      data-error="@errorPerfil">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <form class="modal-content" method="post" action="@Url.Action("Editar", "Perfil")" asp-antiforgery="true" enctype="multipart/form-data">
             <div class="modal-header">
-                <h2 class="modal-title font-titulo h3 mb-0" id="titulo-editar-perfil">Editar perfil</h2>
+                <h2 class="modal-title letra-serif h3 mb-0" id="titulo-editar-perfil">Editar perfil</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <div class="modal-body d-flex flex-column gap-4">
                 @if (errorPerfil != null)
                 {
-                    <p class="sw-error-resumen mb-0" role="alert">@errorPerfil</p>
+                    <p class="aviso-rojo mb-0" role="alert">@errorPerfil</p>
                 }
 
                 <!-- Foto -->
                 <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
-                    <div class="sw-perfil-avatar sw-perfil-avatar--chico" id="vista-previa-foto" data-iniciales="@iniciales">
+                    <div class="foto-redonda-mediana" id="vista-previa-foto" data-iniciales="@iniciales">
                         @if (foto != null)
                         {
                             <img src="@foto" alt="Foto actual">
@@ -239,48 +232,48 @@
                     </div>
                     <div class="d-flex flex-column align-items-center align-items-sm-start gap-2">
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="sw-btn sw-btn-contorno" data-elegir-foto><i class="bi bi-camera me-1"></i> Cambiar foto</button>
-                            <button type="button" class="sw-btn sw-btn-contorno @(foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
+                            <button type="button" class="boton-alto boton-blanco" data-elegir-foto><i class="bi bi-camera me-1" aria-hidden="true"></i> Cambiar foto</button>
+                            <button type="button" class="boton-alto boton-blanco @(foto == null ? "d-none" : "")" id="quitar-foto">Quitar foto</button>
                         </div>
                         <input type="file" class="d-none" id="Foto" name="Foto" accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                                data-max-mb="@maxFotoMB">
                         <input type="hidden" id="QuitarFoto" name="QuitarFoto" value="false">
-                        <span class="sw-ayuda">JPG o PNG, hasta @maxFotoMB MB.</span>
-                        <span class="sw-error" id="error-foto" role="alert"></span>
+                        <span class="texto-chico">JPG o PNG, hasta @maxFotoMB MB.</span>
+                        <span class="texto-rojo" id="error-foto" role="alert"></span>
                     </div>
                 </div>
 
-                <div class="sw-fila">
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Nombre">Nombre</label>
-                        <input class="sw-input" id="Nombre" name="Nombre" value="@usuario.Nombre" maxlength="50" autocomplete="given-name" required>
+                <div class="grilla-dos-columnas">
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Nombre">Nombre</label>
+                        <input class="caja-texto" id="Nombre" name="Nombre" value="@usuario.Nombre" maxlength="50" autocomplete="given-name" required>
                     </div>
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Apellido">Apellido</label>
-                        <input class="sw-input" id="Apellido" name="Apellido" value="@usuario.Apellido" maxlength="50" autocomplete="family-name" required>
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Apellido">Apellido</label>
+                        <input class="caja-texto" id="Apellido" name="Apellido" value="@usuario.Apellido" maxlength="50" autocomplete="family-name" required>
                     </div>
                 </div>
 
-                <div class="sw-fila">
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Usuario">Usuario</label>
-                        <input class="sw-input" id="Usuario" name="Usuario" value="@usuario.Usuario" maxlength="50" autocomplete="username" required>
+                <div class="grilla-dos-columnas">
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Usuario">Usuario</label>
+                        <input class="caja-texto" id="Usuario" name="Usuario" value="@usuario.Usuario" maxlength="50" autocomplete="username" required>
                     </div>
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Telefono">Teléfono</label>
-                        <input class="sw-input" id="Telefono" name="Telefono" type="tel" value="@usuario.Telefono"
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Telefono">Teléfono</label>
+                        <input class="caja-texto" id="Telefono" name="Telefono" type="tel" value="@usuario.Telefono"
                                placeholder="11 0000 0000" autocomplete="tel">
                     </div>
                 </div>
 
-                <div class="sw-fila">
-                    <div class="sw-campo">
-                        <label class="sw-label" for="Barrio">Barrio</label>
-                        <input class="sw-input" id="Barrio" name="Barrio" value="@usuario.Barrio" maxlength="50" placeholder="Ej: Palermo">
+                <div class="grilla-dos-columnas">
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="Barrio">Barrio</label>
+                        <input class="caja-texto" id="Barrio" name="Barrio" value="@usuario.Barrio" maxlength="50" placeholder="Ej: Palermo">
                     </div>
-                    <div class="sw-campo">
-                        <label class="sw-label" for="IdProvincias">Provincia</label>
-                        <select class="sw-input sw-select" id="IdProvincias" name="IdProvincias" required>
+                    <div class="columna-campo">
+                        <label class="etiqueta-negrita" for="IdProvincias">Provincia</label>
+                        <select class="caja-texto con-flecha" id="IdProvincias" name="IdProvincias" required>
                             @foreach (var p in provincias)
                             {
                                 <option value="@p.IdProvincia" selected="@(p.IdProvincia == usuario.IdProvincias)">@p.Nombre</option>
@@ -289,24 +282,24 @@
                     </div>
                 </div>
 
-                <div class="sw-campo">
-                    <label class="sw-label" for="Descripcion">Descripción</label>
-                    <textarea class="sw-input sw-textarea" id="Descripcion" name="Descripcion" rows="4" maxlength="@maxDescripcion"
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="Descripcion">Descripción</label>
+                    <textarea class="caja-texto caja-alta" id="Descripcion" name="Descripcion" rows="4" maxlength="@maxDescripcion"
                               placeholder="Contá quién sos, qué te gusta intercambiar o cómo preferís coordinar…">@usuario.Descripcion</textarea>
-                    <span class="sw-contador" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
-                    <span class="sw-ayuda">La ven todos en tu perfil público.</span>
+                    <span class="texto-mini-derecha" id="contador-descripcion" aria-live="polite">0/@maxDescripcion</span>
+                    <span class="texto-chico">La ven todos en tu perfil público.</span>
                 </div>
 
-                <div class="sw-campo">
-                    <label class="sw-label" for="mail-perfil">Email</label>
-                    <input class="sw-input" id="mail-perfil" value="@usuario.Mail" disabled>
-                    <span class="sw-ayuda">El email no se puede cambiar.</span>
+                <div class="columna-campo">
+                    <label class="etiqueta-negrita" for="mail-perfil">Email</label>
+                    <input class="caja-texto" id="mail-perfil" value="@usuario.Mail" disabled>
+                    <span class="texto-chico">El email no se puede cambiar.</span>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="sw-btn sw-btn-contorno" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="sw-btn sw-btn-solido">Guardar cambios</button>
+                <button type="button" class="boton-alto boton-blanco" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="boton-alto boton-azul">Guardar cambios</button>
             </div>
         </form>
     </div>
