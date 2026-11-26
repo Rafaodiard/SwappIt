@@ -5,16 +5,16 @@
     bool esActual = !esVisitante && plan.Id == idPlanActual;
 }
 <div class="col">
-    <article class="tarjeta-precio tono-@plan.Tono @(esActual ? "resaltada" : "")" aria-labelledby="plan-@plan.Id">
+    <article class="tarjeta-elevable tono-@plan.Tono @(esActual ? "resaltada" : "")" aria-labelledby="plan-@plan.Id">
         @if (esActual)
         {
             <span class="pastilla-flotante"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Tu plan actual</span>
         }
         <header>
-            <span class="tarjeta-precio-pastilla">@plan.Etiqueta</span>
-            <h3 class="tarjeta-precio-titulo" id="plan-@plan.Id">@plan.Nombre</h3>
+            <span class="tarjeta-elevable-pastilla">@plan.Etiqueta</span>
+            <h3 class="tarjeta-elevable-titulo" id="plan-@plan.Id">@plan.Nombre</h3>
         </header>
-        <p class="tarjeta-precio-linea">
+        <p class="tarjeta-elevable-linea">
             <span class="numero-grande">@plan.Precio</span>
             @if (!plan.EsGratis)
             {
@@ -31,22 +31,22 @@
         <div class="empujado-abajo">
             @if (esVisitante)
             {
-                <a href="@Url.Action("Registro", "Account", new { plan = plan.Id })" class="btn tarjeta-precio-boton">@(plan.EsGratis ? "Empezar gratis" : $"Empezar con {plan.Nombre}")</a>
+                <a href="@Url.Action("Registro", "Account", new { plan = plan.Id })" class="btn tarjeta-elevable-boton">@(plan.EsGratis ? "Empezar gratis" : $"Empezar con {plan.Nombre}")</a>
             }
             else if (esActual)
             {
-                <button type="button" class="btn tarjeta-precio-boton" disabled>Es tu plan</button>
+                <button type="button" class="btn tarjeta-elevable-boton" disabled>Es tu plan</button>
             }
             else if (plan.EsGratis)
             {
                 <form method="post" action="@Url.Action("Cambiar", "Planes")" asp-antiforgery="true">
                     <input type="hidden" name="idPlan" value="@plan.Id">
-                    <button type="submit" class="btn tarjeta-precio-boton">Cambiar a @plan.Nombre</button>
+                    <button type="submit" class="btn tarjeta-elevable-boton">Cambiar a @plan.Nombre</button>
                 </form>
             }
             else
             {
-                <a href="@Url.Action("Pago", "Planes", new { id = plan.Id })" class="btn tarjeta-precio-boton">Pasarme a @plan.Nombre</a>
+                <a href="@Url.Action("Pago", "Planes", new { id = plan.Id })" class="btn tarjeta-elevable-boton">Pasarme a @plan.Nombre</a>
             }
         </div>
     </article>

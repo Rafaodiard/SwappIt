@@ -21,7 +21,7 @@
     <nav class="panel-lateral-cuerpo" aria-label="Menú principal">
         @if (!esVisitante)
         {
-            <a href="@Url.Action("Index", "Perfil")" class="fila-usuario">
+            <a href="@Url.Action("Index", "Perfil")" class="fila-gris">
                 <span class="foto-redonda-mini" data-iniciales="@iniciales" aria-hidden="true">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</span>
                 <span class="sin-ancho-minimo">
                     <span class="d-block fw-semibold text-truncate">@(string.IsNullOrEmpty(nombre) ? "Mi perfil" : nombre)</span>

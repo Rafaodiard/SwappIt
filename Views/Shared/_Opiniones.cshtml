@@ -11,11 +11,11 @@
 
     @if (opiniones.Count > 0)
     {
-        <ul class="list-unstyled grilla-opiniones mb-0">
+        <ul class="list-unstyled grilla-automatica mb-0">
             @foreach (var opinion in opiniones)
             {
                 ViewBag.estrellas = (double)opinion.Puntaje;
-                <li class="caja-opinion">
+                <li class="caja-gris">
                     <div class="d-flex align-items-center gap-3 mb-2 sin-ancho-minimo">
                         <span class="foto-redonda-mini" data-iniciales="@opinion.AutorIniciales" aria-hidden="true">
                             @if (opinion.AutorFoto != null) { <img src="@opinion.AutorFoto" alt=""> } else { @opinion.AutorIniciales }

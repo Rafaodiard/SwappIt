@@ -4,9 +4,9 @@
 @if (reputacion.TieneCalificaciones)
 {
     ViewBag.estrellas = reputacion.Estrellas;
-    <span class="fila-estrellas"><partial name="_Estrellas" /> <strong>@reputacion.PromedioTexto</strong> <span class="texto-suave">· @reputacion.CantidadTexto</span></span>
+    <span class="fila-iconos"><partial name="_Estrellas" /> <strong>@reputacion.PromedioTexto</strong> <span class="texto-suave">· @reputacion.CantidadTexto</span></span>
 }
 else
 {
-    <span class="fila-estrellas texto-suave"><i class="bi bi-star" aria-hidden="true"></i> Sin calificaciones todavía</span>
+    <span class="fila-iconos texto-suave"><i class="bi bi-star" aria-hidden="true"></i> Sin calificaciones todavía</span>
 }

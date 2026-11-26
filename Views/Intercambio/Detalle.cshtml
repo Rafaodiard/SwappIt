@@ -269,7 +269,7 @@
                             <form method="post" action="@Url.Action("Calificar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
                                 <fieldset class="mb-3">
                                     <legend class="small fw-semibold mb-2">¿Cómo fue el intercambio con @intercambio.OtroNombre?</legend>
-                                    <div class="estrellas-elegibles">
+                                    <div class="iconos-seleccionables">
                                         @for (int puntaje = Swappit.Models.Calificaciones.MinPuntaje; puntaje <= Swappit.Models.Calificaciones.MaxPuntaje; puntaje++)
                                         {
                                             string etiqueta = Swappit.Models.Reputaciones.Etiqueta(puntaje);
