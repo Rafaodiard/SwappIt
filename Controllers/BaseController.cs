@@ -12,6 +12,8 @@ public abstract class BaseController : Controller
         ViewBag.esVisitante = sesionId == null;
         ViewBag.sesionIniciales = HttpContext.Session.GetString("Iniciales");
         ViewBag.sesionFoto = HttpContext.Session.GetString("Foto");
+        ViewBag.sesionNombre = HttpContext.Session.GetString("NombreCompleto");
+        ViewBag.sesionUsuario = HttpContext.Session.GetString("Usuario");
         base.OnActionExecuted(context);
     }
 }

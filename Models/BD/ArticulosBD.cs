@@ -12,7 +12,7 @@ public static class ArticulosBD
     public static List<ArticuloCardViewModel> GetArticulosCatalogo(string? busqueda = null, int? cantidad = null,
         IReadOnlyCollection<int>? categorias = null, IReadOnlyCollection<int>? estados = null, int? idUsuario = null,
         int? excluirUsuario = null, int? excluirArticulo = null, int? fueraDeIntercambio = null,
-        bool incluirEnIntercambio = false, string? orden = null)
+        bool incluirEnIntercambio = false, string? orden = null, int? favoritosDe = null)
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
@@ -28,6 +28,7 @@ public static class ArticulosBD
                     excluirArticulo,
                     fueraDeIntercambio,
                     incluirEnIntercambio,
+                    favoritosDe,
                     orden
                 },
                 commandType: CommandType.StoredProcedure).AsList();
@@ -130,7 +131,7 @@ public static class ArticulosBD
         }
     }
 
-    public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null, int? excluirUsuario = null)
+    public static List<OpcionFiltroViewModel> GetFiltroCategorias(string? busqueda = null, int? excluirUsuario = null, int? favoritosDe = null)
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
@@ -139,13 +140,14 @@ public static class ArticulosBD
                 {
                     busqueda = TextoBusqueda(busqueda),
                     excluirUsuario,
+                    favoritosDe,
                     comprometidos = string.Join(",", EstadosComprometidos)
                 },
                 commandType: CommandType.StoredProcedure).AsList();
         }
     }
 
-    public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null, int? excluirUsuario = null)
+    public static List<OpcionFiltroViewModel> GetFiltroEstados(string? busqueda = null, int? excluirUsuario = null, int? favoritosDe = null)
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
@@ -154,6 +156,7 @@ public static class ArticulosBD
                 {
                     busqueda = TextoBusqueda(busqueda),
                     excluirUsuario,
+                    favoritosDe,
                     comprometidos = string.Join(",", EstadosComprometidos)
                 },
                 commandType: CommandType.StoredProcedure).AsList();

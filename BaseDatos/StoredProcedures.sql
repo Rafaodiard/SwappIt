@@ -204,6 +204,7 @@ BEGIN
 
 		SELECT @idCambio = MIN(Id) FROM @cambios;
 		EXEC CrearNotificacion @idOtro, @idIntercambio, 'Artículo agregado', @idCambio = @idCambio;
+		UPDATE Intercambios SET RealizadoUsuario1 = 0, RealizadoUsuario2 = 0 WHERE IdIntercambios = @idIntercambio;
 		IF @estado = 'Aceptado'
 			EXEC RechazarPendientesDeArticulos @idIntercambio, @idUsuario;
 		COMMIT TRANSACTION;
@@ -271,6 +272,44 @@ BEGIN
 	DELETE FROM Imagenes WHERE IdUsuarios = @idUsuario AND IdArticulos IS NULL
 END
 GO
+/****** Object:  StoredProcedure [dbo].[CalificarIntercambio]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CalificarIntercambio]
+	@idIntercambio int,
+	@idUsuario int,
+	@puntaje int,
+	@comentario varchar(300) = NULL
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+	CREATE TABLE #Creadas (IdUsuario int, IdIntercambio int, Tipo varchar(50), IdCambio int NULL);
+	DECLARE @idOtro int;
+
+	BEGIN TRANSACTION;
+	SELECT @idOtro = CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END
+	FROM Intercambios i WITH (UPDLOCK, HOLDLOCK)
+	INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+	WHERE i.IdIntercambios = @idIntercambio AND e.Nombre = 'Realizado'
+		AND (i.IdUsuarios1 = @idUsuario OR i.IdUsuarios2 = @idUsuario)
+		AND @puntaje BETWEEN 1 AND 5
+		AND NOT EXISTS (SELECT 1 FROM Calificaciones c WHERE c.IdIntercambio = i.IdIntercambios AND c.IdUsuarioCalifica = @idUsuario);
+
+	IF @idOtro IS NOT NULL
+	BEGIN
+		INSERT INTO Calificaciones (IdIntercambio, IdUsuarioCalifica, IdUsuarioCalificado, Puntaje, Comentario, Fecha)
+		VALUES (@idIntercambio, @idUsuario, @idOtro, @puntaje, NULLIF(LTRIM(RTRIM(@comentario)), ''), GETDATE());
+		EXEC CrearNotificacion @idOtro, @idIntercambio, 'Calificación recibida';
+	END
+	COMMIT TRANSACTION;
+
+	SELECT CAST(CASE WHEN @idOtro IS NULL THEN 0 ELSE 1 END AS bit) AS Calificado;
+	SELECT IdUsuario, IdIntercambio, Tipo, IdCambio FROM #Creadas;
+END
+GO
 /****** Object:  StoredProcedure [dbo].[CambiarEstadoIntercambio]    Script Date: 17/11/2026 19:10:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -304,9 +343,6 @@ BEGIN
 			INNER JOIN Intercambios io ON io.IdIntercambios = otro.IdIntercambio
 			INNER JOIN EstadosIntercambios eio ON eio.IdEstadosIntercambios = io.IdEstado
 			WHERE mio.IdIntercambio = @idIntercambio AND eio.Nombre IN ('Aceptado', 'Realizado')))
-		AND (@estadoNuevo <> 'Realizado' OR NOT EXISTS (SELECT 1 FROM CambiosIntercambios cr
-			INNER JOIN EstadosIntercambios er ON er.IdEstadosIntercambios = cr.IdEstado
-			WHERE cr.IdIntercambio = i.IdIntercambios AND er.Nombre = 'Pendiente'))
 		AND (@estadoNuevo <> 'Aceptado' OR (NOT EXISTS (SELECT 1 FROM CambiosIntercambios cr
 				INNER JOIN EstadosIntercambios er ON er.IdEstadosIntercambios = cr.IdEstado
 				WHERE cr.IdIntercambio = i.IdIntercambios AND er.Nombre = 'Pendiente' AND cr.IdUsuario <> @idUsuario)
@@ -1024,6 +1060,7 @@ CREATE PROCEDURE [dbo].[GetArticulosCatalogo]
 	@excluirArticulo int = NULL,
 	@fueraDeIntercambio int = NULL,
 	@incluirEnIntercambio bit = 0,
+	@favoritosDe int = NULL,
 	@orden varchar(20) = NULL
 AS
 BEGIN
@@ -1044,6 +1081,9 @@ BEGIN
 		FROM Interacciones it
 		INNER JOIN TipoInteracciones t ON t.Id = it.IdTipoInteraccion
 		WHERE @orden = 'populares' AND it.IdArticulo = a.IdArticulos AND it.Fecha >= DATEADD(DAY, -30, GETDATE())) pop
+	OUTER APPLY (SELECT MAX(fv.Fecha) AS Fecha FROM Interacciones fv
+		INNER JOIN TipoInteracciones tf ON tf.Id = fv.IdTipoInteraccion
+		WHERE @favoritosDe IS NOT NULL AND fv.IdUsuario = @favoritosDe AND fv.IdArticulo = a.IdArticulos AND tf.Nombre = 'Favorito') fav
 	WHERE (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (NULLIF(@categorias, '') IS NULL OR a.IdCategorias IN (SELECT CAST(value AS int) FROM STRING_SPLIT(@categorias, ',')))
 		AND (NULLIF(@estados, '') IS NULL OR a.IdEstado IN (SELECT CAST(value AS int) FROM STRING_SPLIT(@estados, ',')))
@@ -1060,7 +1100,9 @@ BEGIN
 			AND NOT EXISTS (SELECT 1 FROM CambiosIntercambios cx
 				INNER JOIN EstadosIntercambios ex ON ex.IdEstadosIntercambios = cx.IdEstado
 				WHERE cx.IdIntercambio = @fueraDeIntercambio AND cx.IdArticulo = a.IdArticulos AND ex.Nombre = 'Pendiente')))
+		AND (@favoritosDe IS NULL OR fav.Fecha IS NOT NULL)
 	ORDER BY CASE WHEN @orden = 'populares' THEN ISNULL(pop.Puntos, 0) END DESC,
+		CASE WHEN @orden = 'guardados' THEN fav.Fecha END DESC,
 		CASE WHEN @orden = 'az' THEN a.Nombre END COLLATE Modern_Spanish_CI_AS,
 		a.IdArticulos DESC
 END
@@ -1097,6 +1139,44 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	SELECT IdPlan, Texto FROM BeneficiosPlanes ORDER BY IdPlan, Id
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetCalificacionesIntercambio]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetCalificacionesIntercambio]
+	@idIntercambio int,
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT c.Puntaje, c.Comentario, c.Fecha,
+		CAST(CASE WHEN c.IdUsuarioCalifica = @idUsuario THEN 1 ELSE 0 END AS bit) AS EsMia
+	FROM Calificaciones c
+	INNER JOIN Intercambios i ON i.IdIntercambios = c.IdIntercambio
+	WHERE c.IdIntercambio = @idIntercambio AND (i.IdUsuarios1 = @idUsuario OR i.IdUsuarios2 = @idUsuario)
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetCalificacionesUsuario]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetCalificacionesUsuario]
+	@idUsuario int,
+	@cantidad int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT TOP (@cantidad) c.Puntaje, c.Comentario, c.Fecha,
+		u.IdUsuarios AS AutorId, u.Nombre AS AutorNombre, u.Apellido AS AutorApellido, u.Usuario AS AutorUsuario,
+		(SELECT TOP 1 im.Ruta FROM Imagenes im WHERE im.IdUsuarios = u.IdUsuarios AND im.IdArticulos IS NULL ORDER BY im.IdImagenes DESC) AS AutorFoto
+	FROM Calificaciones c
+	INNER JOIN Usuarios u ON u.IdUsuarios = c.IdUsuarioCalifica
+	WHERE c.IdUsuarioCalificado = @idUsuario
+	ORDER BY c.Fecha DESC, c.Id DESC
 END
 GO
 /****** Object:  StoredProcedure [dbo].[GetCambiosIntercambio]    Script Date: 17/11/2026 19:10:00 ******/
@@ -1270,32 +1350,6 @@ BEGIN
 	SELECT IdEstadosIntercambios, Nombre FROM EstadosIntercambios ORDER BY IdEstadosIntercambios
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetFavoritos]    Script Date: 17/11/2026 19:10:00 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[GetFavoritos]
-	@idUsuario int
-AS
-BEGIN
-	SET NOCOUNT ON;
-	SELECT a.IdArticulos, a.Nombre, e.Nombre AS Estado, COALESCE(NULLIF(a.Ubicacion, ''), u.Barrio) AS Barrio,
-		(SELECT TOP 1 i.Ruta FROM Imagenes i WHERE i.IdArticulos = a.IdArticulos ORDER BY i.IdImagenes) AS Imagen,
-		a.IdUsuarios, a.IdCategorias, a.IdCategoriaACambio
-	FROM Interacciones f
-	INNER JOIN TipoInteracciones t ON t.Id = f.IdTipoInteraccion
-	INNER JOIN Articulos a ON a.IdArticulos = f.IdArticulo
-	INNER JOIN Usuarios u ON u.IdUsuarios = a.IdUsuarios
-	INNER JOIN EstadosArticulos e ON e.IdEstadosArticulos = a.IdEstado
-	WHERE f.IdUsuario = @idUsuario AND t.Nombre = 'Favorito'
-		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios aic
-			INNER JOIN Intercambios ic ON ic.IdIntercambios = aic.IdIntercambio
-			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
-			WHERE eic.Nombre IN ('Aceptado', 'Realizado') AND aic.IdArticulo = a.IdArticulos)
-	ORDER BY f.Fecha DESC, f.Id DESC
-END
-GO
 /****** Object:  StoredProcedure [dbo].[GetFiltroCategorias]    Script Date: 17/11/2026 19:10:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -1304,6 +1358,7 @@ GO
 CREATE PROCEDURE [dbo].[GetFiltroCategorias]
 	@busqueda varchar(150) = NULL,
 	@excluirUsuario int = NULL,
+	@favoritosDe int = NULL,
 	@comprometidos varchar(200) = NULL
 AS
 BEGIN
@@ -1314,6 +1369,9 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdCategorias = c.IdCategorias
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
+		AND (@favoritosDe IS NULL OR EXISTS (SELECT 1 FROM Interacciones fv
+			INNER JOIN TipoInteracciones tf ON tf.Id = fv.IdTipoInteraccion
+			WHERE fv.IdUsuario = @favoritosDe AND fv.IdArticulo = a.IdArticulos AND tf.Nombre = 'Favorito'))
 		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
 			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
@@ -1331,6 +1389,7 @@ GO
 CREATE PROCEDURE [dbo].[GetFiltroEstados]
 	@busqueda varchar(150) = NULL,
 	@excluirUsuario int = NULL,
+	@favoritosDe int = NULL,
 	@comprometidos varchar(200) = NULL
 AS
 BEGIN
@@ -1341,6 +1400,9 @@ BEGIN
 	LEFT JOIN Articulos a ON a.IdEstado = e.IdEstadosArticulos
 		AND (@busqueda IS NULL OR a.Nombre LIKE '%' + @busqueda + '%')
 		AND (@excluirUsuario IS NULL OR a.IdUsuarios <> @excluirUsuario)
+		AND (@favoritosDe IS NULL OR EXISTS (SELECT 1 FROM Interacciones fv
+			INNER JOIN TipoInteracciones tf ON tf.Id = fv.IdTipoInteraccion
+			WHERE fv.IdUsuario = @favoritosDe AND fv.IdArticulo = a.IdArticulos AND tf.Nombre = 'Favorito'))
 		AND NOT EXISTS (SELECT 1 FROM ArticulosIntercambios ai
 			INNER JOIN Intercambios ic ON ic.IdIntercambios = ai.IdIntercambio
 			INNER JOIN EstadosIntercambios eic ON eic.IdEstadosIntercambios = ic.IdEstado
@@ -1435,7 +1497,11 @@ BEGIN
 		(SELECT TOP 1 isu.Ruta FROM Imagenes isu WHERE isu.IdArticulos = asu.IdArticulos ORDER BY isu.IdImagenes) AS SuArticuloImagen,
 		suyos.Cantidad AS CantidadSuyos,
 		u.IdUsuarios AS OtroIdUsuario, u.Nombre AS OtroNombre, u.Apellido AS OtroApellido, u.Usuario AS OtroUsuario,
-		u.Barrio AS OtroBarrio, p.Nombre AS OtroProvincia
+		u.Barrio AS OtroBarrio, p.Nombre AS OtroProvincia,
+		CAST(CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.RealizadoUsuario1 ELSE i.RealizadoUsuario2 END AS bit) AS RealizadoPorMi,
+		CAST(CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.RealizadoUsuario2 ELSE i.RealizadoUsuario1 END AS bit) AS RealizadoPorOtro,
+		CAST(CASE WHEN EXISTS (SELECT 1 FROM Calificaciones ca
+			WHERE ca.IdIntercambio = i.IdIntercambios AND ca.IdUsuarioCalifica = @idUsuario) THEN 1 ELSE 0 END AS bit) AS YaCalifique
 	FROM Intercambios i
 	INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
 	CROSS APPLY (SELECT CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END AS IdOtro) lado
@@ -1582,6 +1648,21 @@ CREATE PROCEDURE [dbo].[GetProvincias]
 AS
 BEGIN
 	SELECT IdProvincia, Nombre FROM Provincias ORDER BY Nombre
+END
+GO
+/****** Object:  StoredProcedure [dbo].[GetReputacionUsuario]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetReputacionUsuario]
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT CAST(AVG(CAST(Puntaje AS decimal(5, 2))) AS decimal(3, 1)) AS Promedio, COUNT(*) AS Cantidad
+	FROM Calificaciones
+	WHERE IdUsuarioCalificado = @idUsuario
 END
 GO
 /****** Object:  StoredProcedure [dbo].[GetResumenesChat]    Script Date: 17/11/2026 19:10:00 ******/
@@ -1812,6 +1893,53 @@ BEGIN
 	FROM Notificaciones n
 	INNER JOIN TipoNotificaciones t ON t.Id = n.IdTipoNotificacion
 	WHERE n.Id = @idNotificacion AND n.IdUsuario = @idUsuario
+END
+GO
+/****** Object:  StoredProcedure [dbo].[MarcarRealizado]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[MarcarRealizado]
+	@idIntercambio int,
+	@idUsuario int
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
+	CREATE TABLE #Creadas (IdUsuario int, IdIntercambio int, Tipo varchar(50), IdCambio int NULL);
+	DECLARE @idOtro int, @otroConfirmo bit, @resultado varchar(50) = NULL;
+
+	BEGIN TRANSACTION;
+	SELECT @idOtro = CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.IdUsuarios2 ELSE i.IdUsuarios1 END,
+		@otroConfirmo = CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.RealizadoUsuario2 ELSE i.RealizadoUsuario1 END
+	FROM Intercambios i WITH (UPDLOCK, HOLDLOCK)
+	INNER JOIN EstadosIntercambios e ON e.IdEstadosIntercambios = i.IdEstado
+	WHERE i.IdIntercambios = @idIntercambio AND e.Nombre = 'Aceptado'
+		AND (i.IdUsuarios1 = @idUsuario OR i.IdUsuarios2 = @idUsuario)
+		AND (CASE WHEN i.IdUsuarios1 = @idUsuario THEN i.RealizadoUsuario1 ELSE i.RealizadoUsuario2 END) = 0
+		AND NOT EXISTS (SELECT 1 FROM CambiosIntercambios c
+			INNER JOIN EstadosIntercambios ec ON ec.IdEstadosIntercambios = c.IdEstado
+			WHERE c.IdIntercambio = i.IdIntercambios AND ec.Nombre = 'Pendiente');
+
+	IF @idOtro IS NOT NULL
+	BEGIN
+		SET @resultado = CASE WHEN @otroConfirmo = 1 THEN 'Realizado' ELSE 'Aceptado' END;
+		UPDATE Intercambios
+		SET RealizadoUsuario1 = CASE WHEN IdUsuarios1 = @idUsuario THEN 1 ELSE RealizadoUsuario1 END,
+			RealizadoUsuario2 = CASE WHEN IdUsuarios2 = @idUsuario THEN 1 ELSE RealizadoUsuario2 END,
+			IdEstado = (SELECT e.IdEstadosIntercambios FROM EstadosIntercambios e WHERE e.Nombre = @resultado)
+		WHERE IdIntercambios = @idIntercambio;
+
+		IF @resultado = 'Realizado'
+			EXEC CrearNotificacion @idOtro, @idIntercambio, 'Intercambio realizado';
+		ELSE
+			EXEC CrearNotificacion @idOtro, @idIntercambio, 'Marcado como realizado';
+	END
+	COMMIT TRANSACTION;
+
+	SELECT @resultado AS Estado;
+	SELECT IdUsuario, IdIntercambio, Tipo, IdCambio FROM #Creadas;
 END
 GO
 /****** Object:  StoredProcedure [dbo].[ProponerIntercambio]    Script Date: 17/11/2026 19:10:00 ******/
@@ -2150,6 +2278,8 @@ BEGIN
 	BEGIN
 		IF @aceptar = 1 AND @tipo = 'Pedir' AND @estadoIntercambio = 'Aceptado'
 			EXEC RechazarPendientesDeArticulos @idIntercambio, @idUsuario;
+		IF @aceptar = 1
+			UPDATE Intercambios SET RealizadoUsuario1 = 0, RealizadoUsuario2 = 0 WHERE IdIntercambios = @idIntercambio;
 		SET @tipoNotificacion = CASE WHEN @aceptar = 1 THEN 'Cambio aceptado' ELSE 'Cambio rechazado' END;
 		EXEC CrearNotificacion @idAutor, @idIntercambio, @tipoNotificacion, @idCambio = @idCambio;
 		COMMIT TRANSACTION;

@@ -1,7 +1,6 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using Swappit.Models.ViewModels;
 
 namespace Swappit.Models;
 
@@ -12,16 +11,6 @@ public static class FavoritosBD
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
         {
             return connection.Query<int>("GetIdsFavoritos",
-                new { idUsuario },
-                commandType: CommandType.StoredProcedure).AsList();
-        }
-    }
-
-    public static List<ArticuloCardViewModel> GetFavoritos(int idUsuario)
-    {
-        using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
-        {
-            return connection.Query<ArticuloCardViewModel>("GetFavoritos",
                 new { idUsuario },
                 commandType: CommandType.StoredProcedure).AsList();
         }

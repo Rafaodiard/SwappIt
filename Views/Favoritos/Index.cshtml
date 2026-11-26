@@ -1,8 +1,12 @@
 @{
     ViewData["Title"] = "Favoritos";
     List<Swappit.Models.ViewModels.ArticuloCardViewModel> articulos = ViewBag.articulos;
+    int totalFavoritos = ViewBag.totalFavoritos;
     string textoCantidad = ViewBag.textoCantidad;
     bool errorCarga = ViewBag.errorCarga;
+    bool hayFiltros = ViewBag.hayFiltros;
+    string orden = ViewBag.orden;
+    List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> opcionesOrden = ViewBag.opcionesOrden;
 }
 
 <div class="container-xl py-4 py-lg-5">
@@ -19,40 +23,81 @@
             <p class="texto-suave mb-0">Hubo un problema al conectar con la base de datos. Probá de nuevo en un rato.</p>
         </div>
     }
-    else
+    else if (totalFavoritos == 0 && !hayFiltros)
     {
-        <div class="campo-redondeado campo-angosto border mb-3">
-            <input type="search" id="buscador-favoritos" placeholder="Buscar por nombre" aria-label="Buscar favoritos por nombre" autocomplete="off">
-            <i class="bi bi-search me-2 texto-suave" aria-hidden="true"></i>
-        </div>
-
-        <p id="favoritos-estado" class="texto-suave small mb-3" role="status" aria-live="polite" hidden="@(articulos.Count == 0)">
-            @textoCantidad
-        </p>
-
-        <div id="lista-favoritos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-            @foreach (var articulo in articulos)
-            {
-                ViewBag.articulo = articulo;
-                <partial name="_CardObjeto" />
-            }
-        </div>
-
-        <div id="favoritos-sin-resultados" class="tarjeta-blanca p-5 text-center" hidden>
-            <i class="bi bi-search fs-1 texto-suave" aria-hidden="true"></i>
-            <h2 class="letra-serif h3 mt-3">No encontramos favoritos</h2>
-            <p class="texto-suave mb-0">Probá con otro nombre.</p>
-        </div>
-
-        <div id="favoritos-vacio" class="tarjeta-blanca p-5 text-center" hidden="@(articulos.Count > 0)">
+        <div class="tarjeta-blanca p-5 text-center">
             <i class="bi bi-heart fs-1 texto-suave" aria-hidden="true"></i>
             <h2 class="letra-serif h3 mt-3">Todavía no tenés favoritos</h2>
             <p class="texto-suave">Tocá el corazón de un artículo para guardarlo acá.</p>
             <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Explorar artículos</a>
         </div>
     }
+    else
+    {
+        <div class="row g-4">
+
+            <!-- ===== Filtros ===== -->
+            @{
+                ViewBag.urlFiltros = Url.Action("Index", "Favoritos");
+                ViewBag.urlLimpiar = Url.Action("Index", "Favoritos", new { orden });
+            }
+            <partial name="_FiltrosArticulos" />
+
+            <!-- ===== Lista ===== -->
+            <section class="col-lg-9" aria-label="Tus favoritos">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                    <div class="campo-redondeado campo-angosto border flex-grow-1">
+                        <input type="search" id="buscador-favoritos" placeholder="Buscar por nombre" aria-label="Buscar favoritos por nombre" autocomplete="off">
+                        <i class="bi bi-search me-2 texto-suave" aria-hidden="true"></i>
+                    </div>
+                    <select class="form-select form-select-sm w-auto" id="ordenar" name="orden" form="filtros" aria-label="Ordenar por">
+                        @foreach (var opcion in opcionesOrden)
+                        {
+                            <option value="@opcion.Value" selected="@(opcion.Value == orden)">@opcion.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <p id="favoritos-estado" class="texto-suave small mb-3" role="status" aria-live="polite" hidden="@(articulos.Count == 0)">
+                    @textoCantidad
+                </p>
+
+                <div id="lista-favoritos" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
+                    @foreach (var articulo in articulos)
+                    {
+                        ViewBag.articulo = articulo;
+                        <partial name="_CardObjeto" />
+                    }
+                </div>
+
+                <div id="favoritos-sin-resultados" class="tarjeta-blanca p-5 text-center" hidden>
+                    <i class="bi bi-search fs-1 texto-suave" aria-hidden="true"></i>
+                    <h2 class="letra-serif h3 mt-3">No encontramos favoritos</h2>
+                    <p class="texto-suave mb-0">Probá con otro nombre.</p>
+                </div>
+
+                <div id="favoritos-vacio" class="tarjeta-blanca p-5 text-center" hidden="@(articulos.Count > 0)">
+                    @if (hayFiltros)
+                    {
+                        <i class="bi bi-funnel fs-1 texto-suave" aria-hidden="true"></i>
+                        <h2 class="letra-serif h3 mt-3">No hay favoritos con esos filtros</h2>
+                        <p class="texto-suave">Probá sacando alguna categoría o estado.</p>
+                        <a href="@Url.Action("Index", "Favoritos", new { orden })" class="btn boton-bordo">Limpiar filtros</a>
+                    }
+                    else
+                    {
+                        <i class="bi bi-heart fs-1 texto-suave" aria-hidden="true"></i>
+                        <h2 class="letra-serif h3 mt-3">Todavía no tenés favoritos</h2>
+                        <p class="texto-suave">Tocá el corazón de un artículo para guardarlo acá.</p>
+                        <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-bordo">Explorar artículos</a>
+                    }
+                </div>
+            </section>
+        </div>
+    }
 </div>
 
 @section Scripts {
+    <script src="~/js/buscar.js" asp-append-version="true"></script>
     <script src="~/js/favoritos-lista.js" asp-append-version="true"></script>
 }

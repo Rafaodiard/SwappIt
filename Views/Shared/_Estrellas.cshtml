@@ -1,0 +1,9 @@
+@{
+    double estrellas = ViewBag.estrellas;
+}
+<span class="estrellas" role="img" aria-label="@Swappit.Models.Reputaciones.TextoEstrellas(estrellas) de @Swappit.Models.Calificaciones.MaxPuntaje">
+    @for (int posicion = 1; posicion <= Swappit.Models.Calificaciones.MaxPuntaje; posicion++)
+    {
+        <i class="bi @Swappit.Models.Reputaciones.IconoEstrella(estrellas, posicion)" aria-hidden="true"></i>
+    }
+</span>

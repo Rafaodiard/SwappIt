@@ -46,7 +46,8 @@
                                 <span class="insignia tono-@plan.Tono"><i class="bi bi-patch-check-fill" aria-hidden="true"></i><span class="visually-hidden">Usuario</span> @plan.Nombre</span>
                             }
                         </div>
-                        <p class="texto-suave mb-2">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        <p class="texto-suave mb-1">@@<span data-campo="usuario">@usuario.Usuario</span></p>
+                        <a href="#titulo-opiniones" class="d-inline-block text-reset text-decoration-none small mb-2"><partial name="_Reputacion" /></a>
                         @if (tieneDescripcion)
                         {
                             <p class="texto-con-saltos mb-3" data-campo="descripcion">@usuario.Descripcion</p>
@@ -198,6 +199,11 @@
                     </div>
                 }
             </section>
+        </div>
+
+        <!-- ===== Opiniones ===== -->
+        <div class="col-12">
+            <partial name="_Opiniones" />
         </div>
     </div>
 </div>

@@ -1,0 +1,44 @@
+@{
+    List<Swappit.Models.ViewModels.CalificacionViewModel> opiniones = ViewBag.opiniones;
+    Swappit.Models.ResumenReputacion reputacion = ViewBag.reputacion;
+    string textoSinOpiniones = ViewBag.textoSinOpiniones;
+}
+<section class="tarjeta-blanca p-4" aria-labelledby="titulo-opiniones">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+        <h2 class="letra-serif h3 mb-0" id="titulo-opiniones">Opiniones</h2>
+        <partial name="_Reputacion" />
+    </div>
+
+    @if (opiniones.Count > 0)
+    {
+        <ul class="list-unstyled grilla-opiniones mb-0">
+            @foreach (var opinion in opiniones)
+            {
+                ViewBag.estrellas = (double)opinion.Puntaje;
+                <li class="caja-opinion">
+                    <div class="d-flex align-items-center gap-3 mb-2 sin-ancho-minimo">
+                        <span class="foto-redonda-mini" data-iniciales="@opinion.AutorIniciales" aria-hidden="true">
+                            @if (opinion.AutorFoto != null) { <img src="@opinion.AutorFoto" alt=""> } else { @opinion.AutorIniciales }
+                        </span>
+                        <div class="sin-ancho-minimo">
+                            <a href="@Url.Action("Publico", "Perfil", new { id = opinion.AutorId })" class="d-block fw-semibold text-reset text-decoration-none text-truncate">@opinion.AutorNombreCompleto</a>
+                            <time class="d-block texto-suave small" datetime="@opinion.FechaHtml">@opinion.FechaTexto</time>
+                        </div>
+                    </div>
+                    <partial name="_Estrellas" />
+                    @if (opinion.TieneComentario)
+                    {
+                        <p class="small texto-con-saltos mt-2 mb-0">@opinion.Comentario</p>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="text-center py-4">
+            <i class="bi bi-star fs-1 texto-suave" aria-hidden="true"></i>
+            <p class="texto-suave mt-2 mb-0">@textoSinOpiniones</p>
+        </div>
+    }
+</section>

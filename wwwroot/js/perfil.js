@@ -86,6 +86,7 @@
     });
 
     modalEl.addEventListener('hidden.bs.modal', () => {
+        if (location.hash === '#editar-perfil') history.replaceState(null, '', location.pathname + location.search);
         form.reset();
         liberarUrl();
         vistaPrevia.innerHTML = contenidoOriginal;
@@ -95,7 +96,11 @@
         actualizarContador();
     });
 
-    if (modalEl.dataset.error) {
-        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    const abrirModal = () => bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    window.addEventListener('hashchange', () => {
+        if (location.hash === '#editar-perfil') abrirModal();
+    });
+    if (modalEl.dataset.error || location.hash === '#editar-perfil') {
+        abrirModal();
     }
 })();

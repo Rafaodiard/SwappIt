@@ -1,0 +1,63 @@
+@using Swappit.Models.ViewModels
+@{
+    string? busqueda = ViewBag.busqueda;
+    List<OpcionFiltroViewModel> categorias = ViewBag.categorias;
+    List<OpcionFiltroViewModel> estados = ViewBag.estados;
+    bool hayFiltros = ViewBag.hayFiltros;
+    bool ocultarOpcionesVacias = ViewBag.ocultarOpcionesVacias ?? false;
+    string urlFiltros = ViewBag.urlFiltros;
+    string urlLimpiar = ViewBag.urlLimpiar;
+}
+
+<aside class="col-lg-3">
+    <button class="btn boton-contorno-azul w-100 d-lg-none mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filtros" aria-controls="filtros" aria-expanded="@(hayFiltros ? "true" : "false")">
+        <i class="bi bi-funnel" aria-hidden="true"></i> Filtros
+    </button>
+
+    <form id="filtros" class="panel-celeste collapse d-lg-block @(hayFiltros ? "show" : "")" method="get" action="@urlFiltros">
+        @if (busqueda != null)
+        {
+            <input type="hidden" name="q" value="@busqueda">
+        }
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="fs-5 fw-semibold"><i class="bi bi-filter-left" aria-hidden="true"></i> Filtros</span>
+            @if (hayFiltros)
+            {
+                <a href="@urlLimpiar" class="btn btn-link btn-sm texto-suave text-decoration-none p-0">Limpiar</a>
+            }
+        </div>
+
+        <fieldset id="filtro-categorias" class="mb-4">
+            <legend>Categoría</legend>
+            @foreach (var cat in categorias)
+            {
+                if (ocultarOpcionesVacias && cat.Cantidad == 0 && !cat.Seleccionada)
+                {
+                    continue;
+                }
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categoria" value="@cat.Valor" id="cat-@(cat.Valor)"
+                           checked="@cat.Seleccionada">
+                    <label class="form-check-label" for="cat-@(cat.Valor)">@cat.Texto <span class="visually-hidden">(@cat.Cantidad)</span></label>
+                    <span class="numero-suave" aria-hidden="true">@cat.Cantidad</span>
+                </div>
+            }
+        </fieldset>
+
+        <fieldset>
+            <legend>Estado</legend>
+            @foreach (var est in estados)
+            {
+                if (ocultarOpcionesVacias && est.Cantidad == 0 && !est.Seleccionada)
+                {
+                    continue;
+                }
+                <input type="checkbox" class="btn-check" name="estado" value="@est.Valor" id="est-@(est.Valor)"
+                       checked="@est.Seleccionada">
+                <label class="pastilla-blanca" for="est-@(est.Valor)">@est.Texto <span class="visually-hidden">(@est.Cantidad)</span></label>
+            }
+        </fieldset>
+
+        <noscript><button type="submit" class="btn boton-contorno-azul w-100 mt-4">Aplicar filtros</button></noscript>
+    </form>
+</aside>

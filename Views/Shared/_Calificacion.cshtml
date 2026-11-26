@@ -1,0 +1,16 @@
+@{
+    Swappit.Models.ViewModels.CalificacionViewModel calificacion = ViewBag.calificacion;
+    string titulo = ViewBag.tituloCalificacion;
+    ViewBag.estrellas = (double)calificacion.Puntaje;
+}
+<div class="d-flex flex-column gap-1">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <p class="small fw-semibold mb-0">@titulo</p>
+        <time class="texto-suave small" datetime="@calificacion.FechaHtml">@calificacion.FechaTexto</time>
+    </div>
+    <partial name="_Estrellas" />
+    @if (calificacion.TieneComentario)
+    {
+        <p class="small texto-con-saltos mb-0">@calificacion.Comentario</p>
+    }
+</div>

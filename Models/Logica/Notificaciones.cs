@@ -61,6 +61,15 @@ public static class Notificaciones
             case TipoNotificaciones.CambioRechazado:
                 Texto(n, $" no aceptó {sumarOSacar} ", n.CambioArticulos, ".");
                 break;
+            case TipoNotificaciones.MarcadoRealizado:
+                Texto(n, " marcó como realizado el intercambio de ", n.ArticuloNombre, ". Confirmalo vos también.");
+                break;
+            case TipoNotificaciones.IntercambioRealizado:
+                Texto(n, " confirmó el intercambio de ", n.ArticuloNombre, ". ¡Ya está realizado!");
+                break;
+            case TipoNotificaciones.CalificacionRecibida:
+                Texto(n, " te calificó por el intercambio de ", n.ArticuloNombre, ".");
+                break;
             default:
                 n.MuestraOtro = false;
                 Texto(n, n.Tipo, null, "");
@@ -97,6 +106,12 @@ public static class Notificaciones
                 return "bi-question-circle";
             case TipoNotificaciones.PedidoSacar:
                 return "bi-dash-circle";
+            case TipoNotificaciones.MarcadoRealizado:
+                return "bi-check2-circle";
+            case TipoNotificaciones.IntercambioRealizado:
+                return "bi-check-circle";
+            case TipoNotificaciones.CalificacionRecibida:
+                return "bi-star";
             default:
                 return "bi-bell";
         }
@@ -111,6 +126,12 @@ public static class Notificaciones
             case TipoNotificaciones.PedidoArticulo:
             case TipoNotificaciones.PedidoSacar:
                 return "Responder";
+            case TipoNotificaciones.MarcadoRealizado:
+                return "Confirmar";
+            case TipoNotificaciones.IntercambioRealizado:
+                return "Calificar";
+            case TipoNotificaciones.CalificacionRecibida:
+                return "Ver calificación";
             case TipoNotificaciones.PropuestaAceptada:
             case TipoNotificaciones.IntercambioCancelado:
             case TipoNotificaciones.ArticuloAgregado:

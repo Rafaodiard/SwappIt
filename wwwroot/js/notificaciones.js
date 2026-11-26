@@ -1,19 +1,13 @@
 (() => {
     const contenedor = document.querySelector('[data-notif]');
     if (!contenedor) return;
-    const boton = contenedor.querySelector('[data-notif-boton]');
+    const boton = contenedor.querySelector('[data-desplegable-boton]');
     const popup = contenedor.querySelector('.desplegable');
     const contenido = popup.querySelector('[data-notif-contenido]');
     const contador = boton.querySelector('[data-notif-contador]');
     const marcarTodas = popup.querySelector('[data-notif-marcar-todas]');
     const urlNoLeidas = contenedor.dataset.urlNoLeidas;
     const urlLista = contenedor.dataset.urlLista;
-
-    function abrir(abierto) {
-        popup.classList.toggle('abierto', abierto);
-        boton.setAttribute('aria-expanded', String(abierto));
-        if (abierto) cargarLista();
-    }
 
     function mostrarCantidad(cantidad) {
         contador.hidden = cantidad === 0;
@@ -45,6 +39,8 @@
         cargarCantidad();
     }
 
+    swappitDesplegable(contenedor, cargarLista);
+
     marcarTodas.addEventListener('submit', async (e) => {
         e.preventDefault();
         try {
@@ -54,23 +50,6 @@
         }
         cargarLista();
         boton.focus();
-    });
-
-    boton.addEventListener('click', () => abrir(boton.getAttribute('aria-expanded') !== 'true'));
-
-    contenedor.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && popup.classList.contains('abierto')) {
-            abrir(false);
-            boton.focus();
-        }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!contenedor.contains(e.target)) abrir(false);
-    });
-
-    contenedor.addEventListener('focusout', (e) => {
-        if (e.relatedTarget && !contenedor.contains(e.relatedTarget)) abrir(false);
     });
 
     cargarCantidad();

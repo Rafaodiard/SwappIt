@@ -108,6 +108,9 @@ INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (7, N'Pedido de artíc
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (8, N'Pedido para sacar')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (9, N'Cambio aceptado')
 INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (10, N'Cambio rechazado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (11, N'Marcado como realizado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (12, N'Intercambio realizado')
+INSERT [dbo].[TipoNotificaciones] ([Id], [Nombre]) VALUES (13, N'Calificación recibida')
 SET IDENTITY_INSERT [dbo].[TipoNotificaciones] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Usuarios] ON 

@@ -8,4 +8,6 @@ public class Intercambios
     public int IdEstado { get; set; }
     public int IdUsuarios1 { get; set; }
     public int IdUsuarios2 { get; set; }
+    public bool RealizadoUsuario1 { get; set; }
+    public bool RealizadoUsuario2 { get; set; }
 }

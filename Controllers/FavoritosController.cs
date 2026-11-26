@@ -16,7 +16,7 @@ public class FavoritosController : BaseController
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(int[]? categoria, int[]? estado, string? orden)
     {
         int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
         if (usuarioId == null)
@@ -24,13 +24,24 @@ public class FavoritosController : BaseController
             return RedirectToAction("Index", "Account");
         }
 
+        List<int> categoriasSeleccionadas = Listas.IdsValidos(categoria, Catalogo.MaxOpcionesFiltro);
+        List<int> estadosSeleccionados = Listas.IdsValidos(estado, Catalogo.MaxOpcionesFiltro);
+        string ordenElegido = Catalogo.OrdenFavoritosValido(orden);
+
         ViewBag.articulos = new List<ArticuloCardViewModel>();
+        ViewBag.categorias = new List<OpcionFiltroViewModel>();
+        ViewBag.estados = new List<OpcionFiltroViewModel>();
+        ViewBag.totalFavoritos = 0;
         ViewBag.textoCantidad = "";
         ViewBag.errorCarga = false;
         try
         {
-            List<ArticuloCardViewModel> articulos = FavoritosBD.GetFavoritos(usuarioId.Value);
+            List<ArticuloCardViewModel> articulos = Catalogo.Favoritos(usuarioId.Value, categoriasSeleccionadas, estadosSeleccionados, ordenElegido);
+            List<OpcionFiltroViewModel> categorias = Catalogo.FiltroCategorias(null, null, categoriasSeleccionadas, usuarioId.Value);
             ViewBag.articulos = articulos;
+            ViewBag.categorias = categorias;
+            ViewBag.estados = Catalogo.FiltroEstados(null, null, estadosSeleccionados, usuarioId.Value);
+            ViewBag.totalFavoritos = Catalogo.Total(categorias);
             ViewBag.textoCantidad = Listas.Contar(articulos.Count, "favorito", "favoritos");
         }
         catch (SqlException ex)
@@ -38,6 +49,12 @@ public class FavoritosController : BaseController
             _logger.LogError(ex, "No se pudieron cargar los favoritos del usuario {IdUsuario}", usuarioId);
             ViewBag.errorCarga = true;
         }
+
+        ViewBag.busqueda = null;
+        ViewBag.hayFiltros = Catalogo.HayFiltros(categoriasSeleccionadas, estadosSeleccionados);
+        ViewBag.orden = ordenElegido;
+        ViewBag.opcionesOrden = Catalogo.OpcionesOrdenFavoritos();
+        ViewBag.ocultarOpcionesVacias = true;
         return View();
     }
 

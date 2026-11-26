@@ -140,6 +140,14 @@ public class IntercambioController : BaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public IActionResult Calificar(int id, int puntaje, string? comentario)
+    {
+        return Responder(id, idUsuario => Reputaciones.Calificar(id, idUsuario, puntaje, comentario),
+            "No pudimos guardar tu calificación. Probá de nuevo en un rato.");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Cancelar(int id)
     {
         return Responder(id, idUsuario => GestionIntercambios.Cancelar(id, idUsuario),

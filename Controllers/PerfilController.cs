@@ -40,6 +40,9 @@ public class PerfilController : BaseController
         ViewBag.plan = Suscripciones.Buscar(Suscripciones.Planes(), usuario.IdPlan);
         ViewBag.articulosActivos = ArticulosBD.ContarArticulosActivos(usuario.IdUsuarios);
         ViewBag.intercambiosActivos = IntercambiosBD.ContarIntercambiosActivos(usuario.IdUsuarios);
+        ViewBag.reputacion = CalificacionesBD.GetReputacionUsuario(usuario.IdUsuarios);
+        ViewBag.opiniones = CalificacionesBD.GetCalificacionesUsuario(usuario.IdUsuarios, Reputaciones.OpinionesEnPerfil);
+        ViewBag.textoSinOpiniones = "Todavía no te calificaron. Cuando termines un intercambio, la otra persona te va a poder calificar.";
         ViewBag.maxFotoMB = EditarPerfilViewModel.MaxFotoMB;
         ViewBag.maxDescripcion = EditarPerfilViewModel.MaxDescripcion;
         ViewBag.errorPerfil = TempData["ErrorPerfil"] as string;
@@ -78,6 +81,9 @@ public class PerfilController : BaseController
         ViewBag.foto = UsuariosBD.GetFotoUsuario(usuario.IdUsuarios);
         ViewBag.articulos = ArticulosBD.GetArticulosCatalogo(idUsuario: usuario.IdUsuarios);
         ViewBag.plan = Suscripciones.Buscar(Suscripciones.Planes(), usuario.IdPlan);
+        ViewBag.reputacion = CalificacionesBD.GetReputacionUsuario(usuario.IdUsuarios);
+        ViewBag.opiniones = CalificacionesBD.GetCalificacionesUsuario(usuario.IdUsuarios, Reputaciones.OpinionesEnPerfil);
+        ViewBag.textoSinOpiniones = $"{usuario.Nombre} todavía no tiene calificaciones.";
         return View();
     }
 

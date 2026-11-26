@@ -83,6 +83,23 @@ public class DetalleIntercambio
         bool comprometido = estado == EstadosIntercambios.Pendiente && IntercambiosBD.IntercambioConArticuloComprometido(idIntercambio);
         int pendientesQueSeRechazan = intercambio.PorResponder ? IntercambiosBD.ContarPendientesDeArticulos(idIntercambio) : 0;
 
+        CalificacionViewModel? miCalificacion = null;
+        CalificacionViewModel? suCalificacion = null;
+        if (estado == EstadosIntercambios.Realizado)
+        {
+            foreach (CalificacionViewModel c in CalificacionesBD.GetCalificacionesIntercambio(idIntercambio, idUsuario))
+            {
+                if (c.EsMia)
+                {
+                    miCalificacion = c;
+                }
+                else
+                {
+                    suCalificacion = c;
+                }
+            }
+        }
+
         DetalleIntercambio armado = new DetalleIntercambio(intercambio, cambios, pendientes, puedeCambiar);
         bool puedoSacar = mios.Count - armado.SacarPendientesMios() >= 2;
 
@@ -121,6 +138,13 @@ public class DetalleIntercambio
             Realizado = estado == EstadosIntercambios.Realizado,
             AceptadoOMas = estado == EstadosIntercambios.Aceptado || estado == EstadosIntercambios.Realizado,
             PuedeCancelar = puedeCambiar,
+            RealizadoPorMi = intercambio.RealizadoPorMi,
+            RealizadoPorOtro = intercambio.RealizadoPorOtro,
+            TextoConfirmacion = TextoConfirmacion(intercambio),
+            MiCalificacion = miCalificacion,
+            SuCalificacion = suCalificacion,
+            PuedeCalificar = estado == EstadosIntercambios.Realizado && miCalificacion == null,
+            MaxComentario = Calificaciones.MaxComentario,
             CambiosPorResponder = armado.CambiosPorResponder(),
             Historial = armado.Historial(),
             MostrarAgregar = puedeCambiar && lugarMio > 0 && paraAgregar.Count > 0,
@@ -133,6 +157,23 @@ public class DetalleIntercambio
         int cantidadPorResponder = detalle.CambiosPorResponder.Count;
         detalle.TituloCaja = $"{intercambio.OtroNombre} te pide {(cantidadPorResponder == 1 ? "un cambio" : $"{cantidadPorResponder} cambios")}";
         return detalle;
+    }
+
+    private static string TextoConfirmacion(IntercambioViewModel intercambio)
+    {
+        if (intercambio.Estado == EstadosIntercambios.Realizado)
+        {
+            return "Lo confirmaron los dos";
+        }
+        if (intercambio.RealizadoPorMi)
+        {
+            return $"Falta que {intercambio.OtroNombreVisible} confirme";
+        }
+        if (intercambio.RealizadoPorOtro)
+        {
+            return $"{intercambio.OtroNombreVisible} ya lo confirmó";
+        }
+        return "Lo confirman los dos";
     }
 
     private static string Nombres(List<ArticuloCardViewModel> articulos)

@@ -139,6 +139,37 @@ CREATE TABLE [dbo].[BeneficiosPlanes](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [dbo].[Calificaciones]    Script Date: 26/11/2026 12:00:00 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Calificaciones](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[IdIntercambio] [int] NOT NULL,
+	[IdUsuarioCalifica] [int] NOT NULL,
+	[IdUsuarioCalificado] [int] NOT NULL,
+	[Puntaje] [int] NOT NULL,
+	[Comentario] [varchar](300) NULL,
+	[Fecha] [datetime] NOT NULL,
+ CONSTRAINT [PK_Calificaciones] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UQ_Calificaciones] UNIQUE NONCLUSTERED
+(
+	[IdIntercambio] ASC,
+	[IdUsuarioCalifica] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_Calificaciones_IdUsuarioCalificado]    Script Date: 26/11/2026 12:00:00 ******/
+CREATE NONCLUSTERED INDEX [IX_Calificaciones_IdUsuarioCalificado] ON [dbo].[Calificaciones]
+(
+	[IdUsuarioCalificado] ASC,
+	[Fecha] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
 /****** Object:  Table [dbo].[CambiosIntercambios]    Script Date: 14/11/2026 12:00:00 ******/
 SET ANSI_NULLS ON
 GO
@@ -265,6 +296,8 @@ CREATE TABLE [dbo].[Intercambios](
 	[IdUsuarios1] [int] NOT NULL,
 	[IdUsuarios2] [int] NOT NULL,
 	[Ubicacion] [varchar](50) NULL,
+	[RealizadoUsuario1] [bit] NOT NULL CONSTRAINT [DF_Intercambios_RealizadoUsuario1] DEFAULT ((0)),
+	[RealizadoUsuario2] [bit] NOT NULL CONSTRAINT [DF_Intercambios_RealizadoUsuario2] DEFAULT ((0)),
  CONSTRAINT [PK_Intercambios] PRIMARY KEY CLUSTERED 
 (
 	[IdIntercambios] ASC
@@ -443,6 +476,25 @@ ALTER TABLE [dbo].[BeneficiosPlanes]  WITH CHECK ADD  CONSTRAINT [FK_BeneficiosP
 REFERENCES [dbo].[Planes] ([Id])
 GO
 ALTER TABLE [dbo].[BeneficiosPlanes] CHECK CONSTRAINT [FK_BeneficiosPlanes_Planes]
+GO
+ALTER TABLE [dbo].[Calificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Calificaciones_Intercambios] FOREIGN KEY([IdIntercambio])
+REFERENCES [dbo].[Intercambios] ([IdIntercambios])
+GO
+ALTER TABLE [dbo].[Calificaciones] CHECK CONSTRAINT [FK_Calificaciones_Intercambios]
+GO
+ALTER TABLE [dbo].[Calificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Calificaciones_UsuarioCalifica] FOREIGN KEY([IdUsuarioCalifica])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[Calificaciones] CHECK CONSTRAINT [FK_Calificaciones_UsuarioCalifica]
+GO
+ALTER TABLE [dbo].[Calificaciones]  WITH CHECK ADD  CONSTRAINT [FK_Calificaciones_UsuarioCalificado] FOREIGN KEY([IdUsuarioCalificado])
+REFERENCES [dbo].[Usuarios] ([IdUsuarios])
+GO
+ALTER TABLE [dbo].[Calificaciones] CHECK CONSTRAINT [FK_Calificaciones_UsuarioCalificado]
+GO
+ALTER TABLE [dbo].[Calificaciones]  WITH CHECK ADD  CONSTRAINT [CK_Calificaciones_Puntaje] CHECK  (([Puntaje]>=(1) AND [Puntaje]<=(5)))
+GO
+ALTER TABLE [dbo].[Calificaciones] CHECK CONSTRAINT [CK_Calificaciones_Puntaje]
 GO
 ALTER TABLE [dbo].[CambiosIntercambios]  WITH CHECK ADD  CONSTRAINT [FK_CambiosIntercambios_Articulos] FOREIGN KEY([IdArticulo])
 REFERENCES [dbo].[Articulos] ([IdArticulos])

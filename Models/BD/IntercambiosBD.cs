@@ -120,6 +120,21 @@ public static class IntercambiosBD
         }
     }
 
+    public static string? MarcarRealizado(int idIntercambio, int idUsuario, List<NotificacionCreada>? creadas = null)
+    {
+        using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))
+        {
+            using (SqlMapper.GridReader resultado = connection.QueryMultiple("MarcarRealizado",
+                new { idIntercambio, idUsuario },
+                commandType: CommandType.StoredProcedure))
+            {
+                string? estado = resultado.ReadSingle<string?>();
+                NotificacionesBD.LeerCreadas(resultado, creadas);
+                return estado;
+            }
+        }
+    }
+
     public static bool CancelarIntercambio(int idIntercambio, int idUsuario, List<NotificacionCreada>? creadas = null)
     {
         using (SqlConnection connection = new SqlConnection(ConexionBD.ConnectionString))

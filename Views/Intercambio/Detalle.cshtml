@@ -167,7 +167,13 @@
                             </li>
                             <li class="paso-linea @(detalle.Realizado ? "relleno-azul" : detalle.AceptadoOMas ? "anillo-azul" : "")" aria-current="@(detalle.EsAceptado ? "step" : null)">
                                 <span class="circulo-contorno" aria-hidden="true">@if (detalle.Realizado) { <i class="bi bi-check-lg" aria-hidden="true"></i> }</span>
-                                <span class="fw-semibold">Realizado</span>
+                                <span>
+                                    <span class="d-block fw-semibold">Realizado</span>
+                                    @if (detalle.AceptadoOMas)
+                                    {
+                                        <span class="d-block texto-suave small">@detalle.TextoConfirmacion</span>
+                                    }
+                                </span>
                             </li>
                         }
                     </ol>
@@ -210,23 +216,37 @@
                     }
                     else if (detalle.EsAceptado)
                     {
-                        <p class="texto-suave small mb-3">Coordiná con @intercambio.OtroNombre el lugar y el horario. Cuando hayan hecho el intercambio, marcalo como realizado.</p>
+                        @if (detalle.RealizadoPorMi)
+                        {
+                            <p class="aviso-crema mb-3"><i class="bi bi-hourglass-split me-1" aria-hidden="true"></i> Ya lo marcaste como realizado. El intercambio se cierra cuando @intercambio.OtroNombre también lo confirme.</p>
+                        }
+                        else if (detalle.RealizadoPorOtro)
+                        {
+                            <p class="aviso-rosa mb-3"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i> @intercambio.OtroNombre marcó el intercambio como realizado. Si ya lo hicieron, confirmalo para cerrarlo.</p>
+                        }
+                        else
+                        {
+                            <p class="texto-suave small mb-3">Coordiná con @intercambio.OtroNombre el lugar y el horario. Cuando hayan hecho el intercambio, márquenlo como realizado: se cierra cuando lo confirman los dos.</p>
+                        }
                         <div class="d-flex flex-column gap-2">
-                            <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn boton-bordo"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
-                            <form method="post" action="@Url.Action("MarcarRealizado", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
-                                <button type="submit" class="btn boton-contorno-azul w-100" disabled="@detalle.HayPendientes"
-                                        aria-describedby="@(detalle.HayPendientes ? "realizado-bloqueado" : null)">Marcar como realizado</button>
-                            </form>
-                            @if (detalle.HayPendientes)
+                            @if (!detalle.RealizadoPorMi)
                             {
-                                <span class="texto-suave small" id="realizado-bloqueado">Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.</span>
+                                <form method="post" action="@Url.Action("MarcarRealizado", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                                    <button type="submit" class="btn @(detalle.RealizadoPorOtro ? "boton-bordo" : "boton-contorno-azul") w-100" disabled="@detalle.HayPendientes"
+                                            aria-describedby="@(detalle.HayPendientes ? "realizado-bloqueado" : null)">@(detalle.RealizadoPorOtro ? "Confirmar que se realizó" : "Marcar como realizado")</button>
+                                </form>
+                                @if (detalle.HayPendientes)
+                                {
+                                    <span class="texto-suave small" id="realizado-bloqueado">Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.</span>
+                                }
                             }
+                            <a href="@Url.Action("Index", "Chat", new { id = intercambio.IdIntercambios })" class="btn @(detalle.RealizadoPorOtro && !detalle.RealizadoPorMi ? "boton-contorno-azul" : "boton-bordo")"><i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Ir al chat</a>
                             <button type="button" class="btn boton-contorno-bordo" data-bs-toggle="modal" data-bs-target="#modal-cancelar">Cancelar intercambio</button>
                         </div>
                     }
                     else if (detalle.Realizado)
                     {
-                        <p class="texto-suave small mb-0"><i class="bi bi-check-circle-fill texto-azul me-1" aria-hidden="true"></i> ¡Listo! Este intercambio ya se hizo.</p>
+                        <p class="texto-suave small mb-0"><i class="bi bi-check-circle-fill texto-azul me-1" aria-hidden="true"></i> ¡Listo! Los dos confirmaron que el intercambio se hizo.</p>
                     }
                     else if (detalle.Cancelado)
                     {
@@ -239,6 +259,52 @@
                         <a href="@Url.Action("Buscar", "Articulos")" class="btn boton-contorno-azul w-100">Buscar otros artículos</a>
                     }
                 </section>
+
+                @if (detalle.Realizado)
+                {
+                    <section class="tarjeta-blanca p-4" aria-labelledby="titulo-calificacion">
+                        <h2 class="h6 fw-bold mb-3" id="titulo-calificacion">Calificación</h2>
+                        @if (detalle.PuedeCalificar)
+                        {
+                            <form method="post" action="@Url.Action("Calificar", "Intercambio", new { id = intercambio.IdIntercambios })" asp-antiforgery="true">
+                                <fieldset class="mb-3">
+                                    <legend class="small fw-semibold mb-2">¿Cómo fue el intercambio con @intercambio.OtroNombre?</legend>
+                                    <div class="estrellas-elegibles">
+                                        @for (int puntaje = Swappit.Models.Calificaciones.MinPuntaje; puntaje <= Swappit.Models.Calificaciones.MaxPuntaje; puntaje++)
+                                        {
+                                            string etiqueta = Swappit.Models.Reputaciones.Etiqueta(puntaje);
+                                            <input type="radio" name="puntaje" id="puntaje-@puntaje" value="@puntaje" required>
+                                            <label for="puntaje-@puntaje" title="@etiqueta"><i class="bi bi-star" aria-hidden="true"></i><i class="bi bi-star-fill" aria-hidden="true"></i><span class="visually-hidden">@Swappit.Models.Reputaciones.TextoEstrellas(puntaje): @etiqueta</span></label>
+                                        }
+                                    </div>
+                                </fieldset>
+                                <label class="small fw-semibold mb-1" for="comentario-calificacion">Comentario <span class="texto-suave fw-normal">(opcional)</span></label>
+                                <textarea class="form-control" id="comentario-calificacion" name="comentario" rows="3" maxlength="@detalle.MaxComentario"
+                                          placeholder="Contá cómo te fue: puntualidad, estado de los artículos, buena onda…"></textarea>
+                                <button type="submit" class="btn boton-bordo w-100 mt-3">Enviar calificación</button>
+                            </form>
+                        }
+                        else if (detalle.MiCalificacion != null)
+                        {
+                            ViewBag.calificacion = detalle.MiCalificacion;
+                            ViewBag.tituloCalificacion = "Tu calificación";
+                            <partial name="_Calificacion" />
+                        }
+
+                        <div class="pt-3 mt-3 border-top">
+                            @if (detalle.SuCalificacion != null)
+                            {
+                                ViewBag.calificacion = detalle.SuCalificacion;
+                                ViewBag.tituloCalificacion = $"{intercambio.OtroNombre} te calificó";
+                                <partial name="_Calificacion" />
+                            }
+                            else
+                            {
+                                <p class="texto-suave small mb-0">@intercambio.OtroNombre todavía no te calificó.</p>
+                            }
+                        </div>
+                    </section>
+                }
             </div>
         </div>
 

@@ -84,6 +84,7 @@ public class ArticulosController : BaseController
             ViewBag.dueno = dueno;
             ViewBag.inicialesDueno = SesionUsuario.Iniciales(dueno.Nombre, dueno.Apellido);
             ViewBag.fotoDueno = UsuariosBD.GetFotoUsuario(dueno.IdUsuarios);
+            ViewBag.reputacion = CalificacionesBD.GetReputacionUsuario(dueno.IdUsuarios);
             ViewBag.ubicacion = Catalogo.Ubicacion(articulo, dueno);
             ViewBag.otrosArticulos = ArticulosBD.GetArticulosCatalogo(cantidad: 4, idUsuario: dueno.IdUsuarios, excluirArticulo: articulo.IdArticulos);
             ViewBag.esPropio = usuarioId == articulo.IdUsuarios;

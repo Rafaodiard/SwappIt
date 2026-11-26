@@ -33,6 +33,14 @@ public class DetalleIntercambioViewModel
     public bool AceptadoOMas { get; set; }
     public bool PuedeCancelar { get; set; }
 
+    public bool RealizadoPorMi { get; set; }
+    public bool RealizadoPorOtro { get; set; }
+    public string TextoConfirmacion { get; set; } = "";
+    public CalificacionViewModel? MiCalificacion { get; set; }
+    public CalificacionViewModel? SuCalificacion { get; set; }
+    public bool PuedeCalificar { get; set; }
+    public int MaxComentario { get; set; }
+
     public string TituloCaja { get; set; } = "";
     public List<CambioPorResponderViewModel> CambiosPorResponder { get; set; } = new List<CambioPorResponderViewModel>();
     public List<EventoCambioViewModel> Historial { get; set; } = new List<EventoCambioViewModel>();

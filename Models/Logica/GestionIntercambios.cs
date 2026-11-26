@@ -193,12 +193,31 @@ public static class GestionIntercambios
 
     public static Resultado MarcarRealizado(int idIntercambio, int idUsuario)
     {
+        IntercambioViewModel? intercambio = IntercambiosBD.GetIntercambio(idIntercambio, idUsuario);
+        if (intercambio == null)
+        {
+            return new Resultado { NoExiste = true };
+        }
         if (IntercambiosBD.ContarCambiosPendientes(idIntercambio, idUsuario) > 0)
         {
             return Resultado.ConError("Hay cambios sin responder. Respondelos o cancelalos antes de marcarlo como realizado.");
         }
-        return CambiarEstado(idIntercambio, idUsuario, EstadosIntercambios.Aceptado, EstadosIntercambios.Realizado, soloQuienRecibe: false,
-            tipoNotificacion: null, "¡Intercambio realizado!");
+
+        Resultado resultado = new Resultado();
+        string? estado = IntercambiosBD.MarcarRealizado(idIntercambio, idUsuario, resultado.Notificaciones);
+        if (estado == EstadosIntercambios.Realizado)
+        {
+            resultado.Mensaje = $"¡Intercambio realizado! Lo confirmaron los dos. Ahora podés calificar a {intercambio.OtroNombreVisible}.";
+        }
+        else if (estado == EstadosIntercambios.Aceptado)
+        {
+            resultado.Mensaje = $"Marcaste el intercambio como realizado. Se cierra cuando {intercambio.OtroNombreVisible} también lo confirme.";
+        }
+        else
+        {
+            resultado.Error = "No se pudo marcar el intercambio como realizado. Puede que ya haya cambiado de estado.";
+        }
+        return resultado;
     }
 
     public static Resultado Cancelar(int idIntercambio, int idUsuario)

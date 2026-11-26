@@ -28,7 +28,14 @@ public class IntercambioViewModel
     public string? OtroBarrio { get; set; }
     public string? OtroProvincia { get; set; }
 
+    public bool RealizadoPorMi { get; set; }
+    public bool RealizadoPorOtro { get; set; }
+    public bool YaCalifique { get; set; }
+
     public bool PorResponder => EsRecibido && Estado == EstadosIntercambios.Pendiente;
+    public bool TeTocaConfirmar => Estado == EstadosIntercambios.Aceptado && RealizadoPorOtro && !RealizadoPorMi;
+    public bool EsperandoConfirmacion => Estado == EstadosIntercambios.Aceptado && RealizadoPorMi && !RealizadoPorOtro;
+    public bool FaltaCalificar => Estado == EstadosIntercambios.Realizado && !YaCalifique;
     public string EstadoCss => Estado switch
     {
         EstadosIntercambios.Pendiente => "tono-crema",

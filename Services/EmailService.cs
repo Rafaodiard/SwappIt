@@ -213,6 +213,21 @@ public class EmailService
                 "No aceptaron tu pedido",
                 esSacar ? $"{otro} no aceptó que saques {cambio} del intercambio." : $"{otro} no aceptó sumar {cambio} al intercambio.",
                 "Ver intercambio"),
+            TipoNotificaciones.MarcadoRealizado => (
+                $"{otro} marcó el intercambio como realizado",
+                "Confirmá el intercambio",
+                $"{otro} marcó como realizado el intercambio de {tu} {mio} por {suyo}. Si ya lo hicieron, confirmalo vos también para cerrarlo.",
+                "Confirmar"),
+            TipoNotificaciones.IntercambioRealizado => (
+                "¡Intercambio realizado!",
+                "¡Intercambio realizado!",
+                $"{otro} confirmó que el intercambio de {tu} {mio} por {suyo} se realizó. Contanos cómo te fue y calificalo.",
+                "Calificar"),
+            TipoNotificaciones.CalificacionRecibida => (
+                $"{otro} te calificó en Swappit",
+                "Recibiste una calificación",
+                $"{otro} te dejó una calificación por el intercambio de {tu} {mio} por {suyo}.",
+                "Ver calificación"),
             _ => (
                 "Tenés una notificación nueva en Swappit",
                 "Tenés una notificación nueva",

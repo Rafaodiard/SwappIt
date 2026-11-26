@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Swappit.Models.ViewModels;
 
 namespace Swappit.Models;
@@ -5,6 +6,7 @@ namespace Swappit.Models;
 public static class Catalogo
 {
     public const int MaxOpcionesFiltro = 20;
+    public const string OrdenGuardados = "guardados";
 
     public static string? LimpiarBusqueda(string? q)
     {
@@ -18,14 +20,51 @@ public static class Catalogo
         return Recomendaciones.Ordenar(articulos, orden, idUsuario);
     }
 
-    public static List<OpcionFiltroViewModel> FiltroCategorias(string? busqueda, int? idUsuario, List<int> seleccionadas)
+    public static List<OpcionFiltroViewModel> FiltroCategorias(string? busqueda, int? idUsuario, List<int> seleccionadas, int? favoritosDe = null)
     {
-        return MarcarSeleccionadas(ArticulosBD.GetFiltroCategorias(busqueda, idUsuario), seleccionadas);
+        return MarcarSeleccionadas(ArticulosBD.GetFiltroCategorias(busqueda, idUsuario, favoritosDe), seleccionadas);
     }
 
-    public static List<OpcionFiltroViewModel> FiltroEstados(string? busqueda, int? idUsuario, List<int> seleccionados)
+    public static List<OpcionFiltroViewModel> FiltroEstados(string? busqueda, int? idUsuario, List<int> seleccionados, int? favoritosDe = null)
     {
-        return MarcarSeleccionadas(ArticulosBD.GetFiltroEstados(busqueda, idUsuario), seleccionados);
+        return MarcarSeleccionadas(ArticulosBD.GetFiltroEstados(busqueda, idUsuario, favoritosDe), seleccionados);
+    }
+
+    public static List<ArticuloCardViewModel> Favoritos(int idUsuario, List<int> categorias, List<int> estados, string orden)
+    {
+        return ArticulosBD.GetArticulosCatalogo(categorias: categorias, estados: estados, favoritosDe: idUsuario, orden: orden);
+    }
+
+    public static List<SelectListItem> OpcionesOrdenFavoritos()
+    {
+        List<SelectListItem> opciones = new List<SelectListItem>();
+        opciones.Add(new SelectListItem("Guardados recientemente", OrdenGuardados));
+        opciones.Add(new SelectListItem("Más populares", Recomendaciones.OrdenPopulares));
+        opciones.Add(new SelectListItem("Más recientes", Recomendaciones.OrdenRecientes));
+        opciones.Add(new SelectListItem("A - Z", Recomendaciones.OrdenAZ));
+        return opciones;
+    }
+
+    public static string OrdenFavoritosValido(string? orden)
+    {
+        foreach (SelectListItem opcion in OpcionesOrdenFavoritos())
+        {
+            if (opcion.Value == orden)
+            {
+                return orden!;
+            }
+        }
+        return OrdenGuardados;
+    }
+
+    public static int Total(List<OpcionFiltroViewModel> opciones)
+    {
+        int total = 0;
+        foreach (OpcionFiltroViewModel opcion in opciones)
+        {
+            total += opcion.Cantidad;
+        }
+        return total;
     }
 
     private static List<OpcionFiltroViewModel> MarcarSeleccionadas(List<OpcionFiltroViewModel> opciones, List<int> seleccionadas)

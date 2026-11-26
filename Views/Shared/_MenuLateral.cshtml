@@ -1,0 +1,85 @@
+@{
+    bool esVisitante = ViewBag.esVisitante ?? true;
+    string? iniciales = ViewBag.sesionIniciales;
+    string? foto = ViewBag.sesionFoto;
+    string? nombre = ViewBag.sesionNombre;
+    string? usuario = ViewBag.sesionUsuario;
+    string controlador = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string accion = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    string? orden = Context.Request.Query["orden"];
+}
+@functions {
+    private string? Actual(bool esActual) => esActual ? "page" : null;
+}
+<aside class="offcanvas offcanvas-start panel-lateral" tabindex="-1" id="menu-lateral" aria-labelledby="menu-lateral-titulo">
+    <div class="panel-lateral-cabecera">
+        <h2 class="visually-hidden" id="menu-lateral-titulo">Menú</h2>
+        <a href="@Url.Action("Index", "Home")" class="enlace-imagen"><img src="~/img/logo.png" class="imagen-alto-fijo" alt="Swappit"></a>
+        <button type="button" class="boton-icono" data-bs-dismiss="offcanvas" aria-label="Cerrar menú"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+    </div>
+
+    <nav class="panel-lateral-cuerpo" aria-label="Menú principal">
+        @if (!esVisitante)
+        {
+            <a href="@Url.Action("Index", "Perfil")" class="fila-usuario">
+                <span class="foto-redonda-mini" data-iniciales="@iniciales" aria-hidden="true">@if (foto != null) { <img src="@foto" alt=""> } else { @iniciales }</span>
+                <span class="sin-ancho-minimo">
+                    <span class="d-block fw-semibold text-truncate">@(string.IsNullOrEmpty(nombre) ? "Mi perfil" : nombre)</span>
+                    <span class="d-block texto-suave small">Ver mi perfil</span>
+                </span>
+            </a>
+        }
+
+        <h3 class="desplegable-subtitulo">Descubrir</h3>
+        <ul class="lista-enlaces">
+            <li><a href="@Url.Action("Index", "Home")" class="enlace-con-icono" aria-current="@Actual(controlador == "Home" && accion == "Index")"><i class="bi bi-house" aria-hidden="true"></i> Inicio</a></li>
+            <li><a href="@Url.Action("Buscar", "Articulos")" class="enlace-con-icono" aria-current="@Actual(controlador == "Articulos" && accion == "Buscar" && string.IsNullOrEmpty(orden))"><i class="bi bi-search" aria-hidden="true"></i> Explorar artículos</a></li>
+            @if (!esVisitante)
+            {
+                <li><a href="@Url.Action("Buscar", "Articulos", new { orden = Swappit.Models.Recomendaciones.OrdenParaVos })" class="enlace-con-icono" aria-current="@Actual(controlador == "Articulos" && orden == Swappit.Models.Recomendaciones.OrdenParaVos)"><i class="bi bi-stars" aria-hidden="true"></i> Elegidos para vos</a></li>
+            }
+            <li><a href="@Url.Action("Buscar", "Articulos", new { orden = Swappit.Models.Recomendaciones.OrdenRecientes })" class="enlace-con-icono" aria-current="@Actual(controlador == "Articulos" && orden == Swappit.Models.Recomendaciones.OrdenRecientes)"><i class="bi bi-clock" aria-hidden="true"></i> Recién publicados</a></li>
+            <li><a href="@Url.Action("Buscar", "Articulos", new { orden = Swappit.Models.Recomendaciones.OrdenPopulares })" class="enlace-con-icono" aria-current="@Actual(controlador == "Articulos" && orden == Swappit.Models.Recomendaciones.OrdenPopulares)"><i class="bi bi-fire" aria-hidden="true"></i> Los más buscados</a></li>
+            @if (esVisitante)
+            {
+                <li><a href="@Url.Action("Index", "Home")#como-funciona" class="enlace-con-icono"><i class="bi bi-question-circle" aria-hidden="true"></i> Cómo funciona</a></li>
+            }
+        </ul>
+
+        @if (esVisitante)
+        {
+            <h3 class="desplegable-subtitulo">Tu cuenta</h3>
+            <ul class="lista-enlaces">
+                <li><a href="@Url.Action("Index", "Account")" class="enlace-con-icono" aria-current="@Actual(controlador == "Account" && accion == "Index")"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Iniciar sesión</a></li>
+                <li><a href="@Url.Action("Registro", "Account")" class="enlace-con-icono" aria-current="@Actual(controlador == "Account" && accion == "Registro")"><i class="bi bi-person-plus" aria-hidden="true"></i> Crear cuenta</a></li>
+                <li><a href="@Url.Action("Index", "Planes")" class="enlace-con-icono" aria-current="@Actual(controlador == "Planes")"><i class="bi bi-gem" aria-hidden="true"></i> Planes</a></li>
+            </ul>
+        }
+        else
+        {
+            <h3 class="desplegable-subtitulo">Mis cosas</h3>
+            <ul class="lista-enlaces">
+                <li><a href="@Url.Action("Index", "Publicar")" class="enlace-con-icono" aria-current="@Actual(controlador == "Publicar")"><i class="bi bi-plus-circle" aria-hidden="true"></i> Publicar un artículo</a></li>
+                <li><a href="@Url.Action("Index", "Perfil")#titulo-mis-articulos" class="enlace-con-icono"><i class="bi bi-box-seam" aria-hidden="true"></i> Mis artículos</a></li>
+                <li><a href="@Url.Action("Index", "Favoritos")" class="enlace-con-icono" aria-current="@Actual(controlador == "Favoritos")"><i class="bi bi-heart" aria-hidden="true"></i> Favoritos</a></li>
+                <li><a href="@Url.Action("Index", "Intercambio")" class="enlace-con-icono" aria-current="@Actual(controlador == "Intercambio")"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Mis intercambios</a></li>
+                <li><a href="@Url.Action("Index", "Chat")" class="enlace-con-icono" aria-current="@Actual(controlador == "Chat")"><i class="bi bi-chat-dots" aria-hidden="true"></i> Mensajes</a></li>
+            </ul>
+
+            <h3 class="desplegable-subtitulo">Mi cuenta</h3>
+            <ul class="lista-enlaces">
+                <li><a href="@Url.Action("Index", "Perfil")" class="enlace-con-icono" aria-current="@Actual(controlador == "Perfil" && accion == "Index")"><i class="bi bi-person" aria-hidden="true"></i> Mi perfil</a></li>
+                <li><a href="@Url.Action("Index", "Planes")" class="enlace-con-icono" aria-current="@Actual(controlador == "Planes")"><i class="bi bi-gem" aria-hidden="true"></i> Planes</a></li>
+                <li><a href="@Url.Action("CambiarContrasena", "Account")" class="enlace-con-icono" aria-current="@Actual(controlador == "Account" && accion == "CambiarContrasena")"><i class="bi bi-key" aria-hidden="true"></i> Cambiar contraseña</a></li>
+                <li><a href="@Url.Action("Logout", "Account")" class="enlace-con-icono tono-bordo"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión</a></li>
+            </ul>
+        }
+
+        <h3 class="desplegable-subtitulo">Ayuda</h3>
+        <ul class="lista-enlaces">
+            <li><a href="mailto:swappit9@gmail.com" class="enlace-con-icono"><i class="bi bi-envelope" aria-hidden="true"></i> Contacto</a></li>
+            <li><a href="mailto:swappit9@gmail.com?subject=Problema%20en%20Swappit" class="enlace-con-icono"><i class="bi bi-flag" aria-hidden="true"></i> Reportar un problema</a></li>
+            <li><a href="@Url.Action("Privacy", "Home")" class="enlace-con-icono" aria-current="@Actual(controlador == "Home" && accion == "Privacy")"><i class="bi bi-shield-lock" aria-hidden="true"></i> Privacidad</a></li>
+        </ul>
+    </nav>
+</aside>

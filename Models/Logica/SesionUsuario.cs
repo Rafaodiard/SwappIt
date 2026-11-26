@@ -11,6 +11,8 @@ public static class SesionUsuario
     public static void GuardarDatosHeader(ISession session, Usuarios u)
     {
         session.SetString("Iniciales", Iniciales(u.Nombre, u.Apellido));
+        session.SetString("NombreCompleto", $"{u.Nombre} {u.Apellido}".Trim());
+        session.SetString("Usuario", u.Usuario ?? "");
 
         string? foto = UsuariosBD.GetFotoUsuario(u.IdUsuarios);
         if (foto != null)
